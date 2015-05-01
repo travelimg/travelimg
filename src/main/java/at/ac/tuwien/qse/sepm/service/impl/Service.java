@@ -1,7 +1,7 @@
-package at.ac.tuwien.qse.sepm.service;
+package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
-import at.ac.tuwien.qse.sepm.dao.DBConnection;
+import at.ac.tuwien.qse.sepm.dao.impl.DBConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

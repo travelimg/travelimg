@@ -1,7 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 
-import at.ac.tuwien.qse.sepm.service.Service;
+import at.ac.tuwien.qse.sepm.service.impl.Service;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
