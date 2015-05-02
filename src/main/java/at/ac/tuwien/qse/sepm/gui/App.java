@@ -1,6 +1,10 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 
+import at.ac.tuwien.qse.sepm.service.ImportService;
+import at.ac.tuwien.qse.sepm.service.PhotoService;
+import at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl;
+import at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl;
 import at.ac.tuwien.qse.sepm.service.impl.Service;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -33,6 +37,13 @@ public class App extends Application
         //javafx
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Main.fxml"));
         Parent root = loader.load();
+        MainController mainController = loader.getController();
+        PhotoService photoService = new PhotoServiceImpl();
+        ImportService importService = new ImportServiceImpl();
+        mainController.setPhotoService(photoService);
+        mainController.setImportService(importService);
+        mainController.createStructure();
+        mainController.setStage(primaryStage);
         primaryStage.setTitle("Hello world!");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();

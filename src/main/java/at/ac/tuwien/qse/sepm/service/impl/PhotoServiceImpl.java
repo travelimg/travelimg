@@ -1,5 +1,8 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
+import at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
@@ -9,8 +12,23 @@ import java.util.List;
 
 public class PhotoServiceImpl implements PhotoService {
 
+    private PhotoDAO photoDAO;
+
+    public PhotoServiceImpl() throws ServiceException{
+        try {
+            photoDAO = new JDBCPhotoDAO();
+        } catch (DAOException e) {
+            throw new ServiceException(e.getMessage());
+        }
+
+    }
+
     public List<Photo> getAllPhotos() throws ServiceException {
-        return null;
+        try {
+            return photoDAO.readAll();
+        } catch (DAOException e) {
+            throw new ServiceException(e.getMessage());
+        }
     }
 
     public List<Tag> getAllTags() throws ServiceException {
