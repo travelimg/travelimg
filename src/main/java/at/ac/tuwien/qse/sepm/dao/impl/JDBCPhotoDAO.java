@@ -51,11 +51,11 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         }
     }
 
-    public void update(Photo p) throws DAOException {
+    public void update(Photo photo) throws DAOException {
 
     }
 
-    public void delete(Photo p) throws DAOException {
+    public void delete(Photo photo) throws DAOException {
 
     }
 
