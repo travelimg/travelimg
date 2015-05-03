@@ -14,7 +14,7 @@ public class PhotoServiceImpl implements PhotoService {
 
     private PhotoDAO photoDAO;
 
-    public PhotoServiceImpl() throws ServiceException{
+    public PhotoServiceImpl() {
         photoDAO = new JDBCPhotoDAO();
     }
 

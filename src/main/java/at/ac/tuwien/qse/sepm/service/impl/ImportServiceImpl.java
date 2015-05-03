@@ -14,7 +14,7 @@ public class ImportServiceImpl implements ImportService {
 
     private PhotoDAO photoDAO;
 
-    public ImportServiceImpl() throws ServiceException{
+    public ImportServiceImpl() {
         photoDAO = new JDBCPhotoDAO();
 
     }
