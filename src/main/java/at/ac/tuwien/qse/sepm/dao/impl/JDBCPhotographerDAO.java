@@ -7,7 +7,7 @@ import at.ac.tuwien.qse.sepm.entities.Photographer;
 
 import java.util.List;
 
-public class JDBCPhotographerDAO implements PhotographerDAO {
+public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO {
     public Photographer create() throws DAOException {
         return null;
     }

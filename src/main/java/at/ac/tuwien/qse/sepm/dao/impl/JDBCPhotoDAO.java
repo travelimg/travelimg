@@ -11,15 +11,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JDBCPhotoDAO implements PhotoDAO {
+public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
-    private Connection con;
 
-    public JDBCPhotoDAO() throws DAOException{
-        con = DBConnection.getConnection();
+    public JDBCPhotoDAO() {
+
     }
 
     public Photo create(Photo p) throws DAOException {
+        Connection con = getConnection();
         try {
             PreparedStatement insertStatement = con.prepareStatement("INSERT INTO Photo(photographer_id,path,date) VALUES (1,?,?);");
             insertStatement.setString(1,p.getPath());
@@ -44,6 +44,8 @@ public class JDBCPhotoDAO implements PhotoDAO {
     }
 
     public List<Photo> readAll() throws DAOException {
+        Connection con = getConnection();
+
         List<Photo> photos = new ArrayList<Photo>();
         try {
             ResultSet rs = con.createStatement().executeQuery("SELECT* FROM PHOTO ORDER BY DATE;");

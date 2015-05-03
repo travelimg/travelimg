@@ -7,7 +7,7 @@ import at.ac.tuwien.qse.sepm.entities.Tag;
 
 import java.util.List;
 
-public class JDBCPhotoTagDAO implements PhotoTagDAO {
+public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
     public void createPhotoTag(Photo p, Tag t) throws DAOException {
 
     }

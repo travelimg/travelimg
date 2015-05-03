@@ -6,7 +6,7 @@ import at.ac.tuwien.qse.sepm.entities.Tag;
 
 import java.util.List;
 
-public class JDBCTagDAO implements TagDAO {
+public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
     public Tag create(Tag t) throws DAOException {
         return null;
     }

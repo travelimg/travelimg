@@ -15,12 +15,7 @@ public class PhotoServiceImpl implements PhotoService {
     private PhotoDAO photoDAO;
 
     public PhotoServiceImpl() throws ServiceException{
-        try {
-            photoDAO = new JDBCPhotoDAO();
-        } catch (DAOException e) {
-            throw new ServiceException(e.getMessage());
-        }
-
+        photoDAO = new JDBCPhotoDAO();
     }
 
     public List<Photo> getAllPhotos() throws ServiceException {
