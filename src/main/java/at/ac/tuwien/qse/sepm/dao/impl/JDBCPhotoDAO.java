@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,7 +25,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     }
 
-    public Photo create(Photo photo) throws DAOException {
+    public Photo create(Photo photo) throws DAOException, ValidationException {
         Connection con = getConnection();
         try {
             try(PreparedStatement stmt = con.prepareStatement(insertStatement)) {
@@ -51,15 +52,15 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         }
     }
 
-    public void update(Photo photo) throws DAOException {
+    public void update(Photo photo) throws DAOException, ValidationException {
 
     }
 
-    public void delete(Photo photo) throws DAOException {
+    public void delete(Photo photo) throws DAOException, ValidationException {
 
     }
 
-    public List<Photo> readAll() throws DAOException {
+    public List<Photo> readAll() throws DAOException, ValidationException {
         Connection con = getConnection();
 
         List<Photo> photos = new ArrayList<Photo>();

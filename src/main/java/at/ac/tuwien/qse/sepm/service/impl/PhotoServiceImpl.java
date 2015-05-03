@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
@@ -28,7 +29,9 @@ public class PhotoServiceImpl implements PhotoService {
         try {
             return photoDAO.readAll();
         } catch (DAOException e) {
-            throw new ServiceException(e.getMessage());
+            throw new ServiceException(e);
+        } catch(ValidationException e) {
+            throw new ServiceException("Failed to validate entity", e);
         }
     }
 
