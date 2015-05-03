@@ -17,6 +17,7 @@
     <log4j.version>2.2</log4j.version>
     <h2.version>1.4.187</h2.version>
     <spring.version>4.1.6.RELEASE</spring.version>
+    <json.version>20141113</json.version>
   </properties>
 
   <dependencies>
@@ -79,5 +80,11 @@
       <artifactId>spring-tx</artifactId>
       <version>${spring.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>${json.version}</version>
+    </dependency>
+
   </dependencies>
 </project>
