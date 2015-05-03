@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -82,35 +83,9 @@ public class MainController {
     }
 
     @FXML
-    public void onImportPhotosClicked(){
-        DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setTitle("Choose directory pictures"); //maybe we should be able to select specific files from a folder ;)
-        //FileChooser.ExtensionFilter allowedFileTypes = new FileChooser.ExtensionFilter("Pictures (*.jpg;*.jpeg;*.png)", "*.jpg","*.jpeg","*.png");
-        //chooser.getExtensionFilters().add(allowedFileTypes);
-        File selectedDirectory = chooser.showDialog(stage);
-        ArrayList<Photo> photos = new ArrayList<Photo>();
-        for (final File fileEntry : selectedDirectory.listFiles()) {
-            if (!fileEntry.isDirectory() && getExtension(fileEntry.getName()).equals("JPG")) {
-                photos.add(new Photo(null, null, fileEntry.getPath(), new Date(fileEntry.lastModified()), 0));
-            }
-        }
-        try {
-            importService.importPhotos(photos);
-            root.getChildren().clear();
-            createStructure();
-        } catch (ServiceException e) {
-        }
-
-    }
-
-    public String getExtension(String file){
-        String extension = "";
-
-        int i = file.lastIndexOf('.');
-        if (i > 0) {
-            extension = file.substring(i+1);
-        }
-        return extension;
+    public void onImportPhotosClicked() {
+        ImportDialog dialog = new ImportDialog(importService, stage);
+        dialog.showAndWait();
     }
 
     public String getMonth(Date d){
