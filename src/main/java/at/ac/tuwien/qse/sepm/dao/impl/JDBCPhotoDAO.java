@@ -17,22 +17,38 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     private static final Logger logger = LogManager.getLogger();
 
+    private static String insertStatement = "INSERT INTO Photo(photographer_id, path, date) VALUES (1, ?, ?);";
+
 
     public JDBCPhotoDAO() {
 
     }
 
-    public Photo create(Photo p) throws DAOException {
+    public Photo create(Photo photo) throws DAOException {
         Connection con = getConnection();
         try {
-            PreparedStatement insertStatement = con.prepareStatement("INSERT INTO Photo(photographer_id,path,date) VALUES (1,?,?);");
-            insertStatement.setString(1,p.getPath());
-            insertStatement.setDate(2,new java.sql.Date(p.getDate().getTime()));
-            insertStatement.executeUpdate();
+            try(PreparedStatement stmt = con.prepareStatement(insertStatement)) {
+                stmt.setString(1, photo.getPath());
+                stmt.setDate(2, new java.sql.Date(photo.getDate().getTime()));
+
+                int affectedRows = stmt.executeUpdate();
+                ResultSet rs = stmt.getGeneratedKeys();
+
+                if(affectedRows != 1 || !rs.next()) {
+                    logger.error("Failed to create photo {}", photo);
+                    throw new DAOException("Failed to create photo");
+                }
+
+                int id = rs.getInt(1);
+                photo.setId(id);
+
+                logger.info("Created photo {}", photo);
+
+                return photo;
+            }
         } catch (SQLException e) {
             throw new DAOException(e.getMessage());
         }
-        return null;
     }
 
     public void update(Photo p) throws DAOException {
