@@ -9,7 +9,7 @@ public class JDBCPhotoDAOTests extends AbstractPhotoDAOTests {
 
     @Before
     public void setUp(){
-        setPhotoDAO(new JDBCPhotoDAO());
+        setPhotoDAO(new JDBCPhotoDAO("/tmp"));
     }
 
     @After

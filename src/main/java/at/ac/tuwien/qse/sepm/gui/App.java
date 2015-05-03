@@ -31,6 +31,5 @@ public class App extends Application
         primaryStage.setTitle("Hello world!");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-
     }
 }

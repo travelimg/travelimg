@@ -2,6 +2,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" >
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+	</bean>
  
 	<bean id="importServiceBean" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl">
 		<constructor-arg><ref bean="photoDAOBean"></ref></constructor-arg>
@@ -10,6 +14,8 @@
 		<constructor-arg><ref bean="photoDAOBean"></ref></constructor-arg>
 	</bean>
 
-	<bean id="photoDAOBean" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO"></bean>
+	<bean id="photoDAOBean" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
+		<constructor-arg value="${user.home}/travelimg"></constructor-arg>
+	</bean>
  
 </beans>

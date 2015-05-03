@@ -8,6 +8,10 @@ import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +23,11 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private static final String insertStatement = "INSERT INTO Photo(photographer_id, path, date) VALUES (1, ?, ?);";
     private static final String readAllStatement = "SELECT* FROM PHOTO ORDER BY DATE;";
 
-    public JDBCPhotoDAO() {
+    private final String photoDirectory;
 
+    public JDBCPhotoDAO(String photoDirectory) {
+        this.photoDirectory = photoDirectory;
+        logger.debug(photoDirectory);
     }
 
     public Photo create(Photo photo) throws DAOException, ValidationException {
@@ -29,6 +36,15 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         PhotoValidator.validate(photo);
 
         try(PreparedStatement stmt = getConnection().prepareStatement(insertStatement)) {
+
+            try {
+                String dest = copyToPhotoDirectory(photo.getPath());
+                photo.setPath(dest);
+            } catch(IOException e) {
+                logger.error("Failed to copy photo to destination directory", e);
+                throw new DAOException("Failed to copy photo to destination directory", e);
+            }
+
             stmt.setString(1, photo.getPath());
             stmt.setDate(2, new java.sql.Date(photo.getDate().getTime()));
 
@@ -78,5 +94,20 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         }
 
         return photos;
+    }
+
+    private String copyToPhotoDirectory(String photoPath) throws IOException {
+        File source = new File(photoPath);
+        String filename = source.getName();
+        File dest = new File(photoDirectory, filename); // TODO JJJJ/Mon/TT structure
+
+        if(source.getPath().equals(dest.getPath()))
+            return photoPath;
+
+        logger.debug("Copying {} to {}", source.getPath(), dest.getPath());
+
+        Files.copy(source.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+        return dest.getPath();
     }
 }
