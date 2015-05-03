@@ -7,6 +7,8 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.List;
 
@@ -14,8 +16,8 @@ public class PhotoServiceImpl implements PhotoService {
 
     private PhotoDAO photoDAO;
 
-    public PhotoServiceImpl() {
-        photoDAO = new JDBCPhotoDAO();
+    public PhotoServiceImpl(PhotoDAO photoDAO) {
+        this.photoDAO = photoDAO;
     }
 
     public List<Photo> getAllPhotos() throws ServiceException {

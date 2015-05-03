@@ -9,6 +9,9 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import sun.applet.Main;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -26,14 +29,18 @@ public class MainController {
     private PhotoService photoService;
     private ImportService importService;
 
+    public MainController() {
+        ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+
+        photoService = (PhotoService) context.getBean("photoServiceBean");
+        importService = (ImportService) context.getBean("importServiceBean");
+
+    }
+
     public void initialize(){
         root = new TreeItem<String>("Photos");
         root.setExpanded(true);
         photoTreeView.setRoot(root);
-    }
-
-    public void setPhotoService(PhotoService photoService) {
-        this.photoService = photoService;
     }
 
     public void setStage(Stage stage){
@@ -112,9 +119,5 @@ public class MainController {
 
     public String getYear(Date d){
         return new SimpleDateFormat("YYYY").format(d);
-    }
-
-    public void setImportService(ImportService importService) {
-        this.importService=importService;
     }
 }

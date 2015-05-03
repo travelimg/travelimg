@@ -3,7 +3,13 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
  
-	<bean id="serviceBean" class="at.ac.tuwien.qse.sepm.service.impl.Service">
+	<bean id="importServiceBean" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl">
+		<constructor-arg><ref bean="photoDAOBean"></ref></constructor-arg>
 	</bean>
+	<bean id="photoServiceBean" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl">
+		<constructor-arg><ref bean="photoDAOBean"></ref></constructor-arg>
+	</bean>
+
+	<bean id="photoDAOBean" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO"></bean>
  
 </beans>
