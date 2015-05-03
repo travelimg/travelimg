@@ -1,7 +1,20 @@
 package at.ac.tuwien.qse.sepm.dao;
 
-/**
- * Created by kris on 03.05.15.
- */
-public class JDBCPhotoDAOTests {
+
+import at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO;
+import org.junit.After;
+import org.junit.Before;
+
+public class JDBCPhotoDAOTests extends AbstractPhotoDAOTests {
+
+    @Before
+    public void setUp(){
+        setPhotoDAO(new JDBCPhotoDAO());
+    }
+
+    @After
+    public void tearDown() {
+
+    }
+
 }
