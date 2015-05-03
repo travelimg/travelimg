@@ -7,7 +7,7 @@ import java.util.HashSet;
 
 public class ImageFileFilter implements FileFilter {
 
-    private static HashSet<String> allowedExtensions;
+    private final HashSet<String> allowedExtensions = new HashSet<>();
 
     public ImageFileFilter() {
         allowedExtensions.add("jpg");
