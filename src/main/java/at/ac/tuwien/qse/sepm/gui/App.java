@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 public class App extends Application
 {
-    private static final Logger logger = LogManager.getLogger(App.class);
+    private static final Logger logger = LogManager.getLogger();
     public static void main( String[] args )
     {
         launch(args);

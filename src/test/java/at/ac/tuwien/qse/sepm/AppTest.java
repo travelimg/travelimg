@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
  */
 public class AppTest {
 
-    private static final Logger logger = LogManager.getLogger(App.class);
+    private static final Logger logger = LogManager.getLogger();
 
     /**
      * Rigourous Test :-)

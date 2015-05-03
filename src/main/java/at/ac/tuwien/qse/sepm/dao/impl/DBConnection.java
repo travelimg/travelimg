@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 public class DBConnection {
     private static Connection con = null;
-    private static final Logger logger = LogManager.getLogger(DBConnection.class);
+    private static final Logger logger = LogManager.getLogger();
 
     private DBConnection() throws DAOException {
         try {
