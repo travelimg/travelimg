@@ -35,10 +35,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         return null;
     }
 
-    public Photo read(Photo p) throws DAOException {
-        return null;
-    }
-
     public void update(Photo p) throws DAOException {
 
     }
