@@ -17,11 +17,11 @@ public class DBConnection {
             Class.forName("org.h2.Driver");
             con = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/mydb", "sa", "");
         } catch (ClassNotFoundException e) {
-            logger.debug(e.getMessage());
-            throw new DAOException(e.getMessage());
-        } catch (SQLException e) {
-            logger.fatal(e.getMessage());
-            throw new DAOException("Couldn't connect to database. Please try again.");
+            logger.error("Failed to load H2 driver", e);
+            throw new DAOException("Failed to load H2 driver", e);
+        } catch(SQLException e) {
+            logger.error("Failed to open database connection", e);
+            throw new DAOException("Failed to open database connection", e);
         }
     }
 
@@ -47,8 +47,8 @@ public class DBConnection {
                 con.close();
                 logger.info("Connection to the database closed successfully.");
             } catch (SQLException e) {
-                logger.warn(e.getMessage());
-                throw new DAOException(e.getMessage());
+                logger.warn("Failed to close database connection", e);
+                throw new DAOException("Failed to close database connection", e);
             }
         }
     }
