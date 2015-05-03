@@ -12,7 +12,7 @@
             <Label text="Ordner auswählen" />
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <TextField />
+                  <TextField fx:id="directoryTextField" />
                   <Button fx:id="selectFolderButton" mnemonicParsing="false" onAction="#onSelectFolderClicked" text="Select" />
                </children>
             </HBox>
