@@ -5,10 +5,9 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 
 import java.io.File;
 
-public class PhotoValidator implements EntityValidator<Photo> {
+public class PhotoValidator {
 
-    @Override
-    public void validate(Photo entity) throws ValidationException {
+    public static void validate(Photo entity) throws ValidationException {
         if(entity == null)
             throw new ValidationException("Entity can not be null");
 
