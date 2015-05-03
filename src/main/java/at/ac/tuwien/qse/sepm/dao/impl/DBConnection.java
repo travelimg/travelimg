@@ -30,10 +30,11 @@ public class DBConnection {
      * @throws DAOException if could not establish this connection.
      */
     public static Connection getConnection() throws DAOException {
-        if(con==null){
+        if(con == null){
             new DBConnection();
             logger.info("Connection to the database established.");
         }
+
         return con;
     }
 
@@ -42,7 +43,7 @@ public class DBConnection {
      * @throws DAOException if it could not close this connection.
      */
     public static void closeConnection() throws DAOException {
-        if(con!=null){
+        if(con != null){
             try {
                 con.close();
                 logger.info("Connection to the database closed successfully.");
@@ -52,6 +53,4 @@ public class DBConnection {
             }
         }
     }
-
-
 }
