@@ -31,6 +31,6 @@ public class ImageFileFilter implements FileFilter {
             extension = file.substring(i + 1);
         }
 
-        return extension;
+        return extension.toLowerCase();
     }
 }
