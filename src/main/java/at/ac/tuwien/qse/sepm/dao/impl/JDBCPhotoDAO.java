@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,6 +27,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     public Photo create(Photo photo) throws DAOException, ValidationException {
+        PhotoValidator.validate(photo);
+
         Connection con = getConnection();
         try {
             try(PreparedStatement stmt = con.prepareStatement(insertStatement)) {
