@@ -9,6 +9,7 @@ public class Photo {
     private String path;
     private Date date;
     private Integer rating;
+    private Exif exif;
 
     public Photo() {
     }
@@ -59,6 +60,14 @@ public class Photo {
 
     public void setRating(Integer rating) {
         this.rating = rating;
+    }
+
+    public Exif getExif() {
+        return exif;
+    }
+
+    public void setExif(Exif exif) {
+        this.exif = exif;
     }
 
     @Override
