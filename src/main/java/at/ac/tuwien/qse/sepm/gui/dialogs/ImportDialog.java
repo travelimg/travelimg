@@ -54,7 +54,7 @@ public class ImportDialog extends Stage implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        logger.debug("initialize");
+        setTitle("Import photos");
     }
 
     @FXML
