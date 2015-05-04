@@ -1,20 +1,22 @@
 package at.ac.tuwien.qse.sepm.entities;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 public class Exif {
-    private Date date;
-    private float exposure;
-    private float aperture;
-    private float focalLength;
+    private int id;
+    private Timestamp date;
+    private double exposure;
+    private double aperture;
+    private double focalLength;
     private int iso;
     private boolean flash;
     private String cameraModel;
-    private float longitude;
-    private float latitude;
-    private float altitude;
+    private double longitude;
+    private double latitude;
+    private double altitude;
 
-    public Exif(Date date, float exposure, float aperture, float focalLength, int iso, boolean flash, String cameraModel, float longitude, float latitude, float altitude) {
+    public Exif(int id, Timestamp date, double exposure, double aperture, double focalLength, int iso, boolean flash, String cameraModel, double longitude, double latitude, double altitude) {
+        this.id = id;
         this.date = date;
         this.exposure = exposure;
         this.aperture = aperture;
@@ -27,35 +29,43 @@ public class Exif {
         this.altitude = altitude;
     }
 
-    public Date getDate() {
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Timestamp getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Timestamp date) {
         this.date = date;
     }
 
-    public float getExposure() {
+    public double getExposure() {
         return exposure;
     }
 
-    public void setExposure(float exposure) {
+    public void setExposure(double exposure) {
         this.exposure = exposure;
     }
 
-    public float getAperture() {
+    public double getAperture() {
         return aperture;
     }
 
-    public void setAperture(float aperture) {
+    public void setAperture(double aperture) {
         this.aperture = aperture;
     }
 
-    public float getFocalLength() {
+    public double getFocalLength() {
         return focalLength;
     }
 
-    public void setFocalLength(float focalLength) {
+    public void setFocalLength(double focalLength) {
         this.focalLength = focalLength;
     }
 
@@ -83,27 +93,27 @@ public class Exif {
         this.cameraModel = cameraModel;
     }
 
-    public float getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(float longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 
-    public float getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(float latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
-    public float getAltitude() {
+    public double getAltitude() {
         return altitude;
     }
 
-    public void setAltitude(float altitude) {
+    public void setAltitude(double altitude) {
         this.altitude = altitude;
     }
 }
