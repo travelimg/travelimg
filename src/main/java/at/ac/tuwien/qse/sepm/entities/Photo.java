@@ -15,11 +15,11 @@ public class Photo {
     }
 
     public Photo(Integer id, Photographer photographer, String path, Date date, Integer rating) {
-        this.id = id;
-        this.photographer = photographer;
-        this.path = path;
-        this.date = date;
-        this.rating = rating;
+            this.id = id;
+            this.photographer = photographer;
+            this.path = path;
+            this.date = date;
+            this.rating = rating;
     }
 
     public Integer getId() {

@@ -18,6 +18,7 @@ INSERT INTO Photo(photographer_id,path,date) VALUES (1,'test','2012-09-17');
 INSERT INTO Photo(photographer_id,path,date) VALUES (2,'test1','2012-09-18');
 INSERT INTO Photo(photographer_id,path,date) VALUES (1,'test3','2012-09-17');
 INSERT INTO Photo(photographer_id,path,date) VALUES (2,'test4','2012-09-16');
+INSERT INTO Photo(photographer_id,path,date) VALUES (1,'test5','2012-09-16');
 
 INSERT INTO Tag(name) VALUES ('Person');
 INSERT INTO Tag(name) VALUES ('Essen');
@@ -29,4 +30,4 @@ INSERT INTO PhotoTag (photo_id,tag_id) VALUES (2,2);
 INSERT INTO Exif(photo_id, date, exposure, aperture, focallength, iso, flash, cameramodel, longitude, latitude, altitude) VALUES (1,'2015-03-28 12:13:20',0.25,8,24,200,false,'Canon 600D',48.12,16.22,255);
 INSERT INTO Exif(photo_id, date, exposure, aperture, focallength, iso, flash, cameramodel, longitude, latitude, altitude) VALUES (2,'2015-03-28 12:13:20',0.25,8,24,200,false,'Canon 600D',48.12,16.22,255);
 INSERT INTO Exif(photo_id, date, exposure, aperture, focallength, iso, flash, cameramodel, longitude, latitude, altitude) VALUES (3,'2015-03-28 12:13:20',0.25,8,24,200,false,'Canon 600D',48.12,16.22,255);
-INSERT INTO Exif(photo_id, date, exposure, aperture, focallength, iso, flash, cameramodel, longitude, latitude, altitude) VALUES (1,'2015-03-28 12:13:20',0.25,8,24,200,false,'Canon 600D',48.12,16.22,255);
+INSERT INTO Exif(photo_id, date, exposure, aperture, focallength, iso, flash, cameramodel, longitude, latitude, altitude) VALUES (4,'2015-03-28 12:13:20',0.25,8,24,200,false,'Canon 600D',48.12,16.22,255);

@@ -22,7 +22,7 @@ public class JDBCExifDAO implements ExifDAO {
 
     public Exif create(Exif e) throws DAOException {
         try {
-            PreparedStatement insertStatement = con.prepareStatement("INSERT INTO Exif(photo_id, date, exposure, aperture, focallength, iso, flash, cameramodel, longitude, latitude, altitude) VALUES (?,?,?,?,?,?,?,?,?,?,?);");
+            PreparedStatement insertStatement = con.prepareStatement("INSERT INTO exif(photo_id, date, exposure, aperture, focallength, iso, flash, cameramodel, longitude, latitude, altitude) VALUES (?,?,?,?,?,?,?,?,?,?,?);");
             insertStatement.setInt(1, e.getId());
             insertStatement.setTimestamp(2, e.getDate());
             insertStatement.setDouble(3, e.getExposure());
