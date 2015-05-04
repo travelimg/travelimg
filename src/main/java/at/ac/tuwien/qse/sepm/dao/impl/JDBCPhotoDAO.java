@@ -31,7 +31,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     public Photo create(Photo photo) throws DAOException, ValidationException {
-        logger.debug("Creatung photo {}", photo);
+        logger.debug("Creating photo {}", photo);
 
         PhotoValidator.validate(photo);
 
