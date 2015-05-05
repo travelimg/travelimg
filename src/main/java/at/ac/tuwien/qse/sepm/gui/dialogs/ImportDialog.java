@@ -20,36 +20,19 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.ResourceBundle;
 
-public class ImportDialog extends Stage implements Initializable {
-
-    private static final Logger logger = LogManager.getLogger();
-
-    private ImportService importService;
-
-    private Stage parent;
+public class ImportDialog extends ResultDialog<List<Photo>> {
 
     @FXML
     private TextField directoryTextField;
 
-    public ImportDialog(ImportService importService, Stage parent) {
-        this.importService = importService;
-        this.parent = parent;
-
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("dialogs/ImportDialog.fxml"));
-        fxmlLoader.setController(this);
-
-        try {
-            Parent root = fxmlLoader.load();
-
-            setScene(new Scene(root, 300, 350));
-        } catch (IOException e) {
-            logger.error("Failed to load ImportDialog.fxml", e);
-            throw new RuntimeException(e);
-        }
+    public ImportDialog(Stage parent) {
+        super(ImportDialog.class.getClassLoader().getResource("dialogs/ImportDialog.fxml"), parent);
     }
 
     @Override
@@ -62,9 +45,9 @@ public class ImportDialog extends Stage implements Initializable {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Select a folder");
 
-        File directory = directoryChooser.showDialog(parent);
+        File directory = directoryChooser.showDialog(getParent());
         if(directory == null || !directory.exists()) {
-            logger.info("Invalid directory selected.");
+            getLogger().info("Invalid directory selected.");
             return;
         }
 
@@ -73,11 +56,11 @@ public class ImportDialog extends Stage implements Initializable {
 
     @FXML
     private void onImportClicked(ActionEvent event) {
-        logger.info("Import initiated by user");
+        getLogger().info("Import initiated by user");
 
         File directory = new File(directoryTextField.getText());
         if(!directory.exists()) {
-            logger.error("Import directory does not exist");
+            getLogger().error("Import directory does not exist");
             return;
         }
 
@@ -88,23 +71,14 @@ public class ImportDialog extends Stage implements Initializable {
             }
         }
 
-        try {
-            importService.importPhotos(photos);
-        } catch(ServiceException e) {
-            logger.error("Failed to import photos", e);
-            // TODO: notify user about error
-        }
-
-        logger.info("Successfully imported images");
+        setResult(photos);
 
         close();
     }
 
     @FXML
     private void onCancelClicked(ActionEvent event) {
-        logger.info("Import canceled");
+        getLogger().info("Import canceled");
         close();
     }
-
-
 }
