@@ -52,9 +52,9 @@ public class ExifServiceImpl implements ExifService {
         boolean flash;
         String cameraModel;
         Rational[] longitude;
-        String longitudeDirection;
+        String longitudeString;
         Rational[] latitude;
-        String latitudeDirection;
+        String latitudeString;
         double altitude = 0;
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(file);
@@ -79,19 +79,20 @@ public class ExifServiceImpl implements ExifService {
                 double longitudeHours = longitude[0].doubleValue();
                 double longitudeMinutes = longitude[1].doubleValue();
                 double longitudeSeconds = (longitude[1].doubleValue() - Math.floor(longitude[1].doubleValue())) * 60;
-                longitudeDirection = gPSDirectory.getString(GpsDirectory.TAG_LONGITUDE_REF);
+                longitudeString = longitudeHours + " " + longitudeMinutes + " " + longitudeSeconds + " " + gPSDirectory.getString(GpsDirectory.TAG_LONGITUDE_REF);
 
                 latitude = gPSDirectory.getRationalArray(GpsDirectory.TAG_LATITUDE);
                 double latitudeHours = latitude[0].doubleValue();
                 double latitudeMinutes = latitude[1].doubleValue();
                 double latitudeSeconds = (latitude[1].doubleValue() - Math.floor(latitude[1].doubleValue())) * 60;
-                latitudeDirection = gPSDirectory.getString(GpsDirectory.TAG_LATITUDE_REF);
+                latitudeString = latitudeHours + " " + latitudeMinutes + " " + latitudeSeconds + " " + gPSDirectory.getString(GpsDirectory.TAG_LATITUDE_REF);
 
 
 
                 altitude = gPSDirectory.getDouble(GpsDirectory.TAG_ALTITUDE);
-                Exif exif = new Exif(p.getId(), date, exposure, aperture, focalLength, iso, flash, cameraModel, "0", 0, altitude);
+                Exif exif = new Exif(p.getId(), date, exposure, aperture, focalLength, iso, flash, cameraModel, longitudeString, latitudeString, altitude);
                 exifDAO.create(exif);
+                p.setExif(exif);
                 return exif;
             } catch (MetadataException e) {
                 e.printStackTrace();

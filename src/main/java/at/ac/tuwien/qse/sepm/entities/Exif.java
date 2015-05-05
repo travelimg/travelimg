@@ -12,10 +12,10 @@ public class Exif {
     private boolean flash;
     private String cameraModel;
     private String longitude;
-    private double latitude;
+    private String latitude;
     private double altitude;
 
-    public Exif(int id, Timestamp date, String exposure, double aperture, double focalLength, int iso, boolean flash, String cameraModel, String longitude, double latitude, double altitude) {
+    public Exif(int id, Timestamp date, String exposure, double aperture, double focalLength, int iso, boolean flash, String cameraModel, String longitude, String latitude, double altitude) {
         this.id = id;
         this.date = date;
         this.exposure = exposure;
@@ -101,11 +101,11 @@ public class Exif {
         this.longitude = longitude;
     }
 
-    public double getLatitude() {
+    public String getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
+    public void setLatitude(String latitude) {
         this.latitude = latitude;
     }
 
