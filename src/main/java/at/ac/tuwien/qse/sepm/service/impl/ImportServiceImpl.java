@@ -2,18 +2,18 @@ package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
-import at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.ImportService;
+import at.ac.tuwien.qse.sepm.service.Service;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ImportServiceImpl implements ImportService {
 
@@ -25,16 +25,9 @@ public class ImportServiceImpl implements ImportService {
         this.photoDAO = photoDAO;
     }
 
-    public void importPhotos(List<Photo> photos) throws ServiceException {
-        for(Photo p: photos){
-            try {
-                photoDAO.create(p);
-            } catch (DAOException e) {
-                throw new ServiceException(e);
-            } catch(ValidationException e) {
-                throw new ServiceException("Failed to validate entity", e);
-            }
-        }
+    public void importPhotos(List<Photo> photos, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler)  {
+        Thread t = new Thread(new AsyncImporter(photos, callback, errorHandler));
+        t.run();
     }
 
     public void addPhotographerToPhotos(List<Photo> photos, Photographer photographer) throws ServiceException {
@@ -43,5 +36,33 @@ public class ImportServiceImpl implements ImportService {
 
     public void editPhotographerForPhotos(List<Photo> photos, Photographer photographer) throws ServiceException {
 
+    }
+
+    private class AsyncImporter implements Runnable {
+        private List<Photo> photos;
+        private Consumer<Photo> callback;
+        private ErrorHandler<ServiceException> errorHandler;
+
+        public AsyncImporter(List<Photo> photos, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
+            this.photos = photos;
+            this.callback = callback;
+            this.errorHandler = errorHandler;
+        }
+
+        @Override
+        public void run() {
+            for(Photo p: photos) {
+                try {
+                    Photo imported = photoDAO.create(p);
+                    callback.accept(imported);
+                } catch(DAOException e) {
+                    errorHandler.propagate(new ServiceException("Failed to import photo", e));
+                    return;
+                } catch(ValidationException e) {
+                    errorHandler.propagate(new ServiceException("Failed to validate photo", e));
+                    return;
+                }
+            }
+        }
     }
 }

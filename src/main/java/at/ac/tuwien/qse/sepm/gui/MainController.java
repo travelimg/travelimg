@@ -5,7 +5,10 @@ import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.DirectoryChooser;
@@ -19,6 +22,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class MainController {
 
@@ -83,9 +89,35 @@ public class MainController {
     }
 
     @FXML
-    public void onImportPhotosClicked() {
-        ImportDialog dialog = new ImportDialog(importService, stage);
-        dialog.showAndWait();
+    public void onImportPhotosClicked()  {
+        ImportDialog dialog = new ImportDialog(stage);
+
+        Optional<List<Photo>> optionalPhotos = dialog.run();
+
+        if(!optionalPhotos.isPresent())
+            return;
+
+        List<Photo> photos = optionalPhotos.get();
+
+        System.out.println("got " + photos.size() + "photos");
+
+        Consumer<Photo> callback = new Consumer<Photo>() {
+            @Override
+            public void accept(Photo photo) {
+                System.out.println("Imported photo");
+                // TODO
+            }
+        };
+
+        ServiceExceptionHandler errorHandler = new ServiceExceptionHandler() {
+            @Override
+            public void handle(ServiceException exception) {
+                System.out.println("Got error");
+                // TODO
+            }
+        };
+
+        importService.importPhotos(photos, callback, errorHandler);
     }
 
     public String getMonth(Date d){
