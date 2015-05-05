@@ -21,8 +21,10 @@ public class JDBCExifDAO implements ExifDAO {
     }
 
     public Exif create(Exif e) throws DAOException {
-        try {
-            PreparedStatement insertStatement = con.prepareStatement("INSERT INTO exif(photo_id, date, exposure, aperture, focallength, iso, flash, cameramodel, longitude, latitude, altitude) VALUES (?,?,?,?,?,?,?,?,?,?,?);");
+        String query = "INSERT INTO exif(photo_id, date, exposure, aperture, focallength, iso, flash, cameramodel, longitude, latitude, altitude) VALUES (?,?,?,?,?,?,?,?,?,?,?);";
+
+        try(PreparedStatement insertStatement = con.prepareStatement(query)) {
+
             insertStatement.setInt(1, e.getId());
             insertStatement.setTimestamp(2, e.getDate());
             insertStatement.setString(3, e.getExposure());
@@ -61,7 +63,7 @@ public class JDBCExifDAO implements ExifDAO {
                 exifs.add(new Exif(rs.getInt(1), rs.getTimestamp(2), rs.getString(3), rs.getDouble(4), rs.getDouble(5), rs.getInt(6), rs.getBoolean(7), rs.getString(8), rs.getString(9), rs.getString(10), rs.getDouble(11)));
             }
         } catch (SQLException e) {
-            throw new DAOException(e.getMessage());
+            throw new DAOException(e.getMessage(), e);
         }
         return exifs;
     }

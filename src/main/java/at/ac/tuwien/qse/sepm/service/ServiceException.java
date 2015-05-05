@@ -1,5 +1,11 @@
 package at.ac.tuwien.qse.sepm.service;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.MetadataException;
+
+import java.io.IOException;
+
 public class ServiceException extends Exception {
     public ServiceException() {
         super();
@@ -7,5 +13,21 @@ public class ServiceException extends Exception {
 
     public ServiceException(String message) {
         super(message);
+    }
+
+    public ServiceException(String message, MetadataException e) {
+        super(message, e);
+    }
+
+    public ServiceException(String message, IOException e) {
+        super(message, e);
+    }
+
+    public ServiceException(String message, ImageProcessingException e) {
+        super(message, e);
+    }
+
+    public ServiceException(String message, DAOException e) {
+        super(message, e);
     }
 }

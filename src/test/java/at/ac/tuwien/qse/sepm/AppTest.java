@@ -62,7 +62,7 @@ public class AppTest {
     }
 
     @Test
-    public void testExif() {
+    public void testExif() throws ServiceException {
         Photo photo = new Photo(5, null, "C:\\Users\\David\\workspace\\qse-sepm-ss15-18\\src\\test\\resources\\test.jpg", null, 0);
         Exif exif = exifservice.importExif(photo);
        logger.info(exif);
