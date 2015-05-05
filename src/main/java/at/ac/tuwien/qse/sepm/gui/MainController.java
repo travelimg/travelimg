@@ -13,6 +13,8 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import sun.applet.Main;
@@ -27,6 +29,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class MainController {
+
+    private static final Logger logger = LogManager.getLogger();
 
     @FXML
     private TreeView photoTreeView;
@@ -111,6 +115,7 @@ public class MainController {
             @Override
             public void handle(ServiceException exception) {
                 System.out.println("Got error");
+                logger.error("Import failed", exception);
                 // TODO
             }
         };
