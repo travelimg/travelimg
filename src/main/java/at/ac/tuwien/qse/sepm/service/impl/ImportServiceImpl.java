@@ -12,6 +12,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public class ImportServiceImpl implements ImportService {
@@ -19,14 +21,15 @@ public class ImportServiceImpl implements ImportService {
     private static final Logger logger = LogManager.getLogger();
 
     private PhotoDAO photoDAO;
+    ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     public ImportServiceImpl(PhotoDAO photoDAO) {
         this.photoDAO = photoDAO;
     }
 
     public void importPhotos(List<Photo> photos, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler)  {
-        Thread t = new Thread(new AsyncImporter(photos, callback, errorHandler));
-        t.run();
+        AsyncImporter importer = new AsyncImporter(photos, callback, errorHandler);
+        executorService.submit(importer);
     }
 
     public void addPhotographerToPhotos(List<Photo> photos, Photographer photographer) throws ServiceException {
@@ -35,6 +38,11 @@ public class ImportServiceImpl implements ImportService {
 
     public void editPhotographerForPhotos(List<Photo> photos, Photographer photographer) throws ServiceException {
 
+    }
+
+    @Override
+    public void close() {
+        executorService.shutdown();
     }
 
     private class AsyncImporter implements Runnable {

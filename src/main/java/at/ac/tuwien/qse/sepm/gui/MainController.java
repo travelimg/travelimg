@@ -37,11 +37,11 @@ public class MainController {
     private ImportService importService;
 
     public MainController() {
-        ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+    }
 
+    public void setContext(ApplicationContext context) {
         photoService = (PhotoService) context.getBean("photoServiceBean");
         importService = (ImportService) context.getBean("importServiceBean");
-
     }
 
     public void initialize(){
