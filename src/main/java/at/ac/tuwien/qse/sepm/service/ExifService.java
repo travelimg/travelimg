@@ -4,7 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 
 public interface ExifService {
-    public void changeExif(Exif e);
+    public void changeExif(Photo p) throws ServiceException;
 
     /**
      *  Imports Exif-data of the Photo.
