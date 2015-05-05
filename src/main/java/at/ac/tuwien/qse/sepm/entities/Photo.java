@@ -9,16 +9,17 @@ public class Photo {
     private String path;
     private Date date;
     private Integer rating;
+    private Exif exif;
 
     public Photo() {
     }
 
     public Photo(Integer id, Photographer photographer, String path, Date date, Integer rating) {
-        this.id = id;
-        this.photographer = photographer;
-        this.path = path;
-        this.date = date;
-        this.rating = rating;
+            this.id = id;
+            this.photographer = photographer;
+            this.path = path;
+            this.date = date;
+            this.rating = rating;
     }
 
     public Integer getId() {
@@ -59,6 +60,14 @@ public class Photo {
 
     public void setRating(Integer rating) {
         this.rating = rating;
+    }
+
+    public Exif getExif() {
+        return exif;
+    }
+
+    public void setExif(Exif exif) {
+        this.exif = exif;
     }
 
     @Override
