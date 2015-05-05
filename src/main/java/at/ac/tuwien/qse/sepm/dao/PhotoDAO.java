@@ -10,7 +10,8 @@ public interface PhotoDAO {
     /**
      * Create the photo in the data store.
      *
-     * The given photo is copied to the image folder and the attributes are recorded in the data store.
+     * The given photo is copied to the image folder and the attributes are recorded in the data store. The exif data is
+     * additionally also parsed and stored.
      *
      * @param photo Photo which to create.
      * @return The created photo
