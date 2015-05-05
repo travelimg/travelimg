@@ -99,8 +99,6 @@ public class MainController {
 
         List<Photo> photos = optionalPhotos.get();
 
-        System.out.println("got " + photos.size() + "photos");
-
         Consumer<Photo> callback = new Consumer<Photo>() {
             @Override
             public void accept(Photo photo) {
