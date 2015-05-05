@@ -65,6 +65,6 @@ public class AppTest {
     public void testExif() {
         Photo photo = new Photo(5, null, "C:\\Users\\David\\workspace\\qse-sepm-ss15-18\\src\\test\\resources\\test.jpg", null, 0);
         Exif exif = exifservice.importExif(photo);
-        System.out.println("importedExif");
+       logger.info(exif);
     }
 }

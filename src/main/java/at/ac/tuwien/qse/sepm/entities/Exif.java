@@ -5,17 +5,17 @@ import java.sql.Timestamp;
 public class Exif {
     private int id;
     private Timestamp date;
-    private double exposure;
+    private String exposure;
     private double aperture;
     private double focalLength;
     private int iso;
     private boolean flash;
     private String cameraModel;
-    private double longitude;
+    private String longitude;
     private double latitude;
     private double altitude;
 
-    public Exif(int id, Timestamp date, double exposure, double aperture, double focalLength, int iso, boolean flash, String cameraModel, double longitude, double latitude, double altitude) {
+    public Exif(int id, Timestamp date, String exposure, double aperture, double focalLength, int iso, boolean flash, String cameraModel, String longitude, double latitude, double altitude) {
         this.id = id;
         this.date = date;
         this.exposure = exposure;
@@ -45,11 +45,11 @@ public class Exif {
         this.date = date;
     }
 
-    public double getExposure() {
+    public String getExposure() {
         return exposure;
     }
 
-    public void setExposure(double exposure) {
+    public void setExposure(String exposure) {
         this.exposure = exposure;
     }
 
@@ -93,11 +93,11 @@ public class Exif {
         this.cameraModel = cameraModel;
     }
 
-    public double getLongitude() {
+    public String getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(double longitude) {
+    public void setLongitude(String longitude) {
         this.longitude = longitude;
     }
 
@@ -115,5 +115,22 @@ public class Exif {
 
     public void setAltitude(double altitude) {
         this.altitude = altitude;
+    }
+
+    @Override
+    public String toString() {
+        return "Exif{" +
+                "id=" + id +
+                ", date=" + date +
+                ", exposure=" + exposure +
+                ", aperture=" + aperture +
+                ", focalLength=" + focalLength +
+                ", iso=" + iso +
+                ", flash=" + flash +
+                ", cameraModel='" + cameraModel + '\'' +
+                ", longitude=" + longitude +
+                ", latitude=" + latitude +
+                ", altitude=" + altitude +
+                '}';
     }
 }
