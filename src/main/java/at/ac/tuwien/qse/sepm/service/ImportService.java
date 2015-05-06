@@ -20,7 +20,7 @@ public interface ImportService extends Service {
      * @param callback Called with the imported photo.
      * @param errorHandler Handler for occurring exceptions.
      */
-    public void importPhotos(List<Photo> photos, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler);
-    public void addPhotographerToPhotos(List<Photo> photos, Photographer photographer) throws ServiceException;
-    public void editPhotographerForPhotos(List<Photo> photos, Photographer photographer) throws ServiceException;
+    void importPhotos(List<Photo> photos, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler);
+    void addPhotographerToPhotos(List<Photo> photos, Photographer photographer) throws ServiceException;
+    void editPhotographerForPhotos(List<Photo> photos, Photographer photographer) throws ServiceException;
 }
