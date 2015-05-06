@@ -10,7 +10,11 @@ import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.jdbc.core.RowMapper;
 
+import javax.xml.crypto.Data;
 import javax.xml.transform.Result;
 import java.io.File;
 import java.io.IOException;
@@ -53,31 +57,20 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         // store exif data
         exifDAO.importExif(photo);
 
-        try(PreparedStatement stmt = getConnection().prepareStatement(insertStatement)) {
-            try {
-                String dest = copyToPhotoDirectory(photo);
-                photo.setPath(dest);
-            } catch(IOException e) {
-                logger.error("Failed to copy photo to destination directory", e);
-                throw new DAOException("Failed to copy photo to destination directory", e);
-            }
+        try {
+            String dest = copyToPhotoDirectory(photo);
+            photo.setPath(dest);
+        } catch(IOException e) {
+            logger.error("Failed to copy photo to destination directory", e);
+            throw new DAOException("Failed to copy photo to destination directory", e);
+        }
 
-            stmt.setInt(1, photo.getId());
-            stmt.setInt(2, photo.getPhotographer().getId());
-            stmt.setString(3, photo.getPath());
-            stmt.setInt(4, photo.getRating());
-
-            int affectedRows = stmt.executeUpdate();
-
-            if(affectedRows != 1) {
-                logger.error("Failed to create photo {}", photo);
-                throw new DAOException("Failed to create photo");
-            }
+        try {
+            jdbcTemplate.update(insertStatement, photo.getId(), photo.getPhotographer().getId(), photo.getPath(), photo.getRating());
 
             logger.debug("Created photo {}", photo);
-
             return photo;
-        } catch (SQLException e) {
+        } catch(DataAccessException e) {
             throw new DAOException("Failed to create photo", e);
         }
     }
@@ -91,23 +84,13 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     public List<Photo> readAll() throws DAOException, ValidationException {
-        List<Photo> photos = new ArrayList<Photo>();
-        try(Statement stmt = getConnection().createStatement()) {
-            ResultSet rs = stmt.executeQuery(readAllStatement);
-
-            while(rs.next()) {
-                photos.add(new Photo(
-                        rs.getInt(1),
-                        null,
-                        rs.getString(3),
-                        rs.getInt(4)
-                ));
-            }
-        } catch (SQLException e) {
-            throw new DAOException(e);
+        try {
+            return jdbcTemplate.query(readAllStatement, (rs, rowNum) -> {
+                return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
+            });
+        } catch(DataAccessException e) {
+            throw new DAOException("Failed to read all photos", e);
         }
-
-        return photos;
     }
 
     /**
@@ -145,14 +128,12 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
      * @throws DAOException if an error occurs executing the query.
      */
     private int getNextId() throws DAOException {
-        try(Statement stmt = getConnection().createStatement()) {
-            ResultSet result = stmt.executeQuery("select id from Photo order by id desc limit 1");
-
-            if(!result.next()) // no data available
-                return 0;
-
-            return result.getInt(1) + 1;
-        } catch(SQLException e) {
+        try {
+            return jdbcTemplate.queryForObject("select id from Photo order by id desc limit 1", Integer.class) + 1;
+        }  catch(IncorrectResultSizeDataAccessException e) {
+            // no data in table yet
+            return 0;
+        } catch(DataAccessException e) {
             throw new DAOException("Failed to retrieve next id", e);
         }
     }
