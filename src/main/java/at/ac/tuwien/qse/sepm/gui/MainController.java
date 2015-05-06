@@ -66,21 +66,22 @@ public class MainController {
         try {
             List<Photo> photos = photoService.getAllPhotos();
             for(Photo p : photos){
-                if(!getYear(p.getDate()).equals(year)){
-                    y = new TreeItem<String>(getYear(p.getDate()));
-                    m = new TreeItem<String>(getMonth(p.getDate()));
+                Date date = new Date(/*p.getExif().getDate().getTime()*/);
+                if(!getYear(date).equals(year)){
+                    y = new TreeItem<String>(getYear(date));
+                    m = new TreeItem<String>(getMonth(date));
                     m.getChildren().add(new TreeItem<String>(p.getPath()));
                     y.getChildren().add(m);
                     root.getChildren().add(y);
-                    year = getYear(p.getDate());
-                    month = getMonth(p.getDate());
+                    year = getYear(date);
+                    month = getMonth(date);
                 }
                 else{
-                    if(!getMonth(p.getDate()).equals(month)){
-                        m = new TreeItem<String>(getMonth(p.getDate()));
+                    if(!getMonth(date).equals(month)){
+                        m = new TreeItem<String>(getMonth(date));
                         m.getChildren().add(new TreeItem<String>(p.getPath()));
                         y.getChildren().add(m);
-                        month = getMonth(p.getDate());
+                        month = getMonth(date);
                     }
                     else{
                         m.getChildren().add(new TreeItem<String>(p.getPath()));

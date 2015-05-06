@@ -67,7 +67,7 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
         ArrayList<Photo> photos = new ArrayList<Photo>();
         for (final File file : directory.listFiles(new ImageFileFilter())) {
             if (!file.isDirectory()) {
-                photos.add(new Photo(null, new Photographer(1, "TODO"), file.getPath(), new Date(file.lastModified()), 0));
+                photos.add(new Photo(null, new Photographer(1, "TODO"), file.getPath(), 0));
             }
         }
 

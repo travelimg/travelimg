@@ -26,8 +26,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     private static final Logger logger = LogManager.getLogger();
 
-    private static final String insertStatement = "INSERT INTO Photo(id, photographer_id, path, date, rating) VALUES (?, ?, ?, ?, ?);";
-    private static final String readAllStatement = "SELECT* FROM PHOTO ORDER BY DATE;";
+    private static final String insertStatement = "INSERT INTO Photo(id, photographer_id, path, rating) VALUES (?, ?, ?, ?);";
+    private static final String readAllStatement = "SELECT id, photographer_id, path, rating FROM PHOTO;";
 
     private final String photoDirectory;
     private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MMM/dd", Locale.ENGLISH);
@@ -67,8 +67,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             stmt.setInt(1, photo.getId());
             stmt.setInt(2, photo.getPhotographer().getId());
             stmt.setString(3, photo.getPath());
-            stmt.setDate(4, new java.sql.Date(photo.getExif().getDate().getTime()));
-            stmt.setInt(5, photo.getRating());
+            stmt.setInt(4, photo.getRating());
 
             int affectedRows = stmt.executeUpdate();
 
@@ -103,8 +102,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
                         rs.getInt(1),
                         null,
                         rs.getString(3),
-                        rs.getDate(4),
-                        rs.getInt(5)
+                        rs.getInt(4)
                 ));
             }
         } catch (SQLException e) {
