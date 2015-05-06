@@ -114,6 +114,13 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         return photos;
     }
 
+    /**
+     * Copy the photo to the travelimg photo directory. The structure created is Year/Month/Day.
+     *
+     * @param photo The photo to copy.
+     * @return The destination path of the copied photo.
+     * @throws IOException If an error occurs during copying.
+     */
     private String copyToPhotoDirectory(Photo photo) throws IOException {
         File source = new File(photo.getPath());
         String filename = source.getName();
