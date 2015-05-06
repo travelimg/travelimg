@@ -28,6 +28,7 @@ public class ImportServiceImpl implements ImportService {
     }
 
     public void importPhotos(List<Photo> photos, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler)  {
+        logger.debug("Importing photos");
         AsyncImporter importer = new AsyncImporter(photos, callback, errorHandler);
         executorService.submit(importer);
     }
