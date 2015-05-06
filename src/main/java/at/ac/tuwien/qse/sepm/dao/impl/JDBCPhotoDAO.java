@@ -24,8 +24,6 @@ import java.util.Locale;
 
 public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
-    private static final Logger logger = LogManager.getLogger();
-
     private static final String insertStatement = "INSERT INTO Photo(id, photographer_id, path, rating) VALUES (?, ?, ?, ?);";
     private static final String readAllStatement = "SELECT id, photographer_id, path, rating FROM PHOTO;";
 

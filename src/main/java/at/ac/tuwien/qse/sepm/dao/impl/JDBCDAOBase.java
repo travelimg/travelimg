@@ -12,7 +12,7 @@ import java.sql.Connection;
 
 public class JDBCDAOBase {
 
-    private static final Logger logger = LogManager.getLogger();
+    protected static final Logger logger = LogManager.getLogger();
 
     protected JdbcTemplate jdbcTemplate;
 
