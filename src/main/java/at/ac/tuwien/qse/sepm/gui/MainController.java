@@ -107,16 +107,15 @@ public class MainController {
             @Override
             public void accept(Photo photo) {
                 System.out.println("Imported photo");
-                // TODO
+                // TODO: Add photo to image grid
             }
         };
 
         ServiceExceptionHandler errorHandler = new ServiceExceptionHandler() {
             @Override
             public void handle(ServiceException exception) {
-                System.out.println("Got error");
                 logger.error("Import failed", exception);
-                // TODO
+                // TODO: notify user about error
             }
         };
 
