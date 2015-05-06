@@ -35,7 +35,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     public JDBCPhotoDAO(String photoDirectory) {
         this.photoDirectory = photoDirectory;
-        logger.debug(photoDirectory);
 
         // TODO: Spring
         try {
@@ -77,7 +76,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
                 throw new DAOException("Failed to create photo");
             }
 
-            logger.info("Created photo {}", photo);
+            logger.debug("Created photo {}", photo);
 
             return photo;
         } catch (SQLException e) {
