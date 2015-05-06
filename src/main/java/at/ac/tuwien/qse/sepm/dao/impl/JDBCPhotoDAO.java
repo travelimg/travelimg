@@ -37,7 +37,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         this.photoDirectory = photoDirectory;
         logger.debug(photoDirectory);
 
-        // TODO
+        // TODO: Spring
         try {
             this.exifDAO = new JDBCExifDAO();
         } catch(DAOException e) {
