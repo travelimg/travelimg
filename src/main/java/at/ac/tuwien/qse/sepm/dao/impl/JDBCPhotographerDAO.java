@@ -17,10 +17,6 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
         return null;
     }
 
-    public void update(Photographer p) throws DAOException {
-
-    }
-
     public Photographer read(Photographer p) throws DAOException {
         return null;
     }
