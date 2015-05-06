@@ -20,6 +20,7 @@ import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
@@ -29,7 +30,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private static final String readAllStatement = "SELECT* FROM PHOTO ORDER BY DATE;";
 
     private final String photoDirectory;
-    private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MMM/dd");
+    private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MMM/dd", Locale.ENGLISH);
 
     private ExifDAO exifDAO;
 
