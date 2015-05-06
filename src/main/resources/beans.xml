@@ -21,15 +21,15 @@
 
 
  
-	<bean id="importServiceBean" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"
+	<bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"
 			destroy-method="close">
-		<constructor-arg><ref bean="photoDAOBean"></ref></constructor-arg>
+		<constructor-arg><ref bean="photoDAO"></ref></constructor-arg>
 	</bean>
-	<bean id="photoServiceBean" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl">
-		<constructor-arg><ref bean="photoDAOBean"></ref></constructor-arg>
+	<bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl">
+		<constructor-arg><ref bean="photoDAO"></ref></constructor-arg>
 	</bean>
 
-	<bean id="photoDAOBean" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
+	<bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
 		<constructor-arg value="${user.home}/travelimg"></constructor-arg>
 	</bean>
 
