@@ -1,8 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao;
 
 
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.MetadataException;
+import org.apache.commons.imaging.ImageReadException;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -20,16 +19,11 @@ public class DAOException extends Exception {
         super(message, e);
     }
 
-    public DAOException(String message, MetadataException e) {
-        super(message, e);
-    }
-
     public DAOException(String message, IOException e) {
         super(message, e);
     }
 
-    public DAOException(String message, ImageProcessingException e) {
+    public DAOException(String message, ImageReadException e) {
         super(message, e);
     }
-
 }

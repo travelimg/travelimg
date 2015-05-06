@@ -7,13 +7,6 @@ import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.exif.ExifIFD0Directory;
-import com.drew.metadata.exif.ExifSubIFDDirectory;
-import com.drew.metadata.exif.GpsDirectory;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.ImageWriteException;
 import org.apache.commons.imaging.Imaging;
@@ -49,29 +42,8 @@ public class ExifServiceImpl implements ExifService {
         Exif exif = p.getExif();
 
         try {
-            Metadata metadata = ImageMetadataReader.readMetadata(file);
-            Directory subIFDDirectory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
-            Directory iFD0Directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
-            Directory gPSDirectory = metadata.getFirstDirectoryOfType(GpsDirectory.class);
-
-            subIFDDirectory.setString(ExifSubIFDDirectory.TAG_EXPOSURE_TIME, exif.getExposure());
-            subIFDDirectory.setDouble(ExifSubIFDDirectory.TAG_APERTURE, exif.getAperture());
-            subIFDDirectory.setDouble(ExifSubIFDDirectory.TAG_FOCAL_LENGTH, exif.getFocalLength());
-            subIFDDirectory.setInt(ExifSubIFDDirectory.TAG_ISO_EQUIVALENT, exif.getIso());
-            subIFDDirectory.setBoolean(ExifSubIFDDirectory.TAG_FLASH, exif.isFlash());
-            String[] makeModel = exif.getCameraModel().split(" ");
-            iFD0Directory.setString(ExifIFD0Directory.TAG_MAKE, makeModel[0]);
-            iFD0Directory.setString(ExifIFD0Directory.TAG_MODEL, makeModel[1]);
-
-            gPSDirectory.setString(GpsDirectory.TAG_LONGITUDE, exif.getLongitude());
-            gPSDirectory.setString(GpsDirectory.TAG_LONGITUDE, exif.getLatitude());
-            this.setExifGPSTag(file);
-
+            this.setExifGPSTag(file, exif.getLatitude(), exif.getLongitude());
             exifDAO.update(exif);
-
-        } catch (ImageProcessingException e) {
-            e.printStackTrace();
-            throw new ServiceException(e.getMessage(), e);
         } catch (IOException e) {
             e.printStackTrace();
             throw new ServiceException(e.getMessage(), e);
@@ -109,7 +81,7 @@ public class ExifServiceImpl implements ExifService {
      * 247      * @throws ImageWriteException
      * 248
      */
-    public void setExifGPSTag(final File jpegImageFile) throws IOException,
+    public void setExifGPSTag(final File jpegImageFile, final double latitude, final double longitude) throws IOException,
             ImageReadException, ImageWriteException {
 
         File tempFile = new File(jpegImageFile.getPath() + "d");
@@ -124,6 +96,8 @@ public class ExifServiceImpl implements ExifService {
             if (null != jpegMetadata) {
                 // note that exif might be null if no Exif metadata is found.
                 final TiffImageMetadata exif = jpegMetadata.getExif();
+                TiffImageMetadata.GPSInfo gpsInfo = exif.getGPS();
+
 
                 if (null != exif) {
                     // TiffImageMetadata class is immutable (read-only).
@@ -135,6 +109,7 @@ public class ExifServiceImpl implements ExifService {
                     // In these cases, it is easiest to use getOutputSet() to
                     // start with a "copy" of the fields read from the image.
                     outputSet = exif.getOutputSet();
+
                 }
             }
 
@@ -144,16 +119,10 @@ public class ExifServiceImpl implements ExifService {
             if (null == outputSet) {
                 outputSet = new TiffOutputSet();
             }
-            {
-                // Example of how to add/update GPS info to output set.
 
-                // New York City
-                final double longitude = -74.0; // 74 degrees W (in Degrees East)
-                final double latitude = 40 + 43 / 60.0; // 40 degrees N (in Degrees
-                // North)
 
-                outputSet.setGPSInDegrees(longitude, latitude);
-            }
+            outputSet.setGPSInDegrees(longitude, latitude);
+
 
             os = new FileOutputStream(tempFile);
             os = new BufferedOutputStream(os);

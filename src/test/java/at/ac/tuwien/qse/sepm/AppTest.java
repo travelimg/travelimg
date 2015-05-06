@@ -65,8 +65,8 @@ public class AppTest {
     public void testExif() throws ServiceException {
         Photo photo = new Photo(5, null, "C:\\Users\\David\\workspace\\qse-sepm-ss15-18\\src\\test\\resources\\test.jpg", null, 0);
         Exif exif = exifservice.importExif(photo);
-        exif.setLongitude("12 13 14 N");
-        exif.setCameraModel("nono ff");
+        exif.setLongitude(12.245);
+        exif.setModel("nono ff");
         exifservice.changeExif(photo);
        logger.info(exif);
     }

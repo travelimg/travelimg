@@ -1,8 +1,6 @@
 package at.ac.tuwien.qse.sepm.service;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.MetadataException;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.ImageWriteException;
 
@@ -17,15 +15,7 @@ public class ServiceException extends Exception {
         super(message);
     }
 
-    public ServiceException(String message, MetadataException e) {
-        super(message, e);
-    }
-
     public ServiceException(String message, IOException e) {
-        super(message, e);
-    }
-
-    public ServiceException(String message, ImageProcessingException e) {
         super(message, e);
     }
 
