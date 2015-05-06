@@ -4,17 +4,38 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotographerDAO;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
+import at.ac.tuwien.qse.sepm.entities.validators.PhotographerValidator;
+import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO {
 
     private static final Logger logger = LogManager.getLogger();
 
-    public Photographer create(Photographer p) throws DAOException {
-        return null;
+    private static final String insertStatement = "INSERT INTO Photographer(name) VALUES (?);";
+
+    public Photographer create(Photographer p) throws DAOException, ValidationException {
+        logger.debug("Creating photographer {}", p);
+        PhotographerValidator.validate(p);
+
+        try(PreparedStatement stmt = getConnection().prepareStatement(insertStatement, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1,p.getName());
+            stmt.executeUpdate();
+            ResultSet rs = stmt.getGeneratedKeys();
+            rs.next();
+            p.setId(rs.getInt(1));
+            logger.debug("Created photographer {}", p);
+            return p;
+        } catch (SQLException e) {
+            throw new DAOException("Failed to create photographer", e);
+        }
     }
 
     public Photographer read(Photographer p) throws DAOException {
