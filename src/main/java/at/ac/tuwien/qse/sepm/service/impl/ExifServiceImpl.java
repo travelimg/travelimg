@@ -9,19 +9,26 @@ import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
-import com.drew.lang.Rational;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
-import com.drew.metadata.MetadataException;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.exif.GpsDirectory;
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.ImageWriteException;
+import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.common.ImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
+import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
+import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
+import org.apache.commons.imaging.util.IoUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.Timestamp;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 public class ExifServiceImpl implements ExifService {
 
@@ -38,29 +45,46 @@ public class ExifServiceImpl implements ExifService {
     }
 
     public void changeExif(Photo p) throws ServiceException {
-            File file = new File(p.getPath());
-        Metadata metadata = null;
+        File file = new File(p.getPath());
+        Exif exif = p.getExif();
+
         try {
-            metadata = ImageMetadataReader.readMetadata(file);
+            Metadata metadata = ImageMetadataReader.readMetadata(file);
             Directory subIFDDirectory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
             Directory iFD0Directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
             Directory gPSDirectory = metadata.getFirstDirectoryOfType(GpsDirectory.class);
+
+            subIFDDirectory.setString(ExifSubIFDDirectory.TAG_EXPOSURE_TIME, exif.getExposure());
+            subIFDDirectory.setDouble(ExifSubIFDDirectory.TAG_APERTURE, exif.getAperture());
+            subIFDDirectory.setDouble(ExifSubIFDDirectory.TAG_FOCAL_LENGTH, exif.getFocalLength());
+            subIFDDirectory.setInt(ExifSubIFDDirectory.TAG_ISO_EQUIVALENT, exif.getIso());
+            subIFDDirectory.setBoolean(ExifSubIFDDirectory.TAG_FLASH, exif.isFlash());
+            String[] makeModel = exif.getCameraModel().split(" ");
+            iFD0Directory.setString(ExifIFD0Directory.TAG_MAKE, makeModel[0]);
+            iFD0Directory.setString(ExifIFD0Directory.TAG_MODEL, makeModel[1]);
+
+            gPSDirectory.setString(GpsDirectory.TAG_LONGITUDE, exif.getLongitude());
+            gPSDirectory.setString(GpsDirectory.TAG_LONGITUDE, exif.getLatitude());
+            this.setExifGPSTag(file);
+
+            exifDAO.update(exif);
+
         } catch (ImageProcessingException e) {
             e.printStackTrace();
             throw new ServiceException(e.getMessage(), e);
         } catch (IOException e) {
             e.printStackTrace();
             throw new ServiceException(e.getMessage(), e);
+        } catch (DAOException e) {
+            e.printStackTrace();
+            throw new ServiceException(e.getMessage(), e);
+        } catch (ImageWriteException e) {
+            e.printStackTrace();
+            throw new ServiceException(e.getMessage(), e);
+        } catch (ImageReadException e) {
+            e.printStackTrace();
+            throw new ServiceException(e.getMessage(), e);
         }
-
-//        date = new Timestamp(subIFDDirectory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL).getTime());
-//        exposure = subIFDDirectory.getString(ExifSubIFDDirectory.TAG_EXPOSURE_TIME);
-//        aperture = subIFDDirectory.getDouble(ExifSubIFDDirectory.TAG_APERTURE);
-//        focalLength = subIFDDirectory.getDouble(ExifSubIFDDirectory.TAG_FOCAL_LENGTH);
-//        iso = subIFDDirectory.getInt(ExifSubIFDDirectory.TAG_ISO_EQUIVALENT);
-//        flash = subIFDDirectory.getBoolean(ExifSubIFDDirectory.TAG_FLASH);
-//        cameraModel = iFD0Directory.getString(ExifIFD0Directory.TAG_MAKE) + " " + iFD0Directory.getString(ExifIFD0Directory.TAG_MODEL);
-
     }
 
 
@@ -70,6 +94,77 @@ public class ExifServiceImpl implements ExifService {
         } catch (DAOException e) {
             e.printStackTrace();
             throw new ServiceException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 239      * This example illustrates how to set the GPS values in JPEG EXIF metadata.
+     * 240      *
+     * 241      * @param jpegImageFile
+     * 242      *            A source image file.
+     * 243      * @param tempFile
+     * 244      *            The output file.
+     * 245      * @throws IOException
+     * 246      * @throws ImageReadException
+     * 247      * @throws ImageWriteException
+     * 248
+     */
+    public void setExifGPSTag(final File jpegImageFile) throws IOException,
+            ImageReadException, ImageWriteException {
+
+        File tempFile = new File(jpegImageFile.getPath() + "d");
+        OutputStream os = null;
+        boolean canThrow = false;
+        try {
+            TiffOutputSet outputSet = null;
+
+            // note that metadata might be null if no metadata is found.
+            final ImageMetadata metadata = Imaging.getMetadata(jpegImageFile);
+            final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
+            if (null != jpegMetadata) {
+                // note that exif might be null if no Exif metadata is found.
+                final TiffImageMetadata exif = jpegMetadata.getExif();
+
+                if (null != exif) {
+                    // TiffImageMetadata class is immutable (read-only).
+                    // TiffOutputSet class represents the Exif data to write.
+                    //
+                    // Usually, we want to update existing Exif metadata by
+                    // changing
+                    // the values of a few fields, or adding a field.
+                    // In these cases, it is easiest to use getOutputSet() to
+                    // start with a "copy" of the fields read from the image.
+                    outputSet = exif.getOutputSet();
+                }
+            }
+
+            // if file does not contain any exif metadata, we create an empty
+            // set of exif metadata. Otherwise, we keep all of the other
+            // existing tags.
+            if (null == outputSet) {
+                outputSet = new TiffOutputSet();
+            }
+            {
+                // Example of how to add/update GPS info to output set.
+
+                // New York City
+                final double longitude = -74.0; // 74 degrees W (in Degrees East)
+                final double latitude = 40 + 43 / 60.0; // 40 degrees N (in Degrees
+                // North)
+
+                outputSet.setGPSInDegrees(longitude, latitude);
+            }
+
+            os = new FileOutputStream(tempFile);
+            os = new BufferedOutputStream(os);
+
+            new ExifRewriter().updateExifMetadataLossless(jpegImageFile, os,
+                    outputSet);
+            canThrow = true;
+            Files.copy(tempFile.toPath(), jpegImageFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.delete(tempFile.toPath());
+        } finally {
+            IoUtils.closeQuietly(canThrow, os);
         }
     }
 }
