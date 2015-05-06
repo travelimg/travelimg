@@ -13,7 +13,7 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
 
     private static final Logger logger = LogManager.getLogger();
 
-    public Photographer create() throws DAOException {
+    public Photographer create(Photographer p) throws DAOException {
         return null;
     }
 

@@ -6,7 +6,16 @@ import java.util.List;
 
 public interface PhotographerDAO {
 
-    public Photographer create() throws DAOException;
+    /**
+     * Store a new photographer.
+     *
+     * @param p Photographer to create
+     * @return The created photographer
+     * @throws DAOException If the photographer cannot be copied or the data store fails to create a record.
+     */
+    public Photographer create(Photographer p) throws DAOException;
+
     public Photographer read(Photographer p) throws DAOException;
+
     public List<Photographer> readAll() throws DAOException;
 }
