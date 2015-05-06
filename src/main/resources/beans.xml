@@ -32,5 +32,9 @@
 	<bean id="photoDAOBean" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
 		<constructor-arg value="${user.home}/travelimg"></constructor-arg>
 	</bean>
+
+	<bean id="exifDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCExifDAO">
+
+	</bean>
  
 </beans>

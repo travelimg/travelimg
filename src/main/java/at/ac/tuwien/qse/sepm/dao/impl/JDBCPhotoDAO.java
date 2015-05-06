@@ -3,11 +3,13 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.ExifDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
+import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.xml.transform.Result;
 import java.io.File;
@@ -34,13 +36,11 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     public JDBCPhotoDAO(String photoDirectory) {
         this.photoDirectory = photoDirectory;
+    }
 
-        // TODO: Spring
-        try {
-            this.exifDAO = new JDBCExifDAO();
-        } catch(DAOException e) {
-
-        }
+    @Autowired
+    public void setExifDAO(ExifDAO exifDAO) {
+        this.exifDAO = exifDAO;
     }
 
     public Photo create(Photo photo) throws DAOException, ValidationException {
