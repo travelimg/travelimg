@@ -1,7 +1,7 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.entities.Exif;
-import at.ac.tuwien.qse.sepm.entities.ExifList;
+
 
 import at.ac.tuwien.qse.sepm.service.GoogleMapsService;
 import com.lynden.gmapsfx.GoogleMapView;
