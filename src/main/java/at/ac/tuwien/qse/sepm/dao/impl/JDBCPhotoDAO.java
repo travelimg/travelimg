@@ -10,6 +10,7 @@ import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.jdbc.core.RowMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,8 +85,11 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     public List<Photo> readAll() throws DAOException, ValidationException {
         try {
-            return jdbcTemplate.query(readAllStatement, (rs, rowNum) -> {
-                return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
+            return jdbcTemplate.query(readAllStatement, new RowMapper<Photo>() {
+                @Override
+                public Photo mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
+                }
             });
         } catch(DataAccessException e) {
             throw new DAOException("Failed to read all photos", e);
