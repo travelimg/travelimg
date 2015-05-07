@@ -23,7 +23,11 @@ public class JDBCDAOBase {
 
     private Connection con = null;
 
+    /**
+     * @deprecated
+     */
     protected Connection getConnection() throws DAOException {
+        logger.warn("Deprecated use of getConnection(). Use jdbcTemplate.");
         if(con == null)
             con = DBConnection.getConnection();
 
