@@ -20,13 +20,14 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
     private static final Logger logger = LogManager.getLogger();
 
     private static final String insertStatement = "INSERT INTO Photographer(name) VALUES (?);";
+    private static final String readStatement = "SELECT* FROM Photographer WHERE ID=?;";
 
     public Photographer create(Photographer p) throws DAOException, ValidationException {
         logger.debug("Creating photographer {}", p);
         PhotographerValidator.validate(p);
 
         try(PreparedStatement stmt = getConnection().prepareStatement(insertStatement, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1,p.getName());
+            stmt.setString(1, p.getName());
             stmt.executeUpdate();
             ResultSet rs = stmt.getGeneratedKeys();
             rs.next();
@@ -39,7 +40,18 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
     }
 
     public Photographer read(Photographer p) throws DAOException {
-        return null;
+        try(PreparedStatement stmt = getConnection().prepareStatement(readStatement)) {
+
+            stmt.setInt(1,p.getId());
+            ResultSet rs = stmt.executeQuery();
+            if(!rs.next()){
+                throw new DAOException("Photographer not found");
+            }
+            p.setName(rs.getString(2));
+        } catch (SQLException e) {
+            throw new DAOException(e);
+        }
+        return p;
     }
 
     public List<Photographer> readAll() throws DAOException {

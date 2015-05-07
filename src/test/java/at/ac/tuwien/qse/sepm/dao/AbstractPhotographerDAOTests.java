@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractPhotographerDAOTests {
 
@@ -23,6 +24,17 @@ public abstract class AbstractPhotographerDAOTests {
     public void createWithValidParameterShouldPersist() throws ValidationException, DAOException {
         Photographer p = photographerDAO.create(new Photographer(null, "Enri"));
         assertFalse(p.getId() == null);
+    }
+
+    @Test(expected = DAOException.class)
+    public void readWithNonExistingIdShouldThrow() throws DAOException {
+        photographerDAO.read(new Photographer(1337, null));
+    }
+
+    @Test
+    public void readWithValidIdShouldReturnPhotographer() throws DAOException {
+        Photographer p = photographerDAO.read(new Photographer(1,null));
+        assertTrue(p.getName().equals("Alex Kinara"));
     }
 
 }
