@@ -72,4 +72,5 @@ public class ExifServiceImpl implements ExifService {
             throw new ServiceException(e.getMessage(), e);
         }
     }
+
 }

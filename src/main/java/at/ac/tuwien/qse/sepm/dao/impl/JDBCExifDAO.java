@@ -25,6 +25,8 @@ public class JDBCExifDAO implements ExifDAO {
 
     private Connection con;
 
+    private static final String deleteStatement = "Delete from Exif where PHOTO_ID  =?";
+
     public JDBCExifDAO() throws DAOException {
         con = DBConnection.getConnection();
     }
@@ -61,7 +63,12 @@ public class JDBCExifDAO implements ExifDAO {
     }
 
     public void delete(Exif e) throws DAOException {
-
+        try (PreparedStatement stmt = con.prepareStatement(deleteStatement)) {
+            stmt.setInt(1, e.getId());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DAOException("Failed to delete Exif-Data", ex);
+        }
     }
 
     public List<Exif> readAll() throws DAOException {

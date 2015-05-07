@@ -1,9 +1,8 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
-import at.ac.tuwien.qse.sepm.dao.DAOException;
-import at.ac.tuwien.qse.sepm.dao.ExifDAO;
-import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
+import at.ac.tuwien.qse.sepm.dao.*;
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.apache.logging.log4j.LogManager;
@@ -28,11 +27,12 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     private static final String insertStatement = "INSERT INTO Photo(id, photographer_id, path, rating) VALUES (?, ?, ?, ?);";
     private static final String readAllStatement = "SELECT id, photographer_id, path, rating FROM PHOTO;";
-
+    private static final String deleteStatement = "Delete from Photo where id =?";
     private final String photoDirectory;
     private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MMM/dd", Locale.ENGLISH);
 
     private ExifDAO exifDAO;
+    private PhotoTagDAO photoTagDAO;
 
     public JDBCPhotoDAO(String photoDirectory) {
         this.photoDirectory = photoDirectory;
@@ -89,10 +89,30 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     public void delete(Photo photo) throws DAOException, ValidationException {
+        logger.debug("Deleting photo {}", photo);
+        // validate photo
+        PhotoValidator.validate(photo);
 
+        int id = photo.getId();
+        // delete from Table exif
+        exifDAO.delete(photo.getExif());
+
+        // delete from Table photoTag
+        List<Tag> taglist = photoTagDAO.readTagsByPhoto(photo);
+        for (Tag t : taglist) {
+            photoTagDAO.removeTagFromPhoto(t, photo);
+        }
+
+        try (PreparedStatement stmt = getConnection().prepareStatement(deleteStatement)) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DAOException("Failed to delete photo", e);
+        }
     }
 
-    public List<Photo> readAll() throws DAOException, ValidationException {
+
+        public List<Photo> readAll() throws DAOException, ValidationException {
         List<Photo> photos = new ArrayList<Photo>();
         try(Statement stmt = getConnection().createStatement()) {
             ResultSet rs = stmt.executeQuery(readAllStatement);

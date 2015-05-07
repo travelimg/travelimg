@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
+import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
@@ -20,6 +21,7 @@ public class PhotoServiceImpl implements PhotoService {
     private static final Logger logger = LogManager.getLogger();
 
     private PhotoDAO photoDAO;
+    private PhotoTagDAO photoTagDAO;
 
     public PhotoServiceImpl(PhotoDAO photoDAO) {
         this.photoDAO = photoDAO;
@@ -44,7 +46,15 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     public void deletePhotos(List<Photo> photos) throws ServiceException {
-
+        for(Photo p : photos){
+            try {
+                photoDAO.delete(p);
+            } catch (DAOException e) {
+                e.printStackTrace();
+            } catch (ValidationException e) {
+                throw new ServiceException("Failed to validate entity", e);
+            }
+        }
     }
 
     public void addTagToPhotos(List<Photo> photos, Tag t) throws ServiceException {
@@ -52,6 +62,15 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     public void removeTagFromPhotos(List<Photo> photos, Tag t) throws ServiceException {
+        for(Photo p: photos){
+            try {
+                photoTagDAO.removeTagFromPhoto(t,p);
+            } catch (DAOException e) {
+                e.printStackTrace();
+            } catch (ValidationException e) {
+                throw new ServiceException("Failed to validate entity", e);
+            }
+        }
 
     }
 }

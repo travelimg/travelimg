@@ -1,10 +1,13 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
-import at.ac.tuwien.qse.sepm.entities.KoordList;
-import at.ac.tuwien.qse.sepm.entities.Koordinate;
+import at.ac.tuwien.qse.sepm.entities.Exif;
+import at.ac.tuwien.qse.sepm.entities.ExifList;
+
 import at.ac.tuwien.qse.sepm.service.GoogleMapsService;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.javascript.object.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 //import com.lynden.gmapsfx.javascript.object.MapType;
 
@@ -15,12 +18,14 @@ import com.lynden.gmapsfx.javascript.object.*;
 
 public class GoogleMapsServiceImpl implements GoogleMapsService {
 
+    private static final Logger logger = LogManager.getLogger(ExifServiceImpl.class);
+
     private GoogleMapView mapView;
     private GoogleMap map;
     private double x = Double.MIN_VALUE;
     private double y = Double.MIN_VALUE;
-    private KoordList marker;
 
+    private Exif marker;
     /**
      * Default Konstruktor
      * eine neue GoogleMap wird erstellen
@@ -37,7 +42,7 @@ public class GoogleMapsServiceImpl implements GoogleMapsService {
      * uebergeben wird eine Liste mit Koordinaten, welche auf der Map gekennzeichnet werden
      * @param marker
      */
-    public GoogleMapsServiceImpl(KoordList marker){
+    public GoogleMapsServiceImpl(Exif marker){
         this.mapView = new GoogleMapView();
         this.mapView.addMapInializedListener(this);
         this.marker =marker;
@@ -52,7 +57,7 @@ public class GoogleMapsServiceImpl implements GoogleMapsService {
      * @param y die Y-Koordinate des Landes/der Stadt
      * @param marker eine Liste mit Koordinaten, welche auf der Map gekennzeichnet werden
      */
-    public GoogleMapsServiceImpl(double x, double y, KoordList marker){
+    public GoogleMapsServiceImpl(double x, double y, Exif marker){
         this.x=x;
         this.y=y;
         this.marker=marker;
@@ -82,6 +87,7 @@ public class GoogleMapsServiceImpl implements GoogleMapsService {
     @Override
     public void mapInitialized() {
         //Set the initial properties of the map.
+        logger.debug("Initializing Map ");
       if(this.x==Double.MIN_VALUE) {
 
             MapOptions mapOptions = new MapOptions();
@@ -110,19 +116,23 @@ public class GoogleMapsServiceImpl implements GoogleMapsService {
         map = mapView.createMap(mapOptions);
         }
         if(this.marker!=null){
-           for(Koordinate k : this.marker.getKoordinaten()){
-                map.addMarker(new Marker(new MarkerOptions().position(new LatLong(k.getX(),k.getY()) )
+
+                map.addMarker(new Marker(new MarkerOptions().position(new LatLong(Double.parseDouble(marker.getLongitude()),Double.parseDouble(marker.getLatitude()) ))
                         .visible(Boolean.TRUE)));
-            }
+
         }
     }
-
+    public GoogleMapView getMarker(Exif e){
+        return new GoogleMapsServiceImpl(e).getMap();
+    }
     /**
      * GoogleMapsServiceImpl muss existieren
      * @return GoogleMapView fuer eine Scene wird zurueckgegeben
      */
     public GoogleMapView getMap(){
+        logger.debug("returning Map");
         return this.mapView;
+
     }
 
 

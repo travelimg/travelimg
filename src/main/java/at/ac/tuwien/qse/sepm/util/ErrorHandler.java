@@ -9,9 +9,9 @@ public interface ErrorHandler<E extends Throwable> {
      * Notify the consumer about the exception.
      * @param exception Exception to present to the user of the error handler.
      */
-    default void propagate(E exception) {
-        handle(exception);
-    }
+   // default void propagate(E exception) {
+    //      handle(exception);
+   // }
 
     /**
      * Handle an occuring exception.
