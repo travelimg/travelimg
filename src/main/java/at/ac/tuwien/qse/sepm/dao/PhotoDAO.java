@@ -46,4 +46,13 @@ public interface PhotoDAO {
      */
     List<Photo> readAll() throws DAOException, ValidationException;
 
+    /**
+     * Retrieve a list of photos from a given year and month
+     * @param year
+     * @param month
+     * @return the list with the photos
+     * @throws DAOException If the data store fails to retrieve the records.
+     */
+    public List<Photo> readPhotosByYearAndMonth(int year, int month) throws DAOException;
+
 }
