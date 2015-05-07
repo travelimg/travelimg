@@ -34,12 +34,8 @@ public class AppTest {
 
     @Before
     public void setUp() {
-        try {
-            logger.info("setUp");
-            exifservice = new ExifServiceImpl();
-        } catch (ServiceException e) {
-            e.printStackTrace();
-        }
+        logger.info("setUp");
+        exifservice = new ExifServiceImpl();
     }
 
     @Test
@@ -63,7 +59,7 @@ public class AppTest {
 
     @Test
     public void testExif() throws ServiceException {
-        Photo photo = new Photo(5, null, "C:\\Users\\David\\workspace\\qse-sepm-ss15-18\\src\\test\\resources\\test.jpg", null, 0);
+        Photo photo = new Photo(5, null, "C:\\Users\\David\\workspace\\qse-sepm-ss15-18\\src\\test\\resources\\test.jpg", 0);
         Exif exif = exifservice.importExif(photo);
         exif.setLongitude(12.245);
         exif.setModel("nono ff");

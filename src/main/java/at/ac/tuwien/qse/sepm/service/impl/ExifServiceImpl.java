@@ -18,6 +18,7 @@ import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
 import org.apache.commons.imaging.util.IoUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -28,13 +29,13 @@ public class ExifServiceImpl implements ExifService {
     private static final Logger logger = LogManager.getLogger(ExifServiceImpl.class);
     private ExifDAO exifDAO;
 
-    public ExifServiceImpl() throws ServiceException {
-        try {
-            exifDAO = new JDBCExifDAO();
-        } catch (DAOException e) {
-            throw new ServiceException(e.getMessage());
-        }
+    public ExifServiceImpl() {
 
+    }
+
+    @Autowired
+    public void setExifDAO(ExifDAO exifDAO) {
+        this.exifDAO = exifDAO;
     }
 
     public void changeExif(Photo p) throws ServiceException {

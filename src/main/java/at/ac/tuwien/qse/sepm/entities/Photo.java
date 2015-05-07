@@ -7,18 +7,16 @@ public class Photo {
     private Integer id;
     private Photographer photographer;
     private String path;
-    private Date date;
     private Integer rating;
     private Exif exif;
 
     public Photo() {
     }
 
-    public Photo(Integer id, Photographer photographer, String path, Date date, Integer rating) {
+    public Photo(Integer id, Photographer photographer, String path, Integer rating) {
             this.id = id;
             this.photographer = photographer;
             this.path = path;
-            this.date = date;
             this.rating = rating;
     }
 
@@ -46,14 +44,6 @@ public class Photo {
         this.path = path;
     }
 
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
     public Integer getRating() {
         return rating;
     }
@@ -76,7 +66,6 @@ public class Photo {
                 "id=" + id +
                 ", photographer=" + photographer +
                 ", path='" + path + '\'' +
-                ", date=" + date +
                 ", rating=" + rating +
                 '}';
     }

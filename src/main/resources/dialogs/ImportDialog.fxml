@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox layoutX="281.0" layoutY="93.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label text="Ordner auswählen" />
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <TextField fx:id="directoryTextField" />
+                  <Button fx:id="selectFolderButton" mnemonicParsing="false" onAction="#onSelectFolderClicked" text="Select" />
+               </children>
+            </HBox>
+            <Label text="Fotograf" />
+            <RadioButton mnemonicParsing="false" text="aus Metadaten ermitteln">
+               <toggleGroup>
+                  <ToggleGroup fx:id="photographSelectionMode" />
+               </toggleGroup>
+            </RadioButton>
+            <RadioButton mnemonicParsing="false" text="anderen Namen benutzen" toggleGroup="$photographSelectionMode" />
+            <TextField />
+            <Label text="Die ausgewählten Fotos werden kopiert" />
+            <HBox alignment="BOTTOM_LEFT" prefHeight="100.0">
+               <children>
+                  <Label text="X Fotos ausgewählt" />
+                  <Button fx:id="cancelButton" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#onCancelClicked" text="Abbrechen" />
+                  <Button fx:id="importButton" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#onImportClicked" text="Importieren" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

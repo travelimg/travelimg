@@ -1,22 +1,36 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import sun.applet.Main;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class MainController {
+
+    private static final Logger logger = LogManager.getLogger();
 
     @FXML
     private TreeView photoTreeView;
@@ -26,14 +40,18 @@ public class MainController {
     private PhotoService photoService;
     private ImportService importService;
 
+    public MainController() {
+    }
+
+    public void setContext(ApplicationContext context) {
+        photoService = (PhotoService) context.getBean("photoService");
+        importService = (ImportService) context.getBean("importService");
+    }
+
     public void initialize(){
         root = new TreeItem<String>("Photos");
         root.setExpanded(true);
         photoTreeView.setRoot(root);
-    }
-
-    public void setPhotoService(PhotoService photoService) {
-        this.photoService = photoService;
     }
 
     public void setStage(Stage stage){
@@ -48,21 +66,22 @@ public class MainController {
         try {
             List<Photo> photos = photoService.getAllPhotos();
             for(Photo p : photos){
-                if(!getYear(p.getDate()).equals(year)){
-                    y = new TreeItem<String>(getYear(p.getDate()));
-                    m = new TreeItem<String>(getMonth(p.getDate()));
+                Date date = new Date(/*p.getExif().getDate().getTime()*/);
+                if(!getYear(date).equals(year)){
+                    y = new TreeItem<String>(getYear(date));
+                    m = new TreeItem<String>(getMonth(date));
                     m.getChildren().add(new TreeItem<String>(p.getPath()));
                     y.getChildren().add(m);
                     root.getChildren().add(y);
-                    year = getYear(p.getDate());
-                    month = getMonth(p.getDate());
+                    year = getYear(date);
+                    month = getMonth(date);
                 }
                 else{
-                    if(!getMonth(p.getDate()).equals(month)){
-                        m = new TreeItem<String>(getMonth(p.getDate()));
+                    if(!getMonth(date).equals(month)){
+                        m = new TreeItem<String>(getMonth(date));
                         m.getChildren().add(new TreeItem<String>(p.getPath()));
                         y.getChildren().add(m);
-                        month = getMonth(p.getDate());
+                        month = getMonth(date);
                     }
                     else{
                         m.getChildren().add(new TreeItem<String>(p.getPath()));
@@ -75,35 +94,33 @@ public class MainController {
     }
 
     @FXML
-    public void onImportPhotosClicked(){
-        DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setTitle("Choose directory pictures"); //maybe we should be able to select specific files from a folder ;)
-        //FileChooser.ExtensionFilter allowedFileTypes = new FileChooser.ExtensionFilter("Pictures (*.jpg;*.jpeg;*.png)", "*.jpg","*.jpeg","*.png");
-        //chooser.getExtensionFilters().add(allowedFileTypes);
-        File selectedDirectory = chooser.showDialog(stage);
-        ArrayList<Photo> photos = new ArrayList<Photo>();
-        for (final File fileEntry : selectedDirectory.listFiles()) {
-            if (!fileEntry.isDirectory() && getExtension(fileEntry.getName()).equals("JPG")) {
-                photos.add(new Photo(null, null, fileEntry.getPath(), new Date(fileEntry.lastModified()), 0));
+    public void onImportPhotosClicked()  {
+        ImportDialog dialog = new ImportDialog(stage);
+
+        Optional<List<Photo>> optionalPhotos = dialog.run();
+
+        if(!optionalPhotos.isPresent())
+            return;
+
+        List<Photo> photos = optionalPhotos.get();
+
+        Consumer<Photo> callback = new Consumer<Photo>() {
+            @Override
+            public void accept(Photo photo) {
+                System.out.println("Imported photo");
+                // TODO: Add photo to image grid
             }
-        }
-        try {
-            importService.importPhotos(photos);
-            root.getChildren().clear();
-            createStructure();
-        } catch (ServiceException e) {
-        }
+        };
 
-    }
+        ServiceExceptionHandler errorHandler = new ServiceExceptionHandler() {
+            @Override
+            public void handle(ServiceException exception) {
+                logger.error("Import failed", exception);
+                // TODO: notify user about error
+            }
+        };
 
-    public String getExtension(String file){
-        String extension = "";
-
-        int i = file.lastIndexOf('.');
-        if (i > 0) {
-            extension = file.substring(i+1);
-        }
-        return extension;
+        importService.importPhotos(photos, callback, errorHandler);
     }
 
     public String getMonth(Date d){
@@ -112,9 +129,5 @@ public class MainController {
 
     public String getYear(Date d){
         return new SimpleDateFormat("YYYY").format(d);
-    }
-
-    public void setImportService(ImportService importService) {
-        this.importService=importService;
     }
 }

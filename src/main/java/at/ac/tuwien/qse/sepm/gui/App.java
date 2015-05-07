@@ -1,11 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 
-import at.ac.tuwien.qse.sepm.service.ImportService;
-import at.ac.tuwien.qse.sepm.service.PhotoService;
-import at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl;
-import at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl;
-import at.ac.tuwien.qse.sepm.service.impl.Service;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -18,35 +13,39 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class App extends Application
 {
-    private static final Logger logger = LogManager.getLogger(App.class);
-    public static void main( String[] args )
-    {
+    private static final Logger logger = LogManager.getLogger();
+
+    private ClassPathXmlApplicationContext context;
+
+    public static void main( String[] args ) {
         launch(args);
+    }
+
+    public App() {
+        context = new ClassPathXmlApplicationContext("beans.xml");
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        //logger
         logger.info("Application started.");
-
-        /*A short demonstration showing how the spring framework instantiates for us
-        a new service object without using the new operator. All configs go to beans.xml */
-        ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
-        Service service = (Service) context.getBean("serviceBean");
 
         //javafx
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Main.fxml"));
         Parent root = loader.load();
         MainController mainController = loader.getController();
-        PhotoService photoService = new PhotoServiceImpl();
-        ImportService importService = new ImportServiceImpl();
-        mainController.setPhotoService(photoService);
-        mainController.setImportService(importService);
+        mainController.setContext(context);
+
         mainController.createStructure();
         mainController.setStage(primaryStage);
         primaryStage.setTitle("Hello world!");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
+    }
 
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+
+        context.close();
     }
 }
