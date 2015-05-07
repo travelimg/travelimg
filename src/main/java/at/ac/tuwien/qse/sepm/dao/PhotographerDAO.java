@@ -25,6 +25,11 @@ public interface PhotographerDAO {
      */
     public Photographer read(Photographer p) throws DAOException;
 
-
+    /**
+     * Retrieve all existing photographers.
+     *
+     * @return A List of all currently known photographers.
+     * @throws DAOException If the data store fails to retrieve the records.
+     */
     public List<Photographer> readAll() throws DAOException;
 }

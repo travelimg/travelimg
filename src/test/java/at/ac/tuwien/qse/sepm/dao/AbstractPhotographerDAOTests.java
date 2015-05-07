@@ -4,6 +4,8 @@ import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -35,6 +37,12 @@ public abstract class AbstractPhotographerDAOTests {
     public void readWithValidIdShouldReturnPhotographer() throws DAOException {
         Photographer p = photographerDAO.read(new Photographer(1,null));
         assertTrue(p.getName().equals("Alex Kinara"));
+    }
+
+    @Test
+    public void readAllShouldReturnPhotographers() throws DAOException {
+        List<Photographer> photographers = photographerDAO.readAll();
+        assertTrue(photographers.size()>0);
     }
 
 }

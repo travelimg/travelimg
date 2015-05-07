@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO {
@@ -21,6 +22,7 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
 
     private static final String insertStatement = "INSERT INTO Photographer(name) VALUES (?);";
     private static final String readStatement = "SELECT* FROM Photographer WHERE ID=?;";
+    private static final String readAllStatement = "SELECT* FROM Photographer;";
 
     public Photographer create(Photographer p) throws DAOException, ValidationException {
         logger.debug("Creating photographer {}", p);
@@ -55,6 +57,20 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
     }
 
     public List<Photographer> readAll() throws DAOException {
-        return null;
+        List<Photographer> photographers = new ArrayList<Photographer>();
+        try(PreparedStatement stmt = getConnection().prepareStatement(readAllStatement)) {
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()) {
+                photographers.add(new Photographer(
+                        rs.getInt(1),
+                        rs.getString(2)
+                ));
+            }
+        } catch (SQLException e) {
+            throw new DAOException(e);
+        }
+
+        return photographers;
     }
 }
