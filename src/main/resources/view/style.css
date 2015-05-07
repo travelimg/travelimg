@@ -1,0 +1,51 @@
+
+* {
+    -fx-background-insets: 0;
+}
+
+.navbar {
+    -fx-background-color: #2196F3;
+}
+.navbar .button {
+    -fx-border-radius: 0;
+    -fx-background-color: transparent;
+}
+.navbar .button .label {
+    -fx-border-width: 0;
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-opacity: 0.5;
+}
+.navbar .button:hover .label {
+    -fx-opacity: 0.8;
+}
+.navbar .button:disabled {
+    -fx-background-color: #1E88E5;
+}
+.navbar .button:disabled .label {
+    -fx-opacity: 0.3;
+}
+
+.organizer .list-view {
+    -fx-background-color: #FAFAFA;
+}
+.organizer .list-view:focused {
+    -fx-background-color: white;
+    -fx-effect: none;
+}
+.organizer .navbar .import .label {
+    -fx-background-image: url("../icons/add.png");
+}
+.organizer .navbar .present .label {
+    -fx-background-image: url("../icons/play.png");
+}
+
+.inspector .navbar .delete .label {
+    -fx-background-image: url("../icons/delete.png");
+}
+.inspector .navbar .cancel .label {
+    -fx-background-image: url("../icons/close.png");
+}
+.inspector .navbar .confirm .label {
+    -fx-background-image: url("../icons/check.png");
+}
