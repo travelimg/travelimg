@@ -17,7 +17,7 @@ public class JDBCDAOBase {
     protected JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public void setDatasource(DataSource dataSource) {
+    public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
