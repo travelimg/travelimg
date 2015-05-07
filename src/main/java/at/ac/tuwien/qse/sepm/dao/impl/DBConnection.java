@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.Date;
 
 /**
- * @deprecated 
+ * @deprecated
  */
 public class DBConnection {
     private static Connection con = null;
