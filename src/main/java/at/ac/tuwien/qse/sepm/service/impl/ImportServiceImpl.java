@@ -3,7 +3,6 @@ package at.ac.tuwien.qse.sepm.service.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -31,14 +30,6 @@ public class ImportServiceImpl implements ImportService {
         logger.debug("Importing photos");
         AsyncImporter importer = new AsyncImporter(photos, callback, errorHandler);
         executorService.submit(importer);
-    }
-
-    public void addPhotographerToPhotos(List<Photo> photos, Photographer photographer) throws ServiceException {
-
-    }
-
-    public void editPhotographerForPhotos(List<Photo> photos, Photographer photographer) throws ServiceException {
-
     }
 
     @Override
