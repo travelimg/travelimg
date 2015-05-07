@@ -2,7 +2,6 @@ package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
-import at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
@@ -10,8 +9,6 @@ import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.List;
 
@@ -54,4 +51,10 @@ public class PhotoServiceImpl implements PhotoService {
     public void removeTagFromPhotos(List<Photo> photos, Tag t) throws ServiceException {
 
     }
+
+    public void editPhotos(List<Photo> photos, Photo p) throws ServiceException {
+
+    }
+
+
 }

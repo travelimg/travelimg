@@ -13,5 +13,6 @@ public interface PhotoService {
     public void deletePhotos(List<Photo> photos) throws ServiceException;
     public void addTagToPhotos(List<Photo> photos, Tag t) throws ServiceException;
     public void removeTagFromPhotos(List<Photo> photos, Tag t) throws ServiceException;
+    public void editPhotos(List<Photo> photos, Photo p) throws ServiceException;
 
 }
