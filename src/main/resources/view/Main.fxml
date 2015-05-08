@@ -1,47 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <fx:root stylesheets="@style.css" type="javafx.scene.layout.BorderPane"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-    <right>
-        <BorderPane minWidth="240.0" styleClass="inspector">
-            <bottom>
-                <HBox prefHeight="56.0" styleClass="navbar">
-                    <children>
-                        <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity"
-                                styleClass="delete"
-                                HBox.hgrow="ALWAYS">
-                            <graphic>
-                                <Label maxHeight="Infinity"
-                                       maxWidth="Infinity"/>
-                            </graphic>
-                        </Button>
-                        <Button fx:id="cancelButton" maxHeight="Infinity" maxWidth="Infinity"
-                                styleClass="cancel"
-                                HBox.hgrow="ALWAYS">
-                            <graphic>
-                                <Label maxHeight="Infinity"
-                                       maxWidth="Infinity"/>
-                            </graphic>
-                        </Button>
-                        <Button fx:id="confirmButton" maxHeight="Infinity" maxWidth="Infinity"
-                                styleClass="confirm"
-                                HBox.hgrow="ALWAYS">
-                            <graphic>
-                                <Label maxHeight="Infinity"
-                                       maxWidth="Infinity"/>
-                            </graphic>
-                        </Button>
-                    </children>
-                </HBox>
-            </bottom>
-            <center>
-                <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER"/>
-            </center>
-        </BorderPane>
-    </right>
     <center>
         <GridPane fx:id="imageGrid" prefWidth="500" prefHeight="400" styleClass="image-grid">
 
