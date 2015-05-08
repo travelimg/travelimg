@@ -1,5 +1,8 @@
 package at.ac.tuwien.qse.sepm.gui;
 
+import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
+import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import javafx.event.Event;
@@ -8,6 +11,10 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Optional;
 
 public class MainController extends BorderPane {
 
@@ -30,6 +37,8 @@ public class MainController extends BorderPane {
     }
 
     private void handleImport(Event event) {
+        ImportDialog dialog = new ImportDialog(this, "Fotos importieren");
+        Optional<List<Photo>> photos = dialog.showForResult();
         // TODO
     }
 

@@ -1,10 +1,164 @@
 
+.root {
+    -fx-overlay: rgba(0, 0, 0, 0.6);
+    -fx-background: #f9f9f9;
+    -fx-background-alt: #9E9E9E;
+    -fx-text: #757575;
+    -fx-text-muted: #BDBDBD;
+    -fx-default: white;
+    -fx-default-focus: #f5f5f5;
+    -fx-default-hover: #eeeeee;
+    -fx-default-press: #dddddd;
+    -fx-default-disabled: #cccccc;
+    -fx-dropshadow-1: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 5, 0, 0, 1);
+    -fx-dropshadow-2: dropshadow(gaussian, rgba(0, 0, 0, 0.40), 7, 0, 0, 2);
+    -fx-dropshadow-3: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 9, 0, 0, 3);
+    -fx-dropshadow-4: dropshadow(gaussian, rgba(0, 0, 0, 0.50), 11, 0, 0, 4);
+
+    /* blue theme */
+    -fx-primary: #8BC34A;
+    -fx-primary-focus: #7CB342;
+    -fx-primary-hover: #7CB342;
+    -fx-primary-press: #9CCC65;
+    -fx-primary-light-focus: #F1F8E9;
+    -fx-primary-light-hover: #F1F8E9;
+    -fx-primary-light-press: #DCEDC8;
+    -fx-danger: #FFA726;
+}
+
 * {
     -fx-background-insets: 0;
 }
 
+
+.border-pane, .pane {
+    -fx-background-color: black;
+}
+
+/* light button */
+.button {
+    -fx-background-color: transparent;
+    -fx-padding: 11px 8px;
+    -fx-background-radius: 3px;
+    -fx-font-size: 14px;
+    -fx-min-width: 64px;
+}
+.button:hover {
+    -fx-background-color: -fx-default-hover;
+}
+.button:focused {
+    -fx-background-color: -fx-default-focus;
+}
+.button:pressed {
+    -fx-background-color: -fx-default-press;
+}
+.button.primary {
+    -fx-text-fill: -fx-primary;
+}
+.button.primary:focused {
+    -fx-background-color: -fx-primary-light-focus;
+}
+.button.primary:hover {
+    -fx-background-color: -fx-primary-light-hover;
+}
+.button.primary:pressed {
+    -fx-background-color: -fx-primary-light-press;
+}
+.button:disabled {
+    -fx-opacity: 0.5;
+}
+
+/* raised button */
+.button.raised {
+    -fx-background-color: -fx-default;
+    -fx-effect: -fx-dropshadow-1;
+}
+.button.raised:focused {
+    -fx-background-color: -fx-default-focus;
+    -fx-effect: -fx-dropshadow-3;
+}
+.button.raised:hover {
+    -fx-background-color: -fx-default-hover;
+}
+.button.raised:pressed {
+    -fx-effect: -fx-dropshadow-3;
+    -fx-background-color: -fx-default-press;
+}
+.button.raised:disabled {
+    -fx-effect: none;
+    -fx-background-color: -fx-default-disabled;
+}
+.button.raised.primary {
+    -fx-text-fill: white;
+    -fx-background-color: -fx-primary;
+}
+.button.raised.primary:focused {
+    -fx-background-color: -fx-primary-focus;
+}
+.button.raised.primary:hover {
+    -fx-background-color: -fx-primary-hover;
+}
+.button.raised.primary:pressed {
+    -fx-background-color: -fx-primary-press;
+}
+
+/* input fields */
+.text-field {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: -fx-background-alt;
+    -fx-border-style: solid;
+    -fx-border-width: 0 0 2px 0;
+    -fx-font-size: 14px;
+    -fx-padding: 11px 0 4px 0;
+}
+.text-field:focused {
+    -fx-border-color: -fx-primary;
+}
+
+/* dialogs */
+.dialog {
+    -fx-background-color: -fx-background;
+    -fx-font-size: 16px;
+}
+.dialog .label {
+    -fx-font-size: 14px;
+    -fx-padding: 5px 0;
+}
+.dialog .header {
+    -fx-padding: 24px;
+    -fx-font-size: 20px;
+    -fx-background-color: -fx-primary;
+    -fx-text-fill: white;
+    -fx-background-size: 100%;
+}
+.dialog.error .header {
+    -fx-background-color: -fx-danger;
+}
+.dialog .body {
+    -fx-padding: 24px;
+}
+.dialog .footer {
+    -fx-padding: 0 24px 24px 24px;
+}
+.dialog .note {
+    -fx-background-color: -fx-background-alt;
+    -fx-text-fill: white;
+    -fx-padding: 16px;
+    -fx-background-radius: 3px;
+}
+.dialog .note .icon {
+    -fx-border-width: 0;
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-opacity: 0.5;
+}
+.dialog .note .icon.info {
+    -fx-background-image: url("../icons/info.png");
+}
+
 .navbar {
-    -fx-background-color: #2196F3;
+    -fx-background-color: -fx-primary;
 }
 .navbar .button {
     -fx-border-radius: 0;

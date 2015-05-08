@@ -16,10 +16,11 @@
                                 <Label maxHeight="Infinity" maxWidth="Infinity"/>
                             </graphic>
                         </Button>
-                        <Button maxHeight="Infinity" maxWidth="Infinity" styleClass="present"
+                        <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity"
+                                styleClass="present"
                                 HBox.hgrow="ALWAYS">
                             <graphic>
-                                <Label fx:id="presentButton" maxHeight="Infinity"
+                                <Label maxHeight="Infinity"
                                        maxWidth="Infinity"/>
                             </graphic>
                         </Button>
@@ -36,24 +37,27 @@
             <bottom>
                 <HBox prefHeight="56.0" styleClass="navbar">
                     <children>
-                        <Button maxHeight="Infinity" maxWidth="Infinity" styleClass="delete"
+                        <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity"
+                                styleClass="delete"
                                 HBox.hgrow="ALWAYS">
                             <graphic>
-                                <Label fx:id="deleteButton" maxHeight="Infinity"
+                                <Label maxHeight="Infinity"
                                        maxWidth="Infinity"/>
                             </graphic>
                         </Button>
-                        <Button maxHeight="Infinity" maxWidth="Infinity" styleClass="cancel"
+                        <Button fx:id="cancelButton" maxHeight="Infinity" maxWidth="Infinity"
+                                styleClass="cancel"
                                 HBox.hgrow="ALWAYS">
                             <graphic>
-                                <Label fx:id="cancelButton" maxHeight="Infinity"
+                                <Label maxHeight="Infinity"
                                        maxWidth="Infinity"/>
                             </graphic>
                         </Button>
-                        <Button maxHeight="Infinity" maxWidth="Infinity" styleClass="confirm"
+                        <Button fx:id="confirmButton" maxHeight="Infinity" maxWidth="Infinity"
+                                styleClass="confirm"
                                 HBox.hgrow="ALWAYS">
                             <graphic>
-                                <Label fx:id="confirmButton" maxHeight="Infinity"
+                                <Label maxHeight="Infinity"
                                        maxWidth="Infinity"/>
                             </graphic>
                         </Button>

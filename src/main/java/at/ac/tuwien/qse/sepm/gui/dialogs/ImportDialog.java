@@ -1,84 +1,113 @@
 package at.ac.tuwien.qse.sepm.gui.dialogs;
 
-import at.ac.tuwien.qse.sepm.entities.Photographer;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.util.ImageFileFilter;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.service.ImportService;
-import javafx.event.ActionEvent;
+import at.ac.tuwien.qse.sepm.entities.Photographer;
+import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
+import at.ac.tuwien.qse.sepm.util.ImageFileFilter;
+import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.Stage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.ResourceBundle;
 
 public class ImportDialog extends ResultDialog<List<Photo>> {
 
-    @FXML
-    private TextField directoryTextField;
+    @FXML private Button browseButton;
+    @FXML private TextField directoryField;
+    @FXML private TextField authorField;
+    @FXML private Button importButton;
+    @FXML private Button cancelButton;
+    @FXML private Label statusText;
 
-    public ImportDialog(Stage parent) {
-        super(ImportDialog.class.getClassLoader().getResource("dialogs/ImportDialog.fxml"), parent);
+    private final List<Photo> photos = new LinkedList<>();
+
+    public ImportDialog(Node origin, String title) {
+        super(origin, title);
+        FXMLLoadHelper.load(this, this, ImportDialog.class, "view/ImportDialog.fxml");
+
+        browseButton.setOnAction(this::handleBrowse);
+        importButton.setOnAction(this::handleImport);
+        cancelButton.setOnAction(this::handleCancel);
+
+        updateStatus();
+        directoryField.textProperty()
+                .addListener((observable, oldValue, newValue) -> updateStatus());
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        setTitle("Import photos");
-    }
+    private void handleBrowse(Event event) {
 
-    @FXML
-    private void onSelectFolderClicked(ActionEvent event) {
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        directoryChooser.setTitle("Select a folder");
+        directoryChooser.setTitle("Import Verzeichnis wählen");
+        File directory = directoryChooser.showDialog(null);
 
-        File directory = directoryChooser.showDialog(getParent());
-        if(directory == null || !directory.exists()) {
+        if (directory == null || !directory.exists()) {
             getLogger().info("Invalid directory selected.");
             return;
         }
 
-        directoryTextField.setText(directory.getPath());
+        directoryField.setText(directory.getPath());
     }
 
-    @FXML
-    private void onImportClicked(ActionEvent event) {
+    private void handleImport(Event event) {
         getLogger().info("Import initiated by user");
 
-        File directory = new File(directoryTextField.getText());
-        if(!directory.exists()) {
-            getLogger().error("Import directory does not exist");
-            return;
-        }
+        File directory = new File(directoryField.getText());
+        assert (directory.exists()); // import button should be disabled otherwise
 
-        ArrayList<Photo> photos = new ArrayList<Photo>();
+        String author = authorField.getText();
+
+        // Fetch all photos from the directory.
+        ArrayList<Photo> photos = new ArrayList<>();
         for (final File file : directory.listFiles(new ImageFileFilter())) {
             if (!file.isDirectory()) {
-                photos.add(new Photo(null, new Photographer(1, "TODO"), file.getPath(), 0));
+                photos.add(new Photo(null, new Photographer(1, author), file.getPath(), 0));
             }
         }
 
         setResult(photos);
-
         close();
     }
 
-    @FXML
-    private void onCancelClicked(ActionEvent event) {
-        getLogger().info("Import canceled");
+    private void handleCancel(Event event) {
         close();
+    }
+
+    private void updateStatus() {
+
+        importButton.setDisable(true);
+
+        String path = directoryField.getText();
+        if (path.isEmpty()) {
+            statusText.setText("Kein Ordner angegeben");
+            return;
+        }
+
+        File directory = new File(path);
+        if (!directory.exists()) {
+            statusText.setText("Ordner nicht gefunden");
+            return;
+        }
+
+        int count = directory.listFiles(new ImageFileFilter()).length;
+        if (count == 0) {
+            statusText.setText("Keine Fotos im Ordner");
+            return;
+        }
+
+        if (count == 1) {
+            statusText.setText("1 Foto ausgewählt");
+            return;
+        }
+
+        statusText.setText(String.format("%d Fotos ausgewählt", count));
+        importButton.setDisable(false);
     }
 }
