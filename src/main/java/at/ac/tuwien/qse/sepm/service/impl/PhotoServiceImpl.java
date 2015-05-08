@@ -119,4 +119,31 @@ public class PhotoServiceImpl implements PhotoService {
         }
         logger.debug("Leaving removeTagFromPhotos");
     }
+
+    /**
+     * Return list of all tags which are currently set for <tt>photo</tt>.
+     *
+     * @param photo must not be null; photo.id must not be null;
+     * @return List with all tags which are linked to <tt>photo</tt> as a PhotoTag;
+     *     If no tag exists, return an empty List.
+     * @throws ServiceException if an exception occurs on this or an underlying layer
+     * @throws IllegalArgumentException if any precondition is violated
+     */
+    public List<Tag> getTagsForPhoto(Photo photo) throws ServiceException {
+        logger.debug("Entering getTagsForPhoto with {}", photo);
+        if (photo == null || photo.getId() == null) {
+            throw new IllegalArgumentException("Photo is null or does not have an id");
+        }
+
+        List<Tag> tagList;
+        try {
+            tagList = photoTagDAO.readTagsByPhoto(photo);
+            logger.info("Successfully retrieved tags for {}", photo);
+        } catch (DAOException ex) {
+            logger.error("Retrieving tags for {} failed due to DAOException", photo);
+            throw new ServiceException("Could not retrieve tags for photo: " + ex.getMessage());
+        }
+        logger.debug("Leaving getTagsForPhoto with {}", photo);
+        return tagList;
+    }
 }

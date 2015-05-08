@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.service;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 
@@ -34,4 +35,14 @@ public interface PhotoService {
      */
     void removeTagFromPhotos(List<Photo> photos, Tag tag) throws ServiceException;
 
+    /**
+     * Return list of all tags which are currently set for <tt>photo</tt>.
+     *
+     * @param photo must not be null; photo.id must not be null;
+     * @return List with all tags which are linked to <tt>photo</tt> as a PhotoTag;
+     *     If no tag exists, return an empty List.
+     * @throws ServiceException if an exception occurs on this or an underlying layer
+     * @throws IllegalArgumentException if any precondition is violated
+     */
+    List<Tag> getTagsForPhoto(Photo photo) throws ServiceException;
 }
