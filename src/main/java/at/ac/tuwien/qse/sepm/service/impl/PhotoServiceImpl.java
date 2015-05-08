@@ -90,11 +90,6 @@ public class PhotoServiceImpl implements PhotoService {
                 return;
             }
             for(Photo p : photos){
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 callback.accept(p);
             }
         }
