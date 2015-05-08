@@ -44,8 +44,8 @@ public class MainController {
     }
 
     public void setContext(ApplicationContext context) {
-        photoService = (PhotoService) context.getBean("photoServiceBean");
-        importService = (ImportService) context.getBean("importServiceBean");
+        photoService = (PhotoService) context.getBean("photoService");
+        importService = (ImportService) context.getBean("importService");
     }
 
     public void initialize(){
