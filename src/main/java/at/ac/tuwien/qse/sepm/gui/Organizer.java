@@ -5,8 +5,6 @@ import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
@@ -39,9 +37,10 @@ public class Organizer extends BorderPane {
     @FXML private Button presentButton;
     @FXML private ListView<Date> monthList;
 
+    private final ObservableList<Photo> activePhotos = FXCollections.observableArrayList();
+
     private final ObservableList<Date> months = FXCollections.observableArrayList();
     private final SortedList<Date> monthsSorted = new SortedList<>(months);
-
     private final SimpleDateFormat monthFormat = new SimpleDateFormat("yyyy MMM");
 
     public Organizer() {
@@ -63,17 +62,23 @@ public class Organizer extends BorderPane {
         });
 
         months.addAll(getAvailableMonths());
+
+        // TODO: Remove this madness and fetch the images from the system.
+        Photo p1 = new Photo();
+        Photo p2 = new Photo();
+        Photo p3 = new Photo();
+        p1.setPath("http://www.cvent.com/en/images/event-housing-travel.jpg");
+        p2.setPath("http://vignette2.wikia.nocookie.net/kailiaukisland/images/8/8a/Jungle1.jpeg/revision/latest?cb=20100608024535");
+        p3.setPath("http://www.china-mike.com/wp-content/uploads/2010/07/great-wall-china2.jpg");
+        activePhotos.add(p1);
+        activePhotos.add(p2);
+        activePhotos.add(p3);
     }
 
     /**
      * Set of photos that match the current filter.
      */
     public final ObservableList<Photo> getActivePhotos() {
-        return activePhotosProperty().get();
-    }
-    private final ObjectProperty<ObservableList<Photo>> activePhotos =
-            new SimpleObjectProperty<>(this, "activePhotos");
-    public final ObjectProperty<ObservableList<Photo>> activePhotosProperty() {
         return activePhotos;
     }
 
