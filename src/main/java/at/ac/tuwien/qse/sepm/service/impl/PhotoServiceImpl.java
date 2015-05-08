@@ -3,7 +3,6 @@ package at.ac.tuwien.qse.sepm.service.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
-import at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
@@ -11,14 +10,12 @@ import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.List;
 
 public class PhotoServiceImpl implements PhotoService {
 
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private PhotoDAO photoDAO;
     private PhotoTagDAO photoTagDAO;
@@ -61,7 +58,7 @@ public class PhotoServiceImpl implements PhotoService {
      * @throws IllegalArgumentException if any precondition is violated
      */
     public void addTagToPhotos(List<Photo> photos, Tag tag) throws ServiceException {
-        logger.debug("Entering addTagToPhotos with {}, {}", photos, tag);
+        LOGGER.debug("Entering addTagToPhotos with {}, {}", photos, tag);
         if (photos == null) {
             throw new IllegalArgumentException("List<Photo> photos is null");
         }
@@ -78,11 +75,11 @@ public class PhotoServiceImpl implements PhotoService {
             try {
                 photoTagDAO.createPhotoTag(photo, tag);
             } catch (DAOException ex) {
-                logger.error("Photo-Tag-creation with {}, {} failed.", photo, tag);
+                LOGGER.error("Photo-Tag-creation with {}, {} failed.", photo, tag);
                 throw new ServiceException("DAOException was thrown: " + ex.getMessage());
             }
         }
-        logger.debug("Leaving addTagToPhotos");
+        LOGGER.debug("Leaving addTagToPhotos");
     }
 
     /**
@@ -96,7 +93,7 @@ public class PhotoServiceImpl implements PhotoService {
      * @throws IllegalArgumentException if any precondition is violated
      */
     public void removeTagFromPhotos(List<Photo> photos, Tag tag) throws ServiceException {
-        logger.debug("Entering removeTagFromPhotos with {}, {}", photos, tag);
+        LOGGER.debug("Entering removeTagFromPhotos with {}, {}", photos, tag);
         if (photos == null) {
             throw new IllegalArgumentException("List<Photo> photos is null");
         }
@@ -113,11 +110,11 @@ public class PhotoServiceImpl implements PhotoService {
             try {
                 photoTagDAO.removeTagFromPhoto(photo, tag);
             } catch (DAOException ex) {
-                logger.error("Removal of Photo-Tag with {}, {} failed.", photo, tag);
+                LOGGER.error("Removal of Photo-Tag with {}, {} failed.", photo, tag);
                 throw new ServiceException("DAOException was thrown: " + ex.getMessage());
             }
         }
-        logger.debug("Leaving removeTagFromPhotos");
+        LOGGER.debug("Leaving removeTagFromPhotos");
     }
 
     /**
@@ -125,12 +122,12 @@ public class PhotoServiceImpl implements PhotoService {
      *
      * @param photo must not be null; photo.id must not be null;
      * @return List with all tags which are linked to <tt>photo</tt> as a PhotoTag;
-     *     If no tag exists, return an empty List.
-     * @throws ServiceException if an exception occurs on this or an underlying layer
+     * If no tag exists, return an empty List.
+     * @throws ServiceException         if an exception occurs on this or an underlying layer
      * @throws IllegalArgumentException if any precondition is violated
      */
     public List<Tag> getTagsForPhoto(Photo photo) throws ServiceException {
-        logger.debug("Entering getTagsForPhoto with {}", photo);
+        LOGGER.debug("Entering getTagsForPhoto with {}", photo);
         if (photo == null || photo.getId() == null) {
             throw new IllegalArgumentException("Photo is null or does not have an id");
         }
@@ -138,12 +135,12 @@ public class PhotoServiceImpl implements PhotoService {
         List<Tag> tagList;
         try {
             tagList = photoTagDAO.readTagsByPhoto(photo);
-            logger.info("Successfully retrieved tags for {}", photo);
+            LOGGER.info("Successfully retrieved tags for {}", photo);
         } catch (DAOException ex) {
-            logger.error("Retrieving tags for {} failed due to DAOException", photo);
+            LOGGER.error("Retrieving tags for {} failed due to DAOException", photo);
             throw new ServiceException("Could not retrieve tags for photo: " + ex.getMessage());
         }
-        logger.debug("Leaving getTagsForPhoto with {}", photo);
+        LOGGER.debug("Leaving getTagsForPhoto with {}", photo);
         return tagList;
     }
 }
