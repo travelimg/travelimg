@@ -2,8 +2,11 @@ package at.ac.tuwien.qse.sepm.service;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 
+import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
 public interface PhotoService {
 
@@ -14,5 +17,6 @@ public interface PhotoService {
     public void addTagToPhotos(List<Photo> photos, Tag t) throws ServiceException;
     public void removeTagFromPhotos(List<Photo> photos, Tag t) throws ServiceException;
     public void editPhotos(List<Photo> photos, Photo p) throws ServiceException;
+    public void loadPhotosByDate(Date date, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) throws ServiceException;
 
 }

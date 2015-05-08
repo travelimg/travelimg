@@ -7,10 +7,13 @@ import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class PhotoServiceImpl implements PhotoService {
 
@@ -53,6 +56,10 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     public void editPhotos(List<Photo> photos, Photo p) throws ServiceException {
+
+    }
+
+    public void loadPhotosByDate(Date date, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) throws ServiceException {
 
     }
 
