@@ -99,11 +99,15 @@ public class Organizer extends BorderPane {
         });
     }
     private void handleImportError(Throwable error) {
-        InfoDialog dialog = new InfoDialog(this, "Import Fehler");
-        dialog.setError(true);
-        dialog.setHeaderText("Import fehlgeschlagen");
-        dialog.setContentText("Fehlermeldung: " + error.getMessage());
-        dialog.showAndWait();
+        // queue an update in the main gui
+        Platform.runLater(() -> {
+            InfoDialog dialog = new InfoDialog(this, "Import Fehler");
+            dialog.setError(true);
+            dialog.setHeaderText("Import fehlgeschlagen");
+            dialog.setContentText("Fehlermeldung: " + error.getMessage());
+            dialog.showAndWait();
+        });
+
     }
 
     private void handlePresent(Event event) {
