@@ -13,6 +13,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public class PhotoServiceImpl implements PhotoService {
@@ -20,6 +22,8 @@ public class PhotoServiceImpl implements PhotoService {
     private static final Logger logger = LogManager.getLogger();
 
     private PhotoDAO photoDAO;
+
+    private ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     public PhotoServiceImpl(PhotoDAO photoDAO) {
         this.photoDAO = photoDAO;
@@ -60,7 +64,44 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     public void loadPhotosByDate(Date date, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) throws ServiceException {
+        logger.debug("Loading photos");
+        AsyncLoader loader = new AsyncLoader(date, callback, errorHandler);
+        executorService.submit(loader);
+    }
 
+    private class AsyncLoader implements Runnable {
+        private Date date;
+        private Consumer<Photo> callback;
+        private ErrorHandler<ServiceException> errorHandler;
+
+        public AsyncLoader(Date date, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
+            this.date = date;
+            this.callback = callback;
+            this.errorHandler = errorHandler;
+        }
+
+        @Override
+        public void run() {
+            List<Photo> photos;
+            try {
+                photos = photoDAO.readPhotosByDate(date);
+            } catch (DAOException e) {
+                errorHandler.propagate(new ServiceException("Failed to load photos", e));
+                return;
+            }
+            for(Photo p : photos){
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                callback.accept(p);
+            }
+        }
+    }
+
+    public void close() {
+        executorService.shutdown();
     }
 
 
