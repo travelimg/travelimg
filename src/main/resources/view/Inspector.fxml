@@ -1,41 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root type="javafx.scene.layout.BorderPane" prefWidth="240.0" styleClass="inspector"
-         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefWidth="240.0" styleClass="inspector" stylesheets="@style.css" type="javafx.scene.layout.BorderPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <center>
+        <VBox maxHeight="Infinity" maxWidth="Infinity" styleClass="section" BorderPane.alignment="CENTER">
+         <children>
+            <Button mnemonicParsing="false" styleClass="raised" text="TODO" />
+         </children></VBox>
+    </center>
     <bottom>
         <HBox prefHeight="56.0" styleClass="navbar">
             <children>
-                <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity"
-                        styleClass="delete"
-                        HBox.hgrow="ALWAYS">
+                <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity" styleClass="delete" HBox.hgrow="ALWAYS">
                     <graphic>
-                        <Label maxHeight="Infinity"
-                               maxWidth="Infinity"/>
+                        <Label maxHeight="Infinity" maxWidth="Infinity" />
                     </graphic>
                 </Button>
-                <Button fx:id="cancelButton" maxHeight="Infinity" maxWidth="Infinity"
-                        styleClass="cancel"
-                        HBox.hgrow="ALWAYS">
+                <Button fx:id="cancelButton" maxHeight="Infinity" maxWidth="Infinity" styleClass="cancel" HBox.hgrow="ALWAYS">
                     <graphic>
-                        <Label maxHeight="Infinity"
-                               maxWidth="Infinity"/>
+                        <Label maxHeight="Infinity" maxWidth="Infinity" />
                     </graphic>
                 </Button>
-                <Button fx:id="confirmButton" maxHeight="Infinity" maxWidth="Infinity"
-                        styleClass="confirm"
-                        HBox.hgrow="ALWAYS">
+                <Button fx:id="confirmButton" maxHeight="Infinity" maxWidth="Infinity" styleClass="confirm" HBox.hgrow="ALWAYS">
                     <graphic>
-                        <Label maxHeight="Infinity"
-                               maxWidth="Infinity"/>
+                        <Label maxHeight="Infinity" maxWidth="Infinity" />
                     </graphic>
                 </Button>
             </children>
         </HBox>
     </bottom>
-    <center>
-        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER"/>
-    </center>
 </fx:root>

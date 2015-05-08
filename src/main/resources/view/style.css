@@ -17,9 +17,9 @@
 
     /* blue theme */
     -fx-primary: #8BC34A;
-    -fx-primary-focus: #7CB342;
-    -fx-primary-hover: #7CB342;
-    -fx-primary-press: #9CCC65;
+    -fx-primary-focus: #9CCC65;
+    -fx-primary-hover: #9CCC65;
+    -fx-primary-press: #7CB342;
     -fx-primary-light-focus: #F1F8E9;
     -fx-primary-light-hover: #F1F8E9;
     -fx-primary-light-press: #DCEDC8;
@@ -28,11 +28,6 @@
 
 * {
     -fx-background-insets: 0;
-}
-
-
-.border-pane, .pane {
-    -fx-background-color: black;
 }
 
 /* light button */
@@ -116,6 +111,52 @@
     -fx-border-color: -fx-primary;
 }
 
+/* lists */
+.list-view, .list-view * {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+}
+.list-view {
+    -fx-table-cell-border-width: 0;
+    -fx-background-color: -fx-default;
+    -fx-font-size: 16px;
+}
+.list-cell {
+     -fx-font-size: 14px;
+     -fx-padding: 8px 10px;
+ }
+.list-cell:focused {
+    -fx-background-color: -fx-primary-light-focus;
+}
+.list-cell:hover {
+    -fx-background-color: -fx-primary-light-hover;
+}
+.list-cell:pressed {
+    -fx-background-color: -fx-primary-light-press;
+}
+.list-cell:selected {
+    -fx-background-color: -fx-primary;
+}
+.list-cell:selected:focused {
+    -fx-background-color: -fx-primary-focus;
+}
+.list-cell:selected:hover {
+    -fx-background-color: -fx-primary-hover;
+}
+.list-cell:focused .label {
+    -fx-text-fill: white;
+}
+.list-cell:selected .label {
+    -fx-text-fill: white;
+}
+
+.section {
+    -fx-padding: 24px;
+}
+
 /* dialogs */
 .dialog {
     -fx-background-color: -fx-background;
@@ -164,14 +205,20 @@
     -fx-border-radius: 0;
     -fx-background-color: transparent;
 }
+.navbar .button:pressed {
+    -fx-background-color: -fx-primary-press;
+}
 .navbar .button .label {
     -fx-border-width: 0;
     -fx-background-position: center;
     -fx-background-repeat: no-repeat;
-    -fx-opacity: 0.5;
+    -fx-opacity: 0.8;
+}
+.navbar .button:focused .label {
+    -fx-opacity: 1.0;
 }
 .navbar .button:hover .label {
-    -fx-opacity: 0.8;
+    -fx-opacity: 1.0;
 }
 .navbar .button:disabled {
     -fx-background-color: #1E88E5;
@@ -180,6 +227,9 @@
     -fx-opacity: 0.3;
 }
 
+.organizer {
+    -fx-effect: -fx-dropshadow-1;
+}
 .organizer .list-view {
     -fx-background-color: #FAFAFA;
 }
@@ -194,6 +244,9 @@
     -fx-background-image: url("../icons/play.png");
 }
 
+.inspector {
+    -fx-effect: -fx-dropshadow-1;
+}
 .inspector .navbar .delete .label {
     -fx-background-image: url("../icons/delete.png");
 }

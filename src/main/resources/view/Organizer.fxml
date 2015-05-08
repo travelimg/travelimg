@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root type="javafx.scene.layout.BorderPane" prefWidth="160.0" styleClass="organizer"
+<fx:root stylesheets="@style.css" type="javafx.scene.layout.BorderPane" prefWidth="160.0" styleClass="organizer"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <center>
         <ListView maxWidth="Infinity" maxHeight="Infinity" BorderPane.alignment="CENTER"/>
