@@ -17,7 +17,12 @@ public class App extends Application {
     }
 
     public App() {
-        context = new ClassPathXmlApplicationContext("beans.xml");
+        try {
+            context = new ClassPathXmlApplicationContext("beans.xml");
+        } catch (Exception e) {
+            logger.error("Failed to setup application. Exiting.", e);
+            System.exit(1);
+        }
     }
 
     @Override public void start(Stage stage) throws Exception {
