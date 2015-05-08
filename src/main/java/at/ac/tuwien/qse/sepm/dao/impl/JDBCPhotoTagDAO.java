@@ -31,13 +31,17 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      */
     public void createPhotoTag(Photo photo, Tag tag) throws DAOException {
         LOGGER.debug("Entering createPhotoTag with {} {}", photo, tag);
-        //TODO: Check if photo-tag entry already exists. Implement using 'readTagsByPhoto'
-        try {
-            jdbcTemplate.update(CREATE_STRING, photo.getId(), tag.getId());
-            LOGGER.info("Photo-Tag entry successfully created");
-        } catch (DataAccessException ex) {
-            LOGGER.error("Photo-Tag entry creation failed due to DataAccessException");
-            throw new DAOException("Photo-tag entry creation failed: " + ex.getMessage());
+        if (!readTagsByPhoto(photo).contains(tag)) {
+            try {
+                jdbcTemplate.update(CREATE_STRING, photo.getId(), tag.getId());
+                LOGGER.info("Photo-Tag entry successfully created");
+            } catch (DataAccessException ex) {
+                LOGGER.error("Photo-Tag entry creation failed due to DataAccessException");
+                throw new DAOException("Photo-tag entry creation failed: " + ex.getMessage());
+            }
+        } else {
+            //photo-tag entry already exists
+            LOGGER.info("PhotoTag entry to be created already exists. No action taken.");
         }
         LOGGER.debug("Leaving createPhotoTag with {} {}", photo, tag);
     }
