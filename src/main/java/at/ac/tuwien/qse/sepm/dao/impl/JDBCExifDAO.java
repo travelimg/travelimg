@@ -12,12 +12,11 @@ import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
 import org.apache.commons.imaging.formats.tiff.constants.GpsTagConstants;
 import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,55 +24,54 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
     private static final String insertStatement = "INSERT INTO exif(photo_id, date, exposure, aperture, focallength, iso, flash, make, model, latitude, longitude, altitude) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
     private static final String readAllStatement = "SELECT * FROM Exif ORDER BY DATE;";
 
-    public Exif create(Exif e) throws DAOException {
-        logger.debug("Entering create() " + e);
-        jdbcTemplate
-                .update(insertStatement, e.getId(), e.getDate(), e.getExposure(), e.getAperture(),
-                        e.getFocalLength(), e.getIso(), e.isFlash(), e.getMake(), e.getModel(),
-                        e.getLatitude(), e.getLongitude(), e.getAltitude());
-        return e;
-        //            insertStatement.setInt(1, e.getId());
-        //            insertStatement.setTimestamp(2, e.getDate());
-        //            insertStatement.setString(3, e.getExposure());
-        //            insertStatement.setDouble(4, e.getAperture());
-        //            insertStatement.setDouble(5, e.getFocalLength());
-        //            insertStatement.setInt(6, e.getIso());
-        //            insertStatement.setBoolean(7, e.isFlash());
-        //            insertStatement.setString(8, e.getMake());
-        //            insertStatement.setString(9, e.getModel());
-        //            insertStatement.setDouble(10, e.getLatitude());
-        //            insertStatement.setDouble(11, e.getLongitude());
-        //            insertStatement.setDouble(12, e.getAltitude());
+    public Exif create(Exif exif) throws DAOException {
+        logger.debug("Entering create() " + exif);
+        jdbcTemplate.update(insertStatement, exif.getId(), exif.getDate(), exif.getExposure(),
+                exif.getAperture(), exif.getFocalLength(), exif.getIso(), exif.isFlash(),
+                exif.getMake(), exif.getModel(), exif.getLatitude(), exif.getLongitude(),
+                exif.getAltitude());
+        return exif;
+        //            insertStatement.setInt(1, exif.getId());
+        //            insertStatement.setTimestamp(2, exif.getDate());
+        //            insertStatement.setString(3, exif.getExposure());
+        //            insertStatement.setDouble(4, exif.getAperture());
+        //            insertStatement.setDouble(5, exif.getFocalLength());
+        //            insertStatement.setInt(6, exif.getIso());
+        //            insertStatement.setBoolean(7, exif.isFlash());
+        //            insertStatement.setString(8, exif.getMake());
+        //            insertStatement.setString(9, exif.getModel());
+        //            insertStatement.setDouble(10, exif.getLatitude());
+        //            insertStatement.setDouble(11, exif.getLongitude());
+        //            insertStatement.setDouble(12, exif.getAltitude());
         //            insertStatement.executeUpdate();
     }
 
-    public Exif read(Exif e) throws DAOException {
+    public Exif read(Exif exif) throws DAOException {
         return null;
     }
 
-    public void update(Exif e) throws DAOException {
+    public void update(Exif exif) throws DAOException {
 
     }
 
-    public void delete(Exif e) throws DAOException {
+    public void delete(Exif exif) throws DAOException {
 
     }
 
     public List<Exif> readAll() throws DAOException {
-        List<Exif> exifs = new ArrayList<Exif>();
         try {
             return jdbcTemplate.query(readAllStatement, (rs, rowNum) -> {
                 return new Exif(rs.getInt(1), rs.getTimestamp(2), rs.getString(3), rs.getDouble(4),
                         rs.getDouble(5), rs.getInt(6), rs.getBoolean(7), rs.getString(8),
                         rs.getString(9), rs.getDouble(10), rs.getDouble(11), rs.getDouble(12));
-            });
+                });
         } catch (DataAccessException e) {
             throw new DAOException(e.getMessage(), e);
         }
     }
 
-    @Override public Exif importExif(Photo p) throws DAOException {
-        File file = new File(p.getPath());
+    @Override public Exif importExif(Photo photo) throws DAOException {
+        File file = new File(photo.getPath());
         Timestamp date;
         String exposure;
         double aperture;
@@ -121,19 +119,16 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
                 if (null != gpsInfo) {
                     final double longitude = gpsInfo.getLongitudeAsDegreesEast();
                     final double latitude = gpsInfo.getLatitudeAsDegreesNorth();
-                    Exif exif = new Exif(p.getId(), date, exposure, aperture, focalLength, iso,
+                    Exif exif = new Exif(photo.getId(), date, exposure, aperture, focalLength, iso,
                             flash, make, model, latitude, longitude, altitude);
                     this.create(exif);
-                    p.setExif(exif);
+                    photo.setExif(exif);
                     return exif;
                 }
             }
             throw new DAOException("Error while retrieving the GPS data");
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new DAOException(e.getMessage(), e);
-        } catch (ImageReadException e) {
+        } catch (IOException | ImageReadException e) {
             e.printStackTrace();
             throw new DAOException(e.getMessage(), e);
         }
