@@ -1,14 +1,15 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
-import at.ac.tuwien.qse.sepm.dao.AbstractJDBCExifDAOTest;
-import at.ac.tuwien.qse.sepm.dao.ExifDAO;
+
+import at.ac.tuwien.qse.sepm.dao.AbstractPhotoDAOTests;
+import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
+import at.ac.tuwien.qse.sepm.dao.impl.DBConnection;
+import at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO;
 import org.junit.After;
 import org.junit.Before;
 
-/**
- * Created by christoph on 08.05.15.
- */
-public class JDBCExifDAOTest extends AbstractJDBCExifDAOTest {
+public class JDBCPhotoDAOTests extends AbstractPhotoDAOTests {
+
 
     @Before
     public void setUp() throws Exception {
@@ -16,9 +17,9 @@ public class JDBCExifDAOTest extends AbstractJDBCExifDAOTest {
         //ggf. Datenbank erstellen (sofern In-Memory und nicht Server-Mode)
         //Testdaten einspielen
         //erstelle H2JockeyDAO
-        ExifDAO re = new JDBCExifDAO();
+        PhotoDAO re = new JDBCPhotoDAO("{user.home}/travelimg");
         //setzte JockeyDAO
-        setExifDAO(re);
+        setPhotoDAO(re);
         DBConnection.getConnection().setAutoCommit(false);
     }
 
@@ -26,7 +27,5 @@ public class JDBCExifDAOTest extends AbstractJDBCExifDAOTest {
     public void tearDown() throws Exception {
         DBConnection.getConnection().rollback();
     }
-
-
 
 }

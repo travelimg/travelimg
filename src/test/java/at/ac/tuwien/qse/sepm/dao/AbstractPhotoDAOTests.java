@@ -1,16 +1,18 @@
 package at.ac.tuwien.qse.sepm.dao;
 
+import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.junit.Test;
 
-
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
-
+import static org.mockito.Mockito.when;
 
 public abstract class AbstractPhotoDAOTests {
 
@@ -28,12 +30,22 @@ public abstract class AbstractPhotoDAOTests {
     @Test
 
     public void testDelete() throws DAOException, ValidationException {
-        Photo mockPhoto = mock(Photo.class);
-        photoDAO.create(mockPhoto);
-    }
-    public void testReadPhotosByYearAndMonthShouldReturnPhotos() throws DAOException {
-        List<Photo> photos = photoDAO.readPhotosByYearAndMonth(2015,3);
-        assertTrue(photos.size() > 0);
+        Photo e = mock(Photo.class);
+        Exif ex = mock(Exif.class);
+        Photographer p = mock(Photographer.class);
+        when(e.getId()).thenReturn(2);
+        when(ex.getId()).thenReturn(2);
+        when(p.getId()).thenReturn(2);
+        when(e.getPhotographer()).thenReturn(p);
+        when(e.getPath()).thenReturn("test1");
+        when(e.getRating()).thenReturn(0);
+        photoDAO.delete(e);
+
 
     }
+   // public void testReadPhotosByYearAndMonthShouldReturnPhotos() throws DAOException {
+   //     List<Photo> photos = photoDAO.readPhotosByYearAndMonth(2015,3);
+   //     assertTrue(photos.size() > 0);
+
+   // }
 }

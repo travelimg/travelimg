@@ -1,13 +1,16 @@
-package at.ac.tuwien.qse.sepm.dao;
+package at.ac.tuwien.qse.sepm.dao.impl;
 
-
-import at.ac.tuwien.qse.sepm.dao.impl.DBConnection;
-import at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO;
+import at.ac.tuwien.qse.sepm.dao.AbstractJDBCPhotoTagDAOTest;
+import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
+import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
+import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
 
-public class JDBCPhotoDAOTests extends AbstractPhotoDAOTests {
-
+/**
+ * Created by christoph on 08.05.15.
+ */
+public class JDBCPhotoTagDAOTest extends AbstractJDBCPhotoTagDAOTest {
 
     @Before
     public void setUp() throws Exception {
@@ -15,9 +18,9 @@ public class JDBCPhotoDAOTests extends AbstractPhotoDAOTests {
         //ggf. Datenbank erstellen (sofern In-Memory und nicht Server-Mode)
         //Testdaten einspielen
         //erstelle H2JockeyDAO
-        PhotoDAO re = new JDBCPhotoDAO("/tmp");
+        PhotoTagDAO pt = new JDBCPhotoTagDAO();
         //setzte JockeyDAO
-        setPhotoDAO(re);
+        setPhotoTagDAO(pt);
         DBConnection.getConnection().setAutoCommit(false);
     }
 
@@ -25,5 +28,4 @@ public class JDBCPhotoDAOTests extends AbstractPhotoDAOTests {
     public void tearDown() throws Exception {
         DBConnection.getConnection().rollback();
     }
-
 }

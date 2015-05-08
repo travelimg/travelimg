@@ -65,7 +65,6 @@ public class JDBCExifDAO implements ExifDAO {
     public void delete(Exif e) throws DAOException {
         try (PreparedStatement stmt = con.prepareStatement(deleteStatement)) {
             stmt.setInt(1, e.getId());
-            System.out.println(e.getId());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             throw new DAOException("Failed to delete Exif-Data", ex);
