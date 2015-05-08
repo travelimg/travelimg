@@ -5,33 +5,6 @@
 
 <fx:root stylesheets="@style.css" type="javafx.scene.layout.BorderPane"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-    <left>
-        <BorderPane minWidth="160.0" prefWidth="56.0" styleClass="organizer">
-            <bottom>
-                <HBox prefHeight="56.0" styleClass="navbar">
-                    <children>
-                        <Button fx:id="importButton" maxHeight="Infinity" maxWidth="Infinity"
-                                styleClass="import" HBox.hgrow="ALWAYS">
-                            <graphic>
-                                <Label maxHeight="Infinity" maxWidth="Infinity"/>
-                            </graphic>
-                        </Button>
-                        <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity"
-                                styleClass="present"
-                                HBox.hgrow="ALWAYS">
-                            <graphic>
-                                <Label maxHeight="Infinity"
-                                       maxWidth="Infinity"/>
-                            </graphic>
-                        </Button>
-                    </children>
-                </HBox>
-            </bottom>
-            <center>
-                <ListView prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
-            </center>
-        </BorderPane>
-    </left>
     <right>
         <BorderPane minWidth="240.0" styleClass="inspector">
             <bottom>
