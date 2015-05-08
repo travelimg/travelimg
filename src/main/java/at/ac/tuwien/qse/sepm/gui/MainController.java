@@ -8,6 +8,8 @@ import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -34,12 +36,13 @@ public class MainController {
 
     @FXML
     private TreeView photoTreeView;
-
+    private GoogleMapsScene gms;
     private TreeItem<String> root;
     private Stage stage;
     private PhotoService photoService;
     private ImportService importService;
-
+    @FXML
+    private Button gm;
     public MainController() {
     }
 
@@ -92,7 +95,15 @@ public class MainController {
             //TODO some dialog maybe? ;)
         }
     }
-
+    @FXML
+    public void openGM(){
+        this.gms= new GoogleMapsScene();
+        Scene s = gms.getScene();
+        Stage st = new Stage();
+        st.setScene(s);
+        setStage(st);
+        st.show();
+    }
     @FXML
     public void onImportPhotosClicked()  {
         ImportDialog dialog = new ImportDialog(stage);

@@ -16,5 +16,6 @@
           </Menu>
         </menus>
       </MenuBar>
+      <Button fx:id="gm" layoutY="29.0" mnemonicParsing="false" onMouseClicked="#openGM" text="GoogleMaps" />
    </children>
 </AnchorPane>
