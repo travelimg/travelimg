@@ -1,22 +1,19 @@
-package at.ac.tuwien.qse.sepm.service.impl;
+package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Exif;
-
-
-import at.ac.tuwien.qse.sepm.service.GoogleMapsService;
+import at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl;
 import com.lynden.gmapsfx.GoogleMapView;
+import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
+import javafx.application.Application;
+import javafx.scene.Scene;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-//import com.lynden.gmapsfx.javascript.object.MapType;
-
 /**
- * Created by christoph on 06.05.15.
+ * Created by christoph on 08.05.15.
  */
-
-
-public class GoogleMapsServiceImpl implements GoogleMapsService {
+public class GoogleMapsScene implements MapComponentInitializedListener {
 
     private static final Logger logger = LogManager.getLogger(ExifServiceImpl.class);
 
@@ -24,14 +21,14 @@ public class GoogleMapsServiceImpl implements GoogleMapsService {
     private GoogleMap map;
     private double x = Double.MIN_VALUE;
     private double y = Double.MIN_VALUE;
-
+    private Scene gmScene;
     private Exif marker;
     /**
      * Default Konstruktor
      * eine neue GoogleMap wird erstellen
      * angezeigt wird die Welt --> zoom = 2
      */
-    public GoogleMapsServiceImpl(){
+    public GoogleMapsScene(){
         this.mapView = new GoogleMapView();
         this.mapView.addMapInializedListener(this);
         this.marker =null;
@@ -42,7 +39,7 @@ public class GoogleMapsServiceImpl implements GoogleMapsService {
      * uebergeben wird eine Liste mit Koordinaten, welche auf der Map gekennzeichnet werden
      * @param marker
      */
-    public GoogleMapsServiceImpl(Exif marker){
+    public GoogleMapsScene(Exif marker){
         this.mapView = new GoogleMapView();
         this.mapView.addMapInializedListener(this);
         this.marker =marker;
@@ -57,7 +54,7 @@ public class GoogleMapsServiceImpl implements GoogleMapsService {
      * @param y die Y-Koordinate des Landes/der Stadt
      * @param marker eine Liste mit Koordinaten, welche auf der Map gekennzeichnet werden
      */
-    public GoogleMapsServiceImpl(double x, double y, Exif marker){
+    public GoogleMapsScene(double x, double y, Exif marker){
         this.x=x;
         this.y=y;
         this.marker=marker;
@@ -88,7 +85,7 @@ public class GoogleMapsServiceImpl implements GoogleMapsService {
     public void mapInitialized() {
         //Set the initial properties of the map.
         logger.debug("Initializing Map ");
-      if(this.x==Double.MIN_VALUE) {
+        if(this.x==Double.MIN_VALUE) {
 
             MapOptions mapOptions = new MapOptions();
             mapOptions.center(new LatLong(40.7033127, -73.979681))
@@ -101,40 +98,39 @@ public class GoogleMapsServiceImpl implements GoogleMapsService {
                     .zoom(2);
             map = mapView.createMap(mapOptions);
 
-      }else{
-        MapOptions mapOptions = new MapOptions();
+        }else{
+            MapOptions mapOptions = new MapOptions();
 
-        mapOptions.center(new LatLong(x, y))
-                .overviewMapControl(true)
-                .panControl(true)
-                .rotateControl(true)
-                .scaleControl(true)
-                .streetViewControl(false)
-                .zoomControl(true)
-                .zoom(12);
+            mapOptions.center(new LatLong(x, y))
+                    .overviewMapControl(true)
+                    .panControl(true)
+                    .rotateControl(true)
+                    .scaleControl(true)
+                    .streetViewControl(false)
+                    .zoomControl(true)
+                    .zoom(12);
 
-        map = mapView.createMap(mapOptions);
+            map = mapView.createMap(mapOptions);
         }
         if(this.marker!=null){
 
-                map.addMarker(new Marker(new MarkerOptions().position(new LatLong(Double.parseDouble(marker.getLongitude()),Double.parseDouble(marker.getLatitude()) ))
-                        .visible(Boolean.TRUE)));
+            map.addMarker(new Marker(new MarkerOptions().position(new LatLong(Double.parseDouble(marker.getLongitude()),Double.parseDouble(marker.getLatitude()) ))
+                    .visible(Boolean.TRUE)));
 
         }
     }
-    public GoogleMapView getMarker(Exif e){
-        return new GoogleMapsServiceImpl(e).getMap();
-    }
+   // public GoogleMapView getMarker(Exif e){
+    //    return new GoogleMapsServiceImpl(e).getMap();
+   // }
     /**
      * GoogleMapsServiceImpl muss existieren
      * @return GoogleMapView fuer eine Scene wird zurueckgegeben
      */
-    public GoogleMapView getMap(){
-        logger.debug("returning Map");
-        return this.mapView;
-
+    public Scene getScene(){
+        logger.debug("returning Scene");
+        this.gmScene = new Scene(this.mapView);
+        return this.gmScene;
     }
-
 
 
 }
