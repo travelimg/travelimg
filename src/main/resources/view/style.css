@@ -256,3 +256,7 @@
 .inspector .navbar .confirm .label {
     -fx-background-image: url("../icons/check.png");
 }
+
+.image-grid {
+    -fx-background-color: #e7e7e7;
+}

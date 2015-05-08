@@ -42,4 +42,9 @@
             </center>
         </BorderPane>
     </right>
+    <center>
+        <GridPane fx:id="imageGrid" prefWidth="500" prefHeight="400" styleClass="image-grid">
+
+        </GridPane>
+    </center>
 </fx:root>
