@@ -8,14 +8,16 @@ import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.xml.transform.Result;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,12 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     private static final String insertStatement = "INSERT INTO Photo(id, photographer_id, path, rating) VALUES (?, ?, ?, ?);";
     private static final String readAllStatement = "SELECT id, photographer_id, path, rating FROM PHOTO;";
+<<<<<<< HEAD
     private static final String deleteStatement = "Delete from Photo where id =?";
+=======
+    private static final String readByYearAndMonthStatement = "SELECT PHOTO_ID,PHOTOGRAPHER_ID,PATH,RATING FROM PHOTO JOIN EXIF WHERE ID=PHOTO_ID AND YEAR(DATE)=? AND MONTH(DATE)=?;";
+
+>>>>>>> develop
     private final String photoDirectory;
     private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MMM/dd", Locale.ENGLISH);
 
@@ -132,6 +139,30 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         return photos;
     }
 
+    @Override
+    public List<Photo> readPhotosByYearAndMonth(int year, int month) throws DAOException {
+        List<Photo> photos = new ArrayList<Photo>();
+        try(PreparedStatement stmt = getConnection().prepareStatement(readByYearAndMonthStatement)) {
+
+            stmt.setInt(1,year);
+            stmt.setInt(2,month);
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()) {
+                photos.add(new Photo(
+                        rs.getInt(1),
+                        null,
+                        rs.getString(3),
+                        rs.getInt(4)
+                ));
+            }
+        } catch (SQLException e) {
+            throw new DAOException(e);
+        }
+
+        return photos;
+    }
+
     /**
      * Copy the photo to the travelimg photo directory. The structure created is Year/Month/Day.
      *
@@ -178,4 +209,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             throw new DAOException("Failed to retrieve next id", e);
         }
     }
+
+
 }
