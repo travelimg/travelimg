@@ -22,7 +22,7 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
     private static final String READ_TAGS_BY_PHOTO_STRING = "SELECT DISTINCT tag_id, name FROM "
             + "(tag JOIN phototag ON id = tag_id) WHERE photo_id = ?";
     private static final String READ_PHOTOS_BY_TAG_STRING =
-            "SELECT DISTINCT * FROM (photo JOIN" + "phototag ON id = photo_id) where tag_id = ?";
+            "SELECT DISTINCT * FROM (photo JOIN phototag ON id = photo_id) where tag_id = ?";
     private PreparedStatement createStmt;
     private PreparedStatement deleteStmt;
     private PreparedStatement readTagsStmt;
