@@ -34,12 +34,8 @@ public class AppTest {
 
     @Before
     public void setUp() {
-        try {
-            logger.info("setUp");
-            exifservice = new ExifServiceImpl();
-        } catch (ServiceException e) {
-            e.printStackTrace();
-        }
+        logger.info("setUp");
+        exifservice = new ExifServiceImpl();
     }
 
     @Test

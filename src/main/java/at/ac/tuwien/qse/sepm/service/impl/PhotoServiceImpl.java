@@ -10,6 +10,9 @@ import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.List;
 
@@ -20,8 +23,16 @@ public class PhotoServiceImpl implements PhotoService {
     private PhotoDAO photoDAO;
     private PhotoTagDAO photoTagDAO;
 
-    public PhotoServiceImpl(PhotoDAO photoDAO, PhotoTagDAO photoTagDAO) {
+    public PhotoServiceImpl() {
+
+    }
+
+    @Autowired
+    public void setPhotoDAO(PhotoDAO photoDAO) {
         this.photoDAO = photoDAO;
+    }
+    @Autowired
+    public void setPhotoTagDAO(PhotoTagDAO photoTagDAO) {
         this.photoTagDAO = photoTagDAO;
     }
 
