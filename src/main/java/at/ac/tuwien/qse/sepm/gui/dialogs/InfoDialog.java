@@ -8,6 +8,9 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
+/**
+ * Dialog that provides the user with a short message.
+ */
 public class InfoDialog extends Dialog {
 
     @FXML private Node root;
@@ -18,6 +21,9 @@ public class InfoDialog extends Dialog {
 
     @FXML private Button cancelButton;
 
+    /**
+     * {@inheritDoc}
+     */
     public InfoDialog(Node origin, String title) {
         super(origin, title);
         FXMLLoadHelper.load(this, this, InfoDialog.class, "view/InfoDialog.fxml");
@@ -25,6 +31,11 @@ public class InfoDialog extends Dialog {
         cancelButton.setOnAction(this::handleCancel);
     }
 
+    /**
+     * Text that is displayed in the header bar.
+     *
+     * It should summarize the reason for the dialog in a few words.
+     */
     public String getHeaderText() {
         return headerTextProperty().get();
     }
@@ -35,6 +46,9 @@ public class InfoDialog extends Dialog {
         headerTextProperty().set(headerText);
     }
 
+    /**
+     * Text that is displayed in the body. This is usually the full error message.
+     */
     public String getContentText() {
         return contentTextProperty().get();
     }
@@ -45,6 +59,9 @@ public class InfoDialog extends Dialog {
         contentTextProperty().set(contentText);
     }
 
+    /**
+     * Value indicating that this dialog notifies about an error.
+     */
     public boolean isError() {
         return root.getStyleClass().contains("error");
     }

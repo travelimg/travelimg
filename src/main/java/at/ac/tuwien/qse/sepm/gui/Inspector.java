@@ -5,6 +5,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 
+/**
+ * GUI component that is used for viewing and modifying meta-data of a photo.
+ */
 public class Inspector extends BorderPane {
 
     @FXML private Button deleteButton;

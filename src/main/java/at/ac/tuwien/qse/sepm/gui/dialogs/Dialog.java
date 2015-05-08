@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Interface for a GUI component that can be opened as a dialog.
+ * A JavaFX pane that is opened in a separate stage.
  */
 public class Dialog extends Pane {
 
@@ -17,6 +17,10 @@ public class Dialog extends Pane {
 
     private final Stage stage = new Stage();
 
+    /**
+     * @param origin node that provides the stage that serves as the owner of this dialog
+     * @param title title displayed in the top bar of the dialog window
+     */
     public Dialog(Node origin, String title) {
         Stage owner = (Stage) origin.getScene().getWindow();
         stage.initOwner(owner);
@@ -30,11 +34,17 @@ public class Dialog extends Pane {
         return logger;
     }
 
+    /**
+     * Opens the dialog until {@link Dialog::close} is called.
+     */
     public void showAndWait() {
         getLogger().debug("dialog opened");
         stage.showAndWait();
     }
 
+    /**
+     * Closes the dialog.
+     */
     public void close() {
         getLogger().debug("dialog closed");
         stage.close();

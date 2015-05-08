@@ -15,11 +15,22 @@ public abstract class ResultDialog<R> extends Dialog {
         super(origin, title);
     }
 
+    /**
+     * Opens the dialog and returns the result, once the dialog is closed.
+     *
+     * @return result of the dialog
+     */
     public Optional<R> showForResult() {
         showAndWait();
         return result;
     }
 
+    /**
+     * Sets the result that is returned by {@link ResultDialog::showForResult} once the dialog
+     * is closed.
+     *
+     * @param result result that should be used
+     */
     public void setResult(R result) {
         this.result = Optional.of(result);
     }

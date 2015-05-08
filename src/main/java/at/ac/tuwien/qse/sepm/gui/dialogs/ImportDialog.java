@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Dialog that returns a set of photos that should be imported.
+ */
 public class ImportDialog extends ResultDialog<List<Photo>> {
 
     @FXML private Button browseButton;
@@ -29,6 +32,9 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
 
     private final List<Photo> photos = new LinkedList<>();
 
+    /**
+     * {@inheritDoc}
+     */
     public ImportDialog(Node origin, String title) {
         super(origin, title);
         FXMLLoadHelper.load(this, this, ImportDialog.class, "view/ImportDialog.fxml");

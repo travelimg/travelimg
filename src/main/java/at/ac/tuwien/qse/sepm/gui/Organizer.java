@@ -25,6 +25,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * GUI component that is used for browsing photos.
+ *
+ * TODO: Decide whether to call it Organizer or Browser or something else.
+ */
 public class Organizer extends BorderPane {
 
     @Autowired private ImportService importService;
@@ -61,7 +66,7 @@ public class Organizer extends BorderPane {
     }
 
     /**
-     * Get the set of photos currently selected in the organizer.
+     * Set of photos that match the current filter.
      */
     public final ObservableList<Photo> getActivePhotos() {
         return activePhotosProperty().get();
