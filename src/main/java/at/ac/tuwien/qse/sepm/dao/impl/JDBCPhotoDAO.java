@@ -20,9 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
@@ -116,10 +114,13 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     @Override
-    public List<Photo> readPhotosByYearAndMonth(int year, int month) throws DAOException {
+    public List<Photo> readPhotosByDate(Date date) throws DAOException {
         List<Photo> photos = new ArrayList<Photo>();
         try(PreparedStatement stmt = getConnection().prepareStatement(readByYearAndMonthStatement)) {
-
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            int year = cal.get(Calendar.YEAR);
+            int month = cal.get(Calendar.MONTH) + 1;
             stmt.setInt(1,year);
             stmt.setInt(2,month);
             ResultSet rs = stmt.executeQuery();

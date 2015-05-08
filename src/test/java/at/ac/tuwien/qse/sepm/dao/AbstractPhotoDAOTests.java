@@ -4,6 +4,8 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.junit.Test;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
@@ -22,8 +24,9 @@ public abstract class AbstractPhotoDAOTests {
     }
 
     @Test
-    public void testReadPhotosByYearAndMonthShouldReturnPhotos() throws DAOException {
-        List<Photo> photos = photoDAO.readPhotosByYearAndMonth(2015,3);
+    public void testReadPhotosByDateShouldReturnPhotos() throws DAOException, ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-yyyy");
+        List<Photo> photos = photoDAO.readPhotosByDate(sdf.parse("03-2015"));
         assertTrue(photos.size() > 0);
     }
 }
