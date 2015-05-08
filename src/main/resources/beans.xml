@@ -30,5 +30,7 @@
 	</bean>
 
 	<bean id="exifDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCExifDAO"></bean>
+
+	<bean id="exifServiceImpl" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
  
 </beans>

@@ -5,7 +5,5 @@ public interface Service {
     /**
      * Closes associated resources.
      */
-    default void close() {
-
-    }
+    default void close() {}
 }
