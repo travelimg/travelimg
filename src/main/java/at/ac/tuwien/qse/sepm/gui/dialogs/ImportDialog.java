@@ -102,12 +102,14 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
             return;
         }
 
+        // There is at least one photo ready for import.
+        importButton.setDisable(false);
+
         if (count == 1) {
             statusText.setText("1 Foto ausgewählt");
             return;
         }
 
         statusText.setText(String.format("%d Fotos ausgewählt", count));
-        importButton.setDisable(false);
     }
 }
