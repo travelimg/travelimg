@@ -5,6 +5,10 @@ import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
+import at.ac.tuwien.qse.sepm.service.ServiceException;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
@@ -61,18 +65,9 @@ public class Organizer extends BorderPane {
             }
         });
 
-        months.addAll(getAvailableMonths());
+        monthList.getSelectionModel().selectedItemProperty().addListener(this::handleMonthChange);
 
-        // TODO: Remove this madness and fetch the images from the system.
-        Photo p1 = new Photo();
-        Photo p2 = new Photo();
-        Photo p3 = new Photo();
-        p1.setPath("http://www.cvent.com/en/images/event-housing-travel.jpg");
-        p2.setPath("http://vignette2.wikia.nocookie.net/kailiaukisland/images/8/8a/Jungle1.jpeg/revision/latest?cb=20100608024535");
-        p3.setPath("http://www.china-mike.com/wp-content/uploads/2010/07/great-wall-china2.jpg");
-        activePhotos.add(p1);
-        activePhotos.add(p2);
-        activePhotos.add(p3);
+        months.addAll(getAvailableMonths());
     }
 
     /**
@@ -87,20 +82,21 @@ public class Organizer extends BorderPane {
         Optional<List<Photo>> photos = dialog.showForResult();
         if (!photos.isPresent()) return;
 
-        // FIXME importService is not wired
-        //importService.importPhotos(photos.get(),
-        //        this::handleImportedPhoto,
-        //        this::handleImportError);
+        importService.importPhotos(photos.get(),
+                this::handleImportedPhoto,
+                this::handleImportError);
     }
     private void handleImportedPhoto(Photo photo) {
+        // queue an update in the main gui
+        Platform.runLater(() -> {
+            // Ignore photos that are not part of the current filter.
+            if (monthList.getSelectionModel().isEmpty()) return;
+            String photoMonth = monthFormat.format(photo.getExif().getDate());
+            String activeMonth = monthFormat.format(monthList.getSelectionModel().getSelectedItem());
+            if (photoMonth != activeMonth) return;
 
-        // Ignore photos that are not part of the current filter.
-        if (monthList.getSelectionModel().isEmpty()) return;
-        String photoMonth = monthFormat.format(photo.getExif().getDate());
-        String activeMonth = monthFormat.format(monthList.getSelectionModel().getSelectedItem());
-        if (photoMonth != activeMonth) return;
-
-        getActivePhotos().add(photo);
+            getActivePhotos().add(photo);
+        });
     }
     private void handleImportError(Throwable error) {
         InfoDialog dialog = new InfoDialog(this, "Import Fehler");
@@ -112,6 +108,13 @@ public class Organizer extends BorderPane {
 
     private void handlePresent(Event event) {
         // TODO
+    }
+
+    private void handleMonthChange(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {
+        // remove active photos and replace them by
+        // photos from the newly selected month
+        getActivePhotos().clear();
+        getActivePhotos().addAll(getPhotosByMonth(newValue));
     }
 
     // TODO: get photos from service
