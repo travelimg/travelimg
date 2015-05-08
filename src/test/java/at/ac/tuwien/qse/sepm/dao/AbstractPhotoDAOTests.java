@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.dao;
 
+<<<<<<< HEAD
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
@@ -13,6 +14,15 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
+=======
+import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
+>>>>>>> spring-ioc
 
 public abstract class AbstractPhotoDAOTests {
 
@@ -28,6 +38,7 @@ public abstract class AbstractPhotoDAOTests {
     }
 
     @Test
+<<<<<<< HEAD
 
     public void testDelete() throws DAOException, ValidationException {
         Photo e = mock(Photo.class);
@@ -48,4 +59,10 @@ public abstract class AbstractPhotoDAOTests {
    //     assertTrue(photos.size() > 0);
 
    // }
+=======
+    public void testReadPhotosByYearAndMonthShouldReturnPhotos() throws DAOException {
+        List<Photo> photos = photoDAO.readPhotosByYearAndMonth(2015,3);
+        assertTrue(photos.size() > 0);
+    }
+>>>>>>> spring-ioc
 }
