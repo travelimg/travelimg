@@ -14,12 +14,11 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 import javax.sql.DataSource;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO {
 
@@ -47,7 +46,7 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
             Map<String, Object> parameters = new HashMap<String, Object>(1);
             parameters.put("name", p.getName());
             Number newId = insertPhotographer.executeAndReturnKey(parameters);
-            p.setId((int)newId.longValue());
+            p.setId((int) newId.longValue());
             return p;
         } catch (DataAccessException e) {
             throw new DAOException("Failed to create photographer", e);
@@ -55,18 +54,23 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
     }
 
     public Photographer read(Photographer p) throws DAOException {
-        try(PreparedStatement stmt = getConnection().prepareStatement(readStatement)) {
-
-            stmt.setInt(1,p.getId());
-            ResultSet rs = stmt.executeQuery();
-            if(!rs.next()){
-                throw new DAOException("Photographer not found");
-            }
-            p.setName(rs.getString(2));
-        } catch (SQLException e) {
-            throw new DAOException(e);
+        try {
+            return this.jdbcTemplate.queryForObject(
+                    readStatement,
+                    new Object[]{p.getId()},
+                    new RowMapper<Photographer>() {
+                        @Override
+                        public Photographer mapRow(ResultSet rs, int rowNum) throws SQLException {
+                            Photographer p = new Photographer();
+                            p.setId(rs.getInt(1));
+                            p.setName(rs.getString(2));
+                            return p;
+                        }
+                    });
         }
-        return p;
+        catch(DataAccessException e){
+            throw new DAOException("Failed to read a photographer", e);
+        }
     }
 
     public List<Photographer> readAll() throws DAOException {
