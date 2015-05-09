@@ -75,7 +75,7 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
                 );
             }, photo.getId());
         } catch (DataAccessException ex) {
-            throw new DAOException("Failed to retrieve exif data for given photo")
+            throw new DAOException("Failed to retrieve exif data for given photo");
         }
     }
 
