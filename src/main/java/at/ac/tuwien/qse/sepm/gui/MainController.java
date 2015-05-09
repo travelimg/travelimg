@@ -36,13 +36,12 @@ public class MainController {
 
     @FXML
     private TreeView photoTreeView;
-    private GoogleMapsScene gms;
+
     private TreeItem<String> root;
     private Stage stage;
     private PhotoService photoService;
     private ImportService importService;
-    @FXML
-    private Button gm;
+
     public MainController() {
     }
 
@@ -95,15 +94,7 @@ public class MainController {
             //TODO some dialog maybe? ;)
         }
     }
-    @FXML
-    public void openGM(){
-        this.gms= new GoogleMapsScene();
-        Scene s = gms.getScene();
-        Stage st = new Stage();
-        st.setScene(s);
-        setStage(st);
-        st.show();
-    }
+
     @FXML
     public void onImportPhotosClicked()  {
         ImportDialog dialog = new ImportDialog(stage);
