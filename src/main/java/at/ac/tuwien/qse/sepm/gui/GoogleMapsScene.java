@@ -23,10 +23,12 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     private double y = Double.MIN_VALUE;
     private Scene gmScene;
     private Exif marker;
+
+
     /**
-     * Default Konstruktor
-     * eine neue GoogleMap wird erstellen
-     * angezeigt wird die Welt --> zoom = 2
+     * Default Constructor
+     *
+     *
      */
     public GoogleMapsScene(){
         this.mapView = new GoogleMapView();
@@ -35,9 +37,9 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     }
 
     /**
-     * eine neue GoogleMap wird erstellen
-     * uebergeben wird eine Liste mit Koordinaten, welche auf der Map gekennzeichnet werden
-     * @param marker
+     * Constructor of a new GoogleMapsScene-Objekt
+     *
+     * @param marker a Exif-Objekt to be displayed as a marker
      */
     public GoogleMapsScene(Exif marker){
         this.mapView = new GoogleMapView();
@@ -46,13 +48,12 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     }
 
     /**
-     * eine neue GoogleMap wird erstellen
-     * uebergeben wird eine Koordinate (x,y) welche das Land / die Stadt auf der Map in den focus rueckt
-     * zoom = 12
+     * Constructor of a new GoogleMapsScene-Objekt
      *
-     * @param x die X-Koordinate des Landes/der Stadt
-     * @param y die Y-Koordinate des Landes/der Stadt
-     * @param marker eine Liste mit Koordinaten, welche auf der Map gekennzeichnet werden
+     *
+     * @param x the X-Koordinate of the Country/city
+     * @param y the Y-Koordinate of the Country/city
+     * @param marker a Exif-Objekt to be displayed as a marker
      */
     public GoogleMapsScene(double x, double y, Exif marker){
         this.x=x;
@@ -65,20 +66,19 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
 
     /**
-     * Inizialisiert die GoogleMap
-     * wenn Default-Kontruktor --> Welt wird angezeigt (default --> x und y sind Double_MinValue)
-     * sonst wird die X/Y-koordinate uebergeben (Stadt/Land)
-     *
-     * wenn die Koordinatenliste nicht leer ist, werden die Koordinaten ausgelesen und Marker gesetzt
+     * Initialising GoogleMap
+     * default --> show the global view (x and y = Double_MinValue)
+     * Consturctor (exif) --> a marker will be placed at the exif-Koordinate
+     * Constructor (x,y,exif)--> focus Position x,y ;  a marker will be placed at the exif-Koordinate
      *
      *
      * mapOption
-     *  overviewMapControl (true --> wechsel zwischen Map und Satelit)
-     *  panControl(true --> Navigations-Steuerkreuz wird angezeigt )
-     *  rotateControl(true--> keine Auswirkungen)
-     *  scaleControl (true--> keine Auswirkungen)
-     *  streetViewControl(bruachen wir nicht ?)
-     *  zoomControl (true--> Zoom-Navigarion wird angezeigt)
+     *  overviewMapControl (true --> switch between Map and Satelit)
+     *  panControl(true --> show Navigation-element from GoogleMaps )
+     *  rotateControl(true--> no effect)
+     *  scaleControl (true--> no effect)
+     *  streetViewControl(no effect)
+     *  zoomControl (true--> show zoom-element from GoogleMaps)
      *  zoom(zoomfactor)
      */
     @Override
@@ -119,12 +119,10 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
         }
     }
-   // public GoogleMapView getMarker(Exif e){
-    //    return new GoogleMapsServiceImpl(e).getMap();
-   // }
+
     /**
-     * GoogleMapsServiceImpl muss existieren
-     * @return GoogleMapView fuer eine Scene wird zurueckgegeben
+     *
+     * @return GoogleMapView as a Scene
      */
     public Scene getScene(){
         logger.debug("returning Scene");
