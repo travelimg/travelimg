@@ -4,15 +4,22 @@ import at.ac.tuwien.qse.sepm.dao.DAOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Date;
 
+/**
+ * @deprecated
+ */
 public class DBConnection {
     private static Connection con = null;
     private static final Logger logger = LogManager.getLogger();
 
     private DBConnection() throws DAOException {
+        logger.warn("Deprecated. Use jdbcTemplate from JDBCDAOBase");
         try {
             Class.forName("org.h2.Driver");
             con = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/mydb", "sa", "");
