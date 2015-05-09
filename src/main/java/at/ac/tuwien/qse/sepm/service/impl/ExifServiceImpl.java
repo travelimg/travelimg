@@ -10,9 +10,14 @@ import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.ImageWriteException;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.common.ImageMetadata;
+import org.apache.commons.imaging.common.RationalNumber;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
+import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
+import org.apache.commons.imaging.formats.tiff.constants.GpsTagConstants;
+import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
+import org.apache.commons.imaging.formats.tiff.write.TiffOutputDirectory;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
 import org.apache.commons.imaging.util.IoUtils;
 import org.apache.logging.log4j.LogManager;
@@ -41,7 +46,7 @@ public class ExifServiceImpl implements ExifService {
         Exif exif = photo.getExif();
 
         try {
-            this.setExifGPSTag(file, exif.getLatitude(), exif.getLongitude());
+            this.setExifTags(file, exif);
             exifDAO.update(exif);
         } catch (IOException | DAOException | ImageWriteException | ImageReadException e) {
             e.printStackTrace();
@@ -58,8 +63,8 @@ public class ExifServiceImpl implements ExifService {
         }
     }
 
-    public void setExifGPSTag(final File jpegImageFile, final double latitude,
-            final double longitude) throws IOException, ImageReadException, ImageWriteException {
+    public void setExifTags(final File jpegImageFile, Exif exif)
+            throws IOException, ImageReadException, ImageWriteException {
 
         File tempFile = new File(jpegImageFile.getPath() + "d");
         OutputStream os = null;
@@ -72,9 +77,9 @@ public class ExifServiceImpl implements ExifService {
             final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
             if (null != jpegMetadata) {
                 // note that exif might be null if no Exif metadata is found.
-                final TiffImageMetadata exif = jpegMetadata.getExif();
+                final TiffImageMetadata exifMeta = jpegMetadata.getExif();
 
-                if (exif != null) {
+                if (exifMeta != null) {
                     // TiffImageMetadata class is immutable (read-only).
                     // TiffOutputSet class represents the Exif data to write.
                     //
@@ -83,7 +88,7 @@ public class ExifServiceImpl implements ExifService {
                     // the values of a few fields, or adding a field.
                     // In these cases, it is easiest to use getOutputSet() to
                     // start with a "copy" of the fields read from the image.
-                    outputSet = exif.getOutputSet();
+                    outputSet = exifMeta.getOutputSet();
 
                 }
             }
@@ -95,7 +100,40 @@ public class ExifServiceImpl implements ExifService {
                 outputSet = new TiffOutputSet();
             }
 
-            outputSet.setGPSInDegrees(longitude, latitude);
+            TiffOutputDirectory rootDirectory = outputSet.getOrCreateRootDirectory();
+            TiffOutputDirectory exifDirectory = outputSet.getOrCreateExifDirectory();
+            TiffOutputDirectory gpsDirectory = outputSet.getOrCreateGPSDirectory();
+
+            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_EXPOSURE_TIME);
+            exifDirectory.add(ExifTagConstants.EXIF_TAG_EXPOSURE_TIME,
+                    RationalNumber.valueOf(1/Double.parseDouble(exif.getExposure().substring(2))));
+
+
+            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_APERTURE_VALUE);
+            exifDirectory.add(ExifTagConstants.EXIF_TAG_APERTURE_VALUE,
+                    RationalNumber.valueOf(exif.getAperture()));
+
+            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_FOCAL_LENGTH);
+            exifDirectory.add(ExifTagConstants.EXIF_TAG_FOCAL_LENGTH,
+                    RationalNumber.valueOf(exif.getFocalLength()));
+
+            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_ISO);
+            exifDirectory.add(ExifTagConstants.EXIF_TAG_ISO, (short) exif.getIso());
+
+            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_FLASH);
+            exifDirectory.add(ExifTagConstants.EXIF_TAG_FLASH, (short) (exif.isFlash() ? 1 : 0));
+
+            rootDirectory.removeField(TiffTagConstants.TIFF_TAG_MAKE);
+            rootDirectory.add(TiffTagConstants.TIFF_TAG_MAKE, new String[] { exif.getMake() });
+
+            rootDirectory.removeField(TiffTagConstants.TIFF_TAG_MODEL);
+            rootDirectory.add(TiffTagConstants.TIFF_TAG_MODEL, new String[] { exif.getModel() });
+
+            gpsDirectory.removeField(GpsTagConstants.GPS_TAG_GPS_ALTITUDE);
+            gpsDirectory.add(GpsTagConstants.GPS_TAG_GPS_ALTITUDE,
+                    RationalNumber.valueOf(exif.getAltitude()));
+
+            outputSet.setGPSInDegrees(exif.getLongitude(), exif.getLatitude());
 
             os = new FileOutputStream(tempFile);
             os = new BufferedOutputStream(os);

@@ -38,7 +38,7 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
     }
 
     public void update(Exif exif) throws DAOException {
-        logger.debug("Entering create() " + exif);
+        logger.debug("Entering update() " + exif);
         jdbcTemplate.update(updateStatement, exif.getId(), exif.getDate(), exif.getExposure(),
                 exif.getAperture(), exif.getFocalLength(), exif.getIso(), exif.isFlash(),
                 exif.getMake(), exif.getModel(), exif.getLatitude(), exif.getLongitude(),

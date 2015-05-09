@@ -100,24 +100,24 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     public List<Photo> readPhotosByYearAndMonth(int year, int month) throws DAOException {
 
         List<Photo> photos = new ArrayList<Photo>();
-        try(PreparedStatement stmt = getConnection().prepareStatement(readByYearAndMonthStatement)) {
-
-            stmt.setInt(1,year);
-            stmt.setInt(2,month);
-            ResultSet rs = stmt.executeQuery();
-
-            while(rs.next()) {
-                photos.add(new Photo(
-                        rs.getInt(1),
-                        null,
-                        rs.getString(3),
-                        rs.getInt(4)
-                ));
-            }
-        } catch (SQLException e) {
-            throw new DAOException(e);
-        }
-
+//        try(PreparedStatement stmt = getConnection().prepareStatement(readByYearAndMonthStatement)) {
+//
+//            stmt.setInt(1 ,year);
+//            stmt.setInt(2 ,month);
+//            ResultSet rs = stmt.executeQuery();
+//
+//            while(rs.next()) {
+//                photos.add(new Photo(
+//                        rs.getInt(1),
+//                        null,
+//                        rs.getString(3),
+//                        rs.getInt(4)
+//                ));
+//            }
+//        } catch (SQLException e) {
+//            throw new DAOException(e);
+//        }
+//
         return photos;
     }
 
