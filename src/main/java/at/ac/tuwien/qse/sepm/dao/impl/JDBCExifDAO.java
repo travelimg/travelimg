@@ -62,6 +62,11 @@ public class JDBCExifDAO implements ExifDAO {
 
     }
 
+    /**
+     * löscht ein Objekt vom Typ Exif aus der Datenbank
+     * @param e das Objekt, welches gelöscht werden soll
+     * @throws DAOException wenn das Delete fehlschlaegt
+     */
     public void delete(Exif e) throws DAOException {
         try (PreparedStatement stmt = con.prepareStatement(deleteStatement)) {
             stmt.setInt(1, e.getId());
