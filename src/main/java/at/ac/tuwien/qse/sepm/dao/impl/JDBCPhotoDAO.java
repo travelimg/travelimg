@@ -110,13 +110,13 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         for (Tag t : taglist) {
             photoTagDAO.removeTagFromPhoto(t, photo);
         }
+        try{
+            jdbcTemplate.update(deleteStatement,id);
 
-        try (PreparedStatement stmt = getConnection().prepareStatement(deleteStatement)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
+        }catch(DataAccessException e) {
             throw new DAOException("Failed to delete photo", e);
         }
+
     }
 
 
@@ -199,7 +199,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
      */
     private int getNextId() throws DAOException {
         try {
-            return jdbcTemplate.queryForObject("select id from Photo order by id desc limit 1", Integer.class) + 1;
+            return jdbcTemplate.queryForObject("select id from Photo order by id desc limit 1",
+                    Integer.class) + 1;
         }  catch(IncorrectResultSizeDataAccessException e) {
             // no data in table yet
             return 0;

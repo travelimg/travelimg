@@ -8,6 +8,7 @@ import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,15 +39,12 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      * @throws ValidationException
      */
     public void removeTagFromPhoto(Tag t, Photo p) throws DAOException, ValidationException {
-        logger.debug("Deleting Tag from Photo {}", t ,p);
+        logger.debug("Deleting Tag from Photo {}", t, p);
         PhotoValidator.validate(p);
-
-        try (PreparedStatement stmt = con.prepareStatement(deleteStatement)) {
-            stmt.setInt(1, p.getId());
-            stmt.setInt(2,t.getId());
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            throw new DAOException("Failed to delete Tag from Photo", ex);
+        try{
+            jdbcTemplate.update(deleteStatement,p.getId(),t.getId());
+        }catch(DataAccessException e) {
+        throw new DAOException("Failed to delete Tag from Photo", e);
         }
 
     }
