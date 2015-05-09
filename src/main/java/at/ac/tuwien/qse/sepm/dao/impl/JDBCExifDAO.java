@@ -14,6 +14,7 @@ import com.drew.metadata.MetadataException;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.exif.GpsDirectory;
+import org.springframework.dao.DataAccessException;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +22,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JDBCExifDAO implements ExifDAO {
+public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
 
     private Connection con;
 
@@ -63,17 +64,16 @@ public class JDBCExifDAO implements ExifDAO {
     }
 
     /**
-     * löscht ein Objekt vom Typ Exif aus der Datenbank
-     * @param e das Objekt, welches gelöscht werden soll
-     * @throws DAOException wenn das Delete fehlschlaegt
+     * delete an Exif Objekt
+     * @param e the Exif Objekt
+     * @throws DAOException
      */
     public void delete(Exif e) throws DAOException {
-        try (PreparedStatement stmt = con.prepareStatement(deleteStatement)) {
-            stmt.setInt(1, e.getId());
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            throw new DAOException("Failed to delete Exif-Data", ex);
-        }
+        try{
+            jdbcTemplate.update(deleteStatement,e.getId());
+    }catch(DataAccessException ex) {
+        throw new DAOException("Failed to delete exif", ex);
+    }
     }
 
     public List<Exif> readAll() throws DAOException {

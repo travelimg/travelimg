@@ -36,6 +36,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     private static final String insertStatement = "INSERT INTO Photo(id, photographer_id, path, rating) VALUES (?, ?, ?, ?);";
     private static final String readAllStatement = "SELECT id, photographer_id, path, rating FROM PHOTO;";
+   // private static final String readByYearAndMonthStatement = "SELECT PHOTO_ID,PHOTOGRAPHER_ID,PATH,RATING FROM PHOTO JOIN EXIF WHERE ID=PHOTO_ID AND YEAR(DATE)=? AND MONTH(DATE)=?;";
 
     private static final String deleteStatement = "Delete from Photo where id =?";
 
@@ -90,7 +91,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     /**
-     * 
+     * delete the photo which is delivered
      * @param photo Specifies which photo to delete by providing the id.
      * @throws DAOException
      * @throws ValidationException
@@ -109,14 +110,17 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         for (Tag t : taglist) {
             photoTagDAO.removeTagFromPhoto(t, photo);
         }
+        try{
+            jdbcTemplate.update(deleteStatement,id);
 
-        try (PreparedStatement stmt = getConnection().prepareStatement(deleteStatement)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
+        }catch(DataAccessException e) {
             throw new DAOException("Failed to delete photo", e);
         }
+
     }
+
+
+
 
 
     public List<Photo> readAll() throws DAOException, ValidationException {
@@ -129,7 +133,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             });
         } catch(DataAccessException e) {
             throw new DAOException("Failed to read all photos", e);
-
         }
     }
 
@@ -196,7 +199,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
      */
     private int getNextId() throws DAOException {
         try {
-            return jdbcTemplate.queryForObject("select id from Photo order by id desc limit 1", Integer.class) + 1;
+            return jdbcTemplate.queryForObject("select id from Photo order by id desc limit 1",
+                    Integer.class) + 1;
         }  catch(IncorrectResultSizeDataAccessException e) {
             // no data in table yet
             return 0;
