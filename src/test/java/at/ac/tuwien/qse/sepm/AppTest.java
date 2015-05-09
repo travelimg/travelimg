@@ -32,15 +32,13 @@ public class AppTest {
     private ClassPathXmlApplicationContext context;
 
     /**
-     * Rigourous Test :-)
+     * Gets the exifservice from a Java bean.
      */
-
     @Before
     public void setUp() {
         logger.info("setUp");
         context = new ClassPathXmlApplicationContext("beans.xml");
         exifservice = (ExifService) context.getBean("exifServiceImpl");
-//        exifservice = new ExifServiceImpl();
     }
 
     @Test
@@ -62,6 +60,10 @@ public class AppTest {
         assertEquals("Hello World", result);
     }
 
+    /**
+     * Tests the importing of Exif-data and the changing of them.
+     * @throws ServiceException
+     */
     @Test
     public void testExif() throws ServiceException {
         Photo photo = new Photo(5, null, "C:\\Users\\David\\workspace\\qse-sepm-ss15-18\\src\\test\\resources\\test.jpg", 0);
