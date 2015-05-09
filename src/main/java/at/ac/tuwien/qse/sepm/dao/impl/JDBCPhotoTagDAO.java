@@ -30,6 +30,13 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
 
     }
 
+    /**
+     *  delete a Tag from a Photo
+     * @param t which Tag to delete
+     * @param p on which Photo
+     * @throws DAOException
+     * @throws ValidationException
+     */
     public void removeTagFromPhoto(Tag t, Photo p) throws DAOException, ValidationException {
         logger.debug("Deleting Tag from Photo {}", t ,p);
         PhotoValidator.validate(p);

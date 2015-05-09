@@ -51,6 +51,11 @@ public class PhotoServiceImpl implements PhotoService {
 
     }
 
+    /**
+     *  delete a List of Photos
+     * @param photos the list of photos
+     * @throws ServiceException
+     */
     public void deletePhotos(List<Photo> photos) throws ServiceException {
         for(Photo p : photos){
             try {
@@ -67,6 +72,12 @@ public class PhotoServiceImpl implements PhotoService {
 
     }
 
+    /**
+     * delete Tag from a list of Photos
+     * @param photos the list of photos
+     * @param t the Tag which you want to delete
+     * @throws ServiceException
+     */
     public void removeTagFromPhotos(List<Photo> photos, Tag t) throws ServiceException {
         for(Photo p: photos){
             try {
