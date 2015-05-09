@@ -14,6 +14,7 @@ import com.drew.metadata.MetadataException;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.exif.GpsDirectory;
+import org.springframework.dao.DataAccessException;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,9 +22,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JDBCExifDAO implements ExifDAO {
+public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
 
     private Connection con;
+
+    private static final String readStatement = "SELECT photo_id, date, exposure, aperture, focallength, iso, flash, cameramodel, longitude, latitude, altitude FROM exif WHERE photo_id=?";
 
     public JDBCExifDAO() throws DAOException {
         con = DBConnection.getConnection();
@@ -52,8 +55,28 @@ public class JDBCExifDAO implements ExifDAO {
         return null;
     }
 
-    public Exif read(Exif e) throws DAOException {
-        return null;
+    public Exif read(Photo photo) throws DAOException {
+        logger.debug("Reading exif data for photo {}", photo);
+
+        try {
+            return jdbcTemplate.queryForObject(readStatement, (rs, rowNum) -> {
+                return new Exif(
+                        rs.getInt(1),
+                        rs.getTimestamp(2),
+                        rs.getString(3),
+                        rs.getDouble(4),
+                        rs.getDouble(5),
+                        rs.getInt(6),
+                        rs.getBoolean(7),
+                        rs.getString(8),
+                        rs.getString(9),
+                        rs.getString(10),
+                        rs.getDouble(11)
+                );
+            }, photo.getId());
+        } catch (DataAccessException ex) {
+            throw new DAOException("Failed to retrieve exif data for given photo")
+        }
     }
 
     public void update(Exif e) throws DAOException {
