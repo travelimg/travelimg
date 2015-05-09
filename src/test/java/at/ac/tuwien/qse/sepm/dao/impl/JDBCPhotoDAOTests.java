@@ -1,14 +1,15 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
 
-import at.ac.tuwien.qse.sepm.dao.AbstractPhotoDAOTests;
+import at.ac.tuwien.qse.sepm.dao.AbstractJDBCPhotoDAOTests;
+
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.dao.impl.DBConnection;
 import at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO;
 import org.junit.After;
 import org.junit.Before;
 
-public class JDBCPhotoDAOTests extends AbstractPhotoDAOTests {
+public class JDBCPhotoDAOTests extends AbstractJDBCPhotoDAOTests {
 
 
     @Before
