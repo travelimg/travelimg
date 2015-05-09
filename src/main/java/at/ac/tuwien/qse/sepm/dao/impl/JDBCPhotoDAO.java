@@ -1,13 +1,13 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
-<<<<<<< HEAD
+
 import at.ac.tuwien.qse.sepm.dao.*;
-=======
+
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.ExifDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Exif;
->>>>>>> spring-ioc
+
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
@@ -36,7 +36,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     private static final String insertStatement = "INSERT INTO Photo(id, photographer_id, path, rating) VALUES (?, ?, ?, ?);";
     private static final String readAllStatement = "SELECT id, photographer_id, path, rating FROM PHOTO;";
-    private static final String readByYearAndMonthStatement = "SELECT PHOTO_ID,PHOTOGRAPHER_ID,PATH,RATING FROM PHOTO JOIN EXIF WHERE ID=PHOTO_ID AND YEAR(DATE)=? AND MONTH(DATE)=?;";
+   // private static final String readByYearAndMonthStatement = "SELECT PHOTO_ID,PHOTOGRAPHER_ID,PATH,RATING FROM PHOTO JOIN EXIF WHERE ID=PHOTO_ID AND YEAR(DATE)=? AND MONTH(DATE)=?;";
 
     private static final String deleteStatement = "Delete from Photo where id =?";
 
@@ -113,10 +113,10 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         }
     }
 
-<<<<<<< HEAD
 
-        public List<Photo> readAll() throws DAOException, ValidationException {
-=======
+
+   //     public List<Photo> readAll() throws DAOException, ValidationException {
+
     public List<Photo> readAll() throws DAOException, ValidationException {
         try {
             return jdbcTemplate.query(readAllStatement, new RowMapper<Photo>() {
@@ -132,11 +132,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     @Override
     public List<Photo> readPhotosByYearAndMonth(int year, int month) throws DAOException {
-<<<<<<< HEAD
->>>>>>> spring-ioc
-=======
 
->>>>>>> develop
         List<Photo> photos = new ArrayList<Photo>();
         try(PreparedStatement stmt = getConnection().prepareStatement(readByYearAndMonthStatement)) {
 
