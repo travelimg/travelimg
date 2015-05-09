@@ -1,13 +1,13 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
-<<<<<<< HEAD
+
 import at.ac.tuwien.qse.sepm.dao.*;
-=======
+
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.ExifDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Exif;
->>>>>>> develop
+
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
@@ -118,24 +118,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         }
     }
 
-<<<<<<< HEAD
 
-        public List<Photo> readAll() throws DAOException, ValidationException {
-        List<Photo> photos = new ArrayList<Photo>();
-        try(Statement stmt = getConnection().createStatement()) {
-            ResultSet rs = stmt.executeQuery(readAllStatement);
-
-            while(rs.next()) {
-                photos.add(new Photo(
-                        rs.getInt(1),
-                        null,
-                        rs.getString(3),
-                        rs.getInt(4)
-                ));
-            }
-        } catch (SQLException e) {
-            throw new DAOException(e);
-=======
     public List<Photo> readAll() throws DAOException, ValidationException {
         try {
             return jdbcTemplate.query(readAllStatement, new RowMapper<Photo>() {
@@ -146,7 +129,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             });
         } catch(DataAccessException e) {
             throw new DAOException("Failed to read all photos", e);
->>>>>>> develop
+
         }
     }
 
