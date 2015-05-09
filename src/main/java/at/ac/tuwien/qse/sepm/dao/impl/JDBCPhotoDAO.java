@@ -91,7 +91,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     /**
-     * 
+     * delete the photo which is delivered
      * @param photo Specifies which photo to delete by providing the id.
      * @throws DAOException
      * @throws ValidationException
@@ -121,7 +121,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
 
 
-   //     public List<Photo> readAll() throws DAOException, ValidationException {
+
 
     public List<Photo> readAll() throws DAOException, ValidationException {
         try {

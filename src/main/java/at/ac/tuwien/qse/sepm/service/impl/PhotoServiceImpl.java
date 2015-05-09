@@ -52,7 +52,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     /**
-     *  delete a List of Photos
+     *  delete the delivered List of Photos
      * @param photos the list of photos
      * @throws ServiceException
      */
@@ -73,7 +73,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     /**
-     * delete Tag from a list of Photos
+     * delete the delivered Tag from the delivered list of Photos
      * @param photos the list of photos
      * @param t the Tag which you want to delete
      * @throws ServiceException
