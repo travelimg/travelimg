@@ -98,6 +98,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     @Override
     public List<Photo> readPhotosByYearAndMonth(int year, int month) throws DAOException {
+
         List<Photo> photos = new ArrayList<Photo>();
         try(PreparedStatement stmt = getConnection().prepareStatement(readByYearAndMonthStatement)) {
 
@@ -119,6 +120,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
         return photos;
     }
+
+
 
     /**
      * Copy the photo to the travelimg photo directory. The structure created is Year/Month/Day.
