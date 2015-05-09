@@ -98,32 +98,24 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     @Override
     public List<Photo> readPhotosByDate(Date date) throws DAOException {
-        List<Photo> photos = new ArrayList<Photo>();
-        try(PreparedStatement stmt = getConnection().prepareStatement(readByYearAndMonthStatement)) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(date);
-            int year = cal.get(Calendar.YEAR);
-            int month = cal.get(Calendar.MONTH) + 1;
-            stmt.setInt(1,year);
-            stmt.setInt(2,month);
-            ResultSet rs = stmt.executeQuery();
+        logger.debug("retrieving photos by date {}", date);
 
-            while(rs.next()) {
-                photos.add(new Photo(
-                        rs.getInt(1),
-                        null,
-                        rs.getString(3),
-                        rs.getInt(4)
-                ));
-            }
-        } catch (SQLException e) {
-            throw new DAOException(e);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH) + 1;
+
+        try {
+            List<Photo> photos = jdbcTemplate.query(readByYearAndMonthStatement, (ResultSet rs, int rowNum) -> {
+                return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
+            }, year, month);
+
+            logger.debug("Successfully retrieved photos");
+            return photos;
+        } catch (DataAccessException ex) {
+            throw new DAOException("Failed to read photos from given month", ex);
         }
-
-        return photos;
     }
-
-
 
     /**
      * Copy the photo to the travelimg photo directory. The structure created is Year/Month/Day.
