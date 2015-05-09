@@ -24,8 +24,8 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
 
     private static final Logger logger = LogManager.getLogger();
 
-    private static final String readStatement = "SELECT* FROM Photographer WHERE ID=?;";
-    private static final String readAllStatement = "SELECT* FROM Photographer;";
+    private static final String readStatement = "SELECT ID,name FROM Photographer WHERE ID=?;";
+    private static final String readAllStatement = "SELECT ID,name FROM Photographer;";
 
     private SimpleJdbcInsert insertPhotographer;
 
