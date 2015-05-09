@@ -1,13 +1,14 @@
 package at.ac.tuwien.qse.sepm.dao;
 
-import at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotographerDAO;
 import org.junit.After;
 import org.junit.Before;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class JDBCPhotographerDAOTests extends AbstractPhotographerDAOTests {
     @Before
     public void setUp(){
-        setPhotographerDAO(new JDBCPhotographerDAO());
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+        setPhotographerDAO((PhotographerDAO) context.getBean("photographerDAO"));
     }
 
     @After
