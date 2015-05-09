@@ -17,12 +17,12 @@ import org.springframework.dao.DataAccessException;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
     private static final String insertStatement = "INSERT INTO exif(photo_id, date, exposure, aperture, focallength, iso, flash, make, model, latitude, longitude, altitude) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
     private static final String readAllStatement = "SELECT * FROM Exif ORDER BY DATE;";
+    private static final String updateStatement = "UPDATE exif SET date=?, exposure=?, aperture=?, focallength=?, iso=?, flash=?, make=?, model=?, latitude=?, longitude=?, altitude=? WHERE photo_id=?";
 
     public Exif create(Exif exif) throws DAOException {
         logger.debug("Entering create() " + exif);
@@ -31,19 +31,6 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
                 exif.getMake(), exif.getModel(), exif.getLatitude(), exif.getLongitude(),
                 exif.getAltitude());
         return exif;
-        //            insertStatement.setInt(1, exif.getId());
-        //            insertStatement.setTimestamp(2, exif.getDate());
-        //            insertStatement.setString(3, exif.getExposure());
-        //            insertStatement.setDouble(4, exif.getAperture());
-        //            insertStatement.setDouble(5, exif.getFocalLength());
-        //            insertStatement.setInt(6, exif.getIso());
-        //            insertStatement.setBoolean(7, exif.isFlash());
-        //            insertStatement.setString(8, exif.getMake());
-        //            insertStatement.setString(9, exif.getModel());
-        //            insertStatement.setDouble(10, exif.getLatitude());
-        //            insertStatement.setDouble(11, exif.getLongitude());
-        //            insertStatement.setDouble(12, exif.getAltitude());
-        //            insertStatement.executeUpdate();
     }
 
     public Exif read(Exif exif) throws DAOException {
@@ -51,7 +38,11 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
     }
 
     public void update(Exif exif) throws DAOException {
-
+        logger.debug("Entering create() " + exif);
+        jdbcTemplate.update(updateStatement, exif.getId(), exif.getDate(), exif.getExposure(),
+                exif.getAperture(), exif.getFocalLength(), exif.getIso(), exif.isFlash(),
+                exif.getMake(), exif.getModel(), exif.getLatitude(), exif.getLongitude(),
+                exif.getAltitude());
     }
 
     public void delete(Exif exif) throws DAOException {
