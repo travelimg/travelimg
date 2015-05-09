@@ -1,12 +1,14 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.Service;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.util.Cancelable;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -19,15 +21,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * Controller for organizer view which is used for browsing photos by month.
@@ -35,6 +35,8 @@ import java.util.stream.Collectors;
  * TODO: Decide whether to call it Organizer or Browser or something else.
  */
 public class Organizer {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired private ImportService importService;
     @Autowired private PhotoService photoService;
@@ -85,26 +87,18 @@ public class Organizer {
 
     private void handleImport(Event event) {
         ImportDialog dialog = new ImportDialog(root, "Fotos importieren");
+
         Optional<List<Photo>> photos = dialog.showForResult();
         if (!photos.isPresent()) return;
 
         importService.importPhotos(photos.get(),
-                this::handleImportedPhoto,
+                this::handleNewPhoto,
                 this::handleImportError);
     }
-    private void handleImportedPhoto(Photo photo) {
-        // queue an update in the main gui
-        Platform.runLater(() -> {
-            // Ignore photos that are not part of the current filter.
-            if (monthList.getSelectionModel().isEmpty()) return;
-            String photoMonth = monthFormat.format(photo.getExif().getDate());
-            String activeMonth = monthFormat.format(monthList.getSelectionModel().getSelectedItem());
-            if (photoMonth != activeMonth) return;
 
-            getActivePhotos().add(photo);
-        });
-    }
     private void handleImportError(Throwable error) {
+        LOGGER.error("Import error", error);
+
         // queue an update in the main gui
         Platform.runLater(() -> {
             InfoDialog dialog = new InfoDialog(root, "Import Fehler");
@@ -113,7 +107,38 @@ public class Organizer {
             dialog.setContentText("Fehlermeldung: " + error.getMessage());
             dialog.showAndWait();
         });
+    }
 
+    private void handleLoadError(Throwable error) {
+        LOGGER.error("Load error", error);
+
+        // queue an update in the main gui
+        Platform.runLater(() -> {
+            InfoDialog dialog = new InfoDialog(root, "Lade Fehler");
+            dialog.setError(true);
+            dialog.setHeaderText("Laden von Fotos fehlgeschlagen");
+            dialog.setContentText("Fehlermeldung: " + error.getMessage());
+            dialog.showAndWait();
+        });
+    }
+
+    /**
+     * Called whenever a new photo is loaded from the service layer
+     * @param photo The newly loaded photo
+     */
+    private void handleNewPhoto(Photo photo) {
+        // queue an update in the main gui
+        Platform.runLater(() -> {
+            // Ignore photos that are not part of the current filter.
+            if (monthList.getSelectionModel().isEmpty()) return;
+            String photoMonth = monthFormat.format(photo.getExif().getDate());
+            String activeMonth = monthFormat.format(monthList.getSelectionModel().getSelectedItem());
+
+            if(!photoMonth.equals(activeMonth)) return;
+
+            photo.setPath("file://" + photo.getPath()); // TODO: change at a different layer
+            getActivePhotos().add(photo);
+        });
     }
 
     private void handlePresent(Event event) {
@@ -124,13 +149,8 @@ public class Organizer {
         // remove active photos and replace them by
         // photos from the newly selected month
         getActivePhotos().clear();
-        getActivePhotos().addAll(getPhotosByMonth(newValue));
-    }
 
-    // TODO: get photos from service
-    private List<Photo> getPhotosByMonth(Date date) {
-        List<Photo> list = new LinkedList<>();
-        return list;
+        Cancelable task = photoService.loadPhotosByDate(newValue, this::handleNewPhoto, this::handleLoadError);
     }
 
     // TODO: get months from service
