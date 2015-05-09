@@ -9,6 +9,7 @@ import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -22,7 +23,12 @@ public class ImportServiceImpl implements ImportService {
     private PhotoDAO photoDAO;
     ExecutorService executorService = Executors.newFixedThreadPool(1);
 
-    public ImportServiceImpl(PhotoDAO photoDAO) {
+    public ImportServiceImpl() {
+
+    }
+
+    @Autowired
+    public void setPhotoDAO(PhotoDAO photoDAO) {
         this.photoDAO = photoDAO;
     }
 

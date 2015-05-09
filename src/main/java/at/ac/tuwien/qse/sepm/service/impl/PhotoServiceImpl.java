@@ -11,6 +11,11 @@ import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -25,7 +30,12 @@ public class PhotoServiceImpl implements PhotoService {
 
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
 
-    public PhotoServiceImpl(PhotoDAO photoDAO) {
+    public PhotoServiceImpl() {
+
+    }
+
+    @Autowired
+    public void setPhotoDAO(PhotoDAO photoDAO) {
         this.photoDAO = photoDAO;
     }
 
