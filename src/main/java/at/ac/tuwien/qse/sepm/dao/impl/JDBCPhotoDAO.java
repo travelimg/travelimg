@@ -94,6 +94,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
             attachExif(photos);
 
+            logger.debug("Successfully read all photos");
             return photos;
         } catch(DataAccessException e) {
             throw new DAOException("Failed to read all photos", e);
