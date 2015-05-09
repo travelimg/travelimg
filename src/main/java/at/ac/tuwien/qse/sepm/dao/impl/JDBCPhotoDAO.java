@@ -85,12 +85,16 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         logger.debug("retrieving all photos");
 
         try {
-            return jdbcTemplate.query(readAllStatement, new RowMapper<Photo>() {
+            List<Photo> photos = jdbcTemplate.query(readAllStatement, new RowMapper<Photo>() {
                 @Override
                 public Photo mapRow(ResultSet rs, int rowNum) throws SQLException {
                     return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
                 }
             });
+
+            attachExif(photos);
+
+            return photos;
         } catch(DataAccessException e) {
             throw new DAOException("Failed to read all photos", e);
         }
@@ -110,10 +114,24 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
                 return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
             }, year, month);
 
+            attachExif(photos);
+
             logger.debug("Successfully retrieved photos");
             return photos;
         } catch (DataAccessException ex) {
             throw new DAOException("Failed to read photos from given month", ex);
+        }
+    }
+
+    /**
+     * Load the exif data for each photo in the given list.
+     *
+     * @param photos The list of photos which will be annotated with the exif data.
+     * @throws DAOException if an error occurs during reading the exif data.
+     */
+    private void attachExif(List<Photo> photos) throws DAOException {
+        for(Photo photo : photos) {
+            photo.setExif(exifDAO.read(photo));
         }
     }
 
