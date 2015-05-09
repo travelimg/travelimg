@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.service;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 
 import java.util.List;
@@ -17,5 +18,5 @@ public interface ImportService extends Service {
      * @param callback Called with the imported photo.
      * @param errorHandler Handler for occurring exceptions.
      */
-    void importPhotos(List<Photo> photos, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler);
+    Cancelable importPhotos(List<Photo> photos, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler);
 }

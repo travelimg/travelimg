@@ -7,6 +7,8 @@ import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.util.Cancelable;
+import at.ac.tuwien.qse.sepm.util.CancelableTask;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -73,25 +75,28 @@ public class PhotoServiceImpl implements PhotoService {
 
     }
 
-    public void loadPhotosByDate(Date date, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) throws ServiceException {
+    public Cancelable loadPhotosByDate(Date date, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
         logger.debug("Loading photos");
         AsyncLoader loader = new AsyncLoader(date, callback, errorHandler);
         executorService.submit(loader);
+
+        return loader;
     }
 
-    private class AsyncLoader implements Runnable {
+    private class AsyncLoader extends CancelableTask {
         private Date date;
         private Consumer<Photo> callback;
         private ErrorHandler<ServiceException> errorHandler;
 
         public AsyncLoader(Date date, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
+            super();
             this.date = date;
             this.callback = callback;
             this.errorHandler = errorHandler;
         }
 
         @Override
-        public void run() {
+        protected void execute() {
             List<Photo> photos;
             try {
                 photos = photoDAO.readPhotosByDate(date);
@@ -99,7 +104,10 @@ public class PhotoServiceImpl implements PhotoService {
                 errorHandler.propagate(new ServiceException("Failed to load photos", e));
                 return;
             }
+
             for(Photo p : photos){
+                if(!getIsRunning())
+                    return;
                 callback.accept(p);
             }
         }
