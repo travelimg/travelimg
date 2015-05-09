@@ -1,12 +1,21 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
+<<<<<<< HEAD
 import at.ac.tuwien.qse.sepm.dao.*;
+=======
+import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.ExifDAO;
+import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
+import at.ac.tuwien.qse.sepm.entities.Exif;
+>>>>>>> develop
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.jdbc.core.RowMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,8 +34,6 @@ import java.util.Locale;
 
 public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
-    private static final Logger logger = LogManager.getLogger();
-
     private static final String insertStatement = "INSERT INTO Photo(id, photographer_id, path, rating) VALUES (?, ?, ?, ?);";
     private static final String readAllStatement = "SELECT id, photographer_id, path, rating FROM PHOTO;";
 
@@ -43,13 +50,11 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     public JDBCPhotoDAO(String photoDirectory) {
         this.photoDirectory = photoDirectory;
+    }
 
-        // TODO: Spring
-        try {
-            this.exifDAO = new JDBCExifDAO();
-        } catch(DAOException e) {
-
-        }
+    @Autowired
+    public void setExifDAO(ExifDAO exifDAO) {
+        this.exifDAO = exifDAO;
     }
 
     public Photo create(Photo photo) throws DAOException, ValidationException {
@@ -62,31 +67,20 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         // store exif data
         exifDAO.importExif(photo);
 
-        try(PreparedStatement stmt = getConnection().prepareStatement(insertStatement)) {
-            try {
-                String dest = copyToPhotoDirectory(photo);
-                photo.setPath(dest);
-            } catch(IOException e) {
-                logger.error("Failed to copy photo to destination directory", e);
-                throw new DAOException("Failed to copy photo to destination directory", e);
-            }
+        try {
+            String dest = copyToPhotoDirectory(photo);
+            photo.setPath(dest);
+        } catch(IOException e) {
+            logger.error("Failed to copy photo to destination directory", e);
+            throw new DAOException("Failed to copy photo to destination directory", e);
+        }
 
-            stmt.setInt(1, photo.getId());
-            stmt.setInt(2, photo.getPhotographer().getId());
-            stmt.setString(3, photo.getPath());
-            stmt.setInt(4, photo.getRating());
-
-            int affectedRows = stmt.executeUpdate();
-
-            if(affectedRows != 1) {
-                logger.error("Failed to create photo {}", photo);
-                throw new DAOException("Failed to create photo");
-            }
+        try {
+            jdbcTemplate.update(insertStatement, photo.getId(), photo.getPhotographer().getId(), photo.getPath(), photo.getRating());
 
             logger.debug("Created photo {}", photo);
-
             return photo;
-        } catch (SQLException e) {
+        } catch(DataAccessException e) {
             throw new DAOException("Failed to create photo", e);
         }
     }
@@ -124,6 +118,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         }
     }
 
+<<<<<<< HEAD
 
         public List<Photo> readAll() throws DAOException, ValidationException {
         List<Photo> photos = new ArrayList<Photo>();
@@ -140,13 +135,24 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             }
         } catch (SQLException e) {
             throw new DAOException(e);
+=======
+    public List<Photo> readAll() throws DAOException, ValidationException {
+        try {
+            return jdbcTemplate.query(readAllStatement, new RowMapper<Photo>() {
+                @Override
+                public Photo mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
+                }
+            });
+        } catch(DataAccessException e) {
+            throw new DAOException("Failed to read all photos", e);
+>>>>>>> develop
         }
-
-        return photos;
     }
 
     @Override
     public List<Photo> readPhotosByYearAndMonth(int year, int month) throws DAOException {
+
         List<Photo> photos = new ArrayList<Photo>();
         try(PreparedStatement stmt = getConnection().prepareStatement(readByYearAndMonthStatement)) {
 
@@ -168,6 +174,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
         return photos;
     }
+
+
 
     /**
      * Copy the photo to the travelimg photo directory. The structure created is Year/Month/Day.
@@ -204,14 +212,12 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
      * @throws DAOException if an error occurs executing the query.
      */
     private int getNextId() throws DAOException {
-        try(Statement stmt = getConnection().createStatement()) {
-            ResultSet result = stmt.executeQuery("select id from Photo order by id desc limit 1");
-
-            if(!result.next()) // no data available
-                return 0;
-
-            return result.getInt(1) + 1;
-        } catch(SQLException e) {
+        try {
+            return jdbcTemplate.queryForObject("select id from Photo order by id desc limit 1", Integer.class) + 1;
+        }  catch(IncorrectResultSizeDataAccessException e) {
+            // no data in table yet
+            return 0;
+        } catch(DataAccessException e) {
             throw new DAOException("Failed to retrieve next id", e);
         }
     }
