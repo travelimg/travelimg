@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
+import at.ac.tuwien.qse.sepm.service.Service;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -26,17 +27,19 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
- * GUI component that is used for browsing photos.
+ * Controller for organizer view which is used for browsing photos by month.
  *
  * TODO: Decide whether to call it Organizer or Browser or something else.
  */
-public class Organizer extends BorderPane {
+public class Organizer {
 
     @Autowired private ImportService importService;
     @Autowired private PhotoService photoService;
 
+    @FXML private BorderPane root;
     @FXML private Button importButton;
     @FXML private Button presentButton;
     @FXML private ListView<Date> monthList;
@@ -48,8 +51,11 @@ public class Organizer extends BorderPane {
     private final SimpleDateFormat monthFormat = new SimpleDateFormat("yyyy MMM");
 
     public Organizer() {
-        FXMLLoadHelper.load(this, this, Organizer.class, "view/Organizer.fxml");
 
+    }
+
+    @FXML
+    private void initialize() {
         importButton.setOnAction(this::handleImport);
         presentButton.setOnAction(this::handlePresent);
 
@@ -78,7 +84,7 @@ public class Organizer extends BorderPane {
     }
 
     private void handleImport(Event event) {
-        ImportDialog dialog = new ImportDialog(this, "Fotos importieren");
+        ImportDialog dialog = new ImportDialog(root, "Fotos importieren");
         Optional<List<Photo>> photos = dialog.showForResult();
         if (!photos.isPresent()) return;
 
@@ -101,7 +107,7 @@ public class Organizer extends BorderPane {
     private void handleImportError(Throwable error) {
         // queue an update in the main gui
         Platform.runLater(() -> {
-            InfoDialog dialog = new InfoDialog(this, "Import Fehler");
+            InfoDialog dialog = new InfoDialog(root, "Import Fehler");
             dialog.setError(true);
             dialog.setHeaderText("Import fehlgeschlagen");
             dialog.setContentText("Fehlermeldung: " + error.getMessage());

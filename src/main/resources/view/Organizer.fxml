@@ -3,8 +3,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root stylesheets="@style.css" type="javafx.scene.layout.BorderPane" prefWidth="160.0" styleClass="organizer"
-         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="root" stylesheets="@style.css" prefWidth="160.0" styleClass="organizer"
+         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.Organizer">
     <center>
         <ListView fx:id="monthList" maxWidth="Infinity" maxHeight="Infinity" BorderPane.alignment="CENTER"/>
     </center>
@@ -26,4 +26,4 @@
             </children>
         </HBox>
     </bottom>
-</fx:root>
+</BorderPane>

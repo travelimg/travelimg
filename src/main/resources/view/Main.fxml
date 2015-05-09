@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import org.controlsfx.control.GridView?>
-<fx:root stylesheets="@style.css" type="javafx.scene.layout.BorderPane"
-         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.layout.BorderPane?>
+<BorderPane fx:id="root" stylesheets="@view/style.css"
+         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.MainController">
+
+    <left>
+        <fx:include source="view/Organizer.fxml"></fx:include>
+    </left>
     <center>
         <GridView fx:id="imageGrid" prefWidth="500" prefHeight="400" styleClass="image-grid">
 
         </GridView>
     </center>
-</fx:root>
+
+    <right>
+        <fx:include source="view/Inspector.fxml"></fx:include>
+    </right>
+</BorderPane>

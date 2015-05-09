@@ -9,22 +9,27 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class MainController extends BorderPane {
+/**
+ * Controller for the main view.
+ */
+public class MainController {
 
     private static final Logger logger = LogManager.getLogger();
 
-    private final Organizer organizer = new Organizer();
-    private final Inspector inspector = new Inspector();
+    @Autowired private Organizer organizer;
+    @Autowired private Inspector inspector;
 
+    @FXML private BorderPane root;
     @FXML private GridView<Photo> imageGrid;
 
     public MainController() {
-        FXMLLoadHelper.load(this, this, MainController.class, "view/Main.fxml");
 
-        setLeft(organizer);
-        setRight(inspector);
+    }
 
+    @FXML
+    private void initialize() {
         imageGrid.setItems(organizer.getActivePhotos());
         imageGrid.setCellFactory(list -> new PhotoGridCell());
     }
