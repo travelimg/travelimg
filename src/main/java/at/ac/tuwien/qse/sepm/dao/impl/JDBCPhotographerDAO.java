@@ -17,14 +17,14 @@ import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO {
 
     private static final Logger logger = LogManager.getLogger();
 
-    private static final String insertStatement = "INSERT INTO Photographer(name) VALUES (?);";
     private static final String readStatement = "SELECT* FROM Photographer WHERE ID=?;";
     private static final String readAllStatement = "SELECT* FROM Photographer;";
 
@@ -43,16 +43,13 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
         logger.debug("Creating photographer {}", p);
         PhotographerValidator.validate(p);
 
-        try(PreparedStatement stmt = getConnection().prepareStatement(insertStatement, Statement.RETURN_GENERATED_KEYS)) {
-
-            stmt.setString(1, p.getName());
-            stmt.executeUpdate();
-            ResultSet rs = stmt.getGeneratedKeys();
-            rs.next();
-            p.setId(rs.getInt(1));
-            logger.debug("Created photographer {}", p);
+        try {
+            Map<String, Object> parameters = new HashMap<String, Object>(1);
+            parameters.put("name", p.getName());
+            Number newId = insertPhotographer.executeAndReturnKey(parameters);
+            p.setId((int)newId.longValue());
             return p;
-        } catch (SQLException e) {
+        } catch (DataAccessException e) {
             throw new DAOException("Failed to create photographer", e);
         }
     }
