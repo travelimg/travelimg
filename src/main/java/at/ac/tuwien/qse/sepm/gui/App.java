@@ -1,23 +1,23 @@
 package at.ac.tuwien.qse.sepm.gui;
 
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class App extends Application
-{
+import java.io.IOException;
+
+public class App extends Application {
     private static final Logger logger = LogManager.getLogger();
 
     private ClassPathXmlApplicationContext context;
 
-    public static void main( String[] args ) {
+    public static void main(String[] args) {
         launch(args);
     }
 
@@ -30,25 +30,33 @@ public class App extends Application
         }
     }
 
-    @Override
-    public void start(Stage primaryStage) throws Exception{
+    @Override public void start(Stage stage) throws Exception {
         logger.info("Application started.");
 
-        //javafx
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("view/Main.fxml"));
-        Parent root = loader.load();
-        MainController mainController = loader.getController();
-        mainController.setContext(context);
+        FXMLLoader loader = new FXMLLoader();
+        loader.setControllerFactory(new Callback<Class<?>, Object>() {
+            @Override
+            public Object call(Class<?> param) {
+                return context.getBean(param);
+            }
+        });
 
-        mainController.createStructure();
-        mainController.setStage(primaryStage);
-        primaryStage.setTitle("Hello world!");
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
+        // set base location so that resources can be loaded using relative paths
+        loader.setLocation(getClass().getClassLoader().getResource("view"));
+
+        Pane root;
+        try {
+            root = loader.load(getClass().getClassLoader().getResourceAsStream("view/Main.fxml"));
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+
+        stage.setScene(new Scene(root));
+        stage.setTitle("travelimg");
+        stage.show();
     }
 
-    @Override
-    public void stop() throws Exception {
+    @Override public void stop() throws Exception {
         super.stop();
 
         context.close();

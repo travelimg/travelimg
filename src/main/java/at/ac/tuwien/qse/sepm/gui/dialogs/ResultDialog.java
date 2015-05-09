@@ -1,27 +1,37 @@
 package at.ac.tuwien.qse.sepm.gui.dialogs;
 
-import javafx.stage.Stage;
+import javafx.scene.Node;
 
-import java.net.URL;
 import java.util.Optional;
 
 /**
- * Dialog which returns a result (e.g prompting for input)
+ * Dialog which returns a result.
  */
-public abstract class ResultDialog<R> extends BaseDialog {
+public abstract class ResultDialog<R> extends Dialog {
 
     private Optional<R> result = Optional.empty();
 
-    public ResultDialog(URL fxml, Stage parent) {
-        super(fxml, parent);
+    public ResultDialog(Node origin, String title) {
+        super(origin, title);
     }
 
-    public Optional<R> run() {
+    /**
+     * Opens the dialog and returns the result, once the dialog is closed.
+     *
+     * @return result of the dialog
+     */
+    public Optional<R> showForResult() {
         showAndWait();
         return result;
     }
 
-    public void setResult(R value) {
-        result = Optional.of(value);
+    /**
+     * Sets the result that is returned by {@link ResultDialog::showForResult} once the dialog
+     * is closed.
+     *
+     * @param result result that should be used
+     */
+    public void setResult(R result) {
+        this.result = Optional.of(result);
     }
 }
