@@ -1,4 +1,7 @@
-package at.ac.tuwien.qse.sepm.dao;
+import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
+
+
 
 <<<<<<< HEAD
 import at.ac.tuwien.qse.sepm.entities.Exif;
