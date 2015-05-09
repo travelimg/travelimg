@@ -135,27 +135,14 @@ public class Organizer {
 
     // TODO: get months from service
     private List<Date> getAvailableMonths() {
+
+        List<Date> months = new ArrayList<>();
         try {
-            SimpleDateFormat format = new SimpleDateFormat("y-M");
-            List<Date> list = new LinkedList<>();
-            list.add(format.parse("2015-12"));
-            list.add(format.parse("2015-11"));
-            list.add(format.parse("2015-10"));
-            list.add(format.parse("2015-07"));
-            list.add(format.parse("2015-06"));
-            list.add(format.parse("2015-03"));
-            list.add(format.parse("2014-08"));
-            list.add(format.parse("2014-07"));
-            list.add(format.parse("2014-02"));
-            list.add(format.parse("2014-01"));
-            list.add(format.parse("2012-10"));
-            list.add(format.parse("2012-09"));
-            list.add(format.parse("2012-07"));
-            list.add(format.parse("2012-06"));
-            list.add(format.parse("2012-05"));
-            return list;
-        } catch (ParseException ex) {
-            throw new RuntimeException(ex);
+            months = photoService.getMonthsWithPhotos();
+        } catch (ServiceException ex) {
+            // TODO: show error dialog
         }
+
+        return months;
     }
 }

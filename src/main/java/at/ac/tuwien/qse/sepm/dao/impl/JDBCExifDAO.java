@@ -19,14 +19,16 @@ import org.springframework.dao.DataAccessException;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.Date;
+import java.util.stream.Collectors;
 
 public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
 
     private Connection con;
 
     private static final String readStatement = "SELECT photo_id, date, exposure, aperture, focallength, iso, flash, cameramodel, longitude, latitude, altitude FROM exif WHERE photo_id=?";
+    private static final String readMonthStatement = "SELECT YEAR(date), MONTH(date) from exif;";
 
     public JDBCExifDAO() throws DAOException {
         con = DBConnection.getConnection();
@@ -164,6 +166,19 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
         } catch (IOException e) {
             e.printStackTrace();
             throw new DAOException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<Date> getMonthsWithPhotos() throws DAOException {
+        try {
+            return jdbcTemplate.query(readMonthStatement, (rs, rowNum) -> {
+                return new Date(rs.getInt(1) - 1900, rs.getInt(2) - 1, 1);
+            }).stream()
+                    .distinct()
+                    .collect(Collectors.toList());
+        } catch (DataAccessException ex) {
+            throw new DAOException("Failed to retrieve all months", ex);
         }
     }
 }

@@ -29,4 +29,11 @@ public interface PhotoService {
      */
     public Cancelable loadPhotosByDate(Date date, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler);
 
+    /**
+     * Retrieve a list of those months for which there are photos.
+     *
+     * @return a list of dates representing months with available photos
+     */
+    List<Date> getMonthsWithPhotos() throws ServiceException;
+
 }

@@ -1,11 +1,13 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.ExifDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
+import at.ac.tuwien.qse.sepm.service.Service;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.CancelableTask;
@@ -29,6 +31,7 @@ public class PhotoServiceImpl implements PhotoService {
     private static final Logger logger = LogManager.getLogger();
 
     private PhotoDAO photoDAO;
+    @Autowired ExifDAO exifDAO;
 
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
 
@@ -113,9 +116,16 @@ public class PhotoServiceImpl implements PhotoService {
         }
     }
 
+    @Override
+    public List<Date> getMonthsWithPhotos() throws ServiceException{
+        try {
+            return exifDAO.getMonthsWithPhotos();
+        } catch (DAOException ex) {
+            throw new ServiceException(ex);
+        }
+    }
+
     public void close() {
         executorService.shutdown();
     }
-
-
 }
