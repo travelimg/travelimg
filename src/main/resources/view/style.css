@@ -260,3 +260,12 @@
 .image-grid {
     -fx-background-color: #e7e7e7;
 }
+
+.image-tile-non-selected {
+    -fx-padding: 5px;
+}
+
+.image-tile-selected {
+    -fx-padding: 5px;
+    -fx-background-color: #1E88E5;
+}
