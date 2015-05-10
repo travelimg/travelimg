@@ -31,7 +31,10 @@
 
 	<bean id="exifDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCExifDAO"></bean>
 
-	<bean id="exifServiceImpl" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
+
+	<bean> id="exifServiceImpl" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
+
+	<bean id="photographerDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotographerDAO"></bean>
 
 	<bean id="mainController" class="at.ac.tuwien.qse.sepm.gui.MainController"></bean>
 	<bean id="organizerController" class="at.ac.tuwien.qse.sepm.gui.Organizer"></bean>
