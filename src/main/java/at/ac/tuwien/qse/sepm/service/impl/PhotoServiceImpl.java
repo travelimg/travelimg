@@ -21,17 +21,21 @@ public class PhotoServiceImpl implements PhotoService {
 
     private static final Logger logger = LogManager.getLogger();
 
-    private PhotoDAO photoDAO;
-    private PhotoTagDAO photoTagDAO;
+   @Autowired private PhotoDAO photoDAO;
+    @Autowired private PhotoTagDAO photoTagDAO;
 
     public PhotoServiceImpl() {
 
     }
 
-    @Autowired
-    public void setPhotoDAO(PhotoDAO photoDAO) {
-        this.photoDAO = photoDAO;
-    }
+    //@Autowired
+    //public void setPhotoDAO(PhotoDAO photoDAO) {
+    //    this.photoDAO = photoDAO;
+    //}
+    //@Autowired
+    //public void setPhotoTagDAO(PhotoTagDAO photoTagDAO) {
+    //    this.photoTagDAO = photoTagDAO;
+    //}
 
     public List<Photo> getAllPhotos() throws ServiceException {
         try {
@@ -61,7 +65,7 @@ public class PhotoServiceImpl implements PhotoService {
             try {
                 photoDAO.delete(p);
             } catch (DAOException e) {
-                e.printStackTrace();
+                throw new ServiceException(e);
             } catch (ValidationException e) {
                 throw new ServiceException("Failed to validate entity", e);
             }
@@ -83,7 +87,7 @@ public class PhotoServiceImpl implements PhotoService {
             try {
                 photoTagDAO.removeTagFromPhoto(t,p);
             } catch (DAOException e) {
-                e.printStackTrace();
+                throw new ServiceException(e);
             } catch (ValidationException e) {
                 throw new ServiceException("Failed to validate entity", e);
             }

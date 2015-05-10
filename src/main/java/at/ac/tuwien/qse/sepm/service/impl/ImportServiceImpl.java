@@ -21,17 +21,17 @@ public class ImportServiceImpl implements ImportService {
 
     private static final Logger logger = LogManager.getLogger();
 
-    private PhotoDAO photoDAO;
+   @Autowired private PhotoDAO photoDAO;
     ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     public ImportServiceImpl() {
 
     }
 
-    @Autowired
-    public void setPhotoDAO(PhotoDAO photoDAO) {
-        this.photoDAO = photoDAO;
-    }
+    //@Autowired
+    //public void setPhotoDAO(PhotoDAO photoDAO) {
+    //    this.photoDAO = photoDAO;
+    //}
 
     public void importPhotos(List<Photo> photos, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler)  {
         logger.debug("Importing photos");

@@ -46,8 +46,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private final String photoDirectory;
     private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MMM/dd", Locale.ENGLISH);
 
-    private ExifDAO exifDAO;
-    private PhotoTagDAO photoTagDAO;
+    @Autowired private ExifDAO exifDAO;
+    @Autowired private PhotoTagDAO photoTagDAO;
 
     public JDBCPhotoDAO(String photoDirectory) {
         this.photoDirectory = photoDirectory;
@@ -57,6 +57,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     public void setExifDAO(ExifDAO exifDAO) {
         this.exifDAO = exifDAO;
     }
+    @Autowired
+    public void setPhotoTagDAO(PhotoTagDAO photoTagDAO) { this.photoTagDAO =photoTagDAO;}
 
     public Photo create(Photo photo) throws DAOException, ValidationException {
         logger.debug("Creating photo {}", photo);

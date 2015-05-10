@@ -19,12 +19,12 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
 
     private static final Logger logger = LogManager.getLogger();
 
-    private Connection con;
+
 
     private static final String deleteStatement = "Delete from PHOTOTAG  where PHOTO_ID=? and TAG_ID=? ";
 
     public JDBCPhotoTagDAO() throws DAOException {
-        con = DBConnection.getConnection();
+
     }
 
     public void createPhotoTag(Photo p, Tag t) throws DAOException {
@@ -39,7 +39,7 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      * @throws ValidationException
      */
     public void removeTagFromPhoto(Tag t, Photo p) throws DAOException, ValidationException {
-        logger.debug("Deleting Tag from Photo {}", t, p);
+        logger.debug("Deleting Tag from Photo {}", t );
         PhotoValidator.validate(p);
         try{
             jdbcTemplate.update(deleteStatement,p.getId(),t.getId());

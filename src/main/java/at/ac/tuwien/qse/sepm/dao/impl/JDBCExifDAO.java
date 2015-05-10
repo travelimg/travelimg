@@ -35,22 +35,11 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
     public Exif create(Exif e) throws DAOException {
         String query = "INSERT INTO exif(photo_id, date, exposure, aperture, focallength, iso, flash, cameramodel, longitude, latitude, altitude) VALUES (?,?,?,?,?,?,?,?,?,?,?);";
 
-        try(PreparedStatement insertStatement = con.prepareStatement(query)) {
+        try {
+            jdbcTemplate.update(query,e.getId(),e.getDate(),e.getExposure(),e.getAperture(),e.getFocalLength(),e.getIso(),e.isFlash(),e.getCameraModel(),e.getLongitude(),e.getLatitude(),e.getAltitude());
 
-            insertStatement.setInt(1, e.getId());
-            insertStatement.setTimestamp(2, e.getDate());
-            insertStatement.setString(3, e.getExposure());
-            insertStatement.setDouble(4, e.getAperture());
-            insertStatement.setDouble(5, e.getFocalLength());
-            insertStatement.setInt(6, e.getIso());
-            insertStatement.setBoolean(7, e.isFlash());
-            insertStatement.setString(8, e.getCameraModel());
-            insertStatement.setString(9, e.getLongitude());
-            insertStatement.setString(10, e.getLatitude());
-            insertStatement.setDouble(11, e.getAltitude());
-            insertStatement.executeUpdate();
-        } catch (SQLException ex) {
-            throw new DAOException(ex.getMessage());
+        } catch (DataAccessException ex) {
+            throw new DAOException("Failed to create exif", ex);
         }
         return null;
     }
