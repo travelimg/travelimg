@@ -19,11 +19,9 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
     private GoogleMapView mapView;
     private GoogleMap map;
-    private double x = Double.MIN_VALUE;
-    private double y = Double.MIN_VALUE;
-    private Scene gmScene;
+    static final LatLong defaulLocation = new LatLong(40.7033127, -73.979681); // the default Location
+    private static LatLong destination; // the Location from the Exif Objekt
     private Exif marker;
-
 
     /**
      * Default Constructor
@@ -43,25 +41,10 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      */
     public GoogleMapsScene(Exif marker){
         this.mapView = new GoogleMapView();
+        destination = new LatLong(Double.parseDouble(marker.getLongitude()),Double.parseDouble(
+                marker.getLatitude()));
         this.mapView.addMapInializedListener(this);
         this.marker =marker;
-    }
-
-    /**
-     * Constructor of a new GoogleMapsScene-Objekt
-     *
-     *
-     * @param x the X-Koordinate of the Country/city
-     * @param y the Y-Koordinate of the Country/city
-     * @param marker a Exif-Objekt to be displayed as a marker
-     */
-    public GoogleMapsScene(double x, double y, Exif marker){
-        this.x=x;
-        this.y=y;
-        this.marker=marker;
-        this.mapView = new GoogleMapView();
-        this.mapView.addMapInializedListener(this);
-
     }
 
 
@@ -72,62 +55,57 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      * Constructor (x,y,exif)--> focus Position x,y ;  a marker will be placed at the exif-Koordinate
      *
      *
-     * mapOption
-     *  overviewMapControl (true --> switch between Map and Satelit)
-     *  panControl(true --> show Navigation-element from GoogleMaps )
-     *  rotateControl(true--> no effect)
-     *  scaleControl (true--> no effect)
-     *  streetViewControl(no effect)
-     *  zoomControl (true--> show zoom-element from GoogleMaps)
-     *  zoom(zoomfactor)
      */
     @Override
     public void mapInitialized() {
         //Set the initial properties of the map.
         logger.debug("Initializing Map ");
-        if(this.x==Double.MIN_VALUE) {
+        MapOptions mapOptions;
 
-            MapOptions mapOptions = new MapOptions();
-            mapOptions.center(new LatLong(40.7033127, -73.979681))
-                    .overviewMapControl(true)
-                    .panControl(true)
-                    .rotateControl(false)
-                    .scaleControl(true)
-                    .streetViewControl(false)
-                    .zoomControl(true)
-                    .zoom(2);
-            map = mapView.createMap(mapOptions);
-
+        if(destination==null) {
+           mapOptions =returnOption(defaulLocation, true, true, true, 2);
         }else{
-            MapOptions mapOptions = new MapOptions();
-
-            mapOptions.center(new LatLong(x, y))
-                    .overviewMapControl(true)
-                    .panControl(true)
-                    .rotateControl(true)
-                    .scaleControl(true)
-                    .streetViewControl(false)
-                    .zoomControl(true)
-                    .zoom(12);
-
-            map = mapView.createMap(mapOptions);
+            mapOptions =returnOption(destination,true,true,true,12);
         }
+
+        map = mapView.createMap(mapOptions);
+
         if(this.marker!=null){
-
-            map.addMarker(new Marker(new MarkerOptions().position(new LatLong(Double.parseDouble(marker.getLongitude()),Double.parseDouble(marker.getLatitude()) ))
-                    .visible(Boolean.TRUE)));
-
+            map.addMarker(new Marker(new MarkerOptions().position(destination).visible(Boolean.TRUE)));
         }
     }
 
+    /**
+     * returns a MapOption Objekt
+     * @param destinat the destination on the Map
+     * @param overview true --> switch between Map and Satelit
+     * @param panControl true --> show Navigation-element from GoogleMaps
+     * @param zoomControl true--> show zoom-element from GoogleMaps
+     * @param zoomfactor represent the zoomfactor in the map
+     * @return a MapOption-Objekt
+     *
+     */
+    private MapOptions returnOption(LatLong destinat,boolean overview,boolean panControl, boolean zoomControl, int zoomfactor){
+        MapOptions mapOptions = new MapOptions();
+
+        mapOptions.center(destinat)
+                .overviewMapControl(overview)
+                .panControl(panControl)
+                .rotateControl(false)
+                .scaleControl(false)
+                .streetViewControl(false)
+                .zoomControl(zoomControl)
+                .zoom(zoomfactor);
+        return mapOptions;
+    }
     /**
      *
      * @return GoogleMapView as a Scene
      */
     public Scene getScene(){
         logger.debug("returning Scene");
-        this.gmScene = new Scene(this.mapView);
-        return this.gmScene;
+        return new Scene(this.mapView);
+
     }
 
 
