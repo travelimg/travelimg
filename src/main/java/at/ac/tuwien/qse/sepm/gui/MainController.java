@@ -1,15 +1,25 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableBooleanValue;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.TilePane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.controlsfx.control.GridCell;
-import org.controlsfx.control.GridView;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 /**
  * Controller for the main view.
@@ -21,8 +31,11 @@ public class MainController {
     @Autowired private Organizer organizer;
     @Autowired private Inspector inspector;
 
-    @FXML private BorderPane root;
-    @FXML private GridView<Photo> imageGrid;
+    @FXML private ScrollPane scrollPane;
+
+    @FXML private TilePane tilePane;
+
+    private ImageTile selectedTile = null;
 
     public MainController() {
 
@@ -30,34 +43,102 @@ public class MainController {
 
     @FXML
     private void initialize() {
-        imageGrid.setItems(organizer.getActivePhotos());
-        imageGrid.setCellFactory(list -> new PhotoGridCell());
-    }
-}
 
-class PhotoGridCell extends GridCell<Photo> {
-
-    private final ImageView imageView;
-
-    public PhotoGridCell() {
-        this.getStyleClass().add("photo-grid-cell");
-        this.imageView = new ImageView();
-        this.imageView.fitHeightProperty().bind(this.heightProperty());
-        this.imageView.fitWidthProperty().bind(this.widthProperty());
     }
 
-    protected void updateItem(Photo item, boolean empty) {
-        super.updateItem(item, empty);
-         if (empty) {
-            this.setGraphic(null);
-            return;
+    /**
+     * Add a photo to the image grid
+     *
+     * @param photo The photo to be added.
+     */
+    public void addPhoto(Photo photo) {
+        ImageTile imageTile = new ImageTile(photo);
+
+        imageTile.getSelectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if(newValue) {
+                    if (selectedTile != null) {
+                        selectedTile.unselect();
+                    }
+                    selectedTile = imageTile;
+                }
+            }
+        });
+
+        tilePane.getChildren().add(imageTile);
+    }
+
+    /**
+     * Clear the image grid and don't show any photos.
+     */
+    public void clearPhotos() {
+        tilePane.getChildren().clear();
+    }
+
+    /**
+     * Widget for one widget in the image grid. Can either be in a selected or an unselected state.
+     */
+    private class ImageTile extends HBox {
+
+        private Photo photo;
+
+        private Image image;
+        private ImageView imageView;
+
+        private BooleanProperty selected = new SimpleBooleanProperty(false);
+
+        public ImageTile(Photo photo) {
+            this.photo = photo;
+
+            try {
+                image = new Image(new FileInputStream(new File(photo.getPath())), 150, 0, true, true);
+            } catch (FileNotFoundException ex) {
+                logger.error("Could not find photo", ex);
+                return;
+            }
+
+            imageView = new ImageView(image);
+            imageView.setFitWidth(150);
+            imageView.setOnMouseClicked(this::handleSelected);
+
+            getStyleClass().add("image-tile-non-selected");
+
+            this.getChildren().add(imageView);
         }
 
-        // TODO: CACHING. Images are loaded everytime the grid wraps.
+        /**
+         * Select this photo. Triggers an update of the inspector widget.
+         */
+        public void select() {
+            getStyleClass().remove("image-tile-non-selected");
+            getStyleClass().add("image-tile-selected");
 
-        // TODO: JavaFX loads images via URI. We need that URI!
-        Image image = new Image(item.getPath());
-        imageView.setImage(image);
-        setGraphic(this.imageView);
+            inspector.setActivePhoto(photo);
+
+            this.selected.set(true);
+        }
+
+        /**
+         * Unselect a photo.
+         */
+        public void unselect() {
+            getStyleClass().add("image-tile-non-selected");
+            getStyleClass().remove("image-tile-selected");
+
+            this.selected.set(false);
+        }
+
+        /**
+         * Property which represents if this tile is currently selected or not.
+         * @return The selected property.
+         */
+        public BooleanProperty getSelectedProperty() {
+            return selected;
+        }
+
+        private void handleSelected(MouseEvent event) {
+            select();
+        }
     }
 }

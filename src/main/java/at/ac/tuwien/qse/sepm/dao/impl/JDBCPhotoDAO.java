@@ -28,9 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
@@ -126,44 +124,59 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
 
     public List<Photo> readAll() throws DAOException, ValidationException {
+        logger.debug("retrieving all photos");
+
         try {
-            return jdbcTemplate.query(readAllStatement, new RowMapper<Photo>() {
+            List<Photo> photos = jdbcTemplate.query(readAllStatement, new RowMapper<Photo>() {
                 @Override
                 public Photo mapRow(ResultSet rs, int rowNum) throws SQLException {
                     return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
                 }
             });
+
+            attachExif(photos);
+
+            logger.debug("Successfully read all photos");
+            return photos;
         } catch(DataAccessException e) {
             throw new DAOException("Failed to read all photos", e);
         }
     }
 
     @Override
-    public List<Photo> readPhotosByYearAndMonth(int year, int month) throws DAOException {
+    public List<Photo> readPhotosByDate(Date date) throws DAOException {
+        logger.debug("retrieving photos by date {}", date);
 
-        List<Photo> photos = new ArrayList<Photo>();
-        try(PreparedStatement stmt = getConnection().prepareStatement(readByYearAndMonthStatement)) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH) + 1;
 
-            stmt.setInt(1,year);
-            stmt.setInt(2,month);
-            ResultSet rs = stmt.executeQuery();
+        try {
+            List<Photo> photos = jdbcTemplate.query(readByYearAndMonthStatement, (ResultSet rs, int rowNum) -> {
+                return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
+            }, year, month);
 
-            while(rs.next()) {
-                photos.add(new Photo(
-                        rs.getInt(1),
-                        null,
-                        rs.getString(3),
-                        rs.getInt(4)
-                ));
-            }
-        } catch (SQLException e) {
-            throw new DAOException(e);
+            attachExif(photos);
+
+            logger.debug("Successfully retrieved photos");
+            return photos;
+        } catch (DataAccessException ex) {
+            throw new DAOException("Failed to read photos from given month", ex);
         }
-
-        return photos;
     }
 
-
+    /**
+     * Load the exif data for each photo in the given list.
+     *
+     * @param photos The list of photos which will be annotated with the exif data.
+     * @throws DAOException if an error occurs during reading the exif data.
+     */
+    private void attachExif(List<Photo> photos) throws DAOException {
+        for(Photo photo : photos) {
+            photo.setExif(exifDAO.read(photo));
+        }
+    }
 
     /**
      * Copy the photo to the travelimg photo directory. The structure created is Year/Month/Day.

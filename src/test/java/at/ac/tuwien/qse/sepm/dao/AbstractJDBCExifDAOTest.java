@@ -24,10 +24,12 @@ public class AbstractJDBCExifDAOTest extends TestCase{
 
     @Test
     public void testDelete() throws Exception {
-        Exif e = mock(Exif.class);
+        assertTrue(false);
+
+        /*Exif e = mock(Exif.class);
         when(e.getId()).thenReturn(2);
         exifDAO.delete(e);
         assertFalse(exifDAO.read(e) != null);
-        assertNull(exifDAO.read(e));
+        assertNull(exifDAO.read(e));*/
     }
 }
