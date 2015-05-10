@@ -29,7 +29,7 @@ public class MainController {
 
     @FXML private ScrollPane scrollPane;
 
-    private TilePane tilePane;
+    @FXML private TilePane tilePane;
 
     public MainController() {
 
@@ -37,14 +37,7 @@ public class MainController {
 
     @FXML
     private void initialize() {
-        tilePane = new TilePane();
-        tilePane.setPadding(new Insets(15, 15, 15, 15));
-        tilePane.setHgap(15);
-        tilePane.setVgap(15);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); // Horizontal
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // Vertical scroll bar
-        scrollPane.setFitToWidth(true);
-        scrollPane.setContent(tilePane);
+
     }
 
     public void addPhotos(Photo photo){
