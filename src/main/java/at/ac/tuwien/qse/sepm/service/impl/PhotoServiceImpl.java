@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.service.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.ExifDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
+import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
@@ -25,18 +26,14 @@ public class PhotoServiceImpl implements PhotoService {
 
     private static final Logger logger = LogManager.getLogger();
 
-    private PhotoDAO photoDAO;
-    @Autowired ExifDAO exifDAO;
+    @Autowired private ExifDAO exifDAO;
+    @Autowired private PhotoDAO photoDAO;
+    @Autowired private PhotoTagDAO photoTagDAO;
 
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     public PhotoServiceImpl() {
 
-    }
-
-    @Autowired
-    public void setPhotoDAO(PhotoDAO photoDAO) {
-        this.photoDAO = photoDAO;
     }
 
     public List<Photo> getAllPhotos() throws ServiceException {
@@ -57,15 +54,43 @@ public class PhotoServiceImpl implements PhotoService {
 
     }
 
+    /**
+     *  delete the delivered List of Photos
+     * @param photos the list of photos
+     * @throws ServiceException
+     */
     public void deletePhotos(List<Photo> photos) throws ServiceException {
-
+        for(Photo p : photos){
+            try {
+                photoDAO.delete(p);
+            } catch (DAOException e) {
+                throw new ServiceException(e);
+            } catch (ValidationException e) {
+                throw new ServiceException("Failed to validate entity", e);
+            }
+        }
     }
 
     public void addTagToPhotos(List<Photo> photos, Tag t) throws ServiceException {
 
     }
 
+    /**
+     * delete the delivered Tag from the delivered list of Photos
+     * @param photos the list of photos
+     * @param t the Tag which you want to delete
+     * @throws ServiceException
+     */
     public void removeTagFromPhotos(List<Photo> photos, Tag t) throws ServiceException {
+        for(Photo p: photos){
+            try {
+                photoTagDAO.removeTagFromPhoto(t,p);
+            } catch (DAOException e) {
+                throw new ServiceException(e);
+            } catch (ValidationException e) {
+                throw new ServiceException("Failed to validate entity", e);
+            }
+        }
 
     }
 

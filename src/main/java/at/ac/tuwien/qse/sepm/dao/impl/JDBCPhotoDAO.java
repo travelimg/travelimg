@@ -1,10 +1,15 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
+
+import at.ac.tuwien.qse.sepm.dao.*;
+
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.ExifDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Exif;
+
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +34,18 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     private static final String insertStatement = "INSERT INTO Photo(id, photographer_id, path, rating) VALUES (?, ?, ?, ?);";
     private static final String readAllStatement = "SELECT id, photographer_id, path, rating FROM PHOTO;";
+   // private static final String readByYearAndMonthStatement = "SELECT PHOTO_ID,PHOTOGRAPHER_ID,PATH,RATING FROM PHOTO JOIN EXIF WHERE ID=PHOTO_ID AND YEAR(DATE)=? AND MONTH(DATE)=?;";
+
+    private static final String deleteStatement = "Delete from Photo where id =?";
+
     private static final String readByYearAndMonthStatement = "SELECT PHOTO_ID,PHOTOGRAPHER_ID,PATH,RATING FROM PHOTO JOIN EXIF WHERE ID=PHOTO_ID AND YEAR(DATE)=? AND MONTH(DATE)=?;";
+
 
     private final String photoDirectory;
     private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MMM/dd", Locale.ENGLISH);
 
-    private ExifDAO exifDAO;
+    @Autowired private ExifDAO exifDAO;
+    @Autowired private PhotoTagDAO photoTagDAO;
 
     public JDBCPhotoDAO(String photoDirectory) {
         this.photoDirectory = photoDirectory;
@@ -44,6 +55,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     public void setExifDAO(ExifDAO exifDAO) {
         this.exifDAO = exifDAO;
     }
+    @Autowired
+    public void setPhotoTagDAO(PhotoTagDAO photoTagDAO) { this.photoTagDAO =photoTagDAO;}
 
     public Photo create(Photo photo) throws DAOException, ValidationException {
         logger.debug("Creating photo {}", photo);
@@ -77,9 +90,38 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     }
 
+    /**
+     * delete the photo which is delivered
+     * @param photo Specifies which photo to delete by providing the id.
+     * @throws DAOException
+     * @throws ValidationException
+     */
     public void delete(Photo photo) throws DAOException, ValidationException {
+        logger.debug("Deleting photo {}", photo);
+        // validate photo
+        PhotoValidator.validate(photo);
+
+        int id = photo.getId();
+        // delete from Table exif
+        exifDAO.delete(photo.getExif());
+
+        // delete from Table photoTag
+        List<Tag> taglist = photoTagDAO.readTagsByPhoto(photo);
+        for (Tag t : taglist) {
+            photoTagDAO.removeTagFromPhoto(t, photo);
+        }
+        try{
+            jdbcTemplate.update(deleteStatement,id);
+
+        }catch(DataAccessException e) {
+            throw new DAOException("Failed to delete photo", e);
+        }
 
     }
+
+
+
+
 
     public List<Photo> readAll() throws DAOException, ValidationException {
         logger.debug("retrieving all photos");
@@ -172,7 +214,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
      */
     private int getNextId() throws DAOException {
         try {
-            return jdbcTemplate.queryForObject("select id from Photo order by id desc limit 1", Integer.class) + 1;
+            return jdbcTemplate.queryForObject("select id from Photo order by id desc limit 1",
+                    Integer.class) + 1;
         }  catch(IncorrectResultSizeDataAccessException e) {
             // no data in table yet
             return 0;

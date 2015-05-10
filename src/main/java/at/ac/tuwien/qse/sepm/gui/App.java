@@ -25,7 +25,7 @@ public class App extends Application {
         try {
             context = new ClassPathXmlApplicationContext("beans.xml");
         } catch (Exception e) {
-            logger.error("Failed to setup application. Exiting.", e);
+            logger.error("Failed to setup application. Exitingig.", e);
             System.exit(1);
         }
     }
