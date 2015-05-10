@@ -1,16 +1,13 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
-import at.ac.tuwien.qse.sepm.service.Service;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,13 +18,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Controller for organizer view which is used for browsing photos by month.
@@ -41,12 +40,12 @@ public class Organizer {
     @Autowired private ImportService importService;
     @Autowired private PhotoService photoService;
 
+    @Autowired private MainController mainController;
+
     @FXML private BorderPane root;
     @FXML private Button importButton;
     @FXML private Button presentButton;
     @FXML private ListView<Date> monthList;
-
-    private final ObservableList<Photo> activePhotos = FXCollections.observableArrayList();
 
     private final ObservableList<Date> months = FXCollections.observableArrayList();
     private final SortedList<Date> monthsSorted = new SortedList<>(months);
@@ -76,13 +75,6 @@ public class Organizer {
         monthList.getSelectionModel().selectedItemProperty().addListener(this::handleMonthChange);
 
         months.addAll(getAvailableMonths());
-    }
-
-    /**
-     * Set of photos that match the current filter.
-     */
-    public final ObservableList<Photo> getActivePhotos() {
-        return activePhotos;
     }
 
     private void handleImport(Event event) {
@@ -136,8 +128,7 @@ public class Organizer {
 
             if(!photoMonth.equals(activeMonth)) return;
 
-            photo.setPath("file://" + photo.getPath()); // TODO: change at a different layer
-            getActivePhotos().add(photo);
+            mainController.addPhotos(photo);
         });
     }
 
@@ -148,7 +139,7 @@ public class Organizer {
     private void handleMonthChange(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {
         // remove active photos and replace them by
         // photos from the newly selected month
-        getActivePhotos().clear();
+        mainController.clearPhotos();
 
         Cancelable task = photoService.loadPhotosByDate(newValue, this::handleNewPhoto, this::handleLoadError);
     }
