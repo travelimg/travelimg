@@ -38,7 +38,6 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
         super(origin, title);
         FXMLLoadHelper.load(this, this, ImportDialog.class, "view/ImportDialog.fxml");
 
-        setMinHeight(400);
 
         browseButton.setOnAction(this::handleBrowse);
         importButton.setOnAction(this::handleImport);
