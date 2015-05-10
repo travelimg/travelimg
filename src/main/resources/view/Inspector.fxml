@@ -5,13 +5,16 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-
 <BorderPane fx:id="root" prefWidth="240.0" styleClass="inspector" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.Inspector">
     <center>
         <VBox fx:id="contentBox" maxHeight="Infinity" maxWidth="Infinity" styleClass="section" BorderPane.alignment="CENTER">
          <children>
             <Button mnemonicParsing="false" styleClass="raised" text="TODO" />
+            <VBox fx:id="contentBox2" maxHeight="Infinity" maxWidth="Infinity" styleClass="section" BorderPane.alignment="CENTER_LEFT">
+                <children>
+
+                </children>
+            </VBox>
 
              <Label fx:id="proofOfConceptLabel" wrapText="true" />
          </children></VBox>

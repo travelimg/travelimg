@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.controlsfx.tools.Platform;
 
@@ -28,7 +29,7 @@ public class Inspector {
 
     private Photo photo = null;
 
-    @FXML private VBox contentBox;
+    @FXML private VBox contentBox2;
 
     @FXML private Label proofOfConceptLabel;
 
@@ -50,7 +51,10 @@ public class Inspector {
 
         proofOfConceptLabel.setText("Selected photo is: " + photo.getPath());
         this.mapsScene = new GoogleMapsScene(photo.getExif());
-        contentBox.getChildren().add(2,mapsScene.getMapView());
+        contentBox2.getChildren().clear();
+
+        contentBox2.getChildren().add(mapsScene.getMapView());
+
 
 
     }
