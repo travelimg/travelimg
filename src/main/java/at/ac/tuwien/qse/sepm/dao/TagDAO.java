@@ -11,7 +11,7 @@ public interface TagDAO {
      *
      * @param t Tag which to create
      * @return the created Tag
-     * @throws DAOException If the Tag can not be copied or the data store fails to create a record.
+     * @throws DAOException If the Tag can not be created or the data store fails to create a record.
      */
     public Tag create(Tag t) throws DAOException;
 
@@ -20,7 +20,7 @@ public interface TagDAO {
      *
      * @param t Specifies which Tag to retrive by providing the id.
      * @return the Tag-Objekt
-     * @throws DAOException If the Tag can not be retrived or the data store fails to select the record.
+     * @throws DAOException If the Tag can not be retrieved or the data store fails to select the record.
      */
     public Tag read(Tag t) throws DAOException;
 
@@ -37,7 +37,7 @@ public interface TagDAO {
      * Retrieve a list of all existing Tags
      *
      * @return the list of Tags
-     * @throws DAOException If the Tag can not be retrived or the data store fails to select the record.
+     * @throws DAOException If the Tag can not be retrieved or the data store fails to select the record.
      */
     public List<Tag> readAll() throws DAOException;
 

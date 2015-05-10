@@ -24,7 +24,7 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
 
     private static final String readStatement = "SELECT ID,name FROM TAG WHERE ID=?;";
     private static final String readAllStatement = "SELECT ID,name FROM TAG;";
-    private static final String deleteStatement ="DELTE FROM TAG WHERE ID=?;";
+    private static final String deleteStatement ="DELETE FROM TAG WHERE ID=?;";
 
 
     private SimpleJdbcInsert insertTag;
@@ -44,7 +44,7 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
      *
      * @param t Tag which to create
      * @return the created Tag
-     * @throws DAOException If the Tag can not be copied or the data store fails to create a record.
+     * @throws DAOException If the Tag can not be created or the data store fails to create a record.
      */
     public Tag create(Tag t) throws DAOException {
 
@@ -63,9 +63,9 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
     /**
      * Retrieve an existing Tag
      *
-     * @param t Specifies which Tag to retrive by providing the id.
-     * @return the Tag -Objekt
-     * @throws DAOException If the Tag can not be deleted or the data store fails to delete the record.
+     * @param t Specifies which Tag to retrieve by providing the id.
+     * @return the Tag-Objekt
+     * @throws DAOException If the Tag can not be retrieved or the data store fails to select the record.
      */
     public Tag read(Tag t) throws DAOException {
         logger.debug("reading Tag {}",t);
@@ -108,7 +108,7 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
      * Retrieve a list of all existing Tags
      *
      * @return the list of Tags
-     * @throws DAOException If the Tag can not be retrived or the data store fails to select the record.
+     * @throws DAOException If the Tag can not be retrieved or the data store fails to select the record.
      *
      */
     public List<Tag> readAll() throws DAOException {
