@@ -10,6 +10,8 @@ import javafx.scene.Scene;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.DoubleSummaryStatistics;
+
 /**
  * Created by christoph on 08.05.15.
  */
@@ -41,12 +43,31 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      */
     public GoogleMapsScene(Exif marker){
         this.mapView = new GoogleMapView();
-        destination = new LatLong(Double.parseDouble(marker.getLongitude()),Double.parseDouble(
-                marker.getLatitude()));
+        destination = calculate(marker.getLongitude(), marker.getLatitude());
         this.mapView.addMapInializedListener(this);
         this.marker =marker;
     }
 
+    /**
+     * calculate the decimal coordinates
+     * @param longitude the longitude-GPS coordinate from the Exif-file (grad, minutes, sec)
+     * @param latitude  the latitude-GPS coordinate from the Exif-file (grad, minutes, sec)
+     * @return a LatLong-Object with the decimal coordinates
+     */
+    private LatLong calculate(String longitude, String latitude){
+        String[] longi = longitude.split(" ");
+        String[] lat = latitude.split(" ");
+
+        double grad1 = Double.parseDouble(longi[0]);
+        double grad2 = Double.parseDouble(lat[0]);
+        double min1 = Double.parseDouble(longi[1]);
+       double min2 = Double.parseDouble(lat[1]);
+        double sec1 = Double.parseDouble(longi[2]);
+        double sec2 = Double.parseDouble(lat[2]);
+        double erg1 = (((sec1/60)+min1)/60)+grad1;
+        double erg2 = (((sec2/60)+min2)/60)+grad2;
+       return new LatLong(erg1,erg2);
+    }
 
     /**
      * Initialising GoogleMap
