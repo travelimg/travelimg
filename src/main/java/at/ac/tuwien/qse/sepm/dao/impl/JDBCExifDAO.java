@@ -14,16 +14,22 @@ import com.drew.metadata.MetadataException;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.exif.GpsDirectory;
+import org.springframework.dao.DataAccessException;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.Date;
+import java.util.stream.Collectors;
 
-public class JDBCExifDAO implements ExifDAO {
+public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
 
     private Connection con;
+
+    private static final String readStatement = "SELECT photo_id, date, exposure, aperture, focallength, iso, flash, cameramodel, longitude, latitude, altitude FROM exif WHERE photo_id=?";
+    private static final String readMonthStatement = "SELECT YEAR(date), MONTH(date) from exif;";
+    private static final String deleteStatement = "Delete from Exif where PHOTO_ID  =?";
 
     public JDBCExifDAO() throws DAOException {
         con = DBConnection.getConnection();
@@ -32,36 +38,54 @@ public class JDBCExifDAO implements ExifDAO {
     public Exif create(Exif e) throws DAOException {
         String query = "INSERT INTO exif(photo_id, date, exposure, aperture, focallength, iso, flash, cameramodel, longitude, latitude, altitude) VALUES (?,?,?,?,?,?,?,?,?,?,?);";
 
-        try(PreparedStatement insertStatement = con.prepareStatement(query)) {
+        try {
+            jdbcTemplate.update(query,e.getId(),e.getDate(),e.getExposure(),e.getAperture(),e.getFocalLength(),e.getIso(),e.isFlash(),e.getCameraModel(),e.getLongitude(),e.getLatitude(),e.getAltitude());
 
-            insertStatement.setInt(1, e.getId());
-            insertStatement.setTimestamp(2, e.getDate());
-            insertStatement.setString(3, e.getExposure());
-            insertStatement.setDouble(4, e.getAperture());
-            insertStatement.setDouble(5, e.getFocalLength());
-            insertStatement.setInt(6, e.getIso());
-            insertStatement.setBoolean(7, e.isFlash());
-            insertStatement.setString(8, e.getCameraModel());
-            insertStatement.setString(9, e.getLongitude());
-            insertStatement.setString(10, e.getLatitude());
-            insertStatement.setDouble(11, e.getAltitude());
-            insertStatement.executeUpdate();
-        } catch (SQLException ex) {
-            throw new DAOException(ex.getMessage());
+        } catch (DataAccessException ex) {
+            throw new DAOException("Failed to create exif", ex);
         }
         return null;
     }
 
-    public Exif read(Exif e) throws DAOException {
-        return null;
+    public Exif read(Photo photo) throws DAOException {
+        logger.debug("Reading exif data for photo {}", photo);
+
+        try {
+            return jdbcTemplate.queryForObject(readStatement, (rs, rowNum) -> {
+                return new Exif(
+                        rs.getInt(1),
+                        rs.getTimestamp(2),
+                        rs.getString(3),
+                        rs.getDouble(4),
+                        rs.getDouble(5),
+                        rs.getInt(6),
+                        rs.getBoolean(7),
+                        rs.getString(8),
+                        rs.getString(9),
+                        rs.getString(10),
+                        rs.getDouble(11)
+                );
+            }, photo.getId());
+        } catch (DataAccessException ex) {
+            throw new DAOException("Failed to retrieve exif data for given photo", ex);
+        }
     }
 
     public void update(Exif e) throws DAOException {
 
     }
 
+    /**
+     * delete an Exif Objekt
+     * @param e the Exif Objekt
+     * @throws DAOException
+     */
     public void delete(Exif e) throws DAOException {
-
+        try{
+            jdbcTemplate.update(deleteStatement,e.getId());
+    }catch(DataAccessException ex) {
+        throw new DAOException("Failed to delete exif", ex);
+    }
     }
 
     public List<Exif> readAll() throws DAOException {
@@ -141,6 +165,19 @@ public class JDBCExifDAO implements ExifDAO {
         } catch (IOException e) {
             e.printStackTrace();
             throw new DAOException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<Date> getMonthsWithPhotos() throws DAOException {
+        try {
+            return jdbcTemplate.query(readMonthStatement, (rs, rowNum) -> {
+                return new Date(rs.getInt(1) - 1900, rs.getInt(2) - 1, 1);
+            }).stream()
+                    .distinct()
+                    .collect(Collectors.toList());
+        } catch (DataAccessException ex) {
+            throw new DAOException("Failed to retrieve all months", ex);
         }
     }
 }

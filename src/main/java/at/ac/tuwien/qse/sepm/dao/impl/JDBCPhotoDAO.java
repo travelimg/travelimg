@@ -1,10 +1,15 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
+
+import at.ac.tuwien.qse.sepm.dao.*;
+
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.ExifDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Exif;
+
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,20 +28,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     private static final String insertStatement = "INSERT INTO Photo(id, photographer_id, path, rating) VALUES (?, ?, ?, ?);";
     private static final String readAllStatement = "SELECT id, photographer_id, path, rating FROM PHOTO;";
+   // private static final String readByYearAndMonthStatement = "SELECT PHOTO_ID,PHOTOGRAPHER_ID,PATH,RATING FROM PHOTO JOIN EXIF WHERE ID=PHOTO_ID AND YEAR(DATE)=? AND MONTH(DATE)=?;";
+
+    private static final String deleteStatement = "Delete from Photo where id =?";
+
     private static final String readByYearAndMonthStatement = "SELECT PHOTO_ID,PHOTOGRAPHER_ID,PATH,RATING FROM PHOTO JOIN EXIF WHERE ID=PHOTO_ID AND YEAR(DATE)=? AND MONTH(DATE)=?;";
+
 
     private final String photoDirectory;
     private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MMM/dd", Locale.ENGLISH);
 
-    private ExifDAO exifDAO;
+    @Autowired private ExifDAO exifDAO;
+    @Autowired private PhotoTagDAO photoTagDAO;
 
     public JDBCPhotoDAO(String photoDirectory) {
         this.photoDirectory = photoDirectory;
@@ -46,6 +55,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     public void setExifDAO(ExifDAO exifDAO) {
         this.exifDAO = exifDAO;
     }
+    @Autowired
+    public void setPhotoTagDAO(PhotoTagDAO photoTagDAO) { this.photoTagDAO =photoTagDAO;}
 
     public Photo create(Photo photo) throws DAOException, ValidationException {
         logger.debug("Creating photo {}", photo);
@@ -79,45 +90,92 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     }
 
+    /**
+     * delete the photo which is delivered
+     * @param photo Specifies which photo to delete by providing the id.
+     * @throws DAOException
+     * @throws ValidationException
+     */
     public void delete(Photo photo) throws DAOException, ValidationException {
+        logger.debug("Deleting photo {}", photo);
+        // validate photo
+        PhotoValidator.validate(photo);
+
+        int id = photo.getId();
+        // delete from Table exif
+        exifDAO.delete(photo.getExif());
+
+        // delete from Table photoTag
+        List<Tag> taglist = photoTagDAO.readTagsByPhoto(photo);
+        for (Tag t : taglist) {
+            photoTagDAO.removeTagFromPhoto(t, photo);
+        }
+        try{
+            jdbcTemplate.update(deleteStatement,id);
+
+        }catch(DataAccessException e) {
+            throw new DAOException("Failed to delete photo", e);
+        }
 
     }
 
+
+
+
+
     public List<Photo> readAll() throws DAOException, ValidationException {
+        logger.debug("retrieving all photos");
+
         try {
-            return jdbcTemplate.query(readAllStatement, new RowMapper<Photo>() {
+            List<Photo> photos = jdbcTemplate.query(readAllStatement, new RowMapper<Photo>() {
                 @Override
                 public Photo mapRow(ResultSet rs, int rowNum) throws SQLException {
                     return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
                 }
             });
+
+            attachExif(photos);
+
+            logger.debug("Successfully read all photos");
+            return photos;
         } catch(DataAccessException e) {
             throw new DAOException("Failed to read all photos", e);
         }
     }
 
     @Override
-    public List<Photo> readPhotosByYearAndMonth(int year, int month) throws DAOException {
-        List<Photo> photos = new ArrayList<Photo>();
-        try(PreparedStatement stmt = getConnection().prepareStatement(readByYearAndMonthStatement)) {
+    public List<Photo> readPhotosByDate(Date date) throws DAOException {
+        logger.debug("retrieving photos by date {}", date);
 
-            stmt.setInt(1,year);
-            stmt.setInt(2,month);
-            ResultSet rs = stmt.executeQuery();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH) + 1;
 
-            while(rs.next()) {
-                photos.add(new Photo(
-                        rs.getInt(1),
-                        null,
-                        rs.getString(3),
-                        rs.getInt(4)
-                ));
-            }
-        } catch (SQLException e) {
-            throw new DAOException(e);
+        try {
+            List<Photo> photos = jdbcTemplate.query(readByYearAndMonthStatement, (ResultSet rs, int rowNum) -> {
+                return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
+            }, year, month);
+
+            attachExif(photos);
+
+            logger.debug("Successfully retrieved photos");
+            return photos;
+        } catch (DataAccessException ex) {
+            throw new DAOException("Failed to read photos from given month", ex);
         }
+    }
 
-        return photos;
+    /**
+     * Load the exif data for each photo in the given list.
+     *
+     * @param photos The list of photos which will be annotated with the exif data.
+     * @throws DAOException if an error occurs during reading the exif data.
+     */
+    private void attachExif(List<Photo> photos) throws DAOException {
+        for(Photo photo : photos) {
+            photo.setExif(exifDAO.read(photo));
+        }
     }
 
     /**
@@ -156,7 +214,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
      */
     private int getNextId() throws DAOException {
         try {
-            return jdbcTemplate.queryForObject("select id from Photo order by id desc limit 1", Integer.class) + 1;
+            return jdbcTemplate.queryForObject("select id from Photo order by id desc limit 1",
+                    Integer.class) + 1;
         }  catch(IncorrectResultSizeDataAccessException e) {
             // no data in table yet
             return 0;

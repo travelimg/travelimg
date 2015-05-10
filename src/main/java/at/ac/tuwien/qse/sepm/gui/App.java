@@ -25,7 +25,7 @@ public class App extends Application {
         try {
             context = new ClassPathXmlApplicationContext("beans.xml");
         } catch (Exception e) {
-            logger.error("Failed to setup application. Exiting.", e);
+            logger.error("Failed to setup application. Exitingig.", e);
             System.exit(1);
         }
     }
@@ -51,7 +51,7 @@ public class App extends Application {
             throw new RuntimeException(exception);
         }
 
-        stage.setScene(new Scene(root));
+        stage.setScene(new Scene(root, 800, 600));
         stage.setTitle("travelimg");
         stage.show();
     }
