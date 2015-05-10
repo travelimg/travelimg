@@ -94,12 +94,13 @@ public class Organizer {
 
         // queue an update in the main gui
         Platform.runLater(() -> {
-            InfoDialog dialog = new InfoDialog(root, "Import Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Import fehlgeschlagen");
-            dialog.setContentText("Fehlermeldung: " + error.getMessage());
-            dialog.showAndWait();
-        });
+                InfoDialog dialog = new InfoDialog(root, "Import Fehler");
+                dialog.setError(true);
+                dialog.setHeaderText("Import fehlgeschlagen");
+                dialog.setContentText("Fehlermeldung: " + error.getMessage());
+                dialog.showAndWait();
+            }
+        );
     }
 
     private void handleLoadError(Throwable error) {
@@ -140,7 +141,7 @@ public class Organizer {
     private void handleMonthChange(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {
         // remove active photos and replace them by
         // photos from the newly selected month
-        if(loadingTask!=null){
+        if(loadingTask != null) {
             loadingTask.cancel();
         }
         mainController.clearPhotos();
