@@ -46,7 +46,12 @@ public class MainController {
 
     }
 
-    public void addPhoto(Photo photo){
+    /**
+     * Add a photo to the image grid
+     *
+     * @param photo The photo to be added.
+     */
+    public void addPhoto(Photo photo) {
         ImageTile imageTile = new ImageTile(photo);
 
         imageTile.getSelectedProperty().addListener(new ChangeListener<Boolean>() {
@@ -64,10 +69,16 @@ public class MainController {
         tilePane.getChildren().add(imageTile);
     }
 
-    public void clearPhotos(){
+    /**
+     * Clear the image grid and don't show any photos.
+     */
+    public void clearPhotos() {
         tilePane.getChildren().clear();
     }
 
+    /**
+     * Widget for one widget in the image grid. Can either be in a selected or an unselected state.
+     */
     private class ImageTile extends HBox {
 
         private Photo photo;
@@ -96,6 +107,9 @@ public class MainController {
             this.getChildren().add(imageView);
         }
 
+        /**
+         * Select this photo. Triggers an update of the inspector widget.
+         */
         public void select() {
             getStyleClass().remove("image-tile-non-selected");
             getStyleClass().add("image-tile-selected");
@@ -105,6 +119,9 @@ public class MainController {
             this.selected.set(true);
         }
 
+        /**
+         * Unselect a photo.
+         */
         public void unselect() {
             getStyleClass().add("image-tile-non-selected");
             getStyleClass().remove("image-tile-selected");
@@ -112,6 +129,10 @@ public class MainController {
             this.selected.set(false);
         }
 
+        /**
+         * Property which represents if this tile is currently selected or not.
+         * @return The selected property.
+         */
         public BooleanProperty getSelectedProperty() {
             return selected;
         }

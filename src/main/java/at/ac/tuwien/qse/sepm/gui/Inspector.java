@@ -25,6 +25,13 @@ public class Inspector {
 
     }
 
+    /**
+     * Set the active photo.
+     *
+     * The photos metadate will be displayed in the inspector widget.
+     *
+     * @param photo The active photo for which to show further information
+     */
     public void setActivePhoto(Photo photo) {
         this.photo = photo;
 

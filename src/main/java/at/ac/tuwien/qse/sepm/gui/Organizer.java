@@ -152,20 +152,33 @@ public class Organizer {
         );
     }
 
+    /**
+     * Show the current photo selection in fullscreen.
+     * @param event The event triggering the request.
+     */
     private void handlePresent(Event event) {
         // TODO
     }
 
+    /**
+     * Display photos for a newly selected month
+     *
+     * @param observable The observable value which changed
+     * @param oldValue The previously selected month
+     * @param newValue The newly selected month
+     */
     private void handleMonthChange(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {
-        // remove active photos and replace them by
-        // photos from the newly selected month
+        // cancel an older ongoing loading task
         if(loadingTask != null) {
             loadingTask.cancel();
         }
 
         monthSelector.setMonth(newValue);
 
+        // remove currently active photos
         mainController.clearPhotos();
+
+        // load photos from current month
         this.loadingTask = photoService.loadPhotosByDate(newValue, this::handleLoadedPhoto, this::handleLoadError);
     }
 
@@ -181,6 +194,10 @@ public class Organizer {
         }
     }
 
+    /**
+     * Get a list of months for which we currently possess photos.
+     * @return A list of months for which photos are available
+     */
     private List<Date> getAvailableMonths() {
         List<Date> months = new ArrayList<>();
         try {
