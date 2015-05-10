@@ -146,10 +146,8 @@ public class Organizer {
         mainController.clearPhotos();
         this.loadingTask = photoService.loadPhotosByDate(newValue, this::handleNewPhoto, this::handleLoadError);
     }
-
-    // TODO: get months from service
+    
     private List<Date> getAvailableMonths() {
-
         List<Date> months = new ArrayList<>();
         try {
             months = photoService.getMonthsWithPhotos();
