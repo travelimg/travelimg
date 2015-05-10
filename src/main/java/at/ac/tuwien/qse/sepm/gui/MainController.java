@@ -40,7 +40,7 @@ public class MainController {
 
     }
 
-    public void addPhotos(Photo photo){
+    public void addPhoto(Photo photo){
         try {
             Image image = new Image(new FileInputStream(new File(photo.getPath())), 150, 0, true, true);
             ImageView imageView = new ImageView(image);

@@ -129,7 +129,7 @@ public class Organizer {
 
             if(!photoMonth.equals(activeMonth)) return;
 
-            mainController.addPhotos(photo);
+            mainController.addPhoto(photo);
         });
     }
 
