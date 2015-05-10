@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.gui;
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl;
 import com.lynden.gmapsfx.GoogleMapView;
+import com.lynden.gmapsfx.javascript.object.LatLong;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
 import javafx.application.Application;
@@ -21,8 +22,8 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
     private GoogleMapView mapView;
     private GoogleMap map;
-    static final LatLong defaulLocation = new LatLong(40.7033127, -73.979681); // the default Location
-    private static LatLong destination; // the Location from the Exif Objekt
+    private LatLong defaulLocation = null;//new LatLong(40.7033127, -73.979681); // the default Location
+    private  boolean destination = false; // true wenn not default constructor
     private Exif marker;
 
     /**
@@ -43,30 +44,30 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      */
     public GoogleMapsScene(Exif marker){
         this.mapView = new GoogleMapView();
-        destination = calculate(marker.getLongitude(), marker.getLatitude());
+        destination=true;
         this.mapView.addMapInializedListener(this);
         this.marker =marker;
     }
 
     /**
-     * calculate the decimal coordinates
-     * @param longitude the longitude-GPS coordinate from the Exif-file (grad, minutes, sec)
-     * @param latitude  the latitude-GPS coordinate from the Exif-file (grad, minutes, sec)
-     * @return a LatLong-Object with the decimal coordinates
+     * calculate a GPS-Coordinate (Grad,Minutes,Seconds) to GPS-Coordinate(Decimal)
+     * @param gps GPS-Coordinate (Grad,Minutes,Seconds)
+     * @return GPS-Coordinate (Decimal)
      */
-    private LatLong calculate(String longitude, String latitude){
-        String[] longi = longitude.split(" ");
-        String[] lat = latitude.split(" ");
+    private double calculate(String gps){
+        String[] longi = gps.split(" ");
 
-        double grad1 = Double.parseDouble(longi[0]);
-        double grad2 = Double.parseDouble(lat[0]);
-        double min1 = Double.parseDouble(longi[1]);
-       double min2 = Double.parseDouble(lat[1]);
-        double sec1 = Double.parseDouble(longi[2]);
-        double sec2 = Double.parseDouble(lat[2]);
-        double erg1 = (((sec1/60)+min1)/60)+grad1;
-        double erg2 = (((sec2/60)+min2)/60)+grad2;
-       return new LatLong(erg1,erg2);
+        double grad = Double.parseDouble(longi[0]);
+
+        double min = Double.parseDouble(longi[1]);
+
+        double sec = Double.parseDouble(longi[2]);
+
+        double erg= (((sec/60)+min)/60)+grad;
+
+
+
+       return erg;
     }
 
     /**
@@ -83,16 +84,17 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         logger.debug("Initializing Map ");
         MapOptions mapOptions;
 
-        if(destination==null) {
-           mapOptions =returnOption(defaulLocation, true, true, true, 2);
+        if(!destination) {
+           mapOptions =returnOption(new LatLong(39.7385, -104.9871), true, true, true, 2);
         }else{
-            mapOptions =returnOption(destination,true,true,true,12);
+            mapOptions =returnOption(new LatLong(calculate(marker.getLatitude()),-calculate(marker.getLongitude())),true,true,true,12);
         }
 
         map = mapView.createMap(mapOptions);
 
         if(this.marker!=null){
-            map.addMarker(new Marker(new MarkerOptions().position(destination).visible(Boolean.TRUE)));
+
+            map.addMarker(new Marker(new MarkerOptions().position(new LatLong(calculate(marker.getLatitude()),-calculate(marker.getLongitude()))).visible(Boolean.TRUE)));
         }
     }
 
@@ -110,13 +112,13 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         MapOptions mapOptions = new MapOptions();
 
         mapOptions.center(destinat)
-                .overviewMapControl(overview)
-                .panControl(panControl)
+                .overviewMapControl(overview).panControl(panControl)
                 .rotateControl(false)
                 .scaleControl(false)
                 .streetViewControl(false)
                 .zoomControl(zoomControl)
                 .zoom(zoomfactor);
+
         return mapOptions;
     }
     /**
@@ -127,6 +129,14 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         logger.debug("returning Scene");
         return new Scene(this.mapView);
 
+    }
+
+    /**
+     *
+     * @return the GoogleMapView
+     */
+    public GoogleMapView getMapView() {
+       return mapView;
     }
 
 

@@ -1,11 +1,16 @@
 package at.ac.tuwien.qse.sepm.gui;
 
+import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import com.lynden.gmapsfx.GoogleMapView;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import org.controlsfx.tools.Platform;
 
 /**
  * Controller for the inspector view which is used for modifying meta-data of a photo.
@@ -17,9 +22,17 @@ public class Inspector {
     @FXML private Button cancelButton;
     @FXML private Button confirmButton;
 
-    @FXML private Label proofOfConceptLabel;
+
+
+
 
     private Photo photo = null;
+
+    @FXML private VBox contentBox;
+
+    @FXML private Label proofOfConceptLabel;
+
+   private GoogleMapsScene mapsScene;
 
     public Inspector() {
 
@@ -36,6 +49,10 @@ public class Inspector {
         this.photo = photo;
 
         proofOfConceptLabel.setText("Selected photo is: " + photo.getPath());
+        this.mapsScene = new GoogleMapsScene(photo.getExif());
+        contentBox.getChildren().add(2,mapsScene.getMapView());
+
+
     }
 
     @FXML
