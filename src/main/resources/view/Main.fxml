@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import org.controlsfx.control.GridView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <BorderPane fx:id="root" stylesheets="@/view/style.css"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.MainController">
@@ -9,9 +9,9 @@
         <fx:include source="/view/Organizer.fxml"></fx:include>
     </left>
     <center>
-        <GridView fx:id="imageGrid" prefWidth="500" prefHeight="400" styleClass="image-grid">
+        <ScrollPane fx:id="scrollPane" prefWidth="500" prefHeight="400">
 
-        </GridView>
+        </ScrollPane>
     </center>
 
     <right>

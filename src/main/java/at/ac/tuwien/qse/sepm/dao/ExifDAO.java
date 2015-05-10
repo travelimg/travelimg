@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.dao;
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 
+import java.util.Date;
 import java.util.List;
 
 public interface ExifDAO {
@@ -36,13 +37,14 @@ public interface ExifDAO {
      */
     void delete(Exif exif) throws DAOException;
 
-    /**
-     * TODO
-     * @param exif
-     * @return
-     * @throws DAOException
+    /**p
+     * Read the exif metadata for a given photo.
+     *
+     * @param photo The photo for which to read the exif data.
+     * @return The found exif data entity.
+     * @throws DAOException if an error occurs during the read.
      */
-    Exif read(Exif exif) throws DAOException;
+    Exif read(Photo photo) throws DAOException;
 
     /**
      * Retrieve all existing Exif-data.
@@ -63,4 +65,11 @@ public interface ExifDAO {
      * @throws DAOException If there is no Exif-data stored in the Photo or the file does not exist.
      */
     Exif importExif(Photo photo) throws DAOException;
+
+    /**
+     * Retrieve a list of those months for which there are photos.
+     *
+     * @return a list of dates representing months with available photos
+     */
+    List<Date> getMonthsWithPhotos() throws DAOException;
 }

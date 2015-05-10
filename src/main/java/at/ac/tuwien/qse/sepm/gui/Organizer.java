@@ -5,10 +5,9 @@ import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
-import at.ac.tuwien.qse.sepm.service.Service;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.util.Cancelable;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,15 +18,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Controller for organizer view which is used for browsing photos by month.
@@ -36,19 +35,22 @@ import java.util.stream.Collectors;
  */
 public class Organizer {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     @Autowired private ImportService importService;
     @Autowired private PhotoService photoService;
+
+    @Autowired private MainController mainController;
 
     @FXML private BorderPane root;
     @FXML private Button importButton;
     @FXML private Button presentButton;
     @FXML private ListView<Date> monthList;
 
-    private final ObservableList<Photo> activePhotos = FXCollections.observableArrayList();
-
     private final ObservableList<Date> months = FXCollections.observableArrayList();
     private final SortedList<Date> monthsSorted = new SortedList<>(months);
     private final SimpleDateFormat monthFormat = new SimpleDateFormat("yyyy MMM");
+    private Cancelable loadingTask;
 
     public Organizer() {
 
@@ -76,35 +78,20 @@ public class Organizer {
         months.addAll(getAvailableMonths());
     }
 
-    /**
-     * Set of photos that match the current filter.
-     */
-    public final ObservableList<Photo> getActivePhotos() {
-        return activePhotos;
-    }
-
     private void handleImport(Event event) {
         ImportDialog dialog = new ImportDialog(root, "Fotos importieren");
+
         Optional<List<Photo>> photos = dialog.showForResult();
         if (!photos.isPresent()) return;
 
         importService.importPhotos(photos.get(),
-                this::handleImportedPhoto,
+                this::handleNewPhoto,
                 this::handleImportError);
     }
-    private void handleImportedPhoto(Photo photo) {
-        // queue an update in the main gui
-        Platform.runLater(() -> {
-            // Ignore photos that are not part of the current filter.
-            if (monthList.getSelectionModel().isEmpty()) return;
-            String photoMonth = monthFormat.format(photo.getExif().getDate());
-            String activeMonth = monthFormat.format(monthList.getSelectionModel().getSelectedItem());
-            if (photoMonth != activeMonth) return;
 
-            getActivePhotos().add(photo);
-        });
-    }
     private void handleImportError(Throwable error) {
+        LOGGER.error("Import error", error);
+
         // queue an update in the main gui
         Platform.runLater(() -> {
             InfoDialog dialog = new InfoDialog(root, "Import Fehler");
@@ -113,7 +100,37 @@ public class Organizer {
             dialog.setContentText("Fehlermeldung: " + error.getMessage());
             dialog.showAndWait();
         });
+    }
 
+    private void handleLoadError(Throwable error) {
+        LOGGER.error("Load error", error);
+
+        // queue an update in the main gui
+        Platform.runLater(() -> {
+            InfoDialog dialog = new InfoDialog(root, "Lade Fehler");
+            dialog.setError(true);
+            dialog.setHeaderText("Laden von Fotos fehlgeschlagen");
+            dialog.setContentText("Fehlermeldung: " + error.getMessage());
+            dialog.showAndWait();
+        });
+    }
+
+    /**
+     * Called whenever a new photo is loaded from the service layer
+     * @param photo The newly loaded photo
+     */
+    private void handleNewPhoto(Photo photo) {
+        // queue an update in the main gui
+        Platform.runLater(() -> {
+            // Ignore photos that are not part of the current filter.
+            if (monthList.getSelectionModel().isEmpty()) return;
+            String photoMonth = monthFormat.format(photo.getExif().getDate());
+            String activeMonth = monthFormat.format(monthList.getSelectionModel().getSelectedItem());
+
+            if(!photoMonth.equals(activeMonth)) return;
+
+            mainController.addPhotos(photo);
+        });
     }
 
     private void handlePresent(Event event) {
@@ -123,39 +140,23 @@ public class Organizer {
     private void handleMonthChange(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {
         // remove active photos and replace them by
         // photos from the newly selected month
-        getActivePhotos().clear();
-        getActivePhotos().addAll(getPhotosByMonth(newValue));
-    }
-
-    // TODO: get photos from service
-    private List<Photo> getPhotosByMonth(Date date) {
-        List<Photo> list = new LinkedList<>();
-        return list;
+        if(loadingTask!=null){
+            loadingTask.cancel();
+        }
+        mainController.clearPhotos();
+        this.loadingTask = photoService.loadPhotosByDate(newValue, this::handleNewPhoto, this::handleLoadError);
     }
 
     // TODO: get months from service
     private List<Date> getAvailableMonths() {
+
+        List<Date> months = new ArrayList<>();
         try {
-            SimpleDateFormat format = new SimpleDateFormat("y-M");
-            List<Date> list = new LinkedList<>();
-            list.add(format.parse("2015-12"));
-            list.add(format.parse("2015-11"));
-            list.add(format.parse("2015-10"));
-            list.add(format.parse("2015-07"));
-            list.add(format.parse("2015-06"));
-            list.add(format.parse("2015-03"));
-            list.add(format.parse("2014-08"));
-            list.add(format.parse("2014-07"));
-            list.add(format.parse("2014-02"));
-            list.add(format.parse("2014-01"));
-            list.add(format.parse("2012-10"));
-            list.add(format.parse("2012-09"));
-            list.add(format.parse("2012-07"));
-            list.add(format.parse("2012-06"));
-            list.add(format.parse("2012-05"));
-            return list;
-        } catch (ParseException ex) {
-            throw new RuntimeException(ex);
+            months = photoService.getMonthsWithPhotos();
+        } catch (ServiceException ex) {
+            // TODO: show error dialog
         }
+
+        return months;
     }
 }
