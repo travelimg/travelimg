@@ -50,6 +50,7 @@ public class Organizer {
     private final ObservableList<Date> months = FXCollections.observableArrayList();
     private final SortedList<Date> monthsSorted = new SortedList<>(months);
     private final SimpleDateFormat monthFormat = new SimpleDateFormat("yyyy MMM");
+    private Cancelable loadingTask;
 
     public Organizer() {
 
@@ -139,9 +140,11 @@ public class Organizer {
     private void handleMonthChange(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {
         // remove active photos and replace them by
         // photos from the newly selected month
+        if(loadingTask!=null){
+            loadingTask.cancel();
+        }
         mainController.clearPhotos();
-
-        Cancelable task = photoService.loadPhotosByDate(newValue, this::handleNewPhoto, this::handleLoadError);
+        this.loadingTask = photoService.loadPhotosByDate(newValue, this::handleNewPhoto, this::handleLoadError);
     }
 
     // TODO: get months from service
