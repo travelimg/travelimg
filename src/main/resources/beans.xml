@@ -25,14 +25,13 @@
 
 	<bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl"></bean>
 
+	<bean id="exifService" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
+
 	<bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
 		<constructor-arg value="${user.home}/travelimg"></constructor-arg>
 	</bean>
 
 	<bean id="exifDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCExifDAO"></bean>
-
-
-	<bean> id="exifServiceImpl" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
 
 	<bean id="photographerDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotographerDAO"></bean>
 
