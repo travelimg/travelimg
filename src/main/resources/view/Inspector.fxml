@@ -10,6 +10,7 @@
         <VBox maxHeight="Infinity" maxWidth="Infinity" styleClass="section" BorderPane.alignment="CENTER">
          <children>
             <Button mnemonicParsing="false" styleClass="raised" text="TODO" />
+             <Label fx:id="proofOfConceptLabel" wrapText="true"></Label>
          </children></VBox>
     </center>
     <bottom>

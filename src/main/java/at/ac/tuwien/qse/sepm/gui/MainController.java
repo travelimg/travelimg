@@ -46,10 +46,11 @@ public class MainController {
             ImageView imageView = new ImageView(image);
             imageView.setFitWidth(150);
             tilePane.getChildren().add(imageView);
+
             imageView.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
-                    System.out.println(photo + " clicked");
+                    inspector.setActivePhoto(photo);
                 }
             });
         } catch (FileNotFoundException e) {
