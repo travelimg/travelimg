@@ -46,29 +46,29 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         this.mapView = new GoogleMapView();
         destination=true;
         this.mapView.addMapInializedListener(this);
-        this.marker =marker;
+        this.marker = marker;
     }
 
-    /**
-     * calculate a GPS-Coordinate (Grad,Minutes,Seconds) to GPS-Coordinate(Decimal)
-     * @param gps GPS-Coordinate (Grad,Minutes,Seconds)
-     * @return GPS-Coordinate (Decimal)
-     */
-    private double calculate(String gps){
-        String[] longi = gps.split(" ");
-
-        double grad = Double.parseDouble(longi[0]);
-
-        double min = Double.parseDouble(longi[1]);
-
-        double sec = Double.parseDouble(longi[2]);
-
-        double erg= (((sec/60)+min)/60)+grad;
-
-
-
-       return erg;
-    }
+//    /**
+//     * calculate a GPS-Coordinate (Grad,Minutes,Seconds) to GPS-Coordinate(Decimal)
+//     * @param gps GPS-Coordinate (Grad,Minutes,Seconds)
+//     * @return GPS-Coordinate (Decimal)
+//     */
+//    private double calculate(String gps){
+//        String[] longi = gps.split(" ");
+//
+//        double grad = Double.parseDouble(longi[0]);
+//
+//        double min = Double.parseDouble(longi[1]);
+//
+//        double sec = Double.parseDouble(longi[2]);
+//
+//        double erg= (((sec/60)+min)/60)+grad;
+//
+//
+//
+//       return erg;
+//    }
 
     /**
      * Initialising GoogleMap
@@ -87,14 +87,14 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         if(!destination) {
            mapOptions =returnOption(new LatLong(39.7385, -104.9871), true, true, true, 2);
         }else{
-            mapOptions =returnOption(new LatLong(calculate(marker.getLatitude()),-calculate(marker.getLongitude())),true,true,true,12);
+            mapOptions =returnOption(new LatLong(marker.getLatitude(),marker.getLongitude()),true,true,true,12);
         }
 
         map = mapView.createMap(mapOptions);
 
         if(this.marker!=null){
 
-            map.addMarker(new Marker(new MarkerOptions().position(new LatLong(calculate(marker.getLatitude()),-calculate(marker.getLongitude()))).visible(Boolean.TRUE)));
+            map.addMarker(new Marker(new MarkerOptions().position(new LatLong(marker.getLatitude(),marker.getLongitude())).visible(Boolean.TRUE)));
         }
     }
 
