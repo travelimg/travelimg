@@ -27,7 +27,7 @@ public class AbstractJDBCPhotoTagDAOTest extends TestCase {
         Photo p = mock(Photo.class);
         when(t.getId()).thenReturn(2);
         when(p.getId()).thenReturn(1);
-        photoTagDAO.removeTagFromPhoto(t, p);
+        photoTagDAO.removeTagFromPhoto(p, t);
         assertNull(null);
     }
 }

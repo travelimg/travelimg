@@ -36,4 +36,14 @@ public class Tag {
                 ", name='" + name + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        }
+        return (object.getClass() == this.getClass()
+                && ((Tag) object).getId().equals(this.getId())
+                && ((Tag) object).getName().equals(this.getName()));
+    }
 }
