@@ -67,7 +67,9 @@ public class AppTest {
     @Test
     public void testExif() throws ServiceException {
         Photo photo = new Photo(5, null, "C:\\Users\\David\\workspace\\qse-sepm-ss15-18\\src\\test\\resources\\test.jpg", 0);
+        Photo photooriginal = new Photo(6, null, "C:\\Users\\David\\workspace\\qse-sepm-ss15-18\\src\\test\\resources\\testoriginal.jpg", 0);
         Exif exif = exifservice.importExif(photo);
+        exifservice.importExif(photooriginal);
         exif.setExposure("1/1000");
         exif.setAltitude(2000);
         exif.setAperture(10);
