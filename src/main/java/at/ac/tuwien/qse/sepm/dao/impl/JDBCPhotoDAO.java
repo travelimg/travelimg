@@ -99,19 +99,22 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     public void delete(Photo photo) throws DAOException, ValidationException {
         logger.debug("Deleting photo {}", photo);
         // validate photo
-        PhotoValidator.validate(photo);
+        //PhotoValidator.validate(photo); // disabled for IR1
 
         int id = photo.getId();
         // delete from Table exif
         exifDAO.delete(photo.getExif());
 
         // delete from Table photoTag
+
         List<Tag> taglist = photoTagDAO.readTagsByPhoto(photo);
-        for (Tag t : taglist) {
-            photoTagDAO.removeTagFromPhoto(t, photo);
+        if (taglist !=null) {
+            for (Tag t : taglist) {
+                photoTagDAO.removeTagFromPhoto(t, photo);
+            }
         }
         try{
-            jdbcTemplate.update(deleteStatement,id);
+            jdbcTemplate.update(deleteStatement, id);
 
         }catch(DataAccessException e) {
             throw new DAOException("Failed to delete photo", e);
@@ -151,6 +154,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         cal.setTime(date);
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH) + 1;
+
 
         try {
             List<Photo> photos = jdbcTemplate.query(readByYearAndMonthStatement, (ResultSet rs, int rowNum) -> {
