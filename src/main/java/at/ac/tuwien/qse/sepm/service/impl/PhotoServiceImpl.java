@@ -32,14 +32,6 @@ public class PhotoServiceImpl implements PhotoService {
 
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
 
-    public PhotoServiceImpl() {
-
-    }
-    @Autowired
-    public void setPhotoTagDAO(PhotoTagDAO photoTagDAO) {
-        this.photoTagDAO = photoTagDAO;
-    }
-
     public List<Photo> getAllPhotos() throws ServiceException {
         try {
             return photoDAO.readAll();
@@ -59,12 +51,13 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     /**
-     *  delete the delivered List of Photos
+     * delete the delivered List of Photos
+     *
      * @param photos the list of photos
      * @throws ServiceException
      */
     public void deletePhotos(List<Photo> photos) throws ServiceException {
-        for(Photo p : photos){
+        for (Photo p : photos) {
             try {
                 photoDAO.delete(p);
             } catch (DAOException e) {
@@ -104,7 +97,7 @@ public class PhotoServiceImpl implements PhotoService {
                 photoTagDAO.createPhotoTag(photo, tag);
             } catch (DAOException ex) {
                 LOGGER.error("Photo-Tag-creation with {}, {} failed.", photo, tag);
-                throw new ServiceException("DAOException was thrown: " + ex.getMessage());
+                throw new ServiceException("Creation of Photo-Tag failed.", ex);
             }
         }
         LOGGER.debug("Leaving addTagToPhotos");
@@ -139,7 +132,7 @@ public class PhotoServiceImpl implements PhotoService {
                 photoTagDAO.removeTagFromPhoto(photo, tag);
             } catch (DAOException ex) {
                 LOGGER.error("Removal of Photo-Tag with {}, {} failed.", photo, tag);
-                throw new ServiceException("DAOException was thrown: " + ex.getMessage());
+                throw new ServiceException("Photo-Tag removal failed.", ex);
             }
         }
         LOGGER.debug("Leaving removeTagFromPhotos");
@@ -166,7 +159,7 @@ public class PhotoServiceImpl implements PhotoService {
             LOGGER.info("Successfully retrieved tags for {}", photo);
         } catch (DAOException ex) {
             LOGGER.error("Retrieving tags for {} failed due to DAOException", photo);
-            throw new ServiceException("Could not retrieve tags for photo: " + ex.getMessage());
+            throw new ServiceException("Could not retrieve tags for photo.", ex);
         }
         LOGGER.debug("Leaving getTagsForPhoto with {}", photo);
         return tagList;
@@ -176,7 +169,8 @@ public class PhotoServiceImpl implements PhotoService {
 
     }
 
-    public Cancelable loadPhotosByDate(Date date, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
+    public Cancelable loadPhotosByDate(Date date, Consumer<Photo> callback,
+            ErrorHandler<ServiceException> errorHandler) {
         LOGGER.debug("Loading photos");
         AsyncLoader loader = new AsyncLoader(date, callback, errorHandler);
         executorService.submit(loader);
@@ -189,15 +183,15 @@ public class PhotoServiceImpl implements PhotoService {
         private Consumer<Photo> callback;
         private ErrorHandler<ServiceException> errorHandler;
 
-        public AsyncLoader(Date date, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
+        public AsyncLoader(Date date, Consumer<Photo> callback,
+                ErrorHandler<ServiceException> errorHandler) {
             super();
             this.date = date;
             this.callback = callback;
             this.errorHandler = errorHandler;
         }
 
-        @Override
-        protected void execute() {
+        @Override protected void execute() {
             List<Photo> photos;
             try {
                 photos = photoDAO.readPhotosByDate(date);
@@ -206,8 +200,8 @@ public class PhotoServiceImpl implements PhotoService {
                 return;
             }
 
-            for(Photo p : photos){
-                if(!getIsRunning())
+            for (Photo p : photos) {
+                if (!getIsRunning())
                     return;
                 try {
                     Thread.sleep(20);
@@ -219,8 +213,7 @@ public class PhotoServiceImpl implements PhotoService {
         }
     }
 
-    @Override
-    public List<Date> getMonthsWithPhotos() throws ServiceException{
+    @Override public List<Date> getMonthsWithPhotos() throws ServiceException {
         try {
             return exifDAO.getMonthsWithPhotos();
         } catch (DAOException ex) {

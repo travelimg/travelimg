@@ -4,23 +4,18 @@ import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
-import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
-import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 
 public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final String CREATE_STRING = "INSERT INTO phototag VALUES(?, ?)";
-    private static final String DELETE_STRING =
-            "DELETE FROM phototag WHERE " + "photo_id = ? AND tag_id = ?";
+    private static final String DELETE_STRING = "DELETE FROM phototag WHERE "
+            + "photo_id = ? AND tag_id = ?";
     private static final String READ_TAGS_BY_PHOTO_STRING = "SELECT DISTINCT tag_id, name FROM "
             + "(tag JOIN phototag ON id = tag_id) WHERE photo_id = ?";
     private static final String READ_PHOTOS_BY_TAG_STRING = "SELECT DISTINCT * FROM (photo JOIN "
@@ -42,7 +37,7 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
                 LOGGER.info("Photo-Tag entry successfully created");
             } catch (DataAccessException ex) {
                 LOGGER.error("Photo-Tag entry creation failed due to DataAccessException");
-                throw new DAOException("Photo-tag entry creation failed: " + ex.getMessage());
+                throw new DAOException("Photo-tag entry creation failed.", ex);
             }
         } else {
             //photo-tag entry already exists
@@ -65,7 +60,7 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
             LOGGER.info("Photo-Tag entry successfully deleted");
         } catch (DataAccessException ex) {
             LOGGER.error("Photo-Tag entry deletion failed due to DataAccessException");
-            throw new DAOException("Could not delete photo-tag entry: " + ex.getMessage());
+            throw new DAOException("Could not delete photo-tag entry.", ex);
         }
         LOGGER.debug("Leaving removeTagFromPhoto with {} {}", photo, tag);
     }
@@ -88,7 +83,7 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
             LOGGER.info("Successfully read tags for {}", photo);
         } catch (DataAccessException ex) {
             LOGGER.error("Reading Tags failed due to DataAccessException");
-            throw new DAOException("Could not read tags: " + ex.getMessage());
+            throw new DAOException("Could not read tags.", ex);
         }
         LOGGER.debug("Leaving readTagsByPhoto with {}", photo);
         return tagList;
@@ -114,7 +109,7 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
             LOGGER.info("Successfully read photos for {}", tag);
         } catch (DataAccessException ex) {
             LOGGER.error("Reading photos failed due to DataAccessException");
-            throw new DAOException("Could not read photos: " + ex.getMessage());
+            throw new DAOException("Could not read photos.", ex);
         }
         LOGGER.debug("Leaving readPhotosByTag with {}", tag);
         return photoList;

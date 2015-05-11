@@ -38,12 +38,12 @@ public class Tag {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null) {
+    public boolean equals(Object object) {
+        if (object == null) {
             return false;
         }
-        return (o.getClass() == this.getClass()
-                && ((Tag) o).getId().equals(this.getId())
-                && ((Tag) o).getName().equals(this.getName()));
+        return (object.getClass() == this.getClass()
+                && ((Tag) object).getId().equals(this.getId())
+                && ((Tag) object).getName().equals(this.getName()));
     }
 }
