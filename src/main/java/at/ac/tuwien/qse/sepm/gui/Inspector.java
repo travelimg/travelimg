@@ -3,7 +3,6 @@ package at.ac.tuwien.qse.sepm.gui;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -25,6 +24,8 @@ public class Inspector {
     @FXML private Button confirmButton;
 
     @FXML private Label proofOfConceptLabel;
+
+    @Autowired private Organizer organizer;
 
     private Photo photo = null;
     @Autowired private PhotoService photoservice;
@@ -58,6 +59,7 @@ public class Inspector {
 
             List<Photo> photolist = new ArrayList<Photo>();
             photolist.add(photo);
+            organizer.reloadPhotos();
             try {
                 photoservice.deletePhotos(photolist);
             } catch (ServiceException e) {

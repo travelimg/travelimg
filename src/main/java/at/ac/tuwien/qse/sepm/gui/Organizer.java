@@ -79,6 +79,11 @@ public class Organizer {
         months.addAll(getAvailableMonths());
     }
 
+    public void reloadPhotos(){
+        Date selected = monthList.getSelectionModel().getSelectedItem();
+        handleMonthChange(null, null, selected);
+    }
+
     private void handleImport(Event event) {
         ImportDialog dialog = new ImportDialog(root, "Fotos importieren");
 
