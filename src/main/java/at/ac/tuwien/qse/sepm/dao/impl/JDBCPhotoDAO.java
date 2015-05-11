@@ -108,7 +108,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         // delete from Table photoTag
         List<Tag> taglist = photoTagDAO.readTagsByPhoto(photo);
         for (Tag t : taglist) {
-            photoTagDAO.removeTagFromPhoto(t, photo);
+            photoTagDAO.removeTagFromPhoto(photo, t);
         }
         try{
             jdbcTemplate.update(deleteStatement,id);
