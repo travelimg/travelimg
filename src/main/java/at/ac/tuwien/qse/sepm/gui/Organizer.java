@@ -90,9 +90,7 @@ public class Organizer {
         Optional<List<Photo>> photos = dialog.showForResult();
         if (!photos.isPresent()) return;
 
-        importService.importPhotos(photos.get(),
-                this::handleImportedPhoto,
-                this::handleImportError);
+        importService.importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
     }
 
     private void handleImportError(Throwable error) {
@@ -119,8 +117,7 @@ public class Organizer {
                     dialog.setHeaderText("Laden von Fotos fehlgeschlagen");
                     dialog.setContentText("Fehlermeldung: " + error.getMessage());
                     dialog.showAndWait();
-                }
-        );
+                });
     }
 
     /**
