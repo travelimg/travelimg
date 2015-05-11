@@ -16,7 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Date;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -153,24 +153,25 @@ public class PhotoServiceImpl implements PhotoService {
 
     }
 
-    public Cancelable loadPhotosByDate(Date date, Consumer<Photo> callback,
+    @Override
+    public Cancelable loadPhotosByMonth(YearMonth month, Consumer<Photo> callback,
             ErrorHandler<ServiceException> errorHandler) {
         LOGGER.debug("Loading photos");
-        AsyncLoader loader = new AsyncLoader(date, callback, errorHandler);
+        AsyncLoader loader = new AsyncLoader(month, callback, errorHandler);
         executorService.submit(loader);
 
         return loader;
     }
 
     private class AsyncLoader extends CancelableTask {
-        private Date date;
+        private YearMonth month;
         private Consumer<Photo> callback;
         private ErrorHandler<ServiceException> errorHandler;
 
-        public AsyncLoader(Date date, Consumer<Photo> callback,
+        public AsyncLoader(YearMonth month, Consumer<Photo> callback,
                 ErrorHandler<ServiceException> errorHandler) {
             super();
-            this.date = date;
+            this.month = month;
             this.callback = callback;
             this.errorHandler = errorHandler;
         }
@@ -178,7 +179,7 @@ public class PhotoServiceImpl implements PhotoService {
         @Override protected void execute() {
             List<Photo> photos;
             try {
-                photos = photoDAO.readPhotosByDate(date);
+                photos = photoDAO.readPhotosByMonth(month);
             } catch (DAOException e) {
                 errorHandler.propagate(new ServiceException("Failed to load photos", e));
                 return;
@@ -197,7 +198,7 @@ public class PhotoServiceImpl implements PhotoService {
         }
     }
 
-    @Override public List<Date> getMonthsWithPhotos() throws ServiceException {
+    @Override public List<YearMonth> getMonthsWithPhotos() throws ServiceException {
         try {
             return exifDAO.getMonthsWithPhotos();
         } catch (DAOException ex) {

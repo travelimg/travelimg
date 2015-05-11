@@ -23,6 +23,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -45,10 +48,10 @@ public class Organizer {
     @FXML private BorderPane root;
     @FXML private Button importButton;
     @FXML private Button presentButton;
-    @FXML private ListView<Date> monthList;
+    @FXML private ListView<YearMonth> monthList;
 
-    private final ObservableList<Date> months = FXCollections.observableArrayList();
-    private final SimpleDateFormat monthFormat = new SimpleDateFormat("yyyy MMM");
+    private final ObservableList<YearMonth> months = FXCollections.observableArrayList();
+    private final DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy MMM");
     private final MonthSelector monthSelector = new MonthSelector(null);
     private Cancelable loadingTask;
 
@@ -61,15 +64,15 @@ public class Organizer {
         importButton.setOnAction(this::handleImport);
         presentButton.setOnAction(this::handlePresent);
 
-        SortedList<Date> monthsSorted = new SortedList<Date>(months);
+        SortedList<YearMonth> monthsSorted = new SortedList<>(months);
         monthsSorted.setComparator((a, b) -> b.compareTo(a));
         monthList.setItems(monthsSorted);
 
-        monthList.setCellFactory(list -> new ListCell<Date>() {
-            @Override protected void updateItem(Date item, boolean empty) {
+        monthList.setCellFactory(list -> new ListCell<YearMonth>() {
+            @Override protected void updateItem(YearMonth item, boolean empty) {
                 super.updateItem(item, empty);
-                if (item == null) return;
-                String monthString = monthFormat.format(item);
+                if (empty) return;
+                String monthString = monthFormatter.format(item);
                 setText(monthString);
             }
         });
@@ -79,8 +82,8 @@ public class Organizer {
         months.addAll(getAvailableMonths());
     }
 
-    public void reloadPhotos(){
-        Date selected = monthList.getSelectionModel().getSelectedItem();
+    public void reloadPhotos() {
+        YearMonth selected = monthList.getSelectionModel().getSelectedItem();
         handleMonthChange(null, null, selected);
     }
 
@@ -169,7 +172,7 @@ public class Organizer {
      * @param oldValue The previously selected month
      * @param newValue The newly selected month
      */
-    private void handleMonthChange(ObservableValue<? extends Date> observable, Date oldValue, Date newValue) {
+    private void handleMonthChange(ObservableValue<? extends YearMonth> observable, YearMonth oldValue, YearMonth newValue) {
         // cancel an older ongoing loading task
         if(loadingTask != null) {
             loadingTask.cancel();
@@ -181,7 +184,7 @@ public class Organizer {
         mainController.clearPhotos();
 
         // load photos from current month
-        this.loadingTask = photoService.loadPhotosByDate(newValue, this::handleLoadedPhoto, this::handleLoadError);
+        this.loadingTask = photoService.loadPhotosByMonth(newValue, this::handleLoadedPhoto, this::handleLoadError);
     }
 
     /**
@@ -189,7 +192,7 @@ public class Organizer {
      * @param date represents the month to add
      */
     private void updateMonthListWithDate(Date date) {
-        Date month = new Date(date.getYear(), date.getMonth(), 1);
+        YearMonth month = YearMonth.of(date.getYear(), date.getMonth());
 
         if(!months.contains(month)) {
             months.add(month);
@@ -200,8 +203,8 @@ public class Organizer {
      * Get a list of months for which we currently possess photos.
      * @return A list of months for which photos are available
      */
-    private List<Date> getAvailableMonths() {
-        List<Date> months = new ArrayList<>();
+    private List<YearMonth> getAvailableMonths() {
+        List<YearMonth> months = new ArrayList<>();
         try {
             months = photoService.getMonthsWithPhotos();
         } catch (ServiceException ex) {
@@ -215,13 +218,13 @@ public class Organizer {
      * Matches all photos that where taken in the same month as the current active month
      */
     private class MonthSelector implements PhotoSelector {
-        private Date month;
+        private YearMonth month;
 
-        public MonthSelector(Date month) {
+        public MonthSelector(YearMonth month) {
             this.month = month;
         }
 
-        public void setMonth(Date month) {
+        public void setMonth(YearMonth month) {
             this.month = month;
         }
 
@@ -232,7 +235,8 @@ public class Organizer {
             }
 
             Date photoDate = photo.getExif().getDate();
-            return month.equals(new Date(photoDate.getYear(), photoDate.getMonth(), 1));
+
+            return month.equals(YearMonth.of(photoDate.getYear(), photoDate.getMonth()));
         }
     }
 }

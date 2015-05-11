@@ -19,6 +19,7 @@ import org.springframework.dao.DataAccessException;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
+import java.time.YearMonth;
 import java.util.*;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -169,10 +170,10 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
     }
 
     @Override
-    public List<Date> getMonthsWithPhotos() throws DAOException {
+    public List<YearMonth> getMonthsWithPhotos() throws DAOException {
         try {
             return jdbcTemplate.query(readMonthStatement, (rs, rowNum) -> {
-                return new Date(rs.getInt(1) - 1900, rs.getInt(2) - 1, 1);
+                return YearMonth.of(rs.getInt(1), rs.getInt(2));
             }).stream()
                     .distinct()
                     .collect(Collectors.toList());

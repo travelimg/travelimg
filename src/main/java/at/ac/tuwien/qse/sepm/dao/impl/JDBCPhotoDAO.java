@@ -28,6 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.time.YearMonth;
 import java.util.*;
 
 public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
@@ -147,19 +148,13 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     @Override
-    public List<Photo> readPhotosByDate(Date date) throws DAOException {
-        logger.debug("retrieving photos by date {}", date);
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH) + 1;
-
+    public List<Photo> readPhotosByMonth(YearMonth month) throws DAOException {
+        logger.debug("retrieving photos for monthh {}", month);
 
         try {
             List<Photo> photos = jdbcTemplate.query(readByYearAndMonthStatement, (ResultSet rs, int rowNum) -> {
-                return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
-            }, year, month);
+                    return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
+            }, month.getYear(), month.getMonth().getValue());
 
             attachExif(photos);
 
