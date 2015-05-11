@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.dao;
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 
@@ -72,4 +73,17 @@ public interface ExifDAO {
      * @return a list of dates representing months with available photos
      */
     List<Date> getMonthsWithPhotos() throws DAOException;
+
+    /**
+     * Changes the Exif-data in the file.
+     * <p>
+     * Reads the Exif-data from exif and writes it to the file jpegImageFile.
+     * A new temporary file is created in the process and gets deleted afterwards.
+     * </p>
+     *
+     * @param jpegImageFile File which Exif-data shall get changed
+     * @param exif          The Exif-Data that is written to the file
+     * @throws DAOException If there is a problem accessing the file.
+     */
+    void setExifTags(final File jpegImageFile, Exif exif) throws DAOException;
 }
