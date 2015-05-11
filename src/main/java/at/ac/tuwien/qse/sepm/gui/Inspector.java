@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +27,10 @@ public class Inspector {
     @FXML private Label proofOfConceptLabel;
 
     private Photo photo = null;
-    private PhotoService photoservice;
+    @Autowired private PhotoService photoservice;
 
     public Inspector() {
-        photoservice = new PhotoServiceImpl();
+
     }
 
     /**
@@ -54,13 +55,13 @@ public class Inspector {
 
     private void handleDelete(Event event) {
         if(photo!=null){
-            System.out.println(photo.toString());
+
             List<Photo> photolist = new ArrayList<Photo>();
             photolist.add(photo);
             try {
                 photoservice.deletePhotos(photolist);
             } catch (ServiceException e) {
-                System.out.println("Fehler beim löschen");
+                System.out.println(e);
             }
         }
     }
