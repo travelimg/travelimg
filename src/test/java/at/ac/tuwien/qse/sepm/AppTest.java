@@ -38,7 +38,7 @@ public class AppTest {
     public void setUp() {
         logger.info("setUp");
         context = new ClassPathXmlApplicationContext("beans.xml");
-        exifservice = (ExifService) context.getBean("exifServiceImpl");
+        exifservice = (ExifService) context.getBean("exifService");
     }
 
     @Test

@@ -1,15 +1,21 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.TilePane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.controlsfx.control.GridCell;
-import org.controlsfx.control.GridView;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 /**
  * Controller for the main view.
@@ -21,8 +27,9 @@ public class MainController {
     @Autowired private Organizer organizer;
     @Autowired private Inspector inspector;
 
-    @FXML private BorderPane root;
-    @FXML private GridView<Photo> imageGrid;
+    @FXML private ScrollPane scrollPane;
+
+    private TilePane tilePane;
 
     public MainController() {
 
@@ -30,34 +37,34 @@ public class MainController {
 
     @FXML
     private void initialize() {
-        imageGrid.setItems(organizer.getActivePhotos());
-        imageGrid.setCellFactory(list -> new PhotoGridCell());
-    }
-}
-
-class PhotoGridCell extends GridCell<Photo> {
-
-    private final ImageView imageView;
-
-    public PhotoGridCell() {
-        this.getStyleClass().add("photo-grid-cell");
-        this.imageView = new ImageView();
-        this.imageView.fitHeightProperty().bind(this.heightProperty());
-        this.imageView.fitWidthProperty().bind(this.widthProperty());
+        tilePane = new TilePane();
+        tilePane.setPadding(new Insets(15, 15, 15, 15));
+        tilePane.setHgap(15);
+        tilePane.setVgap(15);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); // Horizontal
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // Vertical scroll bar
+        scrollPane.setFitToWidth(true);
+        scrollPane.setContent(tilePane);
     }
 
-    protected void updateItem(Photo item, boolean empty) {
-        super.updateItem(item, empty);
-         if (empty) {
-            this.setGraphic(null);
-            return;
+    public void addPhotos(Photo photo){
+        try {
+            Image image = new Image(new FileInputStream(new File(photo.getPath())), 150, 0, true, true);
+            ImageView imageView = new ImageView(image);
+            imageView.setFitWidth(150);
+            tilePane.getChildren().add(imageView);
+            imageView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    System.out.println(photo + " clicked");
+                }
+            });
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
+    }
 
-        // TODO: CACHING. Images are loaded everytime the grid wraps.
-
-        // TODO: JavaFX loads images via URI. We need that URI!
-        Image image = new Image(item.getPath());
-        imageView.setImage(image);
-        setGraphic(this.imageView);
+    public void clearPhotos(){
+        tilePane.getChildren().clear();
     }
 }
