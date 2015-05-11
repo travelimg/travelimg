@@ -57,6 +57,9 @@ public class PhotoServiceImpl implements PhotoService {
      * @throws ServiceException
      */
     public void deletePhotos(List<Photo> photos) throws ServiceException {
+        if (photos == null) {
+            throw new ServiceException("List<Photo> photos is null");
+        }
         for (Photo p : photos) {
             try {
                 photoDAO.delete(p);
@@ -74,30 +77,22 @@ public class PhotoServiceImpl implements PhotoService {
      *
      * @param photos must not be null; all elements must not be null; no element.id must be null
      * @param tag    must not be null; tag.id must not be null
-     * @throws ServiceException         if an unhandled Exception in this or an underlying
+     * @throws ServiceException         if an Exception in this or an underlying
      *                                  layer occurs
-     * @throws IllegalArgumentException if any precondition is violated
      */
     public void addTagToPhotos(List<Photo> photos, Tag tag) throws ServiceException {
         LOGGER.debug("Entering addTagToPhotos with {}, {}", photos, tag);
         if (photos == null) {
-            throw new IllegalArgumentException("List<Photo> photos is null");
+            throw new ServiceException("List<Photo> photos is null");
         }
-        if (tag == null || tag.getId() == null) {
-            throw new IllegalArgumentException("tag is null or does not have an id");
-        }
-        for (Photo photo : photos) {
-            if (photo == null || photo.getId() == null) {
-                throw new IllegalArgumentException("List element is null or does not have an id");
-            }
-        }
-
         for (Photo photo : photos) {
             try {
                 photoTagDAO.createPhotoTag(photo, tag);
             } catch (DAOException ex) {
                 LOGGER.error("Photo-Tag-creation with {}, {} failed.", photo, tag);
                 throw new ServiceException("Creation of Photo-Tag failed.", ex);
+            } catch (ValidationException e) {
+                throw new ServiceException("Failed to validate entity", e);
             }
         }
         LOGGER.debug("Leaving addTagToPhotos");
@@ -109,30 +104,22 @@ public class PhotoServiceImpl implements PhotoService {
      *
      * @param photos must not be null; all elements must not be null; no element.id must be null
      * @param tag    must not be null; tag.id must not be null
-     * @throws ServiceException         if an unhandled Exception in this or an underlying
+     * @throws ServiceException         if an Exception in this or an underlying
      *                                  layer occurs
-     * @throws IllegalArgumentException if any precondition is violated
      */
     public void removeTagFromPhotos(List<Photo> photos, Tag tag) throws ServiceException {
         LOGGER.debug("Entering removeTagFromPhotos with {}, {}", photos, tag);
         if (photos == null) {
-            throw new IllegalArgumentException("List<Photo> photos is null");
+            throw new ServiceException("List<Photo> photos is null");
         }
-        if (tag == null || tag.getId() == null) {
-            throw new IllegalArgumentException("tag is null or does not have an id");
-        }
-        for (Photo photo : photos) {
-            if (photo == null || photo.getId() == null) {
-                throw new IllegalArgumentException("List element is null or does not have an id");
-            }
-        }
-
         for (Photo photo : photos) {
             try {
                 photoTagDAO.removeTagFromPhoto(photo, tag);
             } catch (DAOException ex) {
                 LOGGER.error("Removal of Photo-Tag with {}, {} failed.", photo, tag);
                 throw new ServiceException("Photo-Tag removal failed.", ex);
+            } catch (ValidationException e) {
+                throw new ServiceException("Failed to validate entity", e);
             }
         }
         LOGGER.debug("Leaving removeTagFromPhotos");
@@ -145,14 +132,9 @@ public class PhotoServiceImpl implements PhotoService {
      * @return List with all tags which are linked to <tt>photo</tt> as a PhotoTag;
      * If no tag exists, return an empty List.
      * @throws ServiceException         if an exception occurs on this or an underlying layer
-     * @throws IllegalArgumentException if any precondition is violated
      */
     public List<Tag> getTagsForPhoto(Photo photo) throws ServiceException {
         LOGGER.debug("Entering getTagsForPhoto with {}", photo);
-        if (photo == null || photo.getId() == null) {
-            throw new IllegalArgumentException("Photo is null or does not have an id");
-        }
-
         List<Tag> tagList;
         try {
             tagList = photoTagDAO.readTagsByPhoto(photo);
@@ -160,12 +142,14 @@ public class PhotoServiceImpl implements PhotoService {
         } catch (DAOException ex) {
             LOGGER.error("Retrieving tags for {} failed due to DAOException", photo);
             throw new ServiceException("Could not retrieve tags for photo.", ex);
+        } catch (ValidationException e) {
+            throw new ServiceException("Failed to validate entity", e);
         }
         LOGGER.debug("Leaving getTagsForPhoto with {}", photo);
         return tagList;
     }
 
-    public void editPhotos(List<Photo> photos, Photo p) throws ServiceException {
+    public void editPhotos(List<Photo> photos, Photo photo) throws ServiceException {
 
     }
 

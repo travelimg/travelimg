@@ -15,8 +15,9 @@ public interface PhotoTagDAO {
      * @param photo must not be null; photo.id must not be null;
      * @param tag   must not be null; tag.id must not be null;
      * @throws DAOException:             if an exception occurs on persistence layer
+     * @throws ValidationException: if parameter validation fails
      */
-    void createPhotoTag(Photo photo, Tag tag) throws DAOException;
+    void createPhotoTag(Photo photo, Tag tag) throws DAOException, ValidationException;
 
     /**
      * Remove if exists the photo-tag entry where Photo = <tt>photo</tt> and Tag = <tt>tag</tt>
@@ -24,8 +25,9 @@ public interface PhotoTagDAO {
      * @param photo must not be null; photo.id must not be null;
      * @param tag   must not be null; tag.id must not be null;
      * @throws DAOException:             if an exception occurs on persistence layer
+     * @throws ValidationException: if parameter validation fails
      */
-    void removeTagFromPhoto(Photo photo, Tag tag) throws DAOException;
+    void removeTagFromPhoto(Photo photo, Tag tag) throws DAOException, ValidationException;
 
     /**
      * Return list of all tags which are currently set for <tt>photo</tt>.
@@ -34,8 +36,9 @@ public interface PhotoTagDAO {
      * @return List with all tags which are linked to <tt>photo</tt> as a PhotoTag;
      *     If no tag exists, return an empty List.
      * @throws DAOException if an exception occurs on persistence layer
+     * @throws ValidationException: if parameter validation fails
      */
-    List<Tag> readTagsByPhoto(Photo photo) throws DAOException;
+    List<Tag> readTagsByPhoto(Photo photo) throws DAOException, ValidationException;
 
     /**
      * Return list of all photos which are currently tagged with Tag <tt>tag</tt>.
@@ -43,6 +46,7 @@ public interface PhotoTagDAO {
      * @param tag must not be null; tag.id must not be null
      * @return List with all Photos, which are linked to <tt>tag</tt> as a PhotoTag;
      * @throws DAOException if an exception occurs on persistence layer
+     * @throws ValidationException: if parameter validation fails
      */
-    List<Photo> readPhotosByTag(Tag tag) throws DAOException;
+    List<Photo> readPhotosByTag(Tag tag) throws DAOException, ValidationException;
 }

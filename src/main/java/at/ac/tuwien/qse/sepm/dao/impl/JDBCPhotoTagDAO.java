@@ -4,6 +4,9 @@ import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
+import at.ac.tuwien.qse.sepm.entities.validators.TagValidator;
+import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.dao.DataAccessException;
@@ -28,9 +31,12 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      * @param photo must not be null; photo.id must not be null;
      * @param tag   must not be null; tag.id must not be null;
      * @throws DAOException: if an exception occurs on persistence layer
+     * @throws ValidationException: if parameter validation fails
      */
-    public void createPhotoTag(Photo photo, Tag tag) throws DAOException {
+    public void createPhotoTag(Photo photo, Tag tag) throws DAOException, ValidationException {
         LOGGER.debug("Entering createPhotoTag with {} {}", photo, tag);
+        PhotoValidator.validateID(photo);
+        TagValidator.validateID(tag);
         if (!readTagsByPhoto(photo).contains(tag)) {
             try {
                 jdbcTemplate.update(CREATE_STRING, photo.getId(), tag.getId());
@@ -52,9 +58,12 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      * @param photo must not be null; photo.id must not be null;
      * @param tag   must not be null; tag.id must not be null;
      * @throws DAOException: if an exception occurs on persistence layer
+     * @throws ValidationException: if parameter validation fails
      */
-    public void removeTagFromPhoto(Photo photo, Tag tag) throws DAOException {
+    public void removeTagFromPhoto(Photo photo, Tag tag) throws DAOException, ValidationException {
         LOGGER.debug("Entering removeTagFromPhoto with {} {}", photo, tag);
+        PhotoValidator.validateID(photo);
+        TagValidator.validateID(tag);
         try {
             jdbcTemplate.update(DELETE_STRING, photo.getId(), tag.getId());
             LOGGER.info("Photo-Tag entry successfully deleted");
@@ -72,9 +81,11 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      * @return List with all tags which are linked to <tt>photo</tt> as a PhotoTag;
      *     If no tag exists, return an empty List.
      * @throws DAOException if an exception occurs on persistence layer
+     * @throws ValidationException: if parameter validation fails
      */
-    public List<Tag> readTagsByPhoto(Photo photo) throws DAOException {
+    public List<Tag> readTagsByPhoto(Photo photo) throws DAOException, ValidationException {
         LOGGER.debug("Entering readTagsByPhoto with {}", photo);
+        PhotoValidator.validateID(photo);
         List<Tag> tagList;
         try {
             tagList = jdbcTemplate.query(READ_TAGS_BY_PHOTO_STRING, (rs, rowNum) -> {
@@ -95,9 +106,11 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      * @param tag must not be null; tag.id must not be null
      * @return List with all Photos, which are linked to <tt>tag</tt> as a PhotoTag;
      * @throws DAOException if an exception occurs on persistence layer
+     * @throws ValidationException: if parameter validation fails
      */
-    public List<Photo> readPhotosByTag(Tag tag) throws DAOException {
+    public List<Photo> readPhotosByTag(Tag tag) throws DAOException, ValidationException {
         LOGGER.debug("Entering readPhotosByTag with {}", tag);
+        TagValidator.validateID(tag);
         List<Photo> photoList;
         try {
             photoList = jdbcTemplate.query(READ_PHOTOS_BY_TAG_STRING, (rs, rowNum) -> {
