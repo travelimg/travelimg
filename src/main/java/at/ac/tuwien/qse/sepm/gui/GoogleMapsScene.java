@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Exif;
+import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.javascript.object.LatLong;
@@ -138,6 +139,5 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     public GoogleMapView getMapView() {
        return mapView;
     }
-
-
+    
 }
