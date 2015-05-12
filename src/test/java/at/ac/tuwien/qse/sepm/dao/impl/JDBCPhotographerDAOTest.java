@@ -13,7 +13,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @UsingTable("Photographer")
-public class JDBCPhotographerDAOTests extends AbstractJDBCDAOTests {
+public class JDBCPhotographerDAOTest extends AbstractJDBCDAOTest {
 
     @Autowired PhotographerDAO photographerDAO;
 

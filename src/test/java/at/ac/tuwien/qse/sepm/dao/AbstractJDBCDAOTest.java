@@ -16,12 +16,12 @@ import javax.sql.DataSource;
 @ContextConfiguration("classpath:test-config.xml")
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 @TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
-public abstract class AbstractJDBCDAOTests {
+public abstract class AbstractJDBCDAOTest {
     private String table;
 
     protected JdbcTemplate jdbcTemplate;
 
-    public AbstractJDBCDAOTests() {
+    public AbstractJDBCDAOTest() {
         super();
 
         UsingTable annotation =  getClass().getAnnotation(UsingTable.class);

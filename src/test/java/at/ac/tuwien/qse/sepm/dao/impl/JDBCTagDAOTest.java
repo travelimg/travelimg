@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.junit.Assert.assertEquals;
 
 @UsingTable("Tag")
-public class JDBCTagDAOTests extends AbstractJDBCDAOTests {
+public class JDBCTagDAOTest extends AbstractJDBCDAOTest {
 
     @Autowired
     TagDAO tagDAO;

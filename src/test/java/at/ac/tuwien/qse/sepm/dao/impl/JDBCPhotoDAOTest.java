@@ -7,11 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@UsingTable("Exif")
-public class JDBCExifDAOTests extends AbstractJDBCDAOTests {
+@UsingTable("Photo")
+public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
     @Autowired
-    ExifDAO exifDAO;
+    PhotoDAO photoDAO;
 
     @Test
     public void testWithEmptyDB() throws DAOException {

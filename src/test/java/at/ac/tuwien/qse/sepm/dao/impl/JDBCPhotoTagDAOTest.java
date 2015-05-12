@@ -8,7 +8,7 @@ import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @UsingTable("PhotoTag")
-public class JDBCPhotoTagDAOTests extends AbstractJDBCDAOTests {
+public class JDBCPhotoTagDAOTest extends AbstractJDBCDAOTest {
 
     @Autowired
     PhotoTagDAO photoTagDAO;
