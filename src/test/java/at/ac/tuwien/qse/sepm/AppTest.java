@@ -11,8 +11,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -28,15 +29,16 @@ public class AppTest {
 
     private static final Logger logger = LogManager.getLogger(App.class);
     private ExifService exifservice;
+    private ClassPathXmlApplicationContext context;
 
     /**
-     * Rigourous Test :-)
+     * Gets the exifservice from a Java bean.
      */
-
     @Before
     public void setUp() {
         logger.info("setUp");
-        exifservice = new ExifServiceImpl();
+        context = new ClassPathXmlApplicationContext("beans.xml");
+        exifservice = (ExifService) context.getBean("exifService");
     }
 
     @Test
@@ -58,10 +60,28 @@ public class AppTest {
         assertEquals("Hello World", result);
     }
 
+    /**
+     * Tests the importing of Exif-data and the changing of them.
+     * @throws ServiceException
+     */
     @Test
     public void testExif() throws ServiceException {
         Photo photo = new Photo(5, null, "C:\\Users\\David\\workspace\\qse-sepm-ss15-18\\src\\test\\resources\\test.jpg", 0);
+        Photo photooriginal = new Photo(6, null, "C:\\Users\\David\\workspace\\qse-sepm-ss15-18\\src\\test\\resources\\testoriginal.jpg", 0);
         Exif exif = exifservice.importExif(photo);
-       logger.info(exif);
+        exifservice.importExif(photooriginal);
+        exif.setExposure("1/1000");
+        exif.setAltitude(2000);
+        exif.setAperture(10);
+        exif.setIso(28);
+        exif.setDate(new Timestamp(new Date().getTime()));
+        exif.setFocalLength(24);
+        exif.setFlash(true);
+        exif.setLongitude(12);
+        exif.setLatitude(12);
+        exif.setModel("nono");
+        exif.setMake("yesyes");
+        exifservice.changeExif(photo);
+        logger.info(exif);
     }
 }

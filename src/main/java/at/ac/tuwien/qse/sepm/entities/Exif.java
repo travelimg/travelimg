@@ -10,12 +10,13 @@ public class Exif {
     private double focalLength;
     private int iso;
     private boolean flash;
-    private String cameraModel;
-    private String longitude;
-    private String latitude;
+    private String make;
+    private String model;
+    private double latitude;
+    private double longitude;
     private double altitude;
 
-    public Exif(int id, Timestamp date, String exposure, double aperture, double focalLength, int iso, boolean flash, String cameraModel, String longitude, String latitude, double altitude) {
+    public Exif(int id, Timestamp date, String exposure, double aperture, double focalLength, int iso, boolean flash, String make, String model, double latitude, double longitude, double altitude) {
         this.id = id;
         this.date = date;
         this.exposure = exposure;
@@ -23,9 +24,10 @@ public class Exif {
         this.focalLength = focalLength;
         this.iso = iso;
         this.flash = flash;
-        this.cameraModel = cameraModel;
-        this.longitude = longitude;
+        this.make = make;
+        this.model = model;
         this.latitude = latitude;
+        this.longitude = longitude;
         this.altitude = altitude;
     }
 
@@ -85,29 +87,22 @@ public class Exif {
         this.flash = flash;
     }
 
-    public String getCameraModel() {
-        return cameraModel;
-    }
-
-    public void setCameraModel(String cameraModel) {
-        this.cameraModel = cameraModel;
-    }
-
-    public String getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
-    }
-
-    public String getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(String latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
 
     public double getAltitude() {
         return altitude;
@@ -117,19 +112,36 @@ public class Exif {
         this.altitude = altitude;
     }
 
+    public String getMake() {
+        return make;
+    }
+
+    public void setMake(String make) {
+        this.make = make;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
     @Override
     public String toString() {
         return "Exif{" +
                 "id=" + id +
                 ", date=" + date +
-                ", exposure=" + exposure +
+                ", exposure='" + exposure + '\'' +
                 ", aperture=" + aperture +
                 ", focalLength=" + focalLength +
                 ", iso=" + iso +
                 ", flash=" + flash +
-                ", cameraModel='" + cameraModel + '\'' +
-                ", longitude=" + longitude +
+                ", make='" + make + '\'' +
+                ", model='" + model + '\'' +
                 ", latitude=" + latitude +
+                ", longitude=" + longitude +
                 ", altitude=" + altitude +
                 '}';
     }
