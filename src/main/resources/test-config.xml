@@ -41,6 +41,7 @@
         <constructor-arg value="${user.home}/travelimg"></constructor-arg>
     </bean>
 
+    <bean id="tagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTagDAO"></bean>
     <bean id="exifDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCExifDAO"></bean>
     <bean id="photoTagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoTagDAO"></bean>
     <bean id="photographerDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotographerDAO"></bean>

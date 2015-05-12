@@ -1,6 +1,5 @@
 package at.ac.tuwien.qse.sepm.dao;
 
-
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,13 +16,14 @@ import javax.sql.DataSource;
 @ContextConfiguration("classpath:test-config.xml")
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 @TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
-public class AbstractDAOTest {
-
+public abstract class AbstractJDBCDAOTests {
     private String table;
 
     protected JdbcTemplate jdbcTemplate;
 
-    public AbstractDAOTest() {
+    public AbstractJDBCDAOTests() {
+        super();
+
         UsingTable annotation =  getClass().getAnnotation(UsingTable.class);
         if(annotation != null) {
             table = annotation.value();
@@ -39,5 +39,9 @@ public class AbstractDAOTest {
 
     protected int countRows() {
         return JdbcTestUtils.countRowsInTable(jdbcTemplate, table);
+    }
+
+    protected int countRowsWhere(String whereClause) {
+        return JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, table, whereClause);
     }
 }
