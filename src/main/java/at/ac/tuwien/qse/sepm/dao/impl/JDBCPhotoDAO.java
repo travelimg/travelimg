@@ -23,12 +23,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
@@ -43,7 +41,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
 
     private final String photoDirectory;
-    private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MMM/dd", Locale.ENGLISH);
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MMM/dd", Locale.ENGLISH);
 
     @Autowired private ExifDAO exifDAO;
     @Autowired private PhotoTagDAO photoTagDAO;

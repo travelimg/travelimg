@@ -22,12 +22,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.text.SimpleDateFormat;
-import java.time.Year;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -191,8 +189,8 @@ public class Organizer {
      * Add a new month to the list if it is not already included.
      * @param date represents the month to add
      */
-    private void updateMonthListWithDate(Date date) {
-        YearMonth month = YearMonth.of(date.getYear(), date.getMonth());
+    private void updateMonthListWithDate(LocalDate date) {
+        YearMonth month = YearMonth.from(date);
 
         if(!months.contains(month)) {
             months.add(month);
@@ -234,9 +232,7 @@ public class Organizer {
                 return false;
             }
 
-            Date photoDate = photo.getExif().getDate();
-
-            return month.equals(YearMonth.of(photoDate.getYear(), photoDate.getMonth()));
+            return month.equals(YearMonth.from(photo.getExif().getDate()));
         }
     }
 }

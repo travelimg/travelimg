@@ -13,8 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.sql.Timestamp;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Iterator;
 
 import static org.junit.Assert.assertEquals;
@@ -74,7 +73,7 @@ public class AppTest {
         exif.setAltitude(2000);
         exif.setAperture(10);
         exif.setIso(28);
-        exif.setDate(new Timestamp(new Date().getTime()));
+        exif.setDate(LocalDate.now());
         exif.setFocalLength(24);
         exif.setFlash(true);
         exif.setLongitude(12);

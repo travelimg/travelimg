@@ -22,12 +22,14 @@ import org.springframework.dao.DataAccessException;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.time.YearMonth;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,16 +42,20 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
     private static final String updateStatement = "UPDATE exif SET date=?, exposure=?, aperture=?, focallength=?, iso=?, flash=?, make=?, model=?, latitude=?, longitude=?, altitude=? WHERE photo_id=?";
     private static final String deleteStatement = "Delete from Exif where PHOTO_ID  =?";
 
+    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
+
     public Exif create(Exif exif) throws DAOException {
         logger.debug("Entering create() " + exif);
         try {
-            jdbcTemplate.update(insertStatement, exif.getId(), exif.getDate(), exif.getExposure(),
+            Date date = Date.valueOf(exif.getDate());
+            jdbcTemplate.update(insertStatement, exif.getId(), date, exif.getExposure(),
                     exif.getAperture(), exif.getFocalLength(), exif.getIso(), exif.isFlash(),
                     exif.getMake(), exif.getModel(), exif.getLatitude(), exif.getLongitude(),
                     exif.getAltitude());
         } catch (DataAccessException e) {
             throw new DAOException(e.getMessage(), e);
         }
+
         return exif;
     }
 
@@ -58,8 +64,8 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
 
         try {
             return jdbcTemplate.queryForObject(readStatement, (rs, rowNum) -> {
-                return new Exif(rs.getInt(1), rs.getTimestamp(2), rs.getString(3), rs.getDouble(4),
-                        rs.getDouble(5), rs.getInt(6), rs.getBoolean(7), rs.getString(8),
+                return new Exif(rs.getInt(1), rs.getTimestamp(2).toLocalDateTime().toLocalDate(), rs.getString(3),
+                        rs.getDouble(4), rs.getDouble(5), rs.getInt(6), rs.getBoolean(7), rs.getString(8),
                         rs.getString(9), rs.getDouble(10), rs.getDouble(11), rs.getDouble(12));
             }, photo.getId());
         } catch (DataAccessException ex) {
@@ -70,7 +76,8 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
     public void update(Exif exif) throws DAOException {
         logger.debug("Entering update() " + exif);
         try {
-            jdbcTemplate.update(updateStatement, exif.getId(), exif.getDate(), exif.getExposure(),
+            Date date = Date.valueOf(exif.getDate());
+            jdbcTemplate.update(updateStatement, exif.getId(), date, exif.getExposure(),
                     exif.getAperture(), exif.getFocalLength(), exif.getIso(), exif.isFlash(),
                     exif.getMake(), exif.getModel(), exif.getLatitude(), exif.getLongitude(),
                     exif.getAltitude());
@@ -96,8 +103,8 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
     public List<Exif> readAll() throws DAOException {
         try {
             return jdbcTemplate.query(readAllStatement, (rs, rowNum) -> {
-                return new Exif(rs.getInt(1), rs.getTimestamp(2), rs.getString(3), rs.getDouble(4),
-                        rs.getDouble(5), rs.getInt(6), rs.getBoolean(7), rs.getString(8),
+                return new Exif(rs.getInt(1), rs.getTimestamp(2).toLocalDateTime().toLocalDate(), rs.getString(3),
+                        rs.getDouble(4), rs.getDouble(5), rs.getInt(6), rs.getBoolean(7), rs.getString(8),
                         rs.getString(9), rs.getDouble(10), rs.getDouble(11), rs.getDouble(12));
             });
         } catch (DataAccessException e) {
@@ -107,7 +114,7 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
 
     @Override public Exif importExif(Photo photo) throws DAOException {
         File file = new File(photo.getPath());
-        Timestamp date;
+        LocalDate date;
         String exposure;
         double aperture;
         double focalLength;
@@ -125,7 +132,8 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
             String tempDate = jpegMetadata
                     .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL)
                     .getValueDescription();
-            date = Timestamp.valueOf(this.convertSeparators(tempDate));
+            tempDate = tempDate.substring(1, tempDate.length() - 1); // remove enclosing single quotes
+            date = dateFormatter.parse(tempDate, LocalDate::from);
             exposure = jpegMetadata
                     .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_EXPOSURE_TIME)
                     .getValueDescription().split(" ")[0];
@@ -167,14 +175,6 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
             e.printStackTrace();
             throw new DAOException(e.getMessage(), e);
         }
-    }
-
-    String convertSeparators(String input) {
-        input = input.substring(1, input.length() - 2);
-        char[] chars = input.toCharArray();
-        chars[4] = '-';
-        chars[7] = '-';
-        return new String(chars);
     }
 
     public void setExifTags(final File jpegImageFile, Exif exif) throws DAOException {

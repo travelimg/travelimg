@@ -4,7 +4,6 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 
 import java.time.YearMonth;
-import java.util.Date;
 import java.util.List;
 
 public interface PhotoDAO {
