@@ -9,11 +9,15 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 
 import javafx.scene.layout.Pane;
@@ -36,8 +40,14 @@ public class Inspector {
     @FXML private Button cancelButton;
     @FXML private Button confirmButton;
 
+    @FXML
+    private TableColumn<Exif, String> exifValue;
 
+    @FXML
+    private TableColumn<Exif, String> exifName;
 
+    @FXML
+    private TableView<?> exifTable;
 
 
 
@@ -73,6 +83,10 @@ public class Inspector {
 
         proofOfConceptLabel.setText("Selected photo is: " + photo.getPath());
 
+        ObservableList<Exif> exifData = FXCollections.observableArrayList();
+
+
+
         //this.mapsScene = new GoogleMapsScene(photo.getExif());
         //contentBox2.getChildren().clear();
 
@@ -90,6 +104,8 @@ public class Inspector {
         confirmButton.setOnAction(this::handleConfirm);
         this.mapsScene= new GoogleMapsScene();
         contentBox2.getChildren().add(mapsScene.getMapView());
+
+
 
     }
 
