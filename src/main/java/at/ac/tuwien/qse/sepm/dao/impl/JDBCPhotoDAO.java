@@ -82,7 +82,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
             logger.debug("Created photo {}", photo);
             return photo;
-        } catch(DataAccessException e) {
+        } catch (DataAccessException e) {
             throw new DAOException("Failed to create photo", e);
         }
     }
@@ -114,10 +114,10 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
                 photoTagDAO.removeTagFromPhoto(photo, t);
             }
         }
-        try{
+        try {
             jdbcTemplate.update(deleteStatement, id);
 
-        }catch(DataAccessException e) {
+        } catch (DataAccessException e) {
             throw new DAOException("Failed to delete photo", e);
         }
 
