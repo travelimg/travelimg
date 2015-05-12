@@ -76,8 +76,8 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     public void addMarker(Photo photo){
         if(actualMarker!=null)
             map.removeMarker(actualMarker);
-        actualMarker = new Marker(new MarkerOptions().position(new LatLong(calculate(photo.getExif().getLatitude()),-calculate(photo.getExif().getLongitude()))).visible(Boolean.TRUE));
-        mapView.setCenter(calculate(photo.getExif().getLatitude()),-calculate(photo.getExif().getLongitude()));
+        actualMarker = new Marker(new MarkerOptions().position(new LatLong(photo.getExif().getLatitude(),photo.getExif().getLongitude())).visible(Boolean.TRUE));
+        mapView.setCenter(photo.getExif().getLatitude(),photo.getExif().getLongitude());
         mapView.setZoom(12);
         //actualMarker.setTitle(photo.getPhotographer().getName());
         map.addMarker(actualMarker);
