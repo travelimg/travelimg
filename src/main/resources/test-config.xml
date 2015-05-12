@@ -38,7 +38,7 @@
     <bean id="exifService" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
 
     <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
-        <constructor-arg value="${user.home}/travelimg"></constructor-arg>
+        <constructor-arg value="${java.io.tmpdir}/travelimg"></constructor-arg>
     </bean>
 
     <bean id="tagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTagDAO"></bean>

@@ -4,14 +4,17 @@ import at.ac.tuwien.qse.sepm.dao.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.nio.file.Paths;
+
 import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @UsingTable("Photo")
 public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
     @Autowired
     PhotoDAO photoDAO;
+
+    private final String dataDir = Paths.get(System.getProperty("java.io.tmpdir"), "travelimg").toString();
 
     @Test
     public void testWithEmptyDB() throws DAOException {
