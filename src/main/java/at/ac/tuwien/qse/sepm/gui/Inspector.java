@@ -9,20 +9,21 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.util.Callback;
 import javafx.util.Pair;
 import org.controlsfx.tools.Platform;
 
@@ -44,13 +45,13 @@ public class Inspector {
     @FXML private Button confirmButton;
 
     @FXML
-    private TableColumn<String, String> exifValue;
+    private TableColumn<Pair<String, Object>, Object> exifValue;
 
     @FXML
-    private TableColumn<String, String> exifName;
+    private TableColumn<Pair<String, Object>, Object> exifName;
 
     @FXML
-    private TableView<Pair<String, ?>> exifTable;
+    private TableView<Pair<String, Object>> exifTable;
 
 
 
@@ -87,16 +88,30 @@ public class Inspector {
         proofOfConceptLabel.setText("Selected photo is: " + photo.getPath());
 
         Exif exif = photo.getExif();
-        ObservableList<Pair<String, ?>> exifData = FXCollections.observableArrayList(
-                new Pair<String, String>("Aufnahmedatum", exif.getDate().toString()),
-                new Pair<String, String>("Kamerahersteller", exif.getMake()),
-                new Pair<String, String>("Kameramodell", exif.getModel())
+        ObservableList<Pair<String, Object>> exifData = FXCollections.observableArrayList(
+                new Pair<String, Object>("Aufnahmedatum", exif.getDate().toString()),
+                new Pair<String, Object>("Kamerahersteller", exif.getMake()),
+                new Pair<String, Object>("Kameramodell", exif.getModel())
         );
 
         exifTable.setEditable(true);
-        exifName.setCellValueFactory(new PropertyValueFactory<String, String>("Key"));
-        exifValue.setCellValueFactory(new PropertyValueFactory<String, String>("Value"));
+        exifName.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Pair<String, Object>, Object>, ObservableValue<Object>>() {
+            @Override
+            public ObservableValue<Object> call(TableColumn.CellDataFeatures<Pair<String, Object>, Object> param) {
+                return new ReadOnlyObjectWrapper(param.getValue().getKey());
+            }
+        });
+
+        exifValue.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Pair<String, Object>, Object>, ObservableValue<Object>>() {
+            @Override
+            public ObservableValue<Object> call(TableColumn.CellDataFeatures<Pair<String, Object>, Object> param) {
+                return new ReadOnlyObjectWrapper(param.getValue().getKey());
+            }
+        });
+
+        exifValue.setCellFactory((param) -> new ExifValueCell());
         exifTable.setItems(exifData);
+
         //this.mapsScene = new GoogleMapsScene(photo.getExif());
         //contentBox2.getChildren().clear();
 
@@ -139,5 +154,32 @@ public class Inspector {
 
     private void handleConfirm(Event event) {
         // TODO
+    }
+
+    class ExifValueCell extends TableCell<Pair<String, Object>, Object> {
+        @Override
+        protected void updateItem(Object item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (item != null) {
+                if (item instanceof String) {
+                    TextField f = new TextField((String) item); // z.b. ein textfield zum editieren. Hier kann auch ein signalhandler auf aenderungen horchen
+                    setGraphic(f);
+                } else if (item instanceof Integer) {
+                    setText(Integer.toString((Integer) item));
+                    setGraphic(null);
+                } else if (item instanceof Boolean) {
+                    CheckBox checkBox = new CheckBox();
+                    checkBox.setSelected((boolean) item);
+                    setGraphic(checkBox);
+                } else {
+                    setText("N/A");
+                    setGraphic(null);
+                }
+            } else {
+                setText(null);
+                setGraphic(null);
+            }
+        }
     }
 }
