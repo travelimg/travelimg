@@ -20,7 +20,6 @@ public class JDBCPhotographerDAOTest extends AbstractJDBCDAOTest {
     @Test
     public void testWithEmptyDB() throws DAOException {
         assertEquals(0, countRows());
-        assertTrue(false);
     }
 
     @Test
