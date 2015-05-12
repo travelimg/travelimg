@@ -30,6 +30,7 @@
     <log4j.version>2.2</log4j.version>
     <h2.version>1.4.187</h2.version>
     <spring.version>4.1.6.RELEASE</spring.version>
+      <flickr.version>2.12</flickr.version>
   </properties>
 
   <repositories>
@@ -121,5 +122,11 @@
         <artifactId>controlsfx</artifactId>
         <version>8.20.8</version>
       </dependency>
+
+        <dependency>
+            <groupId>com.flickr4java</groupId>
+            <artifactId>flickr4java</artifactId>
+            <version>${flickr.version}</version>
+        </dependency>
     </dependencies>
 </project>
