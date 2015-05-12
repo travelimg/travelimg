@@ -18,14 +18,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.util.Pair;
 import org.controlsfx.tools.Platform;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,13 +44,13 @@ public class Inspector {
     @FXML private Button confirmButton;
 
     @FXML
-    private TableColumn<Exif, String> exifValue;
+    private TableColumn<String, String> exifValue;
 
     @FXML
-    private TableColumn<Exif, String> exifName;
+    private TableColumn<String, String> exifName;
 
     @FXML
-    private TableView<?> exifTable;
+    private TableView<Pair<String, ?>> exifTable;
 
 
 
@@ -83,10 +86,17 @@ public class Inspector {
 
         proofOfConceptLabel.setText("Selected photo is: " + photo.getPath());
 
-        ObservableList<Exif> exifData = FXCollections.observableArrayList();
+        Exif exif = photo.getExif();
+        ObservableList<Pair<String, ?>> exifData = FXCollections.observableArrayList(
+                new Pair<String, String>("Aufnahmedatum", exif.getDate().toString()),
+                new Pair<String, String>("Kamerahersteller", exif.getMake()),
+                new Pair<String, String>("Kameramodell", exif.getModel())
+        );
 
-
-
+        exifTable.setEditable(true);
+        exifName.setCellValueFactory(new PropertyValueFactory<String, String>("Key"));
+        exifValue.setCellValueFactory(new PropertyValueFactory<String, String>("Value"));
+        exifTable.setItems(exifData);
         //this.mapsScene = new GoogleMapsScene(photo.getExif());
         //contentBox2.getChildren().clear();
 
