@@ -81,15 +81,18 @@ public class Organizer {
         months.addAll(getAvailableMonths());
     }
 
+    public void reloadPhotos(){
+        Date selected = monthList.getSelectionModel().getSelectedItem();
+        handleMonthChange(null, null, selected);
+    }
+
     private void handleImport(Event event) {
         ImportDialog dialog = new ImportDialog(root, photographerService);
 
         Optional<List<Photo>> photos = dialog.showForResult();
         if (!photos.isPresent()) return;
 
-        importService.importPhotos(photos.get(),
-                this::handleImportedPhoto,
-                this::handleImportError);
+        importService.importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
     }
 
     private void handleImportError(Throwable error) {
@@ -116,8 +119,7 @@ public class Organizer {
                     dialog.setHeaderText("Laden von Fotos fehlgeschlagen");
                     dialog.setContentText("Fehlermeldung: " + error.getMessage());
                     dialog.showAndWait();
-                }
-        );
+                });
     }
 
     /**
