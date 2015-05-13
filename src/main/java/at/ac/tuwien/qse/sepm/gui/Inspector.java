@@ -94,7 +94,7 @@ public class Inspector {
         //contentBox2.getChildren().clear();
 
         //contentBox2.getChildren().add(mapsScene.getMapView());
-
+        mapsScene.setMaxSize(200,200);
         mapsScene.addMarker(photo);
 
     }
