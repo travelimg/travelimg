@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.TilePane?>
+
+<fx:root fx:id="root" styleClass="dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+<AnchorPane prefHeight="447.0" prefWidth="495.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox fx:id="progress" layoutX="310.0" layoutY="424.0" spacing="5.0" visible="false" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="19.0">
+         <children>
+            <Label layoutX="310.0" layoutY="425.0" text="importing..." />
+              <ProgressBar fx:id="progressBar" layoutX="381.0" layoutY="424.0" progress="0.0" />
+         </children>
+      </HBox>
+      <ScrollPane hbarPolicy="NEVER" layoutX="134.0" layoutY="58.0" prefHeight="422.0" prefWidth="495.0" vbarPolicy="AS_NEEDED" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <content>
+             <TilePane fx:id="tilePane" hgap="15" prefHeight="407.0" prefWidth="489.0" styleClass="image-grid" vgap="15">
+                 <padding>
+                     <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                 </padding>
+   
+             </TilePane>
+         </content>
+      </ScrollPane>
+            <Button fx:id="button" layoutX="210.0" layoutY="415.0" mnemonicParsing="false" onAction="#handleOnLoadMoreButtonClicked" text="Load more..." />
+   </children>
+</AnchorPane>
+    </children>
+</fx:root>
