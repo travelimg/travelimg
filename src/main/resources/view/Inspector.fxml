@@ -5,45 +5,48 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane fx:id="root" prefWidth="240.0" styleClass="inspector" stylesheets="@style.css"
-            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.Inspector">
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="at.ac.tuwien.qse.sepm.gui.Inspector">
     <center>
-        <VBox maxHeight="Infinity" maxWidth="Infinity" styleClass="section" BorderPane.alignment="CENTER">
-         <children>
+        <VBox maxHeight="Infinity" maxWidth="Infinity" styleClass="section"
+              BorderPane.alignment="CENTER">
+            <children>
+                <VBox fx:id="contentBox2" maxHeight="200.0" prefHeight="200.0">
+                    <children>
 
-             <VBox fx:id="contentBox2">
+                    </children>
 
-             <VBox fx:id="contentBox2" maxHeight="200.0" prefHeight="200.0">
-                 <children>
+                </VBox>
+                <TableView fx:id="exifTable" prefHeight="200.0" prefWidth="200.0">
+                    <columns>
+                        <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
+                        <TableColumn fx:id="exifValue" prefWidth="100.0" text="Wert"/>
+                    </columns>
+                </TableView>
 
-                 </children>
-
-             </VBox>
-            <TableView fx:id="exifTable" prefHeight="200.0" prefWidth="200.0">
-              <columns>
-                <TableColumn fx:id="exifName" prefWidth="100.0" text="Name" />
-                <TableColumn fx:id="exifValue" prefWidth="100.0" text="Wert" />
-              </columns>
-            </TableView>
-             
-             <Label fx:id="proofOfConceptLabel" wrapText="true" />
-         </children></VBox>
+                <Label fx:id="proofOfConceptLabel" wrapText="true"/>
+            </children>
+        </VBox>
     </center>
     <bottom>
         <HBox prefHeight="56.0" styleClass="navbar">
             <children>
-                <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity" styleClass="delete" HBox.hgrow="ALWAYS">
+                <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity"
+                        styleClass="delete" HBox.hgrow="ALWAYS">
                     <graphic>
-                        <Label maxHeight="Infinity" maxWidth="Infinity" />
+                        <Label maxHeight="Infinity" maxWidth="Infinity"/>
                     </graphic>
                 </Button>
-                <Button fx:id="cancelButton" maxHeight="Infinity" maxWidth="Infinity" styleClass="cancel" HBox.hgrow="ALWAYS">
+                <Button fx:id="cancelButton" maxHeight="Infinity" maxWidth="Infinity"
+                        styleClass="cancel" HBox.hgrow="ALWAYS">
                     <graphic>
-                        <Label maxHeight="Infinity" maxWidth="Infinity" />
+                        <Label maxHeight="Infinity" maxWidth="Infinity"/>
                     </graphic>
                 </Button>
-                <Button fx:id="confirmButton" maxHeight="Infinity" maxWidth="Infinity" styleClass="confirm" HBox.hgrow="ALWAYS">
+                <Button fx:id="confirmButton" maxHeight="Infinity" maxWidth="Infinity"
+                        styleClass="confirm" HBox.hgrow="ALWAYS">
                     <graphic>
-                        <Label maxHeight="Infinity" maxWidth="Infinity" />
+                        <Label maxHeight="Infinity" maxWidth="Infinity"/>
                     </graphic>
                 </Button>
             </children>
