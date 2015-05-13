@@ -70,14 +70,25 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      * @return the GoogleMapView
      */
     public GoogleMapView getMapView() {
-       return mapView;
+
+        return mapView;
+    }
+
+    /**
+     * set the Size of the map-window
+     * @param x width
+     * @param y height
+     */
+    public void setMaxSize(double x, double y){
+        mapView.setMaxSize(x,y);
     }
 
     public void addMarker(Photo photo){
         if(actualMarker!=null)
             map.removeMarker(actualMarker);
-        actualMarker = new Marker(new MarkerOptions().position(new LatLong(calculate(photo.getExif().getLatitude()),-calculate(photo.getExif().getLongitude()))).visible(Boolean.TRUE));
-        mapView.setCenter(calculate(photo.getExif().getLatitude()),-calculate(photo.getExif().getLongitude()));
+        actualMarker = new Marker(new MarkerOptions().position(new LatLong(photo.getExif().getLatitude(),
+                photo.getExif().getLongitude())).visible(Boolean.TRUE));
+        mapView.setCenter(photo.getExif().getLatitude(), photo.getExif().getLongitude());
         mapView.setZoom(12);
         //actualMarker.setTitle(photo.getPhotographer().getName());
         map.addMarker(actualMarker);

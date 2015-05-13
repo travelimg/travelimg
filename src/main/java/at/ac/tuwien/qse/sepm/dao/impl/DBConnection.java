@@ -22,7 +22,7 @@ public class DBConnection {
         logger.warn("Deprecated. Use jdbcTemplate from JDBCDAOBase");
         try {
             Class.forName("org.h2.Driver");
-            con = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/mydb", "sa", "");
+            con = DriverManager.getConnection("jdbc:h2:file:~/travelimg.db", "sa", "");
         } catch (ClassNotFoundException e) {
             logger.error("Failed to load H2 driver", e);
             throw new DAOException("Failed to load H2 driver", e);

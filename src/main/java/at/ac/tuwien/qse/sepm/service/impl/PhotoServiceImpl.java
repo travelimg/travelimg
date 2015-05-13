@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 
 public class PhotoServiceImpl implements PhotoService {
 
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired private ExifDAO exifDAO;
     @Autowired private PhotoDAO photoDAO;
@@ -32,16 +32,12 @@ public class PhotoServiceImpl implements PhotoService {
 
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
 
-    public PhotoServiceImpl() {
-
-    }
-
     public List<Photo> getAllPhotos() throws ServiceException {
         try {
             return photoDAO.readAll();
         } catch (DAOException e) {
             throw new ServiceException(e);
-        } catch(ValidationException e) {
+        } catch (ValidationException e) {
             throw new ServiceException("Failed to validate entity", e);
         }
     }
@@ -55,12 +51,16 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     /**
-     *  delete the delivered List of Photos
+     * delete the delivered List of Photos
+     *
      * @param photos the list of photos
      * @throws ServiceException
      */
     public void deletePhotos(List<Photo> photos) throws ServiceException {
-        for(Photo p : photos){
+        if (photos == null) {
+            throw new ServiceException("List<Photo> photos is null");
+        }
+        for (Photo p : photos) {
             try {
                 photoDAO.delete(p);
             } catch (DAOException e) {
@@ -71,35 +71,91 @@ public class PhotoServiceImpl implements PhotoService {
         }
     }
 
-    public void addTagToPhotos(List<Photo> photos, Tag t) throws ServiceException {
-
-    }
-
     /**
-     * delete the delivered Tag from the delivered list of Photos
-     * @param photos the list of photos
-     * @param t the Tag which you want to delete
-     * @throws ServiceException
+     * Add Tag <tt>tag</tt> to every photo in list <tt>photos</tt>. If a photo already has this tag,
+     * then it will keep it.
+     *
+     * @param photos must not be null; all elements must not be null; no element.id must be null
+     * @param tag    must not be null; tag.id must not be null
+     * @throws ServiceException         if an Exception in this or an underlying
+     *                                  layer occurs
      */
-    public void removeTagFromPhotos(List<Photo> photos, Tag t) throws ServiceException {
-        for(Photo p: photos){
+    public void addTagToPhotos(List<Photo> photos, Tag tag) throws ServiceException {
+        LOGGER.debug("Entering addTagToPhotos with {}, {}", photos, tag);
+        if (photos == null) {
+            throw new ServiceException("List<Photo> photos is null");
+        }
+        for (Photo photo : photos) {
             try {
-                photoTagDAO.removeTagFromPhoto(t,p);
-            } catch (DAOException e) {
-                throw new ServiceException(e);
+                photoTagDAO.createPhotoTag(photo, tag);
+            } catch (DAOException ex) {
+                LOGGER.error("Photo-Tag-creation with {}, {} failed.", photo, tag);
+                throw new ServiceException("Creation of Photo-Tag failed.", ex);
             } catch (ValidationException e) {
                 throw new ServiceException("Failed to validate entity", e);
             }
         }
+        LOGGER.debug("Leaving addTagToPhotos");
+    }
+
+    /**
+     * Remove Tag <tt>tag</tt> from all photos in list <tt>photos</tt>. If a photo in the list
+     * does not have this tag, then no action will be taken for this photo.
+     *
+     * @param photos must not be null; all elements must not be null; no element.id must be null
+     * @param tag    must not be null; tag.id must not be null
+     * @throws ServiceException         if an Exception in this or an underlying
+     *                                  layer occurs
+     */
+    public void removeTagFromPhotos(List<Photo> photos, Tag tag) throws ServiceException {
+        LOGGER.debug("Entering removeTagFromPhotos with {}, {}", photos, tag);
+        if (photos == null) {
+            throw new ServiceException("List<Photo> photos is null");
+        }
+        for (Photo photo : photos) {
+            try {
+                photoTagDAO.removeTagFromPhoto(photo, tag);
+            } catch (DAOException ex) {
+                LOGGER.error("Removal of Photo-Tag with {}, {} failed.", photo, tag);
+                throw new ServiceException("Photo-Tag removal failed.", ex);
+            } catch (ValidationException e) {
+                throw new ServiceException("Failed to validate entity", e);
+            }
+        }
+        LOGGER.debug("Leaving removeTagFromPhotos");
+    }
+
+    /**
+     * Return list of all tags which are currently set for <tt>photo</tt>.
+     *
+     * @param photo must not be null; photo.id must not be null;
+     * @return List with all tags which are linked to <tt>photo</tt> as a PhotoTag;
+     * If no tag exists, return an empty List.
+     * @throws ServiceException         if an exception occurs on this or an underlying layer
+     */
+    public List<Tag> getTagsForPhoto(Photo photo) throws ServiceException {
+        LOGGER.debug("Entering getTagsForPhoto with {}", photo);
+        List<Tag> tagList;
+        try {
+            tagList = photoTagDAO.readTagsByPhoto(photo);
+            LOGGER.info("Successfully retrieved tags for {}", photo);
+        } catch (DAOException ex) {
+            LOGGER.error("Retrieving tags for {} failed due to DAOException", photo);
+            throw new ServiceException("Could not retrieve tags for photo.", ex);
+        } catch (ValidationException e) {
+            throw new ServiceException("Failed to validate entity", e);
+        }
+        LOGGER.debug("Leaving getTagsForPhoto with {}", photo);
+        return tagList;
+    }
+
+    public void editPhotos(List<Photo> photos, Photo photo) throws ServiceException {
 
     }
 
-    public void editPhotos(List<Photo> photos, Photo p) throws ServiceException {
-
-    }
-
-    public Cancelable loadPhotosByDate(Date date, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
-        logger.debug("Loading photos");
+    public Cancelable loadPhotosByDate(Date date, Consumer<Photo> callback,
+            ErrorHandler<ServiceException> errorHandler) {
+        LOGGER.debug("Loading photos");
         AsyncLoader loader = new AsyncLoader(date, callback, errorHandler);
         executorService.submit(loader);
 
@@ -111,15 +167,15 @@ public class PhotoServiceImpl implements PhotoService {
         private Consumer<Photo> callback;
         private ErrorHandler<ServiceException> errorHandler;
 
-        public AsyncLoader(Date date, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
+        public AsyncLoader(Date date, Consumer<Photo> callback,
+                ErrorHandler<ServiceException> errorHandler) {
             super();
             this.date = date;
             this.callback = callback;
             this.errorHandler = errorHandler;
         }
 
-        @Override
-        protected void execute() {
+        @Override protected void execute() {
             List<Photo> photos;
             try {
                 photos = photoDAO.readPhotosByDate(date);
@@ -128,8 +184,8 @@ public class PhotoServiceImpl implements PhotoService {
                 return;
             }
 
-            for(Photo p : photos){
-                if(!getIsRunning())
+            for (Photo p : photos) {
+                if (!getIsRunning())
                     return;
                 try {
                     Thread.sleep(20);
@@ -141,8 +197,7 @@ public class PhotoServiceImpl implements PhotoService {
         }
     }
 
-    @Override
-    public List<Date> getMonthsWithPhotos() throws ServiceException{
+    @Override public List<Date> getMonthsWithPhotos() throws ServiceException {
         try {
             return exifDAO.getMonthsWithPhotos();
         } catch (DAOException ex) {
