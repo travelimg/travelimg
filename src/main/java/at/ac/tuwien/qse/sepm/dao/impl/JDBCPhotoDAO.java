@@ -1,15 +1,11 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
 
-import at.ac.tuwien.qse.sepm.dao.*;
-
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.ExifDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
-import at.ac.tuwien.qse.sepm.entities.Exif;
-
+import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +23,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
 
 public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
@@ -106,12 +103,13 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
         // delete from Table photoTag
 
-        List<Tag> taglist = photoTagDAO.readTagsByPhoto(photo);
+        //TODO maybe the JDBCPhotoTagDAO has errors, like a parameter not set...
+        /*List<Tag> taglist = photoTagDAO.readTagsByPhoto(photo);
         if (taglist !=null) {
             for (Tag t : taglist) {
                 photoTagDAO.removeTagFromPhoto(photo, t);
             }
-        }
+        }*/
         try {
             jdbcTemplate.update(deleteStatement, id);
 

@@ -2,32 +2,22 @@ package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import com.lynden.gmapsfx.GoogleMapView;
-
-import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
-
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
-import org.controlsfx.tools.Platform;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,12 +103,12 @@ public class Inspector {
 
             List<Photo> photolist = new ArrayList<Photo>();
             photolist.add(photo);
-            organizer.reloadPhotos();
             try {
                 photoservice.deletePhotos(photolist);
             } catch (ServiceException e) {
-                System.out.println(e);
+                e.printStackTrace();
             }
+            organizer.reloadPhotos();
         }
     }
 
