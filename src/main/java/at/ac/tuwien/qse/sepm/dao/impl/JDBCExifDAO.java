@@ -112,17 +112,20 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
         }
     }
 
-    @Override public Exif importExif(Photo photo) throws DAOException {
+    @Override
+    public Exif importExif(Photo photo) throws DAOException {
         File file = new File(photo.getPath());
         LocalDate date;
-        String exposure;
-        double aperture;
-        double focalLength;
-        int iso;
-        boolean flash;
-        String make;
-        String model;
-        double altitude;
+        String exposure = "not available";
+        double aperture = 0.0;
+        double focalLength = 0.0;
+        int iso = 0;
+        boolean flash = false;
+        String make = "not available";
+        String model = "not available";
+        double altitude = 0.0;
+        double latitude = 0.0;
+        double longitude = 0.0;
 
         try {
             final ImageMetadata metadata = Imaging.getMetadata(file);
@@ -134,48 +137,67 @@ public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
                     .getValueDescription();
             tempDate = tempDate.substring(1, tempDate.length() - 1); // remove enclosing single quotes
             date = dateFormatter.parse(tempDate, LocalDate::from);
-            exposure = jpegMetadata
-                    .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_EXPOSURE_TIME)
-                    .getValueDescription().split(" ")[0];
-            aperture = jpegMetadata
-                    .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_APERTURE_VALUE)
-                    .getDoubleValue();
-            focalLength = jpegMetadata
-                    .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_FOCAL_LENGTH)
-                    .getDoubleValue();
-            iso = jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_ISO)
-                    .getIntValue();
-            flash = jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_FLASH)
-                    .getIntValue() != 0;
+            if (jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_EXPOSURE_TIME) != null) {
+                exposure = jpegMetadata
+                        .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_EXPOSURE_TIME)
+                        .getValueDescription().split(" ")[0];
+            }
 
-            make = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_MAKE)
-                    .getValueDescription();
-            model = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_MODEL)
-                    .getValueDescription();
+            if (jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_APERTURE_VALUE) != null) {
+                aperture = jpegMetadata
+                        .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_APERTURE_VALUE)
+                        .getDoubleValue();
+            }
+            if (jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_FOCAL_LENGTH) != null) {
+                focalLength = jpegMetadata
+                        .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_FOCAL_LENGTH)
+                        .getDoubleValue();
+            }
+            if (jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_ISO) != null) {
+                iso = jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_ISO)
+                        .getIntValue();
+            }
+            if (jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_FLASH) != null) {
+                flash = jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_FLASH)
+                        .getIntValue() != 0;
+            }
 
-            altitude = jpegMetadata
-                    .findEXIFValueWithExactMatch(GpsTagConstants.GPS_TAG_GPS_ALTITUDE)
-                    .getDoubleValue();
+            if (jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_MAKE) != null) {
+                make = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_MAKE)
+                        .getValueDescription();
+            }
+            if (jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_MODEL) != null) {
+                model = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_MODEL)
+                        .getValueDescription();
+            }
+
+            if (jpegMetadata.findEXIFValueWithExactMatch(GpsTagConstants.GPS_TAG_GPS_ALTITUDE) != null) {
+                altitude = jpegMetadata
+                        .findEXIFValueWithExactMatch(GpsTagConstants.GPS_TAG_GPS_ALTITUDE)
+                        .getDoubleValue();
+            }
+
 
             if (null != exifMetadata) {
                 final TiffImageMetadata.GPSInfo gpsInfo = exifMetadata.getGPS();
                 if (null != gpsInfo) {
-                    final double longitude = gpsInfo.getLongitudeAsDegreesEast();
-                    final double latitude = gpsInfo.getLatitudeAsDegreesNorth();
-                    Exif exif = new Exif(photo.getId(), date, exposure, aperture, focalLength, iso,
-                            flash, make, model, latitude, longitude, altitude);
-                    this.create(exif);
-                    photo.setExif(exif);
-                    return exif;
-                }
-            }
-            throw new DAOException("Error while retrieving the GPS data");
+                     longitude = gpsInfo.getLongitudeAsDegreesEast();
+                     latitude = gpsInfo.getLatitudeAsDegreesNorth();
 
+                }
+            }//throw new DAOException("Error while retrieving the GPS data");
+            Exif exif = new Exif(photo.getId(), date, exposure, aperture, focalLength, iso,
+                    flash, make, model, latitude, longitude, altitude);
+            this.create(exif);
+            photo.setExif(exif);
+            return exif;
         } catch (IOException | ImageReadException e) {
             e.printStackTrace();
             throw new DAOException(e.getMessage(), e);
         }
     }
+
+
 
     public void setExifTags(final File jpegImageFile, Exif exif) throws DAOException {
 
