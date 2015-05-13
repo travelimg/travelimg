@@ -13,9 +13,6 @@ public class PhotoValidator {
         if (entity.getPhotographer() == null)
             throw new ValidationException("Photographer can not be null");
 
-        if (entity.getRating() < 0 || entity.getRating() > 4)
-            throw new ValidationException("Rating must be between 0 and 4");
-
         if (entity.getPath() == null)
             throw new ValidationException("Photo path can not be null");
 

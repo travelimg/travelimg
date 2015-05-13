@@ -1,19 +1,17 @@
 package at.ac.tuwien.qse.sepm.entities;
 
-import java.util.Date;
-
 public class Photo {
 
     private Integer id;
     private Photographer photographer;
     private String path;
-    private Integer rating;
+    private Rating rating;
     private Exif exif;
 
     public Photo() {
     }
 
-    public Photo(Integer id, Photographer photographer, String path, Integer rating) {
+    public Photo(Integer id, Photographer photographer, String path, Rating rating) {
             this.id = id;
             this.photographer = photographer;
             this.path = path;
@@ -44,11 +42,11 @@ public class Photo {
         this.path = path;
     }
 
-    public Integer getRating() {
+    public Rating getRating() {
         return rating;
     }
 
-    public void setRating(Integer rating) {
+    public void setRating(Rating rating) {
         this.rating = rating;
     }
 

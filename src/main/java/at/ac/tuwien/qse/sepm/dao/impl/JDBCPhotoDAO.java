@@ -6,16 +6,15 @@ import at.ac.tuwien.qse.sepm.dao.*;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.ExifDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
-import at.ac.tuwien.qse.sepm.entities.Exif;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.jdbc.core.RowMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,10 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -77,7 +73,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         }
 
         try {
-            jdbcTemplate.update(insertStatement, photo.getId(), photo.getPhotographer().getId(), photo.getPath(), photo.getRating());
+            jdbcTemplate.update(insertStatement, photo.getId(), photo.getPhotographer().getId(), photo.getPath(), photo.getRating().ordinal());
 
             logger.debug("Created photo {}", photo);
             return photo;
@@ -122,19 +118,13 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     }
 
-
-
-
-
     public List<Photo> readAll() throws DAOException, ValidationException {
         logger.debug("retrieving all photos");
 
         try {
-            List<Photo> photos = jdbcTemplate.query(readAllStatement, new RowMapper<Photo>() {
-                @Override
-                public Photo mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
-                }
+            List<Photo> photos = jdbcTemplate.query(readAllStatement, (rs, rowNum) -> {
+                Rating rating = Rating.from(rs.getInt(4));
+                return new Photo(rs.getInt(1), null, rs.getString(3), rating);
             });
 
             attachExif(photos);
@@ -158,7 +148,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
         try {
             List<Photo> photos = jdbcTemplate.query(readByYearAndMonthStatement, (ResultSet rs, int rowNum) -> {
-                return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
+                Rating rating = Rating.from(rs.getInt(4));
+                return new Photo(rs.getInt(1), null, rs.getString(3), rating);
             }, year, month);
 
             attachExif(photos);

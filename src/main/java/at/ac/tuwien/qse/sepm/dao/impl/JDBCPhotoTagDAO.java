@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.TagValidator;
@@ -114,9 +115,10 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
         List<Photo> photoList;
         try {
             photoList = jdbcTemplate.query(READ_PHOTOS_BY_TAG_STRING, (rs, rowNum) -> {
+                    Rating rating = Rating.from(rs.getInt("rating"));
                     return new Photo(rs.getInt("id"), null,
                     //TODO: get Photographer by photographerID
-                        rs.getString("path"), rs.getInt("rating"));
+                        rs.getString("path"), rating);
                     //TODO: get Exif data for photo
                 });
             LOGGER.info("Successfully read photos for {}", tag);
