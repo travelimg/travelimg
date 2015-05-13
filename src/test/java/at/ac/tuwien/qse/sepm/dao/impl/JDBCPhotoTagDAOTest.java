@@ -1,29 +1,28 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
-import at.ac.tuwien.qse.sepm.dao.AbstractJDBCPhotoTagDAOTest;
-import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
-import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
-import at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoTagDAO;
-import junit.framework.TestCase;
-import org.junit.After;
-import org.junit.Before;
+import at.ac.tuwien.qse.sepm.dao.*;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * Created by christoph on 08.05.15.
- */
-public class JDBCPhotoTagDAOTest extends AbstractJDBCPhotoTagDAOTest {
+import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-    @Before
-    public void setUp() throws Exception {
+@UsingTable("PhotoTag")
+public class JDBCPhotoTagDAOTest extends AbstractJDBCDAOTest {
 
-        PhotoTagDAO pt = new JDBCPhotoTagDAO();
+    @Autowired
+    PhotoTagDAO photoTagDAO;
 
-        setPhotoTagDAO(pt);
-        DBConnection.getConnection().setAutoCommit(false);
+    @Test
+    public void testWithEmptyDB() throws DAOException {
+        assertEquals(0, countRows());
+        assertTrue(false);
     }
 
-    @After
-    public void tearDown() throws Exception {
-        DBConnection.getConnection().rollback();
+    @Test
+    @WithData
+    public void testWithData() throws DAOException {
+        // fails because test_data_insert.sql is incomplete
+        assertEquals(1, countRows());
     }
 }
