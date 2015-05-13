@@ -152,7 +152,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
                     return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
             }, month.getYear(), month.getMonth().getValue());
 
-            attachExif(photos);
+            //attachExif(photos);
 
             logger.debug("Successfully retrieved photos");
             return photos;
