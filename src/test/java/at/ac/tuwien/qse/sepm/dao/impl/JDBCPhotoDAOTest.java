@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.nio.file.Paths;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 @UsingTable("Photo")
 public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
