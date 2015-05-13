@@ -1,20 +1,32 @@
-package at.ac.tuwien.qse.sepm.dao;
+package at.ac.tuwien.qse.sepm.dao.impl;
 
+import at.ac.tuwien.qse.sepm.dao.*;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public abstract class AbstractPhotographerDAOTests {
+@UsingTable("Photographer")
+public class JDBCPhotographerDAOTest extends AbstractJDBCDAOTest {
 
-    private PhotographerDAO photographerDAO;
+    @Autowired PhotographerDAO photographerDAO;
 
-    public void setPhotographerDAO(PhotographerDAO photographerDAO ) {
-        this.photographerDAO = photographerDAO;
+    @Test
+    public void testWithEmptyDB() throws DAOException {
+        assertEquals(0, countRows());
+    }
+
+    @Test
+    @WithData
+    public void testWithData() throws DAOException {
+        // fails because test_data_insert.sql is incomplete
+        assertEquals(1, countRows());
     }
 
     @Test(expected = ValidationException.class)
@@ -26,6 +38,7 @@ public abstract class AbstractPhotographerDAOTests {
     public void createWithValidParameterShouldPersist() throws ValidationException, DAOException {
         Photographer p = photographerDAO.create(new Photographer(null, "Enri"));
         assertFalse(p.getId() == null);
+        assertEquals(1, countRows());
     }
 
     @Test(expected = DAOException.class)
@@ -34,15 +47,17 @@ public abstract class AbstractPhotographerDAOTests {
     }
 
     @Test
+    @WithData
     public void readWithValidIdShouldReturnPhotographer() throws DAOException {
         Photographer p = photographerDAO.read(new Photographer(1,null));
         assertTrue(p.getName().equals("Alex Kinara"));
+        assertEquals(1, countRowsWhere("name = 'Alex Kinara'"));
     }
 
     @Test
+    @WithData
     public void readAllShouldReturnPhotographers() throws DAOException {
         List<Photographer> photographers = photographerDAO.readAll();
-        assertTrue(photographers.size()>0);
+        assertEquals(countRows(), photographers.size());
     }
-
 }
