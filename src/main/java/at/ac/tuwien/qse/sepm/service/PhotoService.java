@@ -67,4 +67,12 @@ public interface PhotoService {
      * @throws IllegalArgumentException if any precondition is violated
      */
     List<Tag> getTagsForPhoto(Photo photo) throws ServiceException;
+
+    /**
+     * Persists the rating of the specified photo.
+     *
+     * @param photo photo for which the rating should be stored
+     * @throws ServiceException failed to perform operation
+     */
+    void savePhotoRating(Photo photo) throws ServiceException;
 }

@@ -8,6 +8,7 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
+import at.ac.tuwien.qse.sepm.service.Service;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.CancelableTask;
@@ -151,6 +152,21 @@ public class PhotoServiceImpl implements PhotoService {
 
     public void editPhotos(List<Photo> photos, Photo photo) throws ServiceException {
 
+    }
+
+    @Override public void savePhotoRating(Photo photo) throws ServiceException {
+        LOGGER.debug("Entering savePhotoRating with {}", photo);
+        try {
+            photoDAO.update(photo);
+            LOGGER.info("Successfully saved rating for {}", photo);
+        } catch (DAOException ex) {
+            LOGGER.error("Saving rating for {} failed to to DAOException", photo);
+            throw new ServiceException("Could not store rating of photo.", ex);
+        } catch (ValidationException ex) {
+            LOGGER.error("Saving rating for {} failed to to ValidationException", photo);
+            throw new ServiceException("Could not store rating of photo.", ex);
+        }
+        LOGGER.debug("Leaving savePhotoRating with {}", photo);
     }
 
     @Override
