@@ -66,7 +66,7 @@ public class Inspector {
 
         Exif exif = photo.getExif();
         ObservableList<Pair<String, String>> exifData = FXCollections.observableArrayList(
-                new Pair<String, String>("Aufnahmedatum", exif.getDate().toString()),
+                new Pair<String, String>("Aufnahmedatum", photo.getDate().toString()),
                 new Pair<String, String>("Kamerahersteller", exif.getMake()),
                 new Pair<String, String>("Kameramodell", exif.getModel()),
                 new Pair<String, String>("Belichtungszeit", exif.getExposure() + " Sek."),

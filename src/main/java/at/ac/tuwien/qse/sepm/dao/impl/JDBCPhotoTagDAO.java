@@ -7,6 +7,7 @@ import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.TagValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+import at.ac.tuwien.qse.sepm.util.ExifTool;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.dao.DataAccessException;
@@ -114,10 +115,13 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
         List<Photo> photoList;
         try {
             photoList = jdbcTemplate.query(READ_PHOTOS_BY_TAG_STRING, (rs, rowNum) -> {
-                    return new Photo(rs.getInt("id"), null,
-                    //TODO: get Photographer by photographerID
-                        rs.getString("path"), rs.getInt("rating"));
-                    //TODO: get Exif data for photo
+                Photo photo = new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4),rs.getTimestamp(5).toLocalDateTime().toLocalDate(),rs.getDouble(6),rs.getDouble(7));
+                try {
+                    ExifTool.attachExif(photo);
+                } catch (DAOException e) {
+                    logger.debug(e);
+                }
+                return photo;
                 });
             LOGGER.info("Successfully read photos for {}", tag);
         } catch (DataAccessException ex) {

@@ -4,302 +4,54 @@ import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.ExifDAO;
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import org.apache.commons.imaging.ImageReadException;
-import org.apache.commons.imaging.ImageWriteException;
-import org.apache.commons.imaging.Imaging;
-import org.apache.commons.imaging.common.ImageMetadata;
-import org.apache.commons.imaging.common.RationalNumber;
-import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
-import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
-import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
-import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
-import org.apache.commons.imaging.formats.tiff.constants.GpsTagConstants;
-import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
-import org.apache.commons.imaging.formats.tiff.write.TiffOutputDirectory;
-import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
-import org.apache.commons.imaging.util.IoUtils;
-import org.springframework.dao.DataAccessException;
 
 import java.io.File;
-import java.io.IOException;
-import java.sql.Date;
-import java.time.LocalDate;
 import java.time.YearMonth;
-
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
+/**
+ * @deprecated
+ */
 public class JDBCExifDAO extends JDBCDAOBase implements ExifDAO {
 
-    private static final String insertStatement = "INSERT INTO exif(photo_id, date, exposure, aperture, focallength, iso, flash, make, model, latitude, longitude, altitude) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
-    private static final String readStatement = "SELECT photo_id, date, exposure, aperture, focallength, iso, flash, make, model, latitude, longitude, altitude FROM exif WHERE photo_id=?";
-    private static final String readAllStatement = "SELECT * FROM Exif ORDER BY DATE;";
-    private static final String readMonthStatement = "SELECT YEAR(date), MONTH(date) from exif;";
-    private static final String updateStatement = "UPDATE exif SET date=?, exposure=?, aperture=?, focallength=?, iso=?, flash=?, make=?, model=?, latitude=?, longitude=?, altitude=? WHERE photo_id=?";
-    private static final String deleteStatement = "Delete from Exif where PHOTO_ID  =?";
 
-    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
-
+    @Override
     public Exif create(Exif exif) throws DAOException {
-        logger.debug("Entering create() " + exif);
-        try {
-            Date date = Date.valueOf(exif.getDate());
-            jdbcTemplate.update(insertStatement, exif.getId(), date, exif.getExposure(),
-                    exif.getAperture(), exif.getFocalLength(), exif.getIso(), exif.isFlash(),
-                    exif.getMake(), exif.getModel(), exif.getLatitude(), exif.getLongitude(),
-                    exif.getAltitude());
-        } catch (DataAccessException e) {
-            throw new DAOException(e.getMessage(), e);
-        }
-
-        return exif;
+        return null;
     }
 
-    public Exif read(Photo photo) throws DAOException {
-        logger.debug("Reading exif data for photo {}", photo);
-
-        try {
-            return jdbcTemplate.queryForObject(readStatement, (rs, rowNum) -> {
-                return new Exif(rs.getInt(1), rs.getTimestamp(2).toLocalDateTime().toLocalDate(), rs.getString(3),
-                        rs.getDouble(4), rs.getDouble(5), rs.getInt(6), rs.getBoolean(7), rs.getString(8),
-                        rs.getString(9), rs.getDouble(10), rs.getDouble(11), rs.getDouble(12));
-            }, photo.getId());
-        } catch (DataAccessException ex) {
-            throw new DAOException("Failed to retrieve exif data for given photo", ex);
-        }
-    }
-
+    @Override
     public void update(Exif exif) throws DAOException {
-        logger.debug("Entering update() " + exif);
-        try {
-            Date date = Date.valueOf(exif.getDate());
-            jdbcTemplate.update(updateStatement, exif.getId(), date, exif.getExposure(),
-                    exif.getAperture(), exif.getFocalLength(), exif.getIso(), exif.isFlash(),
-                    exif.getMake(), exif.getModel(), exif.getLatitude(), exif.getLongitude(),
-                    exif.getAltitude());
-        } catch (DataAccessException e) {
-            throw new DAOException(e.getMessage(), e);
-        }
+
     }
 
-    /**
-     * delete an Exif Objekt
-     *
-     * @param e the Exif Objekt
-     * @throws DAOException
-     */
-    public void delete(Exif e) throws DAOException {
-        try {
-            jdbcTemplate.update(deleteStatement, e.getId());
-        } catch (DataAccessException ex) {
-            throw new DAOException("Failed to delete exif", ex);
-        }
+    @Override
+    public void delete(Exif exif) throws DAOException {
+
     }
 
+    @Override
+    public Exif read(Photo photo) throws DAOException {
+        return null;
+    }
+
+    @Override
     public List<Exif> readAll() throws DAOException {
-        try {
-            return jdbcTemplate.query(readAllStatement, (rs, rowNum) -> {
-                return new Exif(rs.getInt(1), rs.getTimestamp(2).toLocalDateTime().toLocalDate(), rs.getString(3),
-                        rs.getDouble(4), rs.getDouble(5), rs.getInt(6), rs.getBoolean(7), rs.getString(8),
-                        rs.getString(9), rs.getDouble(10), rs.getDouble(11), rs.getDouble(12));
-            });
-        } catch (DataAccessException e) {
-            throw new DAOException(e.getMessage(), e);
-        }
+        return null;
     }
 
     @Override
     public Exif importExif(Photo photo) throws DAOException {
-        File file = new File(photo.getPath());
-        LocalDate date;
-        String exposure = "not available";
-        double aperture = 0.0;
-        double focalLength = 0.0;
-        int iso = 0;
-        boolean flash = false;
-        String make = "not available";
-        String model = "not available";
-        double altitude = 0.0;
-        double latitude = 0.0;
-        double longitude = 0.0;
-
-        try {
-            final ImageMetadata metadata = Imaging.getMetadata(file);
-            final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
-            final TiffImageMetadata exifMetadata = jpegMetadata.getExif();
-
-            String tempDate = jpegMetadata
-                    .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL)
-                    .getValueDescription();
-            tempDate = tempDate.substring(1, tempDate.length() - 1); // remove enclosing single quotes
-            date = dateFormatter.parse(tempDate, LocalDate::from);
-            if (jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_EXPOSURE_TIME) != null) {
-                exposure = jpegMetadata
-                        .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_EXPOSURE_TIME)
-                        .getValueDescription().split(" ")[0];
-            }
-
-            if (jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_APERTURE_VALUE) != null) {
-                aperture = jpegMetadata
-                        .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_APERTURE_VALUE)
-                        .getDoubleValue();
-            }
-            if (jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_FOCAL_LENGTH) != null) {
-                focalLength = jpegMetadata
-                        .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_FOCAL_LENGTH)
-                        .getDoubleValue();
-            }
-            if (jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_ISO) != null) {
-                iso = jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_ISO)
-                        .getIntValue();
-            }
-            if (jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_FLASH) != null) {
-                flash = jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_FLASH)
-                        .getIntValue() != 0;
-            }
-
-            if (jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_MAKE) != null) {
-                make = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_MAKE)
-                        .getValueDescription();
-            }
-            if (jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_MODEL) != null) {
-                model = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_MODEL)
-                        .getValueDescription();
-            }
-
-            if (jpegMetadata.findEXIFValueWithExactMatch(GpsTagConstants.GPS_TAG_GPS_ALTITUDE) != null) {
-                altitude = jpegMetadata
-                        .findEXIFValueWithExactMatch(GpsTagConstants.GPS_TAG_GPS_ALTITUDE)
-                        .getDoubleValue();
-            }
-
-
-            if (null != exifMetadata) {
-                final TiffImageMetadata.GPSInfo gpsInfo = exifMetadata.getGPS();
-                if (null != gpsInfo) {
-                     longitude = gpsInfo.getLongitudeAsDegreesEast();
-                     latitude = gpsInfo.getLatitudeAsDegreesNorth();
-
-                }
-            }//throw new DAOException("Error while retrieving the GPS data");
-            Exif exif = new Exif(photo.getId(), date, exposure, aperture, focalLength, iso,
-                    flash, make, model, latitude, longitude, altitude);
-            this.create(exif);
-            photo.setExif(exif);
-            return exif;
-        } catch (IOException | ImageReadException e) {
-            e.printStackTrace();
-            throw new DAOException(e.getMessage(), e);
-        }
-    }
-
-
-
-    public void setExifTags(final File jpegImageFile, Exif exif) throws DAOException {
-
-        File tempFile = new File(jpegImageFile.getPath() + "d");
-        OutputStream os = null;
-        boolean canThrow = false;
-        try {
-            TiffOutputSet outputSet = null;
-
-            // note that metadata might be null if no metadata is found.
-            final ImageMetadata metadata = Imaging.getMetadata(jpegImageFile);
-            final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
-            if (null != jpegMetadata) {
-                // note that exif might be null if no Exif metadata is found.
-                final TiffImageMetadata exifMeta = jpegMetadata.getExif();
-
-                if (exifMeta != null) {
-                    // TiffImageMetadata class is immutable (read-only).
-                    // TiffOutputSet class represents the Exif data to write.
-                    //
-                    // Usually, we want to update existing Exif metadata by
-                    // changing
-                    // the values of a few fields, or adding a field.
-                    // In these cases, it is easiest to use getOutputSet() to
-                    // start with a "copy" of the fields read from the image.
-                    outputSet = exifMeta.getOutputSet();
-
-                }
-            }
-
-            // if file does not contain any exif metadata, we create an empty
-            // set of exif metadata. Otherwise, we keep all of the other
-            // existing tags.
-            if (outputSet == null) {
-                outputSet = new TiffOutputSet();
-            }
-
-            TiffOutputDirectory rootDirectory = outputSet.getOrCreateRootDirectory();
-            TiffOutputDirectory exifDirectory = outputSet.getOrCreateExifDirectory();
-            TiffOutputDirectory gpsDirectory = outputSet.getOrCreateGPSDirectory();
-
-            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_EXPOSURE_TIME);
-            exifDirectory.add(ExifTagConstants.EXIF_TAG_EXPOSURE_TIME, RationalNumber
-                    .valueOf(1 / Double.parseDouble(exif.getExposure().substring(2))));
-
-            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_APERTURE_VALUE);
-            exifDirectory.add(ExifTagConstants.EXIF_TAG_APERTURE_VALUE,
-                    RationalNumber.valueOf(exif.getAperture()));
-
-            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_FOCAL_LENGTH);
-            exifDirectory.add(ExifTagConstants.EXIF_TAG_FOCAL_LENGTH,
-                    RationalNumber.valueOf(exif.getFocalLength()));
-
-            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_ISO);
-            exifDirectory.add(ExifTagConstants.EXIF_TAG_ISO, (short) exif.getIso());
-
-            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_FLASH);
-            exifDirectory.add(ExifTagConstants.EXIF_TAG_FLASH, (short) (exif.isFlash() ? 1 : 0));
-
-            rootDirectory.removeField(TiffTagConstants.TIFF_TAG_MAKE);
-            rootDirectory.add(TiffTagConstants.TIFF_TAG_MAKE, exif.getMake());
-
-            rootDirectory.removeField(TiffTagConstants.TIFF_TAG_MODEL);
-            rootDirectory.add(TiffTagConstants.TIFF_TAG_MODEL, exif.getModel());
-
-            gpsDirectory.removeField(GpsTagConstants.GPS_TAG_GPS_ALTITUDE);
-            gpsDirectory.add(GpsTagConstants.GPS_TAG_GPS_ALTITUDE,
-                    RationalNumber.valueOf(exif.getAltitude()));
-
-            outputSet.setGPSInDegrees(exif.getLongitude(), exif.getLatitude());
-
-            os = new FileOutputStream(tempFile);
-            os = new BufferedOutputStream(os);
-
-            new ExifRewriter().updateExifMetadataLossless(jpegImageFile, os, outputSet);
-            canThrow = true;
-            Files.copy(tempFile.toPath(), jpegImageFile.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
-            Files.delete(tempFile.toPath());
-        } catch (ImageReadException | ImageWriteException | IOException e) {
-            e.printStackTrace();
-            throw new DAOException(e.getMessage(), e);
-        } finally {
-            try {
-                IoUtils.closeQuietly(canThrow, os);
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new DAOException(e.getMessage(), e);
-            }
-        }
+        return null;
     }
 
     @Override
     public List<YearMonth> getMonthsWithPhotos() throws DAOException {
-        try {
-            return jdbcTemplate.query(readMonthStatement, (rs, rowNum) -> {
-                return YearMonth.of(rs.getInt(1), rs.getInt(2));
-            }).stream()
-                    .distinct()
-                    .collect(Collectors.toList());
-        } catch (DataAccessException ex) {
-            throw new DAOException("Failed to retrieve all months", ex);
-        }
+        return null;
+    }
+
+    @Override
+    public void setExifTags(File jpegImageFile, Exif exif) throws DAOException {
+
     }
 }

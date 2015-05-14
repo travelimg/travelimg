@@ -7,6 +7,9 @@ import java.time.YearMonth;
 import java.io.File;
 import java.util.List;
 
+/**
+ * @deprecated
+ */
 public interface ExifDAO {
 
     /**

@@ -2,83 +2,84 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
-import at.ac.tuwien.qse.sepm.dao.ExifDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+import at.ac.tuwien.qse.sepm.util.ExifTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
-    private static final String insertStatement = "INSERT INTO Photo(id, photographer_id, path, rating) VALUES (?, ?, ?, ?);";
-    private static final String readAllStatement = "SELECT id, photographer_id, path, rating FROM PHOTO;";
-   // private static final String readByYearAndMonthStatement = "SELECT PHOTO_ID,PHOTOGRAPHER_ID,PATH,RATING FROM PHOTO JOIN EXIF WHERE ID=PHOTO_ID AND YEAR(DATE)=? AND MONTH(DATE)=?;";
-
+    private static final String readAllStatement = "SELECT id, photographer_id, path, rating, date, latitude, longitude FROM PHOTO;";
     private static final String deleteStatement = "Delete from Photo where id =?";
-
-    private static final String readByYearAndMonthStatement = "SELECT PHOTO_ID,PHOTOGRAPHER_ID,PATH,RATING FROM PHOTO JOIN EXIF WHERE ID=PHOTO_ID AND YEAR(DATE)=? AND MONTH(DATE)=?;";
-
-
+    private static final String readByYearAndMonthStatement = "SELECT id, photographer_id, path, rating, date, latitude, longitude FROM PHOTO WHERE YEAR(DATE)=? AND MONTH(DATE)=?;";
+    private static final String readMonthStatement = "SELECT YEAR(date), MONTH(date) from Photo;";
     private final String photoDirectory;
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MMM/dd", Locale.ENGLISH);
-
-    @Autowired private ExifDAO exifDAO;
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.ENGLISH);
+    private SimpleJdbcInsert insertPhoto;
     @Autowired private PhotoTagDAO photoTagDAO;
 
     public JDBCPhotoDAO(String photoDirectory) {
         this.photoDirectory = photoDirectory;
     }
 
+    @Override
     @Autowired
-    public void setExifDAO(ExifDAO exifDAO) {
-        this.exifDAO = exifDAO;
+    public void setDataSource(DataSource dataSource) {
+        super.setDataSource(dataSource);
+        this.insertPhoto = new SimpleJdbcInsert(dataSource)
+                .withTableName("Photo")
+                .usingGeneratedKeyColumns("id");
     }
+
     @Autowired
     public void setPhotoTagDAO(PhotoTagDAO photoTagDAO) { this.photoTagDAO =photoTagDAO;}
 
     public Photo create(Photo photo) throws DAOException, ValidationException {
         logger.debug("Creating photo {}", photo);
 
-        PhotoValidator.validate(photo);
-
-        photo.setId(getNextId());
-
-        // store exif data
-        exifDAO.importExif(photo);
-
         try {
+            ExifTool.attachDateAndGeoData(photo);
             String dest = copyToPhotoDirectory(photo);
             photo.setPath(dest);
+            PhotoValidator.validate(photo);
+
+            Map<String, Object> parameters = new HashMap<String, Object>(1);
+            parameters.put("photographer_id", photo.getPhotographer().getId());
+            parameters.put("path",photo.getPath());
+            parameters.put("rating",photo.getRating());
+            parameters.put("date", Date.valueOf(photo.getDate()));
+            parameters.put("latitude", photo.getLatitude());
+            parameters.put("longitude", photo.getLongitude());
+            Number newId = insertPhoto.executeAndReturnKey(parameters);
+            photo.setId((int) newId.longValue());
+            return photo;
         } catch(IOException e) {
             logger.error("Failed to copy photo to destination directory", e);
             throw new DAOException("Failed to copy photo to destination directory", e);
-        }
-
-        try {
-            jdbcTemplate.update(insertStatement, photo.getId(), photo.getPhotographer().getId(), photo.getPath(), photo.getRating());
-
-            logger.debug("Created photo {}", photo);
-            return photo;
-        } catch (DataAccessException e) {
-            throw new DAOException("Failed to create photo", e);
         }
     }
 
@@ -98,8 +99,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         //PhotoValidator.validate(photo); // disabled for IR1
 
         int id = photo.getId();
-        // delete from Table exif
-        exifDAO.delete(photo.getExif());
 
         // delete from Table photoTag
 
@@ -119,10 +118,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     }
 
-
-
-
-
     public List<Photo> readAll() throws DAOException, ValidationException {
         logger.debug("retrieving all photos");
 
@@ -130,11 +125,15 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             List<Photo> photos = jdbcTemplate.query(readAllStatement, new RowMapper<Photo>() {
                 @Override
                 public Photo mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
+                    Photo photo = new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4),rs.getTimestamp(5).toLocalDateTime().toLocalDate(),rs.getDouble(6),rs.getDouble(7));
+                    try {
+                        ExifTool.attachExif(photo);
+                    } catch (DAOException e) {
+                        logger.debug(e);
+                    }
+                    return photo;
                 }
             });
-
-            attachExif(photos);
 
             logger.debug("Successfully read all photos");
             return photos;
@@ -149,10 +148,14 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
         try {
             List<Photo> photos = jdbcTemplate.query(readByYearAndMonthStatement, (ResultSet rs, int rowNum) -> {
-                    return new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4));
+                Photo photo = new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4),rs.getTimestamp(5).toLocalDateTime().toLocalDate(),rs.getDouble(6),rs.getDouble(7));
+                try {
+                    ExifTool.attachExif(photo);
+                } catch (DAOException e) {
+                    logger.debug(e);
+                }
+                return photo;
             }, month.getYear(), month.getMonth().getValue());
-
-            //attachExif(photos);
 
             logger.debug("Successfully retrieved photos");
             return photos;
@@ -161,15 +164,16 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         }
     }
 
-    /**
-     * Load the exif data for each photo in the given list.
-     *
-     * @param photos The list of photos which will be annotated with the exif data.
-     * @throws DAOException if an error occurs during reading the exif data.
-     */
-    private void attachExif(List<Photo> photos) throws DAOException {
-        for(Photo photo : photos) {
-            photo.setExif(exifDAO.read(photo));
+    @Override
+    public List<YearMonth> getMonthsWithPhotos() throws DAOException {
+        try {
+            return jdbcTemplate.query(readMonthStatement, (rs, rowNum) -> {
+                return YearMonth.of(rs.getInt(1), rs.getInt(2));
+            }).stream()
+                    .distinct()
+                    .collect(Collectors.toList());
+        } catch (DataAccessException ex) {
+            throw new DAOException("Failed to retrieve all months", ex);
         }
     }
 
@@ -183,7 +187,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private String copyToPhotoDirectory(Photo photo) throws IOException {
         File source = new File(photo.getPath());
         String filename = source.getName();
-        String date = dateFormatter.format(photo.getExif().getDate());
+        String date = dateFormatter.format(photo.getDate());
 
         Path path = Paths.get(photoDirectory, date, filename);
         File dest = path.toFile();
@@ -201,23 +205,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         return dest.getPath();
     }
 
-    /**
-     * Return the next unused id.
-     *
-     * @return An integer that can be used to identify a new photo.
-     * @throws DAOException if an error occurs executing the query.
-     */
-    private int getNextId() throws DAOException {
-        try {
-            return jdbcTemplate.queryForObject("select id from Photo order by id desc limit 1",
-                    Integer.class) + 1;
-        }  catch(IncorrectResultSizeDataAccessException e) {
-            // no data in table yet
-            return 0;
-        } catch(DataAccessException e) {
-            throw new DAOException("Failed to retrieve next id", e);
-        }
-    }
 
 
 }
