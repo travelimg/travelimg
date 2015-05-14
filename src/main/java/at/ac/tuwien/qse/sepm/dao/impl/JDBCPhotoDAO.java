@@ -86,7 +86,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     public void update(Photo photo) throws DAOException, ValidationException {
-
+        throw new DAOException("Not implemented.");
     }
 
     /**
