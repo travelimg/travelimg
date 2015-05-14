@@ -3,8 +3,8 @@ package at.ac.tuwien.qse.sepm.dao;
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 
+import java.time.YearMonth;
 import java.io.File;
-import java.util.Date;
 import java.util.List;
 
 public interface ExifDAO {
@@ -70,9 +70,10 @@ public interface ExifDAO {
     /**
      * Retrieve a list of those months for which there are photos.
      *
-     * @return a list of dates representing months with available photos
+     * @return a list of months with available photos
      */
-    List<Date> getMonthsWithPhotos() throws DAOException;
+    List<YearMonth> getMonthsWithPhotos() throws DAOException;
+
 
     /**
      * Changes the Exif-data in the file.
