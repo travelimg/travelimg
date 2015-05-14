@@ -17,6 +17,9 @@
                     </children>
 
                 </VBox>
+
+                <Pane fx:id="ratingPickerContainer"/>
+
                 <TableView fx:id="exifTable" prefHeight="200.0" prefWidth="200.0">
                     <columns>
                         <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>

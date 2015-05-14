@@ -2,17 +2,18 @@ package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import com.lynden.gmapsfx.GoogleMapView;
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Rating;
+import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -23,11 +24,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
-import org.controlsfx.tools.Platform;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +48,10 @@ public class Inspector {
 
     @FXML private VBox contentBox2;
 
+    @FXML private Pane ratingPickerContainer;
+
+    private final RatingPicker ratingPicker = new RatingPicker();
+
     private GoogleMapsScene mapsScene;
 
     @FXML private Label proofOfConceptLabel;
@@ -57,6 +60,7 @@ public class Inspector {
 
     private Photo photo = null;
     @Autowired private PhotoService photoservice;
+
 
     public Inspector() {
 
@@ -94,9 +98,10 @@ public class Inspector {
         //contentBox2.getChildren().clear();
 
         //contentBox2.getChildren().add(mapsScene.getMapView());
-        mapsScene.setMaxSize(200,200);
+        mapsScene.setMaxSize(200, 200);
         mapsScene.addMarker(photo);
 
+        ratingPicker.setRating(photo.getRating());
     }
 
     @FXML private void initialize() {
@@ -106,6 +111,8 @@ public class Inspector {
         this.mapsScene = new GoogleMapsScene();
         contentBox2.getChildren().add(mapsScene.getMapView());
 
+        ratingPickerContainer.getChildren().add(ratingPicker);
+        ratingPicker.ratingProperty().addListener(this::handleRatingChanged);
     }
 
     private void handleDelete(Event event) {
@@ -128,5 +135,26 @@ public class Inspector {
 
     private void handleConfirm(Event event) {
         // TODO
+    }
+
+    private void handleRatingChanged(ObservableValue<? extends Rating> observable, Rating oldValue, Rating newValue) {
+        if (photo == null) return;
+        if (photo.getRating() == newValue) return;
+        photo.setRating(newValue);
+        try {
+            photoservice.savePhotoRating(photo);
+            throw new ServiceException();
+        } catch (ServiceException ex) {
+
+            InfoDialog dialog = new InfoDialog(root, "Fehler");
+            dialog.setError(true);
+            dialog.setHeaderText("Bewertung fehlgeschlagen");
+            dialog.setContentText("Die Bewertung für das Foto konnte nicht gespeichert werden.");
+            dialog.showAndWait();
+
+            // Undo changes.
+            photo.setRating(oldValue);
+            ratingPicker.setRating(oldValue);
+        }
     }
 }
