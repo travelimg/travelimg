@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+
+<fx:root fx:id="root" styleClass="dialog" stylesheets="@style.css" type="javafx.scene.layout.HBox"
+         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <fx:define>
+        <ToggleGroup fx:id="toggleGroup"></ToggleGroup>
+    </fx:define>
+    <ToggleButton fx:id="dislikeButton" styleClass="dislike" toggleGroup="$toggleGroup">
+        <graphic>
+            <Label maxHeight="Infinity" maxWidth="Infinity"/>
+        </graphic>
+    </ToggleButton>
+    <ToggleButton fx:id="rateButton" styleClass="rate" toggleGroup="$toggleGroup">
+        <graphic>
+            <Label maxHeight="Infinity" maxWidth="Infinity"/>
+        </graphic>
+    </ToggleButton>
+    <ToggleButton fx:id="likeButton" styleClass="like" toggleGroup="$toggleGroup">
+        <graphic>
+            <Label maxHeight="Infinity" maxWidth="Infinity"/>
+        </graphic>
+    </ToggleButton>
+</fx:root>
