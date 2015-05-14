@@ -33,6 +33,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     private static final String insertStatement = "INSERT INTO Photo(id, photographer_id, path, rating) VALUES (?, ?, ?, ?);";
     private static final String readAllStatement = "SELECT id, photographer_id, path, rating FROM PHOTO;";
+    private static final String updateStatement = "UPDATE Photo SET path = ?, rating = ? WHERE id = ?";
    // private static final String readByYearAndMonthStatement = "SELECT PHOTO_ID,PHOTOGRAPHER_ID,PATH,RATING FROM PHOTO JOIN EXIF WHERE ID=PHOTO_ID AND YEAR(DATE)=? AND MONTH(DATE)=?;";
 
     private static final String deleteStatement = "Delete from Photo where id =?";
@@ -86,7 +87,21 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     public void update(Photo photo) throws DAOException, ValidationException {
-        throw new DAOException("Not implemented.");
+        if (photo == null) throw new IllegalArgumentException();
+        logger.debug("Updating photo {}", photo);
+        try {
+            jdbcTemplate.update(updateStatement,
+                    // TODO: Also update photographer ID.
+                    // This is currently not viable since all the read* methods just set the
+                    // photographer to null.
+                    photo.getPath(),
+                    photo.getRating().ordinal(),
+                    photo.getId());
+            logger.debug("Successfully update photo {}", photo);
+        } catch (DataAccessException e) {
+            logger.debug("Failed updating photo {}", photo);
+            throw new DAOException("Failed to update photo", e);
+        }
     }
 
     /**
