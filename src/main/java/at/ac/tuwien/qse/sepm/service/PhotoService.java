@@ -58,9 +58,9 @@ public interface PhotoService {
      * then it will keep it.
      *
      * @param photos must not be null; all elements must not be null; no element.id must be null
-     * @param tag must not be null; tag.id must not be null
-     * @throws ServiceException if an unhandled Exception in this or an underlying layer occurs
-     * @throws IllegalArgumentException if any precondition is violated
+     * @param tag    must not be null; tag.id must not be null
+     * @throws ServiceException         if an Exception in this or an underlying
+     *                                  layer occurs
      */
     void addTagToPhotos(List<Photo> photos, Tag tag) throws ServiceException;
 
@@ -69,9 +69,9 @@ public interface PhotoService {
      * does not have this tag, then no action will be taken for this photo.
      *
      * @param photos must not be null; all elements must not be null; no element.id must be null
-     * @param tag must not be null; tag.id must not be null
-     * @throws ServiceException if an unhandled Exception in this or an underlying layer occurs
-     * @throws IllegalArgumentException if any precondition is violated
+     * @param tag    must not be null; tag.id must not be null
+     * @throws ServiceException         if an Exception in this or an underlying
+     *                                  layer occurs
      */
     void removeTagFromPhotos(List<Photo> photos, Tag tag) throws ServiceException;
 
@@ -80,9 +80,8 @@ public interface PhotoService {
      *
      * @param photo must not be null; photo.id must not be null;
      * @return List with all tags which are linked to <tt>photo</tt> as a PhotoTag;
-     *     If no tag exists, return an empty List.
-     * @throws ServiceException if an exception occurs on this or an underlying layer
-     * @throws IllegalArgumentException if any precondition is violated
+     * If no tag exists, return an empty List.
+     * @throws ServiceException         if an exception occurs on this or an underlying layer
      */
     List<Tag> getTagsForPhoto(Photo photo) throws ServiceException;
 
