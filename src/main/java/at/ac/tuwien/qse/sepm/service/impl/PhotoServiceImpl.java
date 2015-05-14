@@ -155,6 +155,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override public void savePhotoRating(Photo photo) throws ServiceException {
+        if (photo == null) throw new IllegalArgumentException();
         LOGGER.debug("Entering savePhotoRating with {}", photo);
         try {
             photoDAO.update(photo);
