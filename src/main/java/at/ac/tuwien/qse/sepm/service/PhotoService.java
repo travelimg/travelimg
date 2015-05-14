@@ -1,6 +1,5 @@
 package at.ac.tuwien.qse.sepm.service;
 
-import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
@@ -12,11 +11,12 @@ import java.util.function.Consumer;
 
 public interface PhotoService {
 
-    public List<Photo> getAllPhotos() throws ServiceException;
-    public List<Tag> getAllTags() throws ServiceException;
-    public void requestFullscreenMode(List<Photo> photos) throws ServiceException;
-    public void deletePhotos(List<Photo> photos) throws ServiceException;
-    public void editPhotos(List<Photo> photos, Photo p) throws ServiceException;
+    /**
+     * Retrieve a list of those months for which there are photos.
+     *
+     * @return a list of months with available photos
+     */
+    List<YearMonth> getMonthsWithPhotos() throws ServiceException;
 
     /**
      * Retrieve a list of photos from a given month.
@@ -29,11 +29,29 @@ public interface PhotoService {
     Cancelable loadPhotosByMonth(YearMonth month, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler);
 
     /**
-     * Retrieve a list of those months for which there are photos.
+     * delete the delivered List of Photos
      *
-     * @return a list of months with available photos
+     * @param photos the list of photos
+     * @throws ServiceException
      */
-    List<YearMonth> getMonthsWithPhotos() throws ServiceException;
+    void deletePhotos(List<Photo> photos) throws ServiceException;
+
+    /**
+     * edit the delivered List of Photos
+     *
+     * @param photos the list of photos
+     * @throws ServiceException
+     */
+    void editPhotos(List<Photo> photos, Photo p) throws ServiceException;
+
+    /**
+     * @return the list of all available photos
+     * @throws ServiceException
+     */
+    List<Photo> getAllPhotos() throws ServiceException;
+
+    //TODO comment the method
+    void requestFullscreenMode(List<Photo> photos) throws ServiceException;
 
     /**
      * Add Tag <tt>tag</tt> to every photo in list <tt>photos</tt>. If a photo already has this tag,
@@ -67,4 +85,11 @@ public interface PhotoService {
      * @throws IllegalArgumentException if any precondition is violated
      */
     List<Tag> getTagsForPhoto(Photo photo) throws ServiceException;
+
+    /**
+     * @return the list of all available tags
+     * @throws ServiceException
+     */
+    List<Tag> getAllTags() throws ServiceException;
+
 }
