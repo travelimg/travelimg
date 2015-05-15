@@ -3,6 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <BorderPane fx:id="root" stylesheets="@style.css" prefWidth="160.0" styleClass="organizer"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.Organizer">
     <center>
@@ -14,13 +15,13 @@
                 <Button fx:id="importButton" maxHeight="Infinity" maxWidth="Infinity"
                         styleClass="import" HBox.hgrow="ALWAYS">
                     <graphic>
-                        <Label maxHeight="Infinity" maxWidth="Infinity"/>
+                        <FontAwesomeIconView/>
                     </graphic>
                 </Button>
                 <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity"
                         styleClass="present" HBox.hgrow="ALWAYS">
                     <graphic>
-                        <Label maxHeight="Infinity" maxWidth="Infinity"/>
+                        <FontAwesomeIconView/>
                     </graphic>
                 </Button>
             </children>
