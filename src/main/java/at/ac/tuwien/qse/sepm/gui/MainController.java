@@ -1,18 +1,23 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * Controller for the main view.
@@ -76,6 +82,30 @@ public class MainController {
         tilePane.getChildren().clear();
     }
 
+    public void fullsizePhotos()
+    {
+       logger.info("Info fullsize Photos");
+
+
+        FXMLLoader fxmlLoader;
+        Pane page=null;
+        try {
+            fxmlLoader = new FXMLLoader(MainController.class.getResource("view/FullScreenDialog.fxml"));
+            page = (Pane) fxmlLoader.load();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+        Scene secondScene = new Scene(page);
+        Stage secondStage = new Stage();
+        secondStage.setTitle("FullScreen");
+        //secondStage.initModality(Modality.WINDOW_MODAL);
+        secondStage.setScene(secondScene);
+        secondStage.showAndWait();
+        logger.info("fullScreen Windows closed!");
+
+
+    }
+
     /**
      * Widget for one widget in the image grid. Can either be in a selected or an unselected state.
      */
@@ -103,6 +133,7 @@ public class MainController {
             imageView.setOnMouseClicked(this::handleSelected);
 
             getStyleClass().add("image-tile-non-selected");
+
 
             this.getChildren().add(imageView);
         }

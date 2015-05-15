@@ -14,14 +14,21 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -48,10 +55,16 @@ public class Organizer {
     @FXML private Button presentButton;
     @FXML private ListView<YearMonth> monthList;
 
+
+    private static final Logger logger = LogManager.getLogger();
+
     private final ObservableList<YearMonth> months = FXCollections.observableArrayList();
     private final DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy MMM");
     private final MonthSelector monthSelector = new MonthSelector(null);
     private Cancelable loadingTask;
+
+    Stage primaryStage = new Stage();
+    Pane page=null;
 
     public Organizer() {
 
@@ -100,6 +113,7 @@ public class Organizer {
         // queue an update in the main gui
         Platform.runLater(() -> {
                 InfoDialog dialog = new InfoDialog(root, "Import Fehler");
+
                 dialog.setError(true);
                 dialog.setHeaderText("Import fehlgeschlagen");
                 dialog.setContentText("Fehlermeldung: " + error.getMessage());
@@ -159,8 +173,17 @@ public class Organizer {
      * Show the current photo selection in fullscreen.
      * @param event The event triggering the request.
      */
-    private void handlePresent(Event event) {
-        // TODO
+    private void handlePresent(Event event)
+    {
+
+
+        mainController.fullsizePhotos();
+
+
+
+
+
+
     }
 
     /**
