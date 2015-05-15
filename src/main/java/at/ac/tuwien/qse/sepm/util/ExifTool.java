@@ -12,6 +12,8 @@ import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
 import org.apache.commons.imaging.formats.tiff.constants.GpsTagConstants;
 import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 
 public class ExifTool {
 
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
 
     public static void attachExif(Photo photo) throws DAOException {
@@ -90,31 +93,39 @@ public class ExifTool {
         LocalDate date;
         double latitude = 0.0;
         double longitude = 0.0;
+        final TiffImageMetadata exifMetadata;
         try {
             final ImageMetadata metadata = Imaging.getMetadata(file);
             final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
-            final TiffImageMetadata exifMetadata = jpegMetadata.getExif();
+            exifMetadata = jpegMetadata.getExif();
 
             String tempDate = jpegMetadata
-                    .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL)
-                    .getValueDescription();
+                        .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL)
+                        .getValueDescription();
             tempDate = tempDate.substring(1, tempDate.length() - 1); // remove enclosing single quotes
             date = dateFormatter.parse(tempDate, LocalDate::from);
 
-            if (null != exifMetadata) {
+
+        } catch (IOException | ImageReadException e) {
+            //problem here, an invalid photo or one without a date is useless
+            throw new DAOException(e.getMessage(), e);
+        }
+        try {
+            if (exifMetadata != null) {
                 final TiffImageMetadata.GPSInfo gpsInfo = exifMetadata.getGPS();
                 if (null != gpsInfo) {
                     longitude = gpsInfo.getLongitudeAsDegreesEast();
                     latitude = gpsInfo.getLatitudeAsDegreesNorth();
-
                 }
-            }//throw new DAOException("Error while retrieving the GPS data");
-            photo.setDate(date);
-            photo.setLatitude(latitude);
-            photo.setLongitude(longitude);
-        } catch (IOException | ImageReadException e) {
-            throw new DAOException(e.getMessage(), e);
+            }
         }
+        catch(ImageReadException e){
+            //intentionally ignore this, at least we have successfully read the date at this point ;)
+            LOGGER.debug(e);
+        }
+        photo.setDate(date);
+        photo.setLatitude(latitude);
+        photo.setLongitude(longitude);
     }
 
     public static void modifyExifTags(final File jpegImageFile, Exif exif) throws DAOException {
