@@ -41,6 +41,8 @@ public class MainController {
 
     @FXML private TilePane tilePane;
 
+    private  Photo photo2;
+
     private ImageTile selectedTile = null;
 
     public MainController() {
@@ -83,11 +85,13 @@ public class MainController {
     }
 
     public void fullsizePhotos() {
+
+
        logger.info("Info fullsize Photos");
 
 
         FullscreenWindow fullscreen = new FullscreenWindow();
-        fullscreen.present();
+        fullscreen.present(photo2);
 
 
     }
@@ -106,6 +110,7 @@ public class MainController {
 
         public ImageTile(Photo photo) {
             this.photo = photo;
+            photo2 = this.photo;
 
             try {
                 image = new Image(new FileInputStream(new File(photo.getPath())), 150, 0, true, true);
