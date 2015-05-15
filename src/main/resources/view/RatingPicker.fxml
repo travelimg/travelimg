@@ -2,24 +2,25 @@
 
 <?import javafx.scene.control.*?>
 
-<fx:root fx:id="root" styleClass="dialog" stylesheets="@style.css" type="javafx.scene.layout.HBox"
+<fx:root fx:id="root" styleClass="rating-picker" stylesheets="@style.css" type="javafx.scene.layout.HBox"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+
     <fx:define>
-        <ToggleGroup fx:id="toggleGroup"></ToggleGroup>
+        <ToggleGroup fx:id="toggleGroup"/>
     </fx:define>
-    <ToggleButton fx:id="dislikeButton" styleClass="dislike" toggleGroup="$toggleGroup">
+    <ToggleButton fx:id="hateButton" styleClass="hate" toggleGroup="$toggleGroup">
         <graphic>
-            <Label maxHeight="Infinity" maxWidth="Infinity"/>
+            <Label maxHeight="Infinity" maxWidth="Infinity">HATE</Label>
         </graphic>
     </ToggleButton>
     <ToggleButton fx:id="rateButton" styleClass="rate" toggleGroup="$toggleGroup">
         <graphic>
-            <Label maxHeight="Infinity" maxWidth="Infinity"/>
+            <Label maxHeight="Infinity" maxWidth="Infinity">RATE</Label>
         </graphic>
     </ToggleButton>
-    <ToggleButton fx:id="likeButton" styleClass="like" toggleGroup="$toggleGroup">
+    <ToggleButton fx:id="loveButton" styleClass="love" toggleGroup="$toggleGroup">
         <graphic>
-            <Label maxHeight="Infinity" maxWidth="Infinity"/>
+            <Label maxHeight="Infinity" maxWidth="Infinity">LIKE</Label>
         </graphic>
     </ToggleButton>
 </fx:root>

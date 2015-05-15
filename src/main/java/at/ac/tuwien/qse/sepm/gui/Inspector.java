@@ -25,6 +25,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -34,6 +36,8 @@ import java.util.List;
  * Controller for the inspector view which is used for modifying meta-data of a photo.
  */
 public class Inspector {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @FXML private BorderPane root;
     @FXML private Button deleteButton;
@@ -74,6 +78,7 @@ public class Inspector {
      * @param photo The active photo for which to show further information
      */
     public void setActivePhoto(Photo photo) {
+        LOGGER.debug("setActivePhoto({})", photo);
         this.photo = photo;
 
         proofOfConceptLabel.setText("Selected photo is: " + photo.getPath());
@@ -138,23 +143,40 @@ public class Inspector {
     }
 
     private void handleRatingChanged(ObservableValue<? extends Rating> observable, Rating oldValue, Rating newValue) {
-        if (photo == null) return;
-        if (photo.getRating() == newValue) return;
+        LOGGER.debug("handleRatingChanged(~, {}, {})", oldValue, newValue);
+
+        if (photo == null) {
+            LOGGER.debug("No photo selected.");
+            return;
+        }
+
+        if (photo.getRating() == newValue) {
+            LOGGER.debug("Photo already has rating of {}.", newValue);
+            return;
+        }
+
+        LOGGER.debug("Setting photo rating from {} to {}.", photo.getRating(), newValue);
         photo.setRating(newValue);
+
         try {
             photoservice.savePhotoRating(photo);
-            throw new ServiceException();
         } catch (ServiceException ex) {
+            LOGGER.error("Failed saving photo rating.", ex);
+            LOGGER.debug("Resetting rating from {} to {}.", photo.getRating(), oldValue);
+
+            // Undo changes.
+            photo.setRating(oldValue);
+            // FIXME: Reset the RatingPicker.
+            // This is not as simple as expected. Calling ratingPicker.setRating(oldValue) here
+            // will complete and finish. But once the below dialog is closed ANOTHER selection-
+            // change will occur in RatingPicker that is the same as the once that caused the error.
+            // That causes an infinite loop of error dialogs.
 
             InfoDialog dialog = new InfoDialog(root, "Fehler");
             dialog.setError(true);
             dialog.setHeaderText("Bewertung fehlgeschlagen");
             dialog.setContentText("Die Bewertung für das Foto konnte nicht gespeichert werden.");
             dialog.showAndWait();
-
-            // Undo changes.
-            photo.setRating(oldValue);
-            ratingPicker.setRating(oldValue);
         }
     }
 }
