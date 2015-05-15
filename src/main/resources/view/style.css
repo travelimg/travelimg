@@ -97,6 +97,36 @@
     -fx-background-color: -fx-primary-press;
 }
 
+/* toggle button */
+.toggle-button {
+    -fx-padding: 11px 8px;
+    -fx-background-radius: 3px;
+    -fx-font-size: 14px;
+    -fx-background-color: -fx-default;
+    -fx-effect: -fx-dropshadow-1;
+}
+.toggle-button:focused {
+    -fx-background-color: -fx-default-focus;
+    -fx-effect: -fx-dropshadow-3;
+}
+.toggle-button:hover {
+    -fx-background-color: -fx-default-hover;
+}
+.toggle-button:pressed {
+    -fx-effect: -fx-dropshadow-3;
+    -fx-background-color: -fx-default-press;
+}
+.toggle-button:disabled {
+    -fx-effect: none;
+    -fx-background-color: -fx-default-disabled;
+}
+.toggle-button:selected {
+    -fx-background-color: -fx-primary;
+}
+.toggle-button:selected * {
+    -fx-text-fill: white;
+}
+
 /* input fields */
 .text-field {
     -fx-background-color: transparent;
@@ -268,4 +298,18 @@
 .image-tile-selected {
     -fx-padding: 5px;
     -fx-background-color: #1E88E5;
+}
+
+.rating-picker {
+    -fx-effect: -fx-dropshadow-1;
+}
+.rating-picker .toggle-button {
+    -fx-effect: none;
+    -fx-background-radius: 0;
+}
+.rating-picker .toggle-button.hate {
+    -fx-background-radius: 3 0 0 3;
+}
+.rating-picker .toggle-button.love {
+    -fx-background-radius: 0 3 3 0;
 }
