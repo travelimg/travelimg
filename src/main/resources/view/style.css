@@ -139,18 +139,13 @@
 }
 .list-cell:selected {
     -fx-background-color: -fx-primary;
+    -fx-text-fill: white;
 }
 .list-cell:selected:focused {
     -fx-background-color: -fx-primary-focus;
 }
 .list-cell:selected:hover {
     -fx-background-color: -fx-primary-hover;
-}
-.list-cell:focused .label {
-    -fx-text-fill: white;
-}
-.list-cell:selected .label {
-    -fx-text-fill: white;
 }
 
 .section {
@@ -255,7 +250,6 @@
 .inspector .confirm .glyph-icon {
     -glyph-name: "CHECK";
 }
-
 
 .image-grid {
     -fx-background-color: #e7e7e7;
