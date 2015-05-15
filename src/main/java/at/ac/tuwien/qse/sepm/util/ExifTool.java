@@ -96,16 +96,23 @@ public class ExifTool {
         final TiffImageMetadata exifMetadata;
         try {
             final ImageMetadata metadata = Imaging.getMetadata(file);
+            if(metadata==null){
+                throw new DAOException("No metadata found");
+            }
             final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
             exifMetadata = jpegMetadata.getExif();
-
-            String tempDate = jpegMetadata
+            if(jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL)!=null){
+                String tempDate = jpegMetadata
                         .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL)
                         .getValueDescription();
-            tempDate = tempDate.substring(1, tempDate.length() - 1); // remove enclosing single quotes
-            date = dateFormatter.parse(tempDate, LocalDate::from);
+                tempDate = tempDate.substring(1, tempDate.length() - 1); // remove enclosing single quotes
 
+                date = dateFormatter.parse(tempDate, LocalDate::from);
 
+            }
+            else{
+                throw new DAOException("Photo has no date");
+            }
         } catch (IOException | ImageReadException e) {
             //problem here, an invalid photo or one without a date is useless
             throw new DAOException(e.getMessage(), e);
