@@ -82,26 +82,12 @@ public class MainController {
         tilePane.getChildren().clear();
     }
 
-    public void fullsizePhotos()
-    {
+    public void fullsizePhotos() {
        logger.info("Info fullsize Photos");
 
 
-        FXMLLoader fxmlLoader;
-        Pane page=null;
-        try {
-            fxmlLoader = new FXMLLoader(MainController.class.getResource("view/FullScreenDialog.fxml"));
-            page = (Pane) fxmlLoader.load();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-        Scene secondScene = new Scene(page);
-        Stage secondStage = new Stage();
-        secondStage.setTitle("FullScreen");
-        //secondStage.initModality(Modality.WINDOW_MODAL);
-        secondStage.setScene(secondScene);
-        secondStage.showAndWait();
-        logger.info("fullScreen Windows closed!");
+        FullscreenWindow fullscreen = new FullscreenWindow();
+        fullscreen.present();
 
 
     }

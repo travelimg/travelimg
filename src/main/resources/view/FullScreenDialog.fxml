@@ -8,10 +8,12 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 
-<javafx.scene.layout.Pane prefHeight="491.0" prefWidth="691.0" styleClass="dialog" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.MainController">
+<fx:root styleClass="dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane"
+         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+        fx:id="root">
     <children>
       <ImageView fx:id="imageView" fitHeight="303.0" fitWidth="685.0" layoutX="2.0" layoutY="74.0" pickOnBounds="true" preserveRatio="true" />
       <Button layoutX="345.0" layoutY="416.0" mnemonicParsing="false" text="Next" />
       <Button layoutX="278.0" layoutY="416.0" mnemonicParsing="false" text="Previous" />
     </children>
-</javafx.scene.layout.Pane>
+</fx:root>
