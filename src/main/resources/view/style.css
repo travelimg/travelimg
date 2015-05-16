@@ -169,18 +169,13 @@
 }
 .list-cell:selected {
     -fx-background-color: -fx-primary;
+    -fx-text-fill: white;
 }
 .list-cell:selected:focused {
     -fx-background-color: -fx-primary-focus;
 }
 .list-cell:selected:hover {
     -fx-background-color: -fx-primary-hover;
-}
-.list-cell:focused .label {
-    -fx-text-fill: white;
-}
-.list-cell:selected .label {
-    -fx-text-fill: white;
 }
 
 .section {
@@ -218,14 +213,13 @@
     -fx-padding: 16px;
     -fx-background-radius: 3px;
 }
-.dialog .note .icon {
-    -fx-border-width: 0;
-    -fx-background-position: center;
-    -fx-background-repeat: no-repeat;
+.dialog .note .glyph-icon {
+    -glyph-size: 50;
+    -fx-fill: white;
     -fx-opacity: 0.5;
 }
-.dialog .note .icon.info {
-    -fx-background-image: url("../icons/info.png");
+.dialog .note.info .glyph-icon {
+    -glyph-name: "INFO_CIRCLE";
 }
 
 .navbar {
@@ -234,32 +228,29 @@
 .navbar .button {
     -fx-border-radius: 0;
     -fx-background-color: transparent;
+    -fx-text-fill: white;
 }
 .navbar .button:pressed {
     -fx-background-color: -fx-primary-press;
 }
-.navbar .button .label {
-    -fx-border-width: 0;
-    -fx-background-position: center;
-    -fx-background-repeat: no-repeat;
+.navbar .button .glyph-icon {
     -fx-opacity: 0.8;
+    -fx-fill: white;
+    -glyph-size: 20;
 }
-.navbar .button:focused .label {
+.navbar .button:focused  .glyph-icon {
     -fx-opacity: 1.0;
 }
-.navbar .button:hover .label {
+.navbar .button:hover  .glyph-icon {
     -fx-opacity: 1.0;
 }
 .navbar .button:disabled {
     -fx-background-color: #1E88E5;
 }
-.navbar .button:disabled .label {
+.navbar .button:disabled  .glyph-icon {
     -fx-opacity: 0.3;
 }
 
-.organizer {
-    -fx-effect: -fx-dropshadow-1;
-}
 .organizer .list-view {
     -fx-background-color: #FAFAFA;
 }
@@ -267,24 +258,21 @@
     -fx-background-color: white;
     -fx-effect: none;
 }
-.organizer .navbar .import .label {
-    -fx-background-image: url("../icons/add.png");
+.organizer .import .glyph-icon {
+    -glyph-name: "PLUS";
 }
-.organizer .navbar .present .label {
-    -fx-background-image: url("../icons/play.png");
+.organizer .present .glyph-icon {
+    -glyph-name: "PLAY";
 }
 
-.inspector {
-    -fx-effect: -fx-dropshadow-1;
+.inspector .delete .glyph-icon {
+    -glyph-name: "TRASH";
 }
-.inspector .navbar .delete .label {
-    -fx-background-image: url("../icons/delete.png");
+.inspector .cancel .glyph-icon {
+    -glyph-name: "TIMES";
 }
-.inspector .navbar .cancel .label {
-    -fx-background-image: url("../icons/close.png");
-}
-.inspector .navbar .confirm .label {
-    -fx-background-image: url("../icons/check.png");
+.inspector .confirm .glyph-icon {
+    -glyph-name: "CHECK";
 }
 
 .image-grid {
