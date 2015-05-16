@@ -10,7 +10,7 @@
         <ListView fx:id="monthList" maxWidth="Infinity" maxHeight="Infinity" BorderPane.alignment="CENTER"/>
     </center>
     <bottom>
-        <HBox prefHeight="56.0" styleClass="navbar">
+        <HBox prefHeight="40.0" styleClass="navbar">
             <children>
                 <Button fx:id="importButton" maxHeight="Infinity" maxWidth="Infinity"
                         styleClass="import" HBox.hgrow="ALWAYS">
