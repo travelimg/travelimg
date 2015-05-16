@@ -29,27 +29,6 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         this.mapView.addMapInializedListener(this);
     }
 
-    /**
-     * calculate a GPS-Coordinate (Grad,Minutes,Seconds) to GPS-Coordinate(Decimal)
-     * @param gps GPS-Coordinate (Grad,Minutes,Seconds)
-     * @return GPS-Coordinate (Decimal)
-     */
-    private double calculate(String gps){
-        String[] longi = gps.split(" ");
-
-        double grad = Double.parseDouble(longi[0]);
-
-        double min = Double.parseDouble(longi[1]);
-
-        double sec = Double.parseDouble(longi[2]);
-
-        double erg= (((sec/60)+min)/60)+grad;
-
-
-
-       return erg;
-    }
-
     @Override
     public void mapInitialized() {
         //Set the initial properties of the map.
