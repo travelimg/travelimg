@@ -1,7 +1,5 @@
 package at.ac.tuwien.qse.sepm.entities;
 
-import java.util.Date;
-
 public class Photo {
 
     private Integer id;

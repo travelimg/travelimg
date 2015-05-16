@@ -1,10 +1,10 @@
 package at.ac.tuwien.qse.sepm.entities;
 
-import java.sql.Timestamp;
+import java.time.LocalDate;
 
 public class Exif {
     private int id;
-    private Timestamp date;
+    private LocalDate date;
     private String exposure;
     private double aperture;
     private double focalLength;
@@ -16,7 +16,7 @@ public class Exif {
     private double longitude;
     private double altitude;
 
-    public Exif(int id, Timestamp date, String exposure, double aperture, double focalLength, int iso, boolean flash, String make, String model, double latitude, double longitude, double altitude) {
+    public Exif(int id, LocalDate date, String exposure, double aperture, double focalLength, int iso, boolean flash, String make, String model, double latitude, double longitude, double altitude) {
         this.id = id;
         this.date = date;
         this.exposure = exposure;
@@ -39,11 +39,11 @@ public class Exif {
         this.id = id;
     }
 
-    public Timestamp getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Timestamp date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
