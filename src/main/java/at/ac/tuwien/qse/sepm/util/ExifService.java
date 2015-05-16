@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class ExifTool {
+public class ExifService {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
