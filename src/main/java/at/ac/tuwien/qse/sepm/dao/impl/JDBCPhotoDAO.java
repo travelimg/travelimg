@@ -7,7 +7,6 @@ import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
-import at.ac.tuwien.qse.sepm.util.ExifTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
@@ -62,7 +61,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         logger.debug("Creating photo {}", photo);
 
         try {
-            ExifTool.attachDateAndGeoData(photo);
             String dest = copyToPhotoDirectory(photo);
             photo.setPath(dest);
             PhotoValidator.validate(photo);
@@ -126,11 +124,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
                 @Override
                 public Photo mapRow(ResultSet rs, int rowNum) throws SQLException {
                     Photo photo = new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4),rs.getTimestamp(5).toLocalDateTime().toLocalDate(),rs.getDouble(6),rs.getDouble(7));
-                    try {
-                        ExifTool.attachExif(photo);
-                    } catch (DAOException e) {
-                        logger.debug(e);
-                    }
                     return photo;
                 }
             });
@@ -149,11 +142,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         try {
             List<Photo> photos = jdbcTemplate.query(readByYearAndMonthStatement, (ResultSet rs, int rowNum) -> {
                 Photo photo = new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4),rs.getTimestamp(5).toLocalDateTime().toLocalDate(),rs.getDouble(6),rs.getDouble(7));
-                try {
-                    ExifTool.attachExif(photo);
-                } catch (DAOException e) {
-                    logger.debug(e);
-                }
                 return photo;
             }, month.getYear(), month.getMonth().getValue());
 
