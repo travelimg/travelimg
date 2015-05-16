@@ -1,7 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
@@ -13,7 +12,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class GoogleMapsScene implements MapComponentInitializedListener {
 
-    private static final Logger logger = LogManager.getLogger(ExifServiceImpl.class);
+    private static final Logger logger = LogManager.getLogger(GoogleMapsScene.class);
 
     private GoogleMapView mapView;
     private GoogleMap map;
