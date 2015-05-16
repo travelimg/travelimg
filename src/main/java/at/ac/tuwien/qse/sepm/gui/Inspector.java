@@ -9,6 +9,7 @@ import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -50,11 +51,7 @@ public class Inspector {
     @FXML private TableColumn<String, String> exifValue;
     @FXML private TableView<Pair<String, String>> exifTable;
 
-    // FIXME: Map throws NullPointerException if it is not immediately visible.
-    // If no photo is selected a placeholder is displayed in place of the Inspector content. But it
-    // seems that the map immediately tries to measure its parent. So if it is removed from the
-    // tree in the beginning it has no parent and the error occurs.
-    private final GoogleMapsScene mapsScene = new GoogleMapsScene();
+    private GoogleMapsScene mapsScene;
     private Photo photo;
 
     @Autowired private Organizer organizer;
@@ -73,6 +70,13 @@ public class Inspector {
     }
 
     @FXML private void initialize() {
+        mapsScene = new GoogleMapsScene();
+
+        // if placeholder is hidden then it should not take up any space
+        placeholder.managedProperty().bind(placeholder.visibleProperty());
+        // hide placeholder when details are visible
+        placeholder.visibleProperty().bind(Bindings.not(details.visibleProperty()));
+
         deleteButton.setOnAction(this::handleDelete);
         cancelButton.setOnAction(this::handleCancel);
         confirmButton.setOnAction(this::handleConfirm);
@@ -103,11 +107,12 @@ public class Inspector {
 
     private void showDetails(Photo photo) {
         if (photo == null) {
-            root.setCenter(placeholder);
+            details.setVisible(false);
             return;
         }
 
-        root.setCenter(details);
+        details.setVisible(true);
+
         mapsScene.addMarker(photo);
 
         Exif exif = photo.getExif();
