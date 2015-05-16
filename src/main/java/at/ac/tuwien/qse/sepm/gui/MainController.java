@@ -7,8 +7,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
@@ -41,7 +43,7 @@ public class MainController {
 
     @FXML private TilePane tilePane;
 
-    private  Photo photo2;
+    private  Photo photoForFullScreen;
 
     private ImageTile selectedTile = null;
 
@@ -84,14 +86,16 @@ public class MainController {
         tilePane.getChildren().clear();
     }
 
-    public void fullsizePhotos() {
+    public void fullsizePhotos()
+    {
+        ObservableList<Node> c = tilePane.getChildren();
 
 
        logger.info("Info fullsize Photos");
 
 
         FullscreenWindow fullscreen = new FullscreenWindow();
-        fullscreen.present(photo2);
+        fullscreen.present(photoForFullScreen,c);
 
 
     }
@@ -110,7 +114,7 @@ public class MainController {
 
         public ImageTile(Photo photo) {
             this.photo = photo;
-            photo2 = this.photo;
+            photoForFullScreen = this.photo;
 
             try {
                 image = new Image(new FileInputStream(new File(photo.getPath())), 150, 0, true, true);
