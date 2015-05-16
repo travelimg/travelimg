@@ -171,19 +171,20 @@ public class PhotoServiceImpl implements PhotoService {
             List<Photo> photos;
             try {
                 photos = photoDAO.readPhotosByMonth(month);
-                for (Photo p : photos) {
-                    if (!getIsRunning())
-                        return;
-                    try {
-                        Thread.sleep(20);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    callback.accept(p);
-                }
             } catch (DAOException e) {
                 errorHandler.propagate(new ServiceException("Failed to load photos", e));
                 return;
+            }
+
+            for (Photo p : photos) {
+                if (!getIsRunning())
+                    return;
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                callback.accept(p);
             }
         }
     }
