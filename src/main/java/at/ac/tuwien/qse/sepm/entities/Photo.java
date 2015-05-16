@@ -11,7 +11,6 @@ public class Photo {
     private LocalDate date;
     private double latitude;
     private double longitude;
-    private Exif exif;
 
     public Photo() {
     }
@@ -82,14 +81,6 @@ public class Photo {
         this.longitude = longitude;
     }
 
-    public Exif getExif() {
-        return exif;
-    }
-
-    public void setExif(Exif exif) {
-        this.exif = exif;
-    }
-
     @Override
     public String toString() {
         return "Photo{" +
@@ -100,7 +91,6 @@ public class Photo {
                 ", date=" + date +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
-                ", exif=" + exif +
                 '}';
     }
 }
