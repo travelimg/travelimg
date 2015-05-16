@@ -34,14 +34,16 @@
                             </VBox.margin>
                         </Label>
 
-                        <HBox>
+                        <HBox styleClass="photographer" maxWidth="  Infinity" prefWidth="Infinity" VBox.vgrow="ALWAYS">
                             <children>
-                                <ComboBox fx:id="photographerBox" HBox.hgrow="ALWAYS"></ComboBox>
-                                <Button fx:id="addPhotographerButton"
-                                        styleClass="add" HBox.hgrow="ALWAYS">
+                                <ComboBox fx:id="photographerBox" HBox.hgrow="ALWAYS" editable="true"/>
+                                <Button fx:id="addPhotographerButton" styleClass="add,raised" HBox.hgrow="ALWAYS">
                                     <graphic>
                                         <FontAwesomeIconView/>
                                     </graphic>
+                                    <HBox.margin>
+                                        <Insets left="16.0"/>
+                                    </HBox.margin>
                                 </Button>
                             </children>
 

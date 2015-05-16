@@ -6,9 +6,13 @@ import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.ImageFileFilter;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -17,7 +21,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import javafx.util.StringConverter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,9 +39,11 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
     @FXML private Button importButton;
     @FXML private Button cancelButton;
     @FXML private Label statusText;
+    @FXML private Button addPhotographerButton;
     @FXML private ComboBox<Photographer> photographerBox;
 
     private final List<Photo> photos = new LinkedList<>();
+    private ObservableList<Photographer> photographers = FXCollections.observableArrayList();
 
     /**
      * {@inheritDoc}
@@ -60,17 +65,21 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
         photographerBox.setConverter(new StringConverter<Photographer>() {
             @Override
             public String toString(Photographer object) {
+                if (object == null)
+                    return "";
                 return object.getName();
             }
 
             @Override
             public Photographer fromString(String string) {
-                return null;
+                int id = photographerBox.getSelectionModel().getSelectedItem().getId();
+                return new Photographer(id, string);
             }
         });
 
-        // load all photographers into the selection box
-        ObservableList<Photographer> photographers = FXCollections.observableArrayList();
+        addPhotographerButton.setOnAction(this::addPhotographer);
+        photographerBox.valueProperty().addListener(this::handlePhotographerChanged);
+
         try {
             photographers.addAll(photographerService.readAll());
         } catch (ServiceException ex) {
@@ -154,5 +163,34 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
         }
 
         statusText.setText(String.format("%d Fotos ausgewählt", count));
+    }
+
+    @FXML private void addPhotographer(Event event) {
+        try {
+            // add new photographer to application
+            Photographer photographer = photographerService.create(new Photographer(-1, "Neuer Fotograf"));
+
+            photographers.add(photographer);
+            photographerBox.getSelectionModel().select(photographer);
+        } catch (ServiceException ex) {
+            // TODO
+        }
+    }
+
+    private void handlePhotographerChanged(ObservableValue<? extends Photographer> observable, Photographer oldValue, Photographer newValue) {
+        if(oldValue == null) return;
+        if(oldValue.equals(newValue)) return;
+        if(oldValue.getId() != newValue.getId()) return;
+
+        // update name of photographer
+        try {
+            photographerService.update(newValue);
+
+            // update list with new photographer
+            int index = photographerBox.getSelectionModel().getSelectedIndex();
+            photographers.set(index, newValue);
+        } catch (ServiceException ex) {
+            // TODO
+        }
     }
 }
