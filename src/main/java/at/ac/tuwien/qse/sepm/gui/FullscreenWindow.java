@@ -164,25 +164,6 @@ public class FullscreenWindow extends Pane {
     }
 
 
-    public FileVisitResult visitFile(Path t)
-    {
-        try {
-            Image image = new Image(photo.getPath(), 0, 0, true, true);
-
-
-            if (!image.isError()) {
-                images.put(image);
-            }
-        }
-        catch(InterruptedException ex)
-        {
-            logger.error("Fehler!!!");
-            return FileVisitResult.TERMINATE;
-        }
-
-        return FileVisitResult.CONTINUE;
-
-    }
 
 
 
