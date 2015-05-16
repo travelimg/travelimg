@@ -2,36 +2,24 @@ package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import com.lynden.gmapsfx.GoogleMapView;
-
-import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
-
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
-
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
-import org.controlsfx.tools.Platform;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +44,7 @@ public class Inspector {
 
     @Autowired private Organizer organizer;
     @Autowired private PhotoService photoservice;
-
+    @Autowired private ExifService exifService;
     /**
      * Set the active photo.
      *
@@ -115,19 +103,25 @@ public class Inspector {
 
         mapsScene.addMarker(photo);
 
-        Exif exif = photo.getExif();
-        ObservableList<Pair<String, String>> exifData = FXCollections.observableArrayList(
-                new Pair<>("Aufnahmedatum", exif.getDate().toString()),
-                new Pair<>("Kamerahersteller", exif.getMake()),
-                new Pair<>("Kameramodell", exif.getModel()),
-                new Pair<>("Belichtungszeit", exif.getExposure() + " Sek."),
-                new Pair<>("Blende", "f/" + exif.getAperture()),
-                new Pair<>("Brennweite", "" + exif.getFocalLength()),
-                new Pair<>("ISO", "" + exif.getIso()),
-                new Pair<>("Blitz", exif.isFlash()? "wurde ausgelöst" : "wurde nicht ausgelöst"),
-                new Pair<>("Höhe", "" + exif.getAltitude()));
-        exifName.setCellValueFactory(new PropertyValueFactory<>("Key"));
-        exifValue.setCellValueFactory(new PropertyValueFactory<>("Value"));
-        exifTable.setItems(exifData);
+        Exif exif = null;
+        try {
+            exif = exifService.getExif(photo);
+            ObservableList<Pair<String, String>> exifData = FXCollections.observableArrayList(
+                    new Pair<>("Aufnahmedatum", photo.getDate().toString()),
+                    new Pair<>("Kamerahersteller", exif.getMake()),
+                    new Pair<>("Kameramodell", exif.getModel()),
+                    new Pair<>("Belichtungszeit", exif.getExposure() + " Sek."),
+                    new Pair<>("Blende", "f/" + exif.getAperture()),
+                    new Pair<>("Brennweite", "" + exif.getFocalLength()),
+                    new Pair<>("ISO", "" + exif.getIso()),
+                    new Pair<>("Blitz", exif.isFlash()? "wurde ausgelöst" : "wurde nicht ausgelöst"),
+                    new Pair<>("Höhe", "" + exif.getAltitude()));
+            exifName.setCellValueFactory(new PropertyValueFactory<>("Key"));
+            exifValue.setCellValueFactory(new PropertyValueFactory<>("Value"));
+            exifTable.setItems(exifData);
+        } catch (ServiceException e) {
+            //TODO Dialog
+        }
+
     }
 }
