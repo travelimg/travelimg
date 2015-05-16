@@ -42,13 +42,13 @@ public class RatingPicker extends HBox {
 
         ratingProperty().set(rating);
         switch (rating) {
-            case HIDDEN:
+            case BAD:
                 toggleGroup.selectToggle(hateButton);
                 break;
             case NEUTRAL:
                 toggleGroup.selectToggle(rateButton);
                 break;
-            case FAVORITE:
+            case GOOD:
                 toggleGroup.selectToggle(loveButton);
                 break;
         }
@@ -60,11 +60,11 @@ public class RatingPicker extends HBox {
         LOGGER.debug("handleSelect(~)", oldValue, newValue);
 
         if (newValue == hateButton) {
-            setRating(Rating.HIDDEN);
+            setRating(Rating.BAD);
         } else if (newValue == rateButton) {
             setRating(Rating.NEUTRAL);
         } else if (newValue == loveButton) {
-            setRating(Rating.FAVORITE);
+            setRating(Rating.GOOD);
         }
     }
 }

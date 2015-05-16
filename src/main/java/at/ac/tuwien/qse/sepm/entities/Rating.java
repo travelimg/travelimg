@@ -8,9 +8,9 @@ public enum Rating {
     NONE,
 
     /**
-     * Photo is not good and will be hidden from most views per default.
+     * Photo is of low quality.
      */
-    HIDDEN,
+    BAD,
 
     /**
      * Photo was rated and is acceptable.
@@ -18,9 +18,9 @@ public enum Rating {
     NEUTRAL,
 
     /**
-     * Photo is especially good and should be highlighted in most views.
+     * Photo is of high quality.
      */
-    FAVORITE;
+    GOOD;
 
     /**
      * Converts an integer to a PhotoRating, by interpreting it as the ordinal number of the enum
