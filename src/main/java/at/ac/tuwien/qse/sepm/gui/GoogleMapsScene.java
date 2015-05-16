@@ -88,6 +88,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         actualMarker = new Marker(new MarkerOptions().position(new LatLong(photo.getLatitude(),
                 photo.getLongitude())).visible(Boolean.TRUE));
         mapView.setCenter(photo.getLatitude(), photo.getLongitude());
+        mapView.setZoom(1);//workaround to remove the old marker from the view
         mapView.setZoom(12);
         //actualMarker.setTitle(photo.getPhotographer().getName());
         map.addMarker(actualMarker);
