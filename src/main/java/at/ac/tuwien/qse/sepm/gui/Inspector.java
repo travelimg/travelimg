@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import javafx.collections.FXCollections;
@@ -46,6 +47,7 @@ public class Inspector {
 
     @Autowired private Organizer organizer;
     @Autowired private PhotoService photoservice;
+    @Autowired private ExifService exifService;
 
     /**
      * Set the active photo.
@@ -97,19 +99,25 @@ public class Inspector {
         root.setCenter(details);
         mapsScene.addMarker(photo);
 
-        Exif exif = photo.getExif();
-        ObservableList<Pair<String, String>> exifData = FXCollections.observableArrayList(
-                new Pair<>("Aufnahmedatum", photo.getDate().toString()),
-                new Pair<>("Kamerahersteller", exif.getMake()),
-                new Pair<>("Kameramodell", exif.getModel()),
-                new Pair<>("Belichtungszeit", exif.getExposure() + " Sek."),
-                new Pair<>("Blende", "f/" + exif.getAperture()),
-                new Pair<>("Brennweite", "" + exif.getFocalLength()),
-                new Pair<>("ISO", "" + exif.getIso()),
-                new Pair<>("Blitz", exif.isFlash()? "wurde ausgelöst" : "wurde nicht ausgelöst"),
-                new Pair<>("Höhe", "" + exif.getAltitude()));
-        exifName.setCellValueFactory(new PropertyValueFactory<>("Key"));
-        exifValue.setCellValueFactory(new PropertyValueFactory<>("Value"));
-        exifTable.setItems(exifData);
+        Exif exif = null;
+        try {
+            exif = exifService.getExif(photo);
+            ObservableList<Pair<String, String>> exifData = FXCollections.observableArrayList(
+                    new Pair<>("Aufnahmedatum", photo.getDate().toString()),
+                    new Pair<>("Kamerahersteller", exif.getMake()),
+                    new Pair<>("Kameramodell", exif.getModel()),
+                    new Pair<>("Belichtungszeit", exif.getExposure() + " Sek."),
+                    new Pair<>("Blende", "f/" + exif.getAperture()),
+                    new Pair<>("Brennweite", "" + exif.getFocalLength()),
+                    new Pair<>("ISO", "" + exif.getIso()),
+                    new Pair<>("Blitz", exif.isFlash() ? "wurde ausgelöst" : "wurde nicht ausgelöst"),
+                    new Pair<>("Höhe", "" + exif.getAltitude()));
+            exifName.setCellValueFactory(new PropertyValueFactory<>("Key"));
+            exifValue.setCellValueFactory(new PropertyValueFactory<>("Value"));
+            exifTable.setItems(exifData);
+        } catch (ServiceException e) {
+           //TODO dialog
+        }
+
     }
 }
