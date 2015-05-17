@@ -7,10 +7,12 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import org.apache.logging.log4j.LogManager;
@@ -32,9 +34,10 @@ public class MainController {
     @Autowired private Inspector inspector;
 
     @FXML private ScrollPane scrollPane;
-
+    @FXML private BorderPane root;
+    @FXML private Insets in;
     @FXML private TilePane tilePane;
-
+    private  GoogleMapsScene googleMap;
     private ImageTile selectedTile = null;
 
     public MainController() {
@@ -43,6 +46,21 @@ public class MainController {
 
     @FXML
     private void initialize() {
+        scrollPane = new ScrollPane();
+        tilePane = new TilePane();
+        scrollPane.setPrefHeight(400);
+        scrollPane.setPrefWidth(500);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        tilePane.setHgap(15);
+        tilePane.setVgap(15);
+        in = new Insets(15,15,15,15);
+        tilePane.setPadding(in);
+        scrollPane.setContent(tilePane);
+        googleMap = new GoogleMapsScene();
+        root.setCenter(googleMap.getMapView());
 
     }
 
@@ -53,7 +71,7 @@ public class MainController {
      */
     public void addPhoto(Photo photo) {
         ImageTile imageTile = new ImageTile(photo);
-
+        root.setCenter(scrollPane);
         imageTile.getSelectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -114,7 +132,7 @@ public class MainController {
             getStyleClass().remove("image-tile-non-selected");
             getStyleClass().add("image-tile-selected");
 
-            inspector.setActivePhoto(photo);
+            inspector.setActivePhoto(photo,googleMap);
 
             this.selected.set(true);
         }

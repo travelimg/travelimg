@@ -69,9 +69,9 @@ public class Inspector {
      *
      * @param photo The active photo for which to show further information
      */
-    public void setActivePhoto(Photo photo) {
+    public void setActivePhoto(Photo photo, GoogleMapsScene mapsScene) {
         this.photo = photo;
-
+        this.mapsScene = mapsScene;
         proofOfConceptLabel.setText("Selected photo is: " + photo.getPath());
 
         Exif exif = photo.getExif();
@@ -96,6 +96,10 @@ public class Inspector {
         //contentBox2.getChildren().add(mapsScene.getMapView());
         mapsScene.setMaxSize(200,200);
         mapsScene.addMarker(photo);
+        if(contentBox2.getChildren().contains(mapsScene.getMapView())) {
+            contentBox2.getChildren().remove(mapsScene.getMapView());
+        }
+        contentBox2.getChildren().add(mapsScene.getMapView());
 
     }
 
@@ -103,8 +107,7 @@ public class Inspector {
         deleteButton.setOnAction(this::handleDelete);
         cancelButton.setOnAction(this::handleCancel);
         confirmButton.setOnAction(this::handleConfirm);
-        this.mapsScene = new GoogleMapsScene();
-        contentBox2.getChildren().add(mapsScene.getMapView());
+
 
     }
 
