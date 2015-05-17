@@ -4,7 +4,9 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
+import at.ac.tuwien.qse.sepm.dao.PhotographerDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private SimpleJdbcInsert insertPhoto;
 
     @Autowired private PhotoTagDAO photoTagDAO;
+    @Autowired private PhotographerDAO photographerDAO;
 
     public JDBCPhotoDAO(String photoDirectory) {
         this.photoDirectory = photoDirectory;
@@ -125,7 +128,22 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             List<Photo> photos = jdbcTemplate.query(readAllStatement, new RowMapper<Photo>() {
                 @Override
                 public Photo mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    Photo photo = new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4),rs.getTimestamp(5).toLocalDateTime().toLocalDate(),rs.getDouble(6),rs.getDouble(7));
+
+                    Photographer photographer = null;
+                    try {
+                        photographer = photographerDAO.getById(rs.getInt(2));
+                    } catch (DAOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    Photo photo = new Photo(
+                            rs.getInt(1),
+                            photographer,
+                            rs.getString(3),
+                            rs.getInt(4),
+                            rs.getTimestamp(5).toLocalDateTime().toLocalDate(),
+                            rs.getDouble(6),
+                            rs.getDouble(7)
+                    );
                     return photo;
                 }
             });
@@ -134,6 +152,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             return photos;
         } catch(DataAccessException e) {
             throw new DAOException("Failed to read all photos", e);
+        } catch(RuntimeException ex) {
+            throw new DAOException(ex.getCause());
         }
     }
 
@@ -194,7 +214,4 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
         return dest.getPath();
     }
-
-
-
 }
