@@ -36,9 +36,11 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private static final String deleteStatement = "Delete from Photo where id =?";
     private static final String readByYearAndMonthStatement = "SELECT id, photographer_id, path, rating, date, latitude, longitude FROM PHOTO WHERE YEAR(DATE)=? AND MONTH(DATE)=?;";
     private static final String readMonthStatement = "SELECT YEAR(date), MONTH(date) from Photo;";
+
     private final String photoDirectory;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.ENGLISH);
     private SimpleJdbcInsert insertPhoto;
+
     @Autowired private PhotoTagDAO photoTagDAO;
 
     public JDBCPhotoDAO(String photoDirectory) {
@@ -54,8 +56,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
                 .usingGeneratedKeyColumns("id");
     }
 
-    @Autowired
-    public void setPhotoTagDAO(PhotoTagDAO photoTagDAO) { this.photoTagDAO =photoTagDAO;}
+
 
     public Photo create(Photo photo) throws DAOException, ValidationException {
         logger.debug("Creating photo {}", photo);
@@ -85,12 +86,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     }
 
-    /**
-     * delete the photo which is delivered
-     * @param photo Specifies which photo to delete by providing the id.
-     * @throws DAOException
-     * @throws ValidationException
-     */
     public void delete(Photo photo) throws DAOException, ValidationException {
         logger.debug("Deleting photo {}", photo);
         // validate photo
