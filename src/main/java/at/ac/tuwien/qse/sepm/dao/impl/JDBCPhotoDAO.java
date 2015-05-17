@@ -125,28 +125,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         logger.debug("retrieving all photos");
 
         try {
-            List<Photo> photos = jdbcTemplate.query(readAllStatement, new RowMapper<Photo>() {
-                @Override
-                public Photo mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-                    Photographer photographer = null;
-                    try {
-                        photographer = photographerDAO.getById(rs.getInt(2));
-                    } catch (DAOException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    Photo photo = new Photo(
-                            rs.getInt(1),
-                            photographer,
-                            rs.getString(3),
-                            rs.getInt(4),
-                            rs.getTimestamp(5).toLocalDateTime().toLocalDate(),
-                            rs.getDouble(6),
-                            rs.getDouble(7)
-                    );
-                    return photo;
-                }
-            });
+            List<Photo> photos = jdbcTemplate.query(readAllStatement, new PhotoRowMapper());
 
             logger.debug("Successfully read all photos");
             return photos;
@@ -162,23 +141,9 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         logger.debug("retrieving photos for monthh {}", month);
 
         try {
-            List<Photo> photos = jdbcTemplate.query(readByYearAndMonthStatement, (ResultSet rs, int rowNum) -> {
-                    Photographer photographer = null;
-                    try {
-                        photographer = photographerDAO.getById(rs.getInt(2));
-                    } catch (DAOException ex) {
-                        throw new RuntimeException(ex);
-                    }
-
-                    Photo photo = new Photo(rs.getInt(1),
-                            photographer,
-                            rs.getString(3),
-                            rs.getInt(4),rs.getTimestamp(5).toLocalDateTime().toLocalDate(),
-                            rs.getDouble(6),
-                            rs.getDouble(7)
-                    );
-                    return photo;
-            }, month.getYear(), month.getMonth().getValue());
+            List<Photo> photos = jdbcTemplate.query(readByYearAndMonthStatement,
+                    new PhotoRowMapper(), month.getYear(), month.getMonth().getValue()
+            );
 
             logger.debug("Successfully retrieved photos");
             return photos;
@@ -230,5 +195,26 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         Files.copy(source.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
         return dest.getPath();
+    }
+
+    private class PhotoRowMapper implements RowMapper<Photo> {
+        @Override
+        public Photo mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Photographer photographer = null;
+            try {
+                photographer = photographerDAO.getById(rs.getInt(2));
+            } catch (DAOException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            Photo photo = new Photo(rs.getInt(1),
+                    photographer,
+                    rs.getString(3),
+                    rs.getInt(4),rs.getTimestamp(5).toLocalDateTime().toLocalDate(),
+                    rs.getDouble(6),
+                    rs.getDouble(7)
+            );
+            return photo;
+        }
     }
 }
