@@ -7,16 +7,20 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.geometry.*;
+import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,16 +38,32 @@ public class MainController {
     @FXML private ScrollPane scrollPane;
 
     @FXML private TilePane tilePane;
-
+    @FXML private Insets in;
+    @FXML private BorderPane root;
+    private GoogleMapsScene worldMap;
     private ImageTile selectedTile = null;
 
     public MainController() {
-
+        scrollPane = new ScrollPane();
+        in = new Insets(15,15,15,15);
+        tilePane = new TilePane();
+        scrollPane.setPrefWidth(500);
+        scrollPane.setPrefHeight(400);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        tilePane.setHgap(15);
+        tilePane.setVgap(15);
+        tilePane.setPadding(in);
+        scrollPane.setContent(tilePane);
+       // worldMap = new GoogleMapsScene();
     }
 
     @FXML
     private void initialize() {
-
+        worldMap = new GoogleMapsScene();
+        root.setCenter(worldMap.getMapView());
     }
 
     /**
@@ -52,6 +72,7 @@ public class MainController {
      * @param photo The photo to be added.
      */
     public void addPhoto(Photo photo) {
+        root.setCenter(scrollPane);
         ImageTile imageTile = new ImageTile(photo);
 
         imageTile.getSelectedProperty().addListener(new ChangeListener<Boolean>() {
