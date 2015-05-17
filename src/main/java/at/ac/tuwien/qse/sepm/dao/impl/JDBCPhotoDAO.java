@@ -60,8 +60,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
                 .usingGeneratedKeyColumns("id");
     }
 
-
-
+    @Override
     public Photo create(Photo photo) throws DAOException, ValidationException {
         logger.debug("Creating photo {}", photo);
 
@@ -93,10 +92,12 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         }
     }
 
+    @Override
     public void update(Photo photo) throws DAOException, ValidationException {
 
     }
 
+    @Override
     public void delete(Photo photo) throws DAOException, ValidationException {
         logger.debug("Deleting photo {}", photo);
         // validate photo
