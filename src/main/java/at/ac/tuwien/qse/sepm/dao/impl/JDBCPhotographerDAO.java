@@ -24,8 +24,9 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
 
     private static final Logger logger = LogManager.getLogger();
 
-    private static final String readStatement = "SELECT ID,name FROM Photographer WHERE ID=?;";
-    private static final String readAllStatement = "SELECT ID,name FROM Photographer;";
+    private static final String UPDATE_STATEMENT = "UPDATE Photographer SET name=? WHERE id=?";
+    private static final String GET_BY_ID_STATEMENT = "SELECT ID,name FROM Photographer WHERE ID=?;";
+    private static final String READ_ALL_STATEMENT = "SELECT ID,name FROM Photographer;";
 
     private SimpleJdbcInsert insertPhotographer;
 
@@ -38,18 +39,20 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
                 .usingGeneratedKeyColumns("id");
     }
 
-    public Photographer create(Photographer p) throws DAOException, ValidationException {
-        logger.debug("Creating photographer {}", p);
-        PhotographerValidator.validate(p);
+    @Override
+    public Photographer create(Photographer photographer) throws DAOException, ValidationException {
+        logger.debug("Creating photographer {}", photographer);
+        PhotographerValidator.validate(photographer);
 
         try {
             Map<String, Object> parameters = new HashMap<String, Object>(1);
-            parameters.put("name", p.getName());
+            parameters.put("name", photographer.getName());
             Number newId = insertPhotographer.executeAndReturnKey(parameters);
-            p.setId((int) newId.longValue());
-            return p;
-        } catch (DataAccessException e) {
-            throw new DAOException("Failed to create photographer", e);
+            photographer.setId((int) newId.longValue());
+            return photographer;
+        } catch (DataAccessException ex) {
+            logger.error("Failed to create photographer", ex);
+            throw new DAOException("Failed to create photographer", ex);
         }
     }
 
@@ -57,7 +60,7 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
     public Photographer getById(int id) throws DAOException {
         try {
             return this.jdbcTemplate.queryForObject(
-                    readStatement,
+                    GET_BY_ID_STATEMENT,
                     new Object[]{id},
                     new RowMapper<Photographer>() {
                         @Override
@@ -70,14 +73,26 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
                     });
         } catch (DataAccessException ex) {
             logger.error("Failed to read photographer", ex);
-            throw new DAOException("Failed to read a photographer", ex);
+            throw new DAOException("Failed to read photographer", ex);
+        }
+    }
+
+    public void update(Photographer photographer) throws DAOException, ValidationException {
+        logger.debug("Updating photographer {}", photographer);
+        PhotographerValidator.validate(photographer);
+
+        try {
+            jdbcTemplate.update(UPDATE_STATEMENT, photographer.getName(), photographer.getId());
+        } catch (DataAccessException ex) {
+            logger.error("Failed to update photographer", ex);
+            throw new DAOException("Failed to update photographer", ex);
         }
     }
 
     @Override
     public List<Photographer> readAll() throws DAOException {
         try {
-            return jdbcTemplate.query(readAllStatement, new RowMapper<Photographer>() {
+            return jdbcTemplate.query(READ_ALL_STATEMENT, new RowMapper<Photographer>() {
                 @Override
                 public Photographer mapRow(ResultSet rs, int rowNum) throws SQLException {
                     return new Photographer(rs.getInt(1), rs.getString(2));
@@ -88,5 +103,4 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
             throw new DAOException("Failed to read all photographers", ex);
         }
     }
-
 }

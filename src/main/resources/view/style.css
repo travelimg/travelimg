@@ -257,3 +257,7 @@
     -fx-padding: 5px;
     -fx-background-color: #1E88E5;
 }
+
+.dialog .photographer .add .glyph-icon {
+    -glyph-name: "PLUS";
+}
