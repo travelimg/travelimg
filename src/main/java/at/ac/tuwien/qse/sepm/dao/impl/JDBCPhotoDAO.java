@@ -3,12 +3,16 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
-import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
+
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Rating;
+import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
+
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
@@ -21,21 +25,26 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Date;
 import java.sql.ResultSet;
+
 import java.sql.SQLException;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+
+import java.util.stream.Collectors;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
+    private static final String updateStatement = "UPDATE Photo SET path = ?, rating = ? WHERE id = ?";
     private static final String readAllStatement = "SELECT id, photographer_id, path, rating, date, latitude, longitude FROM PHOTO;";
     private static final String deleteStatement = "Delete from Photo where id =?";
     private static final String readByYearAndMonthStatement = "SELECT id, photographer_id, path, rating, date, latitude, longitude FROM PHOTO WHERE YEAR(DATE)=? AND MONTH(DATE)=?;";
     private static final String readMonthStatement = "SELECT YEAR(date), MONTH(date) from Photo;";
+
     private final String photoDirectory;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.ENGLISH);
     private SimpleJdbcInsert insertPhoto;
@@ -68,7 +77,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             Map<String, Object> parameters = new HashMap<String, Object>(1);
             parameters.put("photographer_id", photo.getPhotographer().getId());
             parameters.put("path",photo.getPath());
-            parameters.put("rating",photo.getRating());
+            parameters.put("rating",photo.getRating().ordinal());
             parameters.put("date", Date.valueOf(photo.getDate()));
             parameters.put("latitude", photo.getLatitude());
             parameters.put("longitude", photo.getLongitude());
@@ -82,7 +91,21 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     public void update(Photo photo) throws DAOException, ValidationException {
-
+        if (photo == null) throw new IllegalArgumentException();
+        logger.debug("Updating photo {}", photo);
+        try {
+            jdbcTemplate.update(updateStatement,
+                    // TODO: Also update photographer ID.
+                    // This is currently not viable since all the read* methods just set the
+                    // photographer to null.
+                    photo.getPath(),
+                    photo.getRating().ordinal(),
+                    photo.getId());
+            logger.debug("Successfully update photo {}", photo);
+        } catch (DataAccessException e) {
+            logger.debug("Failed updating photo {}", photo);
+            throw new DAOException("Failed to update photo", e);
+        }
     }
 
     /**
@@ -123,8 +146,17 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             List<Photo> photos = jdbcTemplate.query(readAllStatement, new RowMapper<Photo>() {
                 @Override
                 public Photo mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    Photo photo = new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4),rs.getTimestamp(5).toLocalDateTime().toLocalDate(),rs.getDouble(6),rs.getDouble(7));
-                    return photo;
+                    Rating rating = Rating.from(rs.getInt(4));
+
+                    return new Photo(
+                            rs.getInt(1),
+                            null,
+                            rs.getString(3),
+                            rating,
+                            rs.getTimestamp(5).toLocalDateTime().toLocalDate(),
+                            rs.getDouble(6),
+                            rs.getDouble(7)
+                    );
                 }
             });
 
@@ -141,8 +173,17 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
         try {
             List<Photo> photos = jdbcTemplate.query(readByYearAndMonthStatement, (ResultSet rs, int rowNum) -> {
-                Photo photo = new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4),rs.getTimestamp(5).toLocalDateTime().toLocalDate(),rs.getDouble(6),rs.getDouble(7));
-                return photo;
+                Rating rating = Rating.from(rs.getInt(4));
+
+                return new Photo(
+                        rs.getInt(1),
+                        null,
+                        rs.getString(3),
+                        rating,
+                        rs.getTimestamp(5).toLocalDateTime().toLocalDate(),
+                        rs.getDouble(6),
+                        rs.getDouble(7)
+                );
             }, month.getYear(), month.getMonth().getValue());
 
             logger.debug("Successfully retrieved photos");
@@ -192,7 +233,4 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
         return dest.getPath();
     }
-
-
-
 }

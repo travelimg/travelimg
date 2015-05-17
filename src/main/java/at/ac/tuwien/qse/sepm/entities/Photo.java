@@ -7,7 +7,7 @@ public class Photo {
     private Integer id;
     private Photographer photographer;
     private String path;
-    private Integer rating;
+    private Rating rating;
     private LocalDate date;
     private double latitude;
     private double longitude;
@@ -15,7 +15,7 @@ public class Photo {
     public Photo() {
     }
 
-    public Photo(Integer id, Photographer photographer, String path, Integer rating, LocalDate date, double latitude, double longitude) {
+    public Photo(Integer id, Photographer photographer, String path, Rating rating, LocalDate date, double latitude, double longitude) {
         this.id = id;
         this.photographer = photographer;
         this.path = path;
@@ -41,6 +41,10 @@ public class Photo {
         this.path = path;
     }
 
+    public Rating getRating() {
+        return rating;
+    }
+
     public Photographer getPhotographer() {
         return photographer;
     }
@@ -49,11 +53,7 @@ public class Photo {
         this.photographer = photographer;
     }
 
-    public Integer getRating() {
-        return rating;
-    }
-
-    public void setRating(Integer rating) {
+    public void setRating(Rating rating) {
         this.rating = rating;
     }
 

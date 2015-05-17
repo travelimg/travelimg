@@ -13,8 +13,9 @@
                 <Label fx:id="placeholder" text="Kein Foto ausgewählt." VBox.vgrow="ALWAYS" alignment="CENTER" maxWidth="Infinity" maxHeight="Infinity"/>
                 <VBox fx:id="details" visible="false">
                     <children>
-                        <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0" prefHeight="Infinity"/>
-                        <TableView fx:id="exifTable" prefWidth="Infinity">
+                    <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0" prefHeight="Infinity"/>
+                        <Pane fx:id="ratingPickerContainer"/>
+                        <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="200">
                             <columns>
                                 <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
                                 <TableColumn fx:id="exifValue" prefWidth="100.0" text="Wert"/>
