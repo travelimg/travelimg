@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -29,6 +30,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controller for the main view.
@@ -48,6 +50,10 @@ public class MainController {
 
     private ImageTile selectedTile = null;
 
+    ArrayList<Photo> photoListe  = new ArrayList<>();
+
+
+
     public MainController() {
 
     }
@@ -65,6 +71,10 @@ public class MainController {
     public void addPhoto(Photo photo) {
         ImageTile imageTile = new ImageTile(photo);
 
+        //photosList.add(photo);
+        photoListe.add(photo);
+        logger.info("Achtung Info Photo"+photoListe.size());
+
         imageTile.getSelectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -81,6 +91,14 @@ public class MainController {
     }
 
     /**
+     * Retunr the List of Photos which are added
+     * @return
+     */
+    public ArrayList<Photo> getPhotosList()
+    {
+        return photoListe;
+    }
+    /**
      * Clear the image grid and don't show any photos.
      */
     public void clearPhotos() {
@@ -89,14 +107,14 @@ public class MainController {
 
     public void fullsizePhotos()
     {
-        ObservableList<Node> c = tilePane.getChildren();
+        //ObservableList<Node> c = tilePane.getChildren();
         //ArrayList myList = tilePane.getChildren().toArray();
 
        logger.info("Info fullsize Photos");
 
 
         FullscreenWindow fullscreen = new FullscreenWindow();
-        fullscreen.present(photoForFullScreen, c);
+        fullscreen.present(photoForFullScreen,photoListe);
 
 
     }

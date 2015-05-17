@@ -11,12 +11,15 @@
 <fx:root fx:id="root" prefHeight="722.0" prefWidth="1021.0" styleClass="dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
       <BorderPane prefHeight="722.0" prefWidth="1030.0">
-         <bottom>
-            <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="158.0" text="Button" BorderPane.alignment="CENTER" />
-         </bottom>
          <center>
-            <ImageView fx:id="imageView" fitHeight="575.0" fitWidth="1001.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+            <ImageView fx:id="imageView" fitHeight="575.0" fitWidth="826.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
          </center>
+         <left>
+            <Button fx:id="bt_previous" mnemonicParsing="false" onAction="#bt_previousPressed" text="Prevoius" BorderPane.alignment="CENTER" />
+         </left>
+         <right>
+            <Button fx:id="bt_next" minWidth="62.0" mnemonicParsing="false" onAction="#bt_nextPressed" prefHeight="40.0" prefWidth="106.0" text="Next" BorderPane.alignment="CENTER" />
+         </right>
       </BorderPane>
     </children>
 </fx:root>
