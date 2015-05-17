@@ -38,6 +38,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private static final String deleteStatement = "Delete from Photo where id =?";
     private static final String readByYearAndMonthStatement = "SELECT id, photographer_id, path, rating, date, latitude, longitude FROM PHOTO WHERE YEAR(DATE)=? AND MONTH(DATE)=?;";
     private static final String readMonthStatement = "SELECT YEAR(date), MONTH(date) from Photo;";
+    private static final String GET_BY_ID_STATEMENT = "SELECT id, photographer_id, path, rating, date, latitude, longitude FROM Photo where id=?";
 
     private final String photoDirectory;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.ENGLISH);
@@ -119,6 +120,18 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             throw new DAOException("Failed to delete photo", e);
         }
 
+    @Override
+    public Photo getById(int id) throws DAOException, ValidationException {
+        logger.debug("Get photo with id {}", id);
+
+        PhotoValidator.validateID(id);
+
+        try {
+            return this.jdbcTemplate.queryForObject(GET_BY_ID_STATEMENT, new Object[]{id}, new PhotoRowMapper());
+        } catch (DataAccessException ex) {
+            logger.error("Failed to get photo", ex);
+            throw new DAOException("Failed to get photo", ex);
+        }
     }
 
     public List<Photo> readAll() throws DAOException, ValidationException {
