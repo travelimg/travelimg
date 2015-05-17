@@ -15,10 +15,10 @@
             <ImageView fx:id="imageView" fitHeight="575.0" fitWidth="826.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
          </center>
          <left>
-            <Button fx:id="bt_previous" mnemonicParsing="false" onAction="#bt_previousPressed" text="Prevoius" BorderPane.alignment="CENTER" />
+            <Button fx:id="bt_previous" mnemonicParsing="false" onAction="#bt_previousPressed" text="&lt;" BorderPane.alignment="CENTER" />
          </left>
          <right>
-            <Button fx:id="bt_next" minWidth="62.0" mnemonicParsing="false" onAction="#bt_nextPressed" prefHeight="40.0" prefWidth="106.0" text="Next" BorderPane.alignment="CENTER" />
+            <Button fx:id="bt_next" minWidth="62.0" mnemonicParsing="false" onAction="#bt_nextPressed" prefHeight="40.0" prefWidth="106.0" text="&gt;" BorderPane.alignment="CENTER" />
          </right>
       </BorderPane>
     </children>
