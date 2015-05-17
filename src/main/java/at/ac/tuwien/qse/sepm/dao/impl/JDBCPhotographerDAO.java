@@ -53,26 +53,28 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
         }
     }
 
-    public Photographer read(Photographer p) throws DAOException {
+    @Override
+    public Photographer getById(int id) throws DAOException {
         try {
             return this.jdbcTemplate.queryForObject(
                     readStatement,
-                    new Object[]{p.getId()},
+                    new Object[]{id},
                     new RowMapper<Photographer>() {
                         @Override
                         public Photographer mapRow(ResultSet rs, int rowNum) throws SQLException {
-                            Photographer p = new Photographer();
-                            p.setId(rs.getInt(1));
-                            p.setName(rs.getString(2));
-                            return p;
+                            Photographer photographer = new Photographer();
+                            photographer.setId(rs.getInt(1));
+                            photographer.setName(rs.getString(2));
+                            return photographer;
                         }
                     });
-        }
-        catch(DataAccessException e){
-            throw new DAOException("Failed to read a photographer", e);
+        } catch (DataAccessException ex) {
+            logger.error("Failed to read photographer", ex);
+            throw new DAOException("Failed to read a photographer", ex);
         }
     }
 
+    @Override
     public List<Photographer> readAll() throws DAOException {
         try {
             return jdbcTemplate.query(readAllStatement, new RowMapper<Photographer>() {
@@ -81,9 +83,9 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
                     return new Photographer(rs.getInt(1), rs.getString(2));
                 }
             });
-        }
-        catch(DataAccessException e){
-            throw new DAOException("Failed to read all photographers", e);
+        } catch (DataAccessException ex) {
+            logger.error("Failed to read all photographers", ex);
+            throw new DAOException("Failed to read all photographers", ex);
         }
     }
 
