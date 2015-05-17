@@ -233,4 +233,31 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
         assertThat(photoDAO.readPhotosByMonth(expectedMonths[2]), hasItem(photo));
     }
+
+    @Test
+    @WithData
+    public void testDeleteWithNonexistingPhotoIsNop() throws DAOException, ValidationException {
+        int initial = countRows();
+
+        Photo photo = getExpectedPhoto(1);
+        photo.setId(-42);
+        photoDAO.delete(photo);
+
+        assertEquals(initial, countRows());
+    }
+
+    @Test
+    @WithData
+    public void testDeletePhotoRemovesEntry() throws DAOException, ValidationException {
+        int initial = countRows();
+
+        Photo photo = getExpectedPhoto(3);
+        assertThat(setPrefix(photoDAO.readAll()), hasItem(photo));
+
+        photoDAO.delete(photo);
+
+        assertEquals(initial - 1, countRows());
+        assertThat(setPrefix(photoDAO.readAll()), not(hasItem(photo)));
+    }
+
 }
