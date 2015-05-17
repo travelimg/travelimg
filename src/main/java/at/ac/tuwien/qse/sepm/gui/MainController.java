@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Controller for the main view.
@@ -89,13 +90,13 @@ public class MainController {
     public void fullsizePhotos()
     {
         ObservableList<Node> c = tilePane.getChildren();
-
+        //ArrayList myList = tilePane.getChildren().toArray();
 
        logger.info("Info fullsize Photos");
 
 
         FullscreenWindow fullscreen = new FullscreenWindow();
-        fullscreen.present(photoForFullScreen,c);
+        fullscreen.present(photoForFullScreen, c);
 
 
     }

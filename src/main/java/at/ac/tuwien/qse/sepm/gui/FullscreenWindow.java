@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import javafx.animation.*;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -34,8 +35,13 @@ public class FullscreenWindow extends Pane {
     private Photo photo;
     private Image image;
 
+    int slideshowcount;
+
     @FXML
     private ImageView current;
+
+    @FXML
+    private ImageView imageView;
 
     @FXML
     private ImageView next;
@@ -59,10 +65,38 @@ public class FullscreenWindow extends Pane {
 
     public void present(Photo photo,ObservableList<Node> c)
     {
+        for(int i = 0; i <c.size(); i++)
+        {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run()
+                {
+                    try {
+                        image = new Image(new FileInputStream(new File(photo.getPath())), 0, 0, true, true);
+                    } catch (FileNotFoundException ex) {
+                        logger.error("Could not find photo", ex);
+                        return;
+                    }
+
+                    imageView.setImage(image);
+                    slideshowcount++;
+                    if(slideshowcount >= c.size())
+                    {
+                        slideshowcount=0;
+                    }
+                }
+            });
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
 
         this.photo = photo;
-        logger.info(photo);
+        logger.info(c.size());
         //image = new Image(new File(photo.getPath()));
 
         /*try {
@@ -77,14 +111,23 @@ public class FullscreenWindow extends Pane {
         //photo.setPath("blabla");
         //logger.info(photo.getPath());
 
+        /*
 
         logger.info("before Image Load");
-        Image image = getNextImage();
+        Image image = null;
+        try {
+            image = new Image(new FileInputStream(new File(photo.getPath())), 0, 0, true, true);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
         logger.info("after image load"+image);
 
         if(image!=null)
             startImage(image,c);
+
+        logger.info(image);
+        */
 
         stage.show();
 
@@ -101,6 +144,11 @@ public class FullscreenWindow extends Pane {
         next = null;
 
         next = new ImageView(image);
+
+        next.setFitHeight(720);
+        next.setFitHeight(580);
+        next.setPreserveRatio(true);
+        next.setOpacity(0);
 
         c.add(next);
 
@@ -182,7 +230,12 @@ public class FullscreenWindow extends Pane {
 
         return FileVisitResult.CONTINUE;
 
+
+
     }
+
+
+
 
 
 
