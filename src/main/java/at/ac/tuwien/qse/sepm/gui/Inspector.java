@@ -59,12 +59,14 @@ public class Inspector {
     }
 
     public void setMap(GoogleMapsScene mapsScene){
+        this.mapsScene=mapsScene;
         if(mapContainer.getChildren().contains(mapsScene.getMapView())){
             mapContainer.getChildren().remove(mapsScene.getMapView());
         }
         mapContainer.getChildren().add(mapsScene.getMapView());
-       // mapContainer.getChildren().add(mapsScene.getMapView());
+
         this.mapsScene=mapsScene;
+        mapsScene.removeAktiveMarker();
     }
     @FXML private void initialize() {
 

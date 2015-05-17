@@ -1,6 +1,9 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.service.PhotoService;
+import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -24,6 +27,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 /**
  * Controller for the main view.
@@ -34,6 +38,7 @@ public class MainController {
 
     @Autowired private Organizer organizer;
     @Autowired private Inspector inspector;
+    @Autowired private PhotoService photoService;
 
     @FXML private ScrollPane scrollPane;
 
@@ -57,13 +62,36 @@ public class MainController {
         tilePane.setVgap(15);
         tilePane.setPadding(in);
         scrollPane.setContent(tilePane);
-        // worldMap = new GoogleMapsScene();
+
     }
 
     @FXML
     private void initialize() {
-        worldMap = new GoogleMapsScene();
+
+        worldMap = new GoogleMapsScene(getAllPhotos());
+
         root.setCenter(worldMap.getMapView());
+
+
+
+    }
+
+    /**
+     * returns a ArrayList with all Photos
+     * @return ArrayList with all Photos
+     */
+    private ArrayList<Photo> getAllPhotos(){
+        ArrayList<Photo> l = new ArrayList<>();
+        try {
+
+            for(Photo p : photoService.getAllPhotos()){
+                l.add(p);
+            }
+
+        } catch (ServiceException e) {
+            e.printStackTrace();
+        }
+        return l;
     }
 
     /**

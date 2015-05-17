@@ -1,12 +1,19 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.service.PhotoService;
+import at.ac.tuwien.qse.sepm.service.ServiceException;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import javafx.beans.binding.Bindings;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.beans.BeanInstantiationException;
 /**
  * Created by christoph on 08.05.15.
  */
@@ -16,16 +23,31 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
     private GoogleMapView mapView;
     private GoogleMap map;
+    private ArrayList<Photo> markers =null;
+    private ArrayList<Marker> aktivMarker;
     //new LatLong(40.7033127, -73.979681); // the default Location
     private Marker actualMarker;
-
+    private Marker m;
     /**
      * Default Constructor
      *
      *
      */
     public GoogleMapsScene(){
+
         this.mapView = new GoogleMapView();
+        this.mapView.addMapInializedListener(this);
+
+    }
+
+    /**
+     * WorldMap Constructor
+     * @param l
+     */
+    public GoogleMapsScene(ArrayList<Photo> l){
+        this.mapView = new GoogleMapView();
+        markers = l;
+        aktivMarker = new ArrayList<Marker>();
         this.mapView.addMapInializedListener(this);
     }
 
@@ -41,6 +63,16 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
                 .zoomControl(true)
                 .zoom(2);
         map = mapView.createMap(mapOptions);
+
+        if(markers!=null){
+            for(Photo photo : markers){
+                Marker m = new Marker(new MarkerOptions().position(new LatLong(photo.getLatitude(),
+                        photo.getLongitude())).visible(Boolean.TRUE));
+                aktivMarker.add(m);
+                map.addMarker(m);
+            }
+        }
+
     }
 
     /**
@@ -58,9 +90,17 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      * @param y height
      */
     public void setMaxSize(double x, double y){
-        mapView.setMaxSize(x,y);
+        mapView.setMaxSize(x, y);
     }
 
+    /**
+     * removes all Marker from Map
+     */
+    public void removeAktiveMarker(){
+        for(Marker m : aktivMarker){
+            map.removeMarker(m);
+        }
+    }
     public void addMarker(Photo photo){
         if(actualMarker!=null)
             map.removeMarker(actualMarker);
