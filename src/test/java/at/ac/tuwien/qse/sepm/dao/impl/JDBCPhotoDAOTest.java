@@ -15,12 +15,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @UsingTable("Photo")
 public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
@@ -33,6 +38,12 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
     private static final String dataDir = Paths.get(System.getProperty("java.io.tmpdir"), "travelimg").toString();
     private static final String sourceDir = Paths.get(JDBCPhotoDAOTest.class.getClassLoader().getResource("db/testimages").getPath()).toString();
+
+    private YearMonth expectedMonths[] = new YearMonth[] {
+            YearMonth.of(2005, 9),
+            YearMonth.of(2015, 3),
+            YearMonth.of(2015, 5)
+    };
 
     private Photo expectedPhotos[] = new Photo[] {
             new Photo(1, defaultPhotographer, dataDir + "/2015/03/06/1.jpg", 0, LocalDate.of(2015, 3, 6), 41.5, 19.5),
@@ -134,5 +145,67 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
         }
     }
 
+    @Test
+    @WithData
+    public void testCreateAddsRow() throws DAOException, ValidationException {
+        int initial = countRows();
 
+        photoDAO.create(getInputPhoto(0));
+
+        assertEquals(initial + 1, countRows());
+    }
+
+    @Test
+    @WithData
+    public void testReadAllReturnsCreated() throws DAOException, ValidationException {
+        Photo photo = getInputPhoto(1);
+        Photo expected = getExpectedPhoto(photo);
+
+        assertTrue(!photoDAO.readAll().contains(expected));
+
+        int id = photoDAO.create(photo).getId();
+        expected.setId(id);
+
+        assertTrue(photoDAO.readAll().contains(expected));
+    }
+
+    @Test
+    public void testReadMonthsEmpty() throws DAOException {
+        assertEquals(0, photoDAO.getMonthsWithPhotos().size());
+    }
+
+    @Test
+    @WithData
+    public void testReadMonthsWithData() throws DAOException {
+        assertEquals(2, photoDAO.getMonthsWithPhotos().size());
+
+        for(YearMonth month : photoDAO.getMonthsWithPhotos()) {
+            assertThat(Arrays.asList(expectedMonths), hasItem(month));
+        }
+    }
+
+    @Test
+    @WithData
+    public void testCreateNewMonthsAffectsReadMonths() throws DAOException, ValidationException {
+        Photo photo = getInputPhoto(0);
+        photo.setDate(LocalDate.of(2000, 1, 1));
+
+        int initial = photoDAO.getMonthsWithPhotos().size();
+        photoDAO.create(photo);
+        assertEquals(initial + 1, photoDAO.getMonthsWithPhotos().size());
+    }
+
+    @Test
+    public void testReadPhotosByMonthEmpty() throws DAOException {
+        for(YearMonth month : expectedMonths) {
+            assertEquals(0, photoDAO.readPhotosByMonth(month).size());
+        }
+    }
+
+    @Test
+    @WithData
+    public void testReadPhotosByMonthWithData() throws DAOException {
+        assertEquals(3, photoDAO.readPhotosByMonth(expectedMonths[0]).size());
+        assertEquals(2, photoDAO.readPhotosByMonth(expectedMonths[1]).size());
+    }
 }
