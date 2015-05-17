@@ -188,7 +188,6 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     @WithData
     public void testCreateNewMonthsAffectsReadMonths() throws DAOException, ValidationException {
         Photo photo = getInputPhoto(0);
-        photo.setDate(LocalDate.of(2000, 1, 1));
 
         int initial = photoDAO.getMonthsWithPhotos().size();
         photoDAO.create(photo);
@@ -207,5 +206,16 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     public void testReadPhotosByMonthWithData() throws DAOException {
         assertEquals(3, photoDAO.readPhotosByMonth(expectedMonths[0]).size());
         assertEquals(2, photoDAO.readPhotosByMonth(expectedMonths[1]).size());
+    }
+
+    @Test
+    @WithData
+    public void testCreateAffectsReadPhotosByMonth() throws DAOException, ValidationException {
+        Photo photo = getInputPhoto(1);
+
+        int id = photoDAO.create(photo).getId();
+        photo.setId(id);
+
+        assertThat(photoDAO.readPhotosByMonth(expectedMonths[2]), hasItem(photo));
     }
 }
