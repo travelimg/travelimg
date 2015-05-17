@@ -10,5 +10,8 @@ public class PhotographerValidator {
         if(entity.getName()==null || entity.getName().isEmpty())
             throw new ValidationException("Name cannot be null or empty");
 
+        if(entity.getId()==null || entity.getId()< 0){
+            throw new ValidationException("Invalid ID");
+        }
     }
 }
