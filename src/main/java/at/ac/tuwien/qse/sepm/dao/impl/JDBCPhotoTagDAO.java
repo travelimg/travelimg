@@ -35,8 +35,10 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      */
     public void createPhotoTag(Photo photo, Tag tag) throws DAOException, ValidationException {
         LOGGER.debug("Entering createPhotoTag with {} {}", photo, tag);
-        PhotoValidator.validateID(photo);
+
+        PhotoValidator.validateID(photo.getId());
         TagValidator.validateID(tag);
+
         if (!readTagsByPhoto(photo).contains(tag)) {
             try {
                 jdbcTemplate.update(CREATE_STRING, photo.getId(), tag.getId());
@@ -62,8 +64,10 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      */
     public void removeTagFromPhoto(Photo photo, Tag tag) throws DAOException, ValidationException {
         LOGGER.debug("Entering removeTagFromPhoto with {} {}", photo, tag);
-        PhotoValidator.validateID(photo);
+
+        PhotoValidator.validateID(photo.getId());
         TagValidator.validateID(tag);
+
         try {
             jdbcTemplate.update(DELETE_STRING, photo.getId(), tag.getId());
             LOGGER.info("Photo-Tag entry successfully deleted");
@@ -85,7 +89,9 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      */
     public List<Tag> readTagsByPhoto(Photo photo) throws DAOException, ValidationException {
         LOGGER.debug("Entering readTagsByPhoto with {}", photo);
-        PhotoValidator.validateID(photo);
+
+        PhotoValidator.validateID(photo.getId());
+
         List<Tag> tagList;
         try {
             tagList = jdbcTemplate.query(READ_TAGS_BY_PHOTO_STRING, (rs, rowNum) -> {

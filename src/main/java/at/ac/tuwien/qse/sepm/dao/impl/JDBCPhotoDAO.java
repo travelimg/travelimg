@@ -100,10 +100,9 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     @Override
     public void delete(Photo photo) throws DAOException, ValidationException {
         logger.debug("Deleting photo {}", photo);
-        // validate photo
-        //PhotoValidator.validate(photo); // disabled for IR1
 
-        int id = photo.getId();
+        PhotoValidator.validate(photo);
+        PhotoValidator.validateID(photo.getId());
 
         // delete from Table photoTag
 
