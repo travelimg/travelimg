@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Rating;
@@ -10,8 +11,10 @@ import at.ac.tuwien.qse.sepm.entities.validators.TagValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
@@ -22,8 +25,9 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
             + "photo_id = ? AND tag_id = ?";
     private static final String READ_TAGS_BY_PHOTO_STRING = "SELECT DISTINCT tag_id, name FROM "
             + "(tag JOIN phototag ON id = tag_id) WHERE photo_id = ?";
-    private static final String READ_PHOTOS_BY_TAG_STRING = "SELECT DISTINCT * FROM (photo JOIN "
-            + "phototag ON id = photo_id) where tag_id = ?";
+    private static final String READ_PHOTOS_BY_TAG_STRING = "SELECT DISTINCT photo_id FROM phototag where tag_id = ?";
+
+    @Autowired private PhotoDAO photoDAO;
 
     /**
      * Create a photo-tag entry in database which links Tag <tt>tag</tt> to Photo <tt>photo</tt>.
@@ -36,8 +40,10 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      */
     public void createPhotoTag(Photo photo, Tag tag) throws DAOException, ValidationException {
         LOGGER.debug("Entering createPhotoTag with {} {}", photo, tag);
-        PhotoValidator.validateID(photo);
+
+        PhotoValidator.validateID(photo.getId());
         TagValidator.validateID(tag);
+
         if (!readTagsByPhoto(photo).contains(tag)) {
             try {
                 jdbcTemplate.update(CREATE_STRING, photo.getId(), tag.getId());
@@ -63,8 +69,10 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      */
     public void removeTagFromPhoto(Photo photo, Tag tag) throws DAOException, ValidationException {
         LOGGER.debug("Entering removeTagFromPhoto with {} {}", photo, tag);
-        PhotoValidator.validateID(photo);
+
+        PhotoValidator.validateID(photo.getId());
         TagValidator.validateID(tag);
+
         try {
             jdbcTemplate.update(DELETE_STRING, photo.getId(), tag.getId());
             LOGGER.info("Photo-Tag entry successfully deleted");
@@ -86,12 +94,14 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      */
     public List<Tag> readTagsByPhoto(Photo photo) throws DAOException, ValidationException {
         LOGGER.debug("Entering readTagsByPhoto with {}", photo);
-        PhotoValidator.validateID(photo);
+
+        PhotoValidator.validateID(photo.getId());
+
         List<Tag> tagList;
         try {
             tagList = jdbcTemplate.query(READ_TAGS_BY_PHOTO_STRING, (rs, rowNum) -> {
                     return new Tag(rs.getInt("id"), rs.getString("name"));
-                });
+                }, photo.getId());
             LOGGER.info("Successfully read tags for {}", photo);
         } catch (DataAccessException ex) {
             LOGGER.error("Reading Tags failed due to DataAccessException");
@@ -111,28 +121,25 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      */
     public List<Photo> readPhotosByTag(Tag tag) throws DAOException, ValidationException {
         LOGGER.debug("Entering readPhotosByTag with {}", tag);
+
         TagValidator.validateID(tag);
-        List<Photo> photoList;
+
+        List<Photo> photoList = new ArrayList<>();
         try {
-            photoList = jdbcTemplate.query(READ_PHOTOS_BY_TAG_STRING, (rs, rowNum) -> {
-                    Rating rating = Rating.from(rs.getInt("rating"));
-
-                    return new Photo(
-                        rs.getInt(1),
-                        null,
-                        rs.getString(3),
-                        rating,
-                        rs.getTimestamp(5).toLocalDateTime().toLocalDate(),
-                        rs.getDouble(6),
-                        rs.getDouble(7)
-                    );
-
+            List<Integer> photoIds = jdbcTemplate.query(READ_PHOTOS_BY_TAG_STRING, (rs, rowNum) -> {
+                    return rs.getInt(1);
             });
+
+            for (Integer id : photoIds) {
+                photoList.add(photoDAO.getById(id));
+            }
+
             LOGGER.info("Successfully read photos for {}", tag);
         } catch (DataAccessException ex) {
             LOGGER.error("Reading photos failed due to DataAccessException");
             throw new DAOException("Could not read photos.", ex);
         }
+
         LOGGER.debug("Leaving readPhotosByTag with {}", tag);
         return photoList;
     }

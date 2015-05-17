@@ -43,15 +43,15 @@ public class JDBCPhotographerDAOTest extends AbstractJDBCDAOTest {
 
     @Test(expected = DAOException.class)
     public void readWithNonExistingIdShouldThrow() throws DAOException {
-        photographerDAO.read(new Photographer(1337, null));
+        photographerDAO.getById(1337);
     }
 
     @Test
     @WithData
     public void readWithValidIdShouldReturnPhotographer() throws DAOException {
-        Photographer p = photographerDAO.read(new Photographer(1,null));
-        assertTrue(p.getName().equals("Alex Kinara"));
-        assertEquals(1, countRowsWhere("name = 'Alex Kinara'"));
+        Photographer p = photographerDAO.getById(1);
+        assertTrue(p.getName().equals("Test Photographer"));
+        assertEquals(1, countRowsWhere("name = 'Test Photographer'"));
     }
 
     @Test
