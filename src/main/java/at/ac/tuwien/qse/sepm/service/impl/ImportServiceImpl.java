@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
@@ -22,7 +23,8 @@ public class ImportServiceImpl implements ImportService {
 
     private static final Logger logger = LogManager.getLogger();
 
-   @Autowired private PhotoDAO photoDAO;
+    @Autowired private PhotoDAO photoDAO;
+    @Autowired private ExifService exifService;
     ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     public ImportServiceImpl() {
@@ -66,6 +68,7 @@ public class ImportServiceImpl implements ImportService {
                     return;
 
                 try {
+                    exifService.attachDateAndGeoData(p);
                     Photo imported = photoDAO.create(p);
                     callback.accept(imported);
                 } catch(DAOException e) {
@@ -73,6 +76,9 @@ public class ImportServiceImpl implements ImportService {
                     return;
                 } catch(ValidationException e) {
                     errorHandler.propagate(new ServiceException("Failed to validate photo", e));
+                    return;
+                } catch (ServiceException e) {
+                    errorHandler.propagate(new ServiceException("Failed to attach date", e));
                     return;
                 }
             }
