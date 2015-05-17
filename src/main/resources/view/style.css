@@ -370,6 +370,13 @@
 .rating-picker .toggle-button.good {
     -fx-background-radius: 0 3 3 0;
 }
+.rating-picker .toggle-button .glyph-icon {
+    -glyph-size: 16;
+    -fx-fill: -fx-text;
+}
+.rating-picker .toggle-button:selected .glyph-icon {
+    -fx-fill: white;
+}
 
 
 .import-dialog .add .glyph-icon {
