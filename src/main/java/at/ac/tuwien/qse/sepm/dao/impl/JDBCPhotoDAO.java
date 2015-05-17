@@ -7,6 +7,7 @@ import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotographerDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
+import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,21 +105,22 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         PhotoValidator.validate(photo);
         PhotoValidator.validateID(photo.getId());
 
-        // delete from Table photoTag
+        int id = photo.getId();
 
-        //TODO maybe the JDBCPhotoTagDAO has errors, like a parameter not set...
-        /*List<Tag> taglist = photoTagDAO.readTagsByPhoto(photo);
-        if (taglist !=null) {
+        List<Tag> taglist = photoTagDAO.readTagsByPhoto(photo);
+        if (taglist != null) {
             for (Tag t : taglist) {
                 photoTagDAO.removeTagFromPhoto(photo, t);
             }
-        }*/
+        }
+
         try {
             jdbcTemplate.update(DELETE_STATEMENT, id);
 
         } catch (DataAccessException e) {
             throw new DAOException("Failed to delete photo", e);
         }
+    }
 
     @Override
     public Photo getById(int id) throws DAOException, ValidationException {
