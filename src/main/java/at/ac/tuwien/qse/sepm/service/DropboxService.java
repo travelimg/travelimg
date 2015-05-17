@@ -14,7 +14,7 @@ public interface DropboxService extends Service {
      *
      * @return The base directory of the users dropbox.
      */
-    String getDropboxFolder();
+    String getDropboxFolder() throws ServiceException;
 
     /**
      * Upload a given set of photos to the user dropbox.
