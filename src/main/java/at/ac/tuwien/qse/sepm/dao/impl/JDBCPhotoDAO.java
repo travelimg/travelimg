@@ -163,14 +163,31 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
         try {
             List<Photo> photos = jdbcTemplate.query(readByYearAndMonthStatement, (ResultSet rs, int rowNum) -> {
-                Photo photo = new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4),rs.getTimestamp(5).toLocalDateTime().toLocalDate(),rs.getDouble(6),rs.getDouble(7));
-                return photo;
+                    Photographer photographer = null;
+                    try {
+                        photographer = photographerDAO.getById(rs.getInt(2));
+                    } catch (DAOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
+                    Photo photo = new Photo(rs.getInt(1),
+                            photographer,
+                            rs.getString(3),
+                            rs.getInt(4),rs.getTimestamp(5).toLocalDateTime().toLocalDate(),
+                            rs.getDouble(6),
+                            rs.getDouble(7)
+                    );
+                    return photo;
             }, month.getYear(), month.getMonth().getValue());
 
             logger.debug("Successfully retrieved photos");
             return photos;
         } catch (DataAccessException ex) {
+            logger.error("Failed to read photos from given month", ex);
             throw new DAOException("Failed to read photos from given month", ex);
+        } catch (RuntimeException ex) {
+            logger.error("Failed to read photos from given month", ex);
+            throw new DAOException("Failed to read photos from given month", ex.getCause());
         }
     }
 
