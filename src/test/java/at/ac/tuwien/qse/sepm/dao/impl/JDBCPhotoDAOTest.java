@@ -28,12 +28,22 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     PhotoDAO photoDAO;
 
     private static final Photographer defaultPhotographer = new Photographer(1, "Test Photographer");
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.ENGLISH);
+    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.ENGLISH);
 
-    private final String dataDir = Paths.get(System.getProperty("java.io.tmpdir"), "travelimg").toString();
-    private final String sourceDir = Paths.get(getClass().getClassLoader().getResource("db/testimages").getPath()).toString();
+    private static final String dataDir = Paths.get(System.getProperty("java.io.tmpdir"), "travelimg").toString();
+    private static final String sourceDir = Paths.get(JDBCPhotoDAOTest.class.getClassLoader().getResource("db/testimages").getPath()).toString();
 
-    private Pair<String, String> getPhotoSourceDest(Integer id) {
+    private static Photo getTestPhoto(Integer id) {
+        Pair<String, String> paths = getPhotoSourceDest(6);
+        return new Photo(-1, defaultPhotographer, paths.getKey(), 0, LocalDate.now(), -30, 30);
+    }
+
+    private static Photo getExpectedPhoto(Integer id) {
+        Pair<String, String> paths = getPhotoSourceDest(6);
+        return new Photo(-1, defaultPhotographer, paths.getValue(), 0, LocalDate.now(), -30, 30);
+    }
+
+    private static Pair<String, String> getPhotoSourceDest(Integer id) {
         if (id < 6 || id > 8) return null;
 
         String date = dateFormatter.format(LocalDate.now());
@@ -65,8 +75,8 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     @WithData
     public void testCreateResultHasCorrectAttributes() throws DAOException, ValidationException {
         Pair<String, String> paths = getPhotoSourceDest(6);
-        Photo photo = new Photo(-1, defaultPhotographer, paths.getKey(), 0, LocalDate.now(), -30, 30);
-        Photo expected = new Photo(-1, defaultPhotographer, paths.getValue(), 0, LocalDate.now(), -30, 30);
+        Photo photo = getTestPhoto(6); //new Photo(-1, defaultPhotographer, paths.getKey(), 0, LocalDate.now(), -30, 30);
+        Photo expected = getExpectedPhoto(6);// Photo(-1, defaultPhotographer, paths.getValue(), 0, LocalDate.now(), -30, 30);
 
         Photo value = photoDAO.create(photo);
 
@@ -77,13 +87,22 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     @Test
     @WithData
     public void testCreateImageFileIsCopied() throws DAOException, ValidationException {
-        Pair<String, String> paths = getPhotoSourceDest(6);
-        Photo photo = new Photo(-1, defaultPhotographer, paths.getKey(), 0, LocalDate.now(), -30, 30);
+        Photo photo = getTestPhoto(7);
+        Photo expected = getExpectedPhoto(7);
 
         Photo value = photoDAO.create(photo);
 
-        assertEquals(paths.getValue(), value.getPath());
-        assertTrue(Files.exists(Paths.get(paths.getValue())));
+        assertEquals(expected.getPath(), value.getPath());
+        assertTrue(Files.exists(Paths.get(expected.getPath())));
+    }
+
+    @Test(expected = ValidationException.class)
+    @WithData
+    public void testCreateWithNonexistingPathThrows() throws DAOException, ValidationException {
+        Photo photo = getTestPhoto(8);
+        photo.setPath("/path/to/oblivion");
+
+        photoDAO.create(photo);
     }
 
     @Test(expected = DAOException.class)

@@ -61,24 +61,31 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     public Photo create(Photo photo) throws DAOException, ValidationException {
         logger.debug("Creating photo {}", photo);
 
+        PhotoValidator.validate(photo);
+
         try {
             String dest = copyToPhotoDirectory(photo);
             photo.setPath(dest);
-            PhotoValidator.validate(photo);
+        } catch (IOException ex) {
+            logger.error("Failed to copy photo to destination directory", ex);
+            throw new DAOException("Failed to copy photo to destination directory", ex);
+        }
 
-            Map<String, Object> parameters = new HashMap<String, Object>(1);
-            parameters.put("photographer_id", photo.getPhotographer().getId());
-            parameters.put("path",photo.getPath());
-            parameters.put("rating",photo.getRating());
-            parameters.put("date", Date.valueOf(photo.getDate()));
-            parameters.put("latitude", photo.getLatitude());
-            parameters.put("longitude", photo.getLongitude());
+        Map<String, Object> parameters = new HashMap<String, Object>(1);
+        parameters.put("photographer_id", photo.getPhotographer().getId());
+        parameters.put("path",photo.getPath());
+        parameters.put("rating",photo.getRating());
+        parameters.put("date", Date.valueOf(photo.getDate()));
+        parameters.put("latitude", photo.getLatitude());
+        parameters.put("longitude", photo.getLongitude());
+
+        try {
             Number newId = insertPhoto.executeAndReturnKey(parameters);
             photo.setId((int) newId.longValue());
             return photo;
-        } catch(IOException e) {
-            logger.error("Failed to copy photo to destination directory", e);
-            throw new DAOException("Failed to copy photo to destination directory", e);
+        } catch (DataAccessException ex) {
+            logger.error("Failed to create photo", ex);
+            throw new DAOException("Failed to create photo", ex);
         }
     }
 
