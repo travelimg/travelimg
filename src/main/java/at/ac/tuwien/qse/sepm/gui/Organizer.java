@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
+import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import javafx.application.Platform;
@@ -40,6 +41,7 @@ public class Organizer {
 
     @Autowired private ImportService importService;
     @Autowired private PhotoService photoService;
+    @Autowired private PhotographerService photographerService;
 
     @Autowired private MainController mainController;
 
@@ -86,7 +88,7 @@ public class Organizer {
     }
 
     private void handleImport(Event event) {
-        ImportDialog dialog = new ImportDialog(root, "Fotos importieren");
+        ImportDialog dialog = new ImportDialog(root, photographerService);
 
         Optional<List<Photo>> photos = dialog.showForResult();
         if (!photos.isPresent()) return;
@@ -128,7 +130,7 @@ public class Organizer {
     private void handleImportedPhoto(Photo photo) {
         // queue an update in the main gui
         Platform.runLater(() -> {
-            updateMonthListWithDate(photo.getExif().getDate());
+            updateMonthListWithDate(photo.getDate());
 
             // Ignore photos that are not part of the current filter.
             if (!monthSelector.matches(photo)) {
@@ -232,7 +234,7 @@ public class Organizer {
                 return false;
             }
 
-            return month.equals(YearMonth.from(photo.getExif().getDate()));
+            return month.equals(YearMonth.from(photo.getDate()));
         }
     }
 }

@@ -6,21 +6,24 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 public interface ExifService {
 
     /**
-     * Changes the Exif-data of a photo.
-     *
-     * The Exif-data in the file which is stored in the photos path changed and also
-     * the Exif-data in the datastore is updated.
-     * @param photo The photo which contains the changed Exif-data
-     * @throws ServiceException If there was a problem changing the file or the database entry.
+     * Returns the exif data of a photo
+     * @param photo the photo, must have a valid path
+     * @return the exif object, containing the exif data
+     * @throws ServiceException
      */
-    public void changeExif(Photo photo) throws ServiceException;
+    public Exif getExif(Photo photo) throws ServiceException;
 
     /**
-     * Imports Exif-data of the Photo.
-     *
-     * @param photo the Photo from which the Exif-data is extracted
-     * @return an Exif-entity which represent the Exif database entry
-     * @throws ServiceException if there is a problem with the metadata extraction process
+     * Reads date, latitude and longitude (if possible)
+     * @param photo the photo, must have a valid path
+     * @throws ServiceException
      */
-    public Exif importExif(Photo photo) throws ServiceException;
+    public void attachDateAndGeoData(Photo photo) throws ServiceException;
+
+    /**
+     * Modifies the exif data of a photo
+     * @param photo the photo, must have a valid path
+     * @throws ServiceException
+     */
+    public void modifyExifTags(Photo photo) throws ServiceException;
 }

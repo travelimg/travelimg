@@ -301,3 +301,7 @@
 .rating-picker .toggle-button.love {
     -fx-background-radius: 0 3 3 0;
 }
+
+.dialog .photographer .add .glyph-icon {
+    -glyph-name: "PLUS";
+}

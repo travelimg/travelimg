@@ -116,11 +116,18 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
         try {
             photoList = jdbcTemplate.query(READ_PHOTOS_BY_TAG_STRING, (rs, rowNum) -> {
                     Rating rating = Rating.from(rs.getInt("rating"));
-                    return new Photo(rs.getInt("id"), null,
-                    //TODO: get Photographer by photographerID
-                        rs.getString("path"), rating);
-                    //TODO: get Exif data for photo
-                });
+
+                    return new Photo(
+                        rs.getInt(1),
+                        null,
+                        rs.getString(3),
+                        rating,
+                        rs.getTimestamp(5).toLocalDateTime().toLocalDate(),
+                        rs.getDouble(6),
+                        rs.getDouble(7)
+                    );
+
+            });
             LOGGER.info("Successfully read photos for {}", tag);
         } catch (DataAccessException ex) {
             LOGGER.error("Reading photos failed due to DataAccessException");

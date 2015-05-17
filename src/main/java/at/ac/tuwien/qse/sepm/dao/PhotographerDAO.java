@@ -15,7 +15,16 @@ public interface PhotographerDAO {
      * @throws ValidationException If the photographer is invalid
      * @throws DAOException If the photographer cannot be created or the data store fails to create a record.
      */
-    public Photographer create(Photographer p) throws DAOException, ValidationException;
+    Photographer create(Photographer photographer) throws DAOException, ValidationException;
+
+    /**
+     * Update given photgrapher
+     *
+     * @param photographer The photographer to be updated.
+     * @throws DAOException If the photographer can not be updated.
+     * @throws ValidationException If the photographer is invalid
+     */
+    void update(Photographer photographer) throws DAOException, ValidationException;
 
     /**
      * Reads a single photographer by the id
@@ -23,7 +32,7 @@ public interface PhotographerDAO {
      * @return the read photographer
      * @throws DAOException If the data store fails to retrieve the record or if the photographer doesn't exist.
      */
-    public Photographer read(Photographer p) throws DAOException;
+    Photographer read(Photographer photographer) throws DAOException;
 
     /**
      * Retrieve all existing photographers.
@@ -31,5 +40,5 @@ public interface PhotographerDAO {
      * @return A List of all currently known photographers.
      * @throws DAOException If the data store fails to retrieve the records.
      */
-    public List<Photographer> readAll() throws DAOException;
+    List<Photographer> readAll() throws DAOException;
 }
