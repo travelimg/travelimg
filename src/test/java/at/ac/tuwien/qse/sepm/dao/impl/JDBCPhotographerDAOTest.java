@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @UsingTable("Photographer")
@@ -25,25 +24,27 @@ public class JDBCPhotographerDAOTest extends AbstractJDBCDAOTest {
     @Test
     @WithData
     public void testWithData() throws DAOException {
-        // fails because test_data_insert.sql is incomplete
-        assertEquals(1, countRows());
+        assertEquals(3, countRows());
     }
 
     @Test(expected = ValidationException.class)
+    @WithData
     public void createWithNullShouldThrow() throws ValidationException, DAOException {
         photographerDAO.create(null);
     }
 
     @Test
+    @WithData
     public void createWithValidParameterShouldPersist() throws ValidationException, DAOException {
         Photographer p = photographerDAO.create(new Photographer(null, "Enri"));
-        assertFalse(p.getId() == null);
-        assertEquals(1, countRows());
+        assertEquals(4, countRows());
+        assertTrue(4 == p.getId());
     }
 
     @Test(expected = DAOException.class)
+    @WithData
     public void readWithNonExistingIdShouldThrow() throws DAOException {
-        photographerDAO.getById(1337);
+        photographerDAO.getById(-1);
     }
 
     @Test
