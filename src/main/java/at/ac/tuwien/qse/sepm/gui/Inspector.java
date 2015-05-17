@@ -2,32 +2,24 @@ package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import com.lynden.gmapsfx.GoogleMapView;
-
-import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
-
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
-
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
-import org.controlsfx.tools.Platform;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,91 +29,59 @@ import java.util.List;
 public class Inspector {
 
     @FXML private BorderPane root;
+    @FXML private Node placeholder;
+    @FXML private Node details;
     @FXML private Button deleteButton;
     @FXML private Button cancelButton;
     @FXML private Button confirmButton;
-
-    @FXML private TableColumn<String, String> exifValue;
-
+    @FXML private VBox mapContainer;
     @FXML private TableColumn<String, String> exifName;
-
+    @FXML private TableColumn<String, String> exifValue;
     @FXML private TableView<Pair<String, String>> exifTable;
 
-    @FXML private VBox contentBox2;
-
     private GoogleMapsScene mapsScene;
-
-    @FXML private Label proofOfConceptLabel;
+    private Photo photo;
 
     @Autowired private Organizer organizer;
-
-    private Photo photo = null;
     @Autowired private PhotoService photoservice;
-
-    public Inspector() {
-
-    }
-
+    @Autowired private ExifService exifService;
     /**
      * Set the active photo.
-     * <p>
-     * The photos metadate will be displayed in the inspector widget.
+     *
+     * The photos metadata will be displayed in the inspector widget.
      *
      * @param photo The active photo for which to show further information
      */
-    public void setActivePhoto(Photo photo, GoogleMapsScene mapsScene) {
+    public void setActivePhoto(Photo photo) {
         this.photo = photo;
-        this.mapsScene = mapsScene;
-        proofOfConceptLabel.setText("Selected photo is: " + photo.getPath());
-
-        Exif exif = photo.getExif();
-        ObservableList<Pair<String, String>> exifData = FXCollections.observableArrayList(
-                new Pair<String, String>("Aufnahmedatum", exif.getDate().toString()),
-                new Pair<String, String>("Kamerahersteller", exif.getMake()),
-                new Pair<String, String>("Kameramodell", exif.getModel()),
-                new Pair<String, String>("Belichtungszeit", exif.getExposure() + " Sek."),
-                new Pair<String, String>("Blende", "f/" + exif.getAperture()),
-                new Pair<String, String>("Brennweite", "" + exif.getFocalLength()),
-                new Pair<String, String>("ISO", "" + exif.getIso()),
-                new Pair<String, String>("Blitz", exif.isFlash()? "wurde ausgelöst" : "wurde nicht ausgelöst"),
-                new Pair<String, String>("Höhe", "" + exif.getAltitude()));
-
-        exifTable.setEditable(true);
-        exifName.setCellValueFactory(new PropertyValueFactory<String, String>("Key"));
-        exifValue.setCellValueFactory(new PropertyValueFactory<String, String>("Value"));
-        exifTable.setItems(exifData);
-        //this.mapsScene = new GoogleMapsScene(photo.getExif());
-        //contentBox2.getChildren().clear();
-
-        //contentBox2.getChildren().add(mapsScene.getMapView());
-        mapsScene.setMaxSize(200,200);
-        mapsScene.addMarker(photo);
-        if(contentBox2.getChildren().contains(mapsScene.getMapView())) {
-            contentBox2.getChildren().remove(mapsScene.getMapView());
-        }
-        contentBox2.getChildren().add(mapsScene.getMapView());
-
+        showDetails(photo);
     }
 
     @FXML private void initialize() {
+        mapsScene = new GoogleMapsScene();
+
+        // if placeholder is hidden then it should not take up any space
+        placeholder.managedProperty().bind(placeholder.visibleProperty());
+        // hide placeholder when details are visible
+        placeholder.visibleProperty().bind(Bindings.not(details.visibleProperty()));
+
         deleteButton.setOnAction(this::handleDelete);
         cancelButton.setOnAction(this::handleCancel);
         confirmButton.setOnAction(this::handleConfirm);
-
-
+        mapContainer.getChildren().add(mapsScene.getMapView());
+        setActivePhoto(null);
     }
 
     private void handleDelete(Event event) {
-        if (photo != null) {
+        if (photo == null) return;
 
-            List<Photo> photolist = new ArrayList<Photo>();
-            photolist.add(photo);
-            organizer.reloadPhotos();
-            try {
-                photoservice.deletePhotos(photolist);
-            } catch (ServiceException e) {
-                System.out.println(e);
-            }
+        List<Photo> photos = new ArrayList<>();
+        photos.add(photo);
+        organizer.reloadPhotos();
+        try {
+            photoservice.deletePhotos(photos);
+        } catch (ServiceException e) {
+            System.out.println(e);
         }
     }
 
@@ -131,5 +91,37 @@ public class Inspector {
 
     private void handleConfirm(Event event) {
         // TODO
+    }
+
+    private void showDetails(Photo photo) {
+        if (photo == null) {
+            details.setVisible(false);
+            return;
+        }
+
+        details.setVisible(true);
+
+        mapsScene.addMarker(photo);
+
+        Exif exif = null;
+        try {
+            exif = exifService.getExif(photo);
+            ObservableList<Pair<String, String>> exifData = FXCollections.observableArrayList(
+                    new Pair<>("Aufnahmedatum", photo.getDate().toString()),
+                    new Pair<>("Kamerahersteller", exif.getMake()),
+                    new Pair<>("Kameramodell", exif.getModel()),
+                    new Pair<>("Belichtungszeit", exif.getExposure() + " Sek."),
+                    new Pair<>("Blende", "f/" + exif.getAperture()),
+                    new Pair<>("Brennweite", "" + exif.getFocalLength()),
+                    new Pair<>("ISO", "" + exif.getIso()),
+                    new Pair<>("Blitz", exif.isFlash()? "wurde ausgelöst" : "wurde nicht ausgelöst"),
+                    new Pair<>("Höhe", "" + exif.getAltitude()));
+            exifName.setCellValueFactory(new PropertyValueFactory<>("Key"));
+            exifValue.setCellValueFactory(new PropertyValueFactory<>("Value"));
+            exifTable.setItems(exifData);
+        } catch (ServiceException e) {
+            //TODO Dialog
+        }
+
     }
 }
