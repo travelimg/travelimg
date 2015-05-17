@@ -25,6 +25,7 @@ import java.util.Locale;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @UsingTable("Photo")
@@ -66,13 +67,21 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
         return new Photo(inputPhotos[seq]);
     }
 
-    private Photo getExpectedPhoto(Photo template) {
-        return new Photo(expectedPhotos[template.getId() - 1]);
+    private Photo getExpectedPhoto(int id) {
+        return new Photo(expectedPhotos[id - 1]);
     }
 
     private void setDataPrefixDir(Photo photo) {
         String path = photo.getPath().replace("$DIR", dataDir);
         photo.setPath(path);
+    }
+
+    private List<Photo> setPrefix(List<Photo> photos) {
+        for(Photo photo : photos) {
+            setDataPrefixDir(photo);
+        }
+
+        return photos;
     }
 
     @Before
@@ -96,7 +105,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     @WithData
     public void testCreateResultHasCorrectAttributes() throws DAOException, ValidationException {
         Photo photo = getInputPhoto(0);
-        Photo expected = getExpectedPhoto(photo);
+        Photo expected = getExpectedPhoto(photo.getId());
 
         Photo value = photoDAO.create(photo);
 
@@ -108,7 +117,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     @WithData
     public void testCreateImageFileIsCopied() throws DAOException, ValidationException {
         Photo photo = getInputPhoto(1);
-        Photo expected = getExpectedPhoto(photo);
+        Photo expected = getExpectedPhoto(photo.getId());
 
         Photo value = photoDAO.create(photo);
 
@@ -136,37 +145,43 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     @Test
     @WithData
     public void testReadAllRecordsExist() throws DAOException, ValidationException {
-        List<Photo> photos = photoDAO.readAll();
+        List<Photo> photos = setPrefix(photoDAO.readAll());
 
         for(Photo photo : photos) {
             setDataPrefixDir(photo);
-            Photo expected = getExpectedPhoto(photo);
+            Photo expected = getExpectedPhoto(photo.getId());
             assertEquals(expected, photo);
         }
     }
 
     @Test
     @WithData
-    public void testCreateAddsRow() throws DAOException, ValidationException {
+    public void testCreateAddsEntry() throws DAOException, ValidationException {
         int initial = countRows();
 
-        photoDAO.create(getInputPhoto(0));
+        Photo photo = getInputPhoto(0);
+
+        assertThat(setPrefix(photoDAO.readAll()), not(hasItem(photo)));
+
+        int id = photoDAO.create(photo).getId();
+        photo.setId(id);
 
         assertEquals(initial + 1, countRows());
+        assertThat(setPrefix(photoDAO.readAll()), hasItem(photo));
     }
 
     @Test
     @WithData
     public void testReadAllReturnsCreated() throws DAOException, ValidationException {
         Photo photo = getInputPhoto(1);
-        Photo expected = getExpectedPhoto(photo);
+        Photo expected = getExpectedPhoto(photo.getId());
 
-        assertTrue(!photoDAO.readAll().contains(expected));
+        assertThat(setPrefix(photoDAO.readAll()), not(hasItem(expected)));
 
         int id = photoDAO.create(photo).getId();
         expected.setId(id);
 
-        assertTrue(photoDAO.readAll().contains(expected));
+        assertThat(setPrefix(photoDAO.readAll()), hasItem(expected));
     }
 
     @Test
