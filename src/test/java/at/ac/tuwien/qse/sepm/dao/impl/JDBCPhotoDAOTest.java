@@ -38,7 +38,9 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.ENGLISH);
 
     private static final String dataDir = Paths.get(System.getProperty("java.io.tmpdir"), "travelimg").toString();
-    private static final String sourceDir = Paths.get(JDBCPhotoDAOTest.class.getClassLoader().getResource("db/testimages").getPath()).toString();
+    private static final String sourceDir = Paths.get(System.getProperty( "os.name" ).contains( "indow" ) ?
+            JDBCPhotoDAOTest.class.getClassLoader().getResource("db/testimages").getPath().substring(1) :
+            JDBCPhotoDAOTest.class.getClassLoader().getResource("db/testimages").getPath()).toString();
 
     private YearMonth expectedMonths[] = new YearMonth[] {
             YearMonth.of(2005, 9),
@@ -62,6 +64,19 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
             new Photo(7, defaultPhotographer, sourceDir + "/7.jpg", 0, LocalDate.of(2015, 5, 17), 41.5042718, 19.5180115),
             new Photo(8, defaultPhotographer, sourceDir + "/8.jpg", 0, LocalDate.of(2015, 5, 17), 41.5042718, 19.5180115),
     };
+
+    public JDBCPhotoDAOTest() {
+        for(Photo photo : Arrays.asList(expectedPhotos)) {
+            String path = photo.getPath().replace("/", File.separator);
+            photo.setPath(path);;
+        }
+
+        for(Photo photo : Arrays.asList(inputPhotos)) {
+            String path = photo.getPath().replace("/", File.separator);
+            photo.setPath(path);;
+        }
+
+    }
 
     private Photo getInputPhoto(int seq) {
         return new Photo(inputPhotos[seq]);
