@@ -41,6 +41,19 @@ public class JDBCPhotographerDAOTest extends AbstractJDBCDAOTest {
         assertTrue(4 == p.getId());
     }
 
+    @Test(expected = ValidationException.class)
+    @WithData
+    public void updateWithInvalidNameShouldThrow() throws DAOException, ValidationException {
+        photographerDAO.update(new Photographer(1,""));
+    }
+
+    @Test
+    @WithData
+    public void updateWithValidNameShouldUpdate() throws DAOException, ValidationException {
+        photographerDAO.update(new Photographer(1,"Enri"));
+        assertEquals("Enri",photographerDAO.getById(1).getName());
+    }
+
     @Test(expected = DAOException.class)
     @WithData
     public void readWithNonExistingIdShouldThrow() throws DAOException {
