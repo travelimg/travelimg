@@ -19,15 +19,15 @@
                         <Label text="Ordner auswählen"/>
                         <HBox prefHeight="0.0" prefWidth="0.0" VBox.vgrow="ALWAYS">
                             <children>
-                                <TextField fx:id="directoryField" HBox.hgrow="ALWAYS"/>
                                 <Button fx:id="browseButton" styleClass="search,raised" HBox.hgrow="ALWAYS">
                                     <graphic>
                                         <FontAwesomeIconView/>
                                     </graphic>
                                     <HBox.margin>
-                                        <Insets left="16.0"/>
+                                        <Insets right="16.0"/>
                                     </HBox.margin>
                                 </Button>
+                                <TextField fx:id="directoryField" HBox.hgrow="ALWAYS"/>
                             </children>
                         </HBox>
 
@@ -38,15 +38,15 @@
                         </Label>
                         <HBox prefHeight="0.0" prefWidth="0.0" VBox.vgrow="ALWAYS">
                             <children>
-                                <ComboBox fx:id="photographerBox" HBox.hgrow="ALWAYS" editable="true"/>
                                 <Button fx:id="addPhotographerButton" styleClass="add,raised" HBox.hgrow="ALWAYS">
                                     <graphic>
                                         <FontAwesomeIconView/>
                                     </graphic>
                                     <HBox.margin>
-                                        <Insets left="16.0"/>
+                                        <Insets right="16.0"/>
                                     </HBox.margin>
                                 </Button>
+                                <ComboBox fx:id="photographerBox" HBox.hgrow="ALWAYS" editable="true"/>
                             </children>
                         </HBox>
 
