@@ -94,19 +94,21 @@ public class FullscreenWindow extends Pane {
     {
         logger.info("Button next pressed!");
 
-        if(slideshowcount<ListofPhotos.size()) {
+        logger.info(ListofPhotos.size());
+
+
+        if(slideshowcount<ListofPhotos.size()-1) {
             try {
-                image = new Image(new FileInputStream(new File(ListofPhotos.get(slideshowcount).getPath())), 0, 0, true, true);
                 slideshowcount++;
+                image = new Image(new FileInputStream(new File(ListofPhotos.get(slideshowcount).getPath())), 0, 0, true, true);
+
             } catch (FileNotFoundException ex) {
                 logger.error("Could not find photo", ex);
                 return;
             }
 
             imageView.setImage(image);
-
-
-
+            logger.info(slideshowcount);
         }
         else
             logger.info("Album Ende erreicht!");
@@ -117,11 +119,13 @@ public class FullscreenWindow extends Pane {
     public void bt_previousPressed(ActionEvent event) {
         logger.info("Button previous pressed!");
 
+
         if ((slideshowcount == ListofPhotos.size() || slideshowcount <= ListofPhotos.size()) && slideshowcount >0)
         {
             try {
-                image = new Image(new FileInputStream(new File(ListofPhotos.get(slideshowcount-1).getPath())), 0, 0, true, true);
                 slideshowcount--;
+                image = new Image(new FileInputStream(new File(ListofPhotos.get(slideshowcount).getPath())), 0, 0, true, true);
+
             } catch (FileNotFoundException ex) {
                 logger.error("Could not find photo", ex);
                 return;
@@ -129,10 +133,12 @@ public class FullscreenWindow extends Pane {
 
 
         imageView.setImage(image);
+            logger.info(slideshowcount);
+
 
         }
         else
-            logger.info("Album Ende erreicht!");
+           logger.info("Album Ende erreicht!");
 
 
     }
