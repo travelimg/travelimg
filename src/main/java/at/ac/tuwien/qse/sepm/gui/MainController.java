@@ -7,6 +7,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.geometry.*;
 import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
@@ -19,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,34 +36,34 @@ public class MainController {
     @Autowired private Inspector inspector;
 
     @FXML private ScrollPane scrollPane;
-    @FXML private BorderPane root;
-    @FXML private Insets in;
+
     @FXML private TilePane tilePane;
-    private  GoogleMapsScene googleMap;
+    @FXML private Insets in;
+    @FXML private BorderPane root;
+    private GoogleMapsScene worldMap;
     private ImageTile selectedTile = null;
 
     public MainController() {
-
+        scrollPane = new ScrollPane();
+        in = new Insets(15,15,15,15);
+        tilePane = new TilePane();
+        scrollPane.setPrefWidth(500);
+        scrollPane.setPrefHeight(400);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        tilePane.setHgap(15);
+        tilePane.setVgap(15);
+        tilePane.setPadding(in);
+        scrollPane.setContent(tilePane);
+        // worldMap = new GoogleMapsScene();
     }
 
     @FXML
     private void initialize() {
-        scrollPane = new ScrollPane();
-        tilePane = new TilePane();
-        scrollPane.setPrefHeight(400);
-        scrollPane.setPrefWidth(500);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-        tilePane.setHgap(15);
-        tilePane.setVgap(15);
-        in = new Insets(15,15,15,15);
-        tilePane.setPadding(in);
-        scrollPane.setContent(tilePane);
-        googleMap = new GoogleMapsScene();
-        root.setCenter(googleMap.getMapView());
-
+        worldMap = new GoogleMapsScene();
+        root.setCenter(worldMap.getMapView());
     }
 
     /**
@@ -70,8 +72,9 @@ public class MainController {
      * @param photo The photo to be added.
      */
     public void addPhoto(Photo photo) {
-        ImageTile imageTile = new ImageTile(photo);
         root.setCenter(scrollPane);
+        ImageTile imageTile = new ImageTile(photo);
+
         imageTile.getSelectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -131,8 +134,8 @@ public class MainController {
         public void select() {
             getStyleClass().remove("image-tile-non-selected");
             getStyleClass().add("image-tile-selected");
-
-            inspector.setActivePhoto(photo,googleMap);
+            inspector.setMap(worldMap);
+            inspector.setActivePhoto(photo);
 
             this.selected.set(true);
         }

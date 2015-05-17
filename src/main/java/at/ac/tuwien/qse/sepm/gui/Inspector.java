@@ -54,11 +54,20 @@ public class Inspector {
      */
     public void setActivePhoto(Photo photo) {
         this.photo = photo;
+
         showDetails(photo);
     }
 
+    public void setMap(GoogleMapsScene mapsScene){
+        if(mapContainer.getChildren().contains(mapsScene.getMapView())){
+            mapContainer.getChildren().remove(mapsScene.getMapView());
+        }
+        mapContainer.getChildren().add(mapsScene.getMapView());
+       // mapContainer.getChildren().add(mapsScene.getMapView());
+        this.mapsScene=mapsScene;
+    }
     @FXML private void initialize() {
-        mapsScene = new GoogleMapsScene();
+
 
         // if placeholder is hidden then it should not take up any space
         placeholder.managedProperty().bind(placeholder.visibleProperty());
@@ -68,7 +77,7 @@ public class Inspector {
         deleteButton.setOnAction(this::handleDelete);
         cancelButton.setOnAction(this::handleCancel);
         confirmButton.setOnAction(this::handleConfirm);
-        mapContainer.getChildren().add(mapsScene.getMapView());
+
         setActivePhoto(null);
     }
 
