@@ -34,10 +34,10 @@ import java.util.stream.Collectors;
 
 public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
-    private static final String readAllStatement = "SELECT id, photographer_id, path, rating, date, latitude, longitude FROM PHOTO;";
-    private static final String deleteStatement = "Delete from Photo where id =?";
-    private static final String readByYearAndMonthStatement = "SELECT id, photographer_id, path, rating, date, latitude, longitude FROM PHOTO WHERE YEAR(DATE)=? AND MONTH(DATE)=?;";
-    private static final String readMonthStatement = "SELECT YEAR(date), MONTH(date) from Photo;";
+    private static final String READ_ALL_STATEMENT = "SELECT id, photographer_id, path, rating, date, latitude, longitude FROM PHOTO;";
+    private static final String DELETE_STATEMENT = "Delete from Photo where id =?";
+    private static final String READ_BY_YEAR_AND_MONTH_STATEMENT = "SELECT id, photographer_id, path, rating, date, latitude, longitude FROM PHOTO WHERE YEAR(DATE)=? AND MONTH(DATE)=?;";
+    private static final String READ_MONTH_STATEMENT = "SELECT YEAR(date), MONTH(date) from Photo;";
     private static final String GET_BY_ID_STATEMENT = "SELECT id, photographer_id, path, rating, date, latitude, longitude FROM Photo where id=?";
 
     private final String photoDirectory;
@@ -114,7 +114,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             }
         }*/
         try {
-            jdbcTemplate.update(deleteStatement, id);
+            jdbcTemplate.update(DELETE_STATEMENT, id);
 
         } catch (DataAccessException e) {
             throw new DAOException("Failed to delete photo", e);
@@ -134,17 +134,18 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         }
     }
 
+    @Override
     public List<Photo> readAll() throws DAOException, ValidationException {
         logger.debug("retrieving all photos");
 
         try {
-            List<Photo> photos = jdbcTemplate.query(readAllStatement, new PhotoRowMapper());
+            List<Photo> photos = jdbcTemplate.query(READ_ALL_STATEMENT, new PhotoRowMapper());
 
             logger.debug("Successfully read all photos");
             return photos;
-        } catch(DataAccessException e) {
+        } catch (DataAccessException e) {
             throw new DAOException("Failed to read all photos", e);
-        } catch(RuntimeException ex) {
+        } catch (RuntimeException ex) {
             throw new DAOException(ex.getCause());
         }
     }
@@ -154,7 +155,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         logger.debug("retrieving photos for monthh {}", month);
 
         try {
-            List<Photo> photos = jdbcTemplate.query(readByYearAndMonthStatement,
+            List<Photo> photos = jdbcTemplate.query(READ_BY_YEAR_AND_MONTH_STATEMENT,
                     new PhotoRowMapper(), month.getYear(), month.getMonth().getValue()
             );
 
@@ -171,9 +172,10 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     @Override
     public List<YearMonth> getMonthsWithPhotos() throws DAOException {
+
         try {
-            return jdbcTemplate.query(readMonthStatement, (rs, rowNum) -> {
-                return YearMonth.of(rs.getInt(1), rs.getInt(2));
+            return jdbcTemplate.query(READ_MONTH_STATEMENT, (rs, rowNum) -> {
+                    return YearMonth.of(rs.getInt(1), rs.getInt(2));
             }).stream()
                     .distinct()
                     .collect(Collectors.toList());
@@ -213,21 +215,20 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private class PhotoRowMapper implements RowMapper<Photo> {
         @Override
         public Photo mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Photographer photographer = null;
+            Photographer photographer;
             try {
                 photographer = photographerDAO.getById(rs.getInt(2));
             } catch (DAOException ex) {
                 throw new RuntimeException(ex);
             }
 
-            Photo photo = new Photo(rs.getInt(1),
+            return new Photo(rs.getInt(1),
                     photographer,
                     rs.getString(3),
                     rs.getInt(4),rs.getTimestamp(5).toLocalDateTime().toLocalDate(),
                     rs.getDouble(6),
                     rs.getDouble(7)
             );
-            return photo;
         }
     }
 }
