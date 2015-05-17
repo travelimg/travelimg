@@ -16,9 +16,9 @@ public class RatingPicker extends HBox {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @FXML private ToggleGroup toggleGroup;
-    @FXML private Toggle hateButton;
-    @FXML private Toggle rateButton;
-    @FXML private Toggle loveButton;
+    @FXML private Toggle badButton;
+    @FXML private Toggle neutralButton;
+    @FXML private Toggle goodButton;
 
     public RatingPicker() {
         LOGGER.debug("RatingPicker()");
@@ -41,15 +41,16 @@ public class RatingPicker extends HBox {
         }
 
         ratingProperty().set(rating);
+        toggleGroup.selectToggle(null);
         switch (rating) {
             case BAD:
-                toggleGroup.selectToggle(hateButton);
+                toggleGroup.selectToggle(badButton);
                 break;
             case NEUTRAL:
-                toggleGroup.selectToggle(rateButton);
+                toggleGroup.selectToggle(neutralButton);
                 break;
             case GOOD:
-                toggleGroup.selectToggle(loveButton);
+                toggleGroup.selectToggle(goodButton);
                 break;
         }
     }
@@ -59,11 +60,11 @@ public class RatingPicker extends HBox {
     private void handleSelect(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
         LOGGER.debug("handleSelect(~)", oldValue, newValue);
 
-        if (newValue == hateButton) {
+        if (newValue == badButton) {
             setRating(Rating.BAD);
-        } else if (newValue == rateButton) {
+        } else if (newValue == neutralButton) {
             setRating(Rating.NEUTRAL);
-        } else if (newValue == loveButton) {
+        } else if (newValue == goodButton) {
             setRating(Rating.GOOD);
         }
     }
