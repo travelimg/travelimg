@@ -135,12 +135,9 @@ public class FullscreenWindow extends Pane {
         imageView.setImage(image);
             logger.info(slideshowcount);
 
-
         }
         else
            logger.info("Album Ende erreicht!");
-
-
     }
 
 }
