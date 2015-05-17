@@ -25,6 +25,16 @@ public class Photo {
         this.longitude = longitude;
     }
 
+    public Photo(Photo other) {
+        this.id = other.id;
+        this.photographer = other.photographer;
+        this.path = other.path;
+        this.rating = other.rating;
+        this.date = other.date;
+        this.latitude = other.latitude;
+        this.longitude = other.longitude;
+    }
+
     public Integer getId() {
         return id;
     }
