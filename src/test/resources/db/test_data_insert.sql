@@ -1,4 +1,6 @@
 INSERT INTO Photographer(id, name) VALUES (1, 'Test Photographer');
+INSERT INTO Photographer(id, name) VALUES (2, 'Enri');
+INSERT INTO Photographer(id, name) VALUES (3, 'Steve');
 
 INSERT INTO Tag(id, name) VALUES (1, 'Person');
 INSERT INTO Tag(id, name) VALUES (2, 'Essen');
