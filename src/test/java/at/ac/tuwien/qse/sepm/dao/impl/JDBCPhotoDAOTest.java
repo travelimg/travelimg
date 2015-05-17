@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 import at.ac.tuwien.qse.sepm.dao.*;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
+import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
@@ -49,20 +50,20 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     };
 
     private Photo expectedPhotos[] = new Photo[] {
-            new Photo(1, defaultPhotographer, dataDir + "/2015/03/06/1.jpg", 0, LocalDate.of(2015, 3, 6), 41.5, 19.5),
-            new Photo(2, defaultPhotographer, dataDir + "/2005/09/11/2.jpg", 0, LocalDate.of(2005, 9, 11), 39.7, -104.9),
-            new Photo(3, defaultPhotographer, dataDir + "/2005/09/11/3.jpg", 0, LocalDate.of(2005, 9, 11), 39.7, -104.9),
-            new Photo(4, defaultPhotographer, dataDir + "/2005/09/11/4.jpg", 0, LocalDate.of(2005, 9, 11), 39.7, -104.9),
-            new Photo(5, defaultPhotographer, dataDir + "/2015/03/04/5.jpg", 0, LocalDate.of(2015, 3, 4), 12.0, 12.0),
-            new Photo(6, defaultPhotographer, dataDir + "/2015/05/17/6.jpg", 0, LocalDate.of(2015, 5, 17), 41.5042718, 19.5180115),
-            new Photo(7, defaultPhotographer, dataDir + "/2015/05/17/7.jpg", 0, LocalDate.of(2015, 5, 17), 41.5042718, 19.5180115),
-            new Photo(8, defaultPhotographer, dataDir + "/2015/05/17/8.jpg", 0, LocalDate.of(2015, 5, 17), 41.5042718, 19.5180115),
+            new Photo(1, defaultPhotographer, dataDir + "/2015/03/06/1.jpg", Rating.NONE, LocalDate.of(2015, 3, 6), 41.5, 19.5),
+            new Photo(2, defaultPhotographer, dataDir + "/2005/09/11/2.jpg", Rating.NONE, LocalDate.of(2005, 9, 11), 39.7, -104.9),
+            new Photo(3, defaultPhotographer, dataDir + "/2005/09/11/3.jpg", Rating.NONE, LocalDate.of(2005, 9, 11), 39.7, -104.9),
+            new Photo(4, defaultPhotographer, dataDir + "/2005/09/11/4.jpg", Rating.NONE, LocalDate.of(2005, 9, 11), 39.7, -104.9),
+            new Photo(5, defaultPhotographer, dataDir + "/2015/03/04/5.jpg", Rating.NONE, LocalDate.of(2015, 3, 4), 12.0, 12.0),
+            new Photo(6, defaultPhotographer, dataDir + "/2015/05/17/6.jpg", Rating.NONE, LocalDate.of(2015, 5, 17), 41.5042718, 19.5180115),
+            new Photo(7, defaultPhotographer, dataDir + "/2015/05/17/7.jpg", Rating.NONE, LocalDate.of(2015, 5, 17), 41.5042718, 19.5180115),
+            new Photo(8, defaultPhotographer, dataDir + "/2015/05/17/8.jpg", Rating.NONE, LocalDate.of(2015, 5, 17), 41.5042718, 19.5180115),
     };
 
     private Photo inputPhotos[] = new Photo[] {
-            new Photo(6, defaultPhotographer, sourceDir + "/6.jpg", 0, LocalDate.of(2015, 5, 17), 41.5042718, 19.5180115),
-            new Photo(7, defaultPhotographer, sourceDir + "/7.jpg", 0, LocalDate.of(2015, 5, 17), 41.5042718, 19.5180115),
-            new Photo(8, defaultPhotographer, sourceDir + "/8.jpg", 0, LocalDate.of(2015, 5, 17), 41.5042718, 19.5180115),
+            new Photo(6, defaultPhotographer, sourceDir + "/6.jpg", Rating.NONE, LocalDate.of(2015, 5, 17), 41.5042718, 19.5180115),
+            new Photo(7, defaultPhotographer, sourceDir + "/7.jpg", Rating.NONE, LocalDate.of(2015, 5, 17), 41.5042718, 19.5180115),
+            new Photo(8, defaultPhotographer, sourceDir + "/8.jpg", Rating.NONE, LocalDate.of(2015, 5, 17), 41.5042718, 19.5180115),
     };
 
     public JDBCPhotoDAOTest() {
