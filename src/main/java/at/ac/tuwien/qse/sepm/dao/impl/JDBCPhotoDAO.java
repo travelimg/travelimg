@@ -77,7 +77,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             Map<String, Object> parameters = new HashMap<String, Object>(1);
             parameters.put("photographer_id", photo.getPhotographer().getId());
             parameters.put("path",photo.getPath());
-            parameters.put("rating",photo.getRating());
+            parameters.put("rating",photo.getRating().ordinal());
             parameters.put("date", Date.valueOf(photo.getDate()));
             parameters.put("latitude", photo.getLatitude());
             parameters.put("longitude", photo.getLongitude());
