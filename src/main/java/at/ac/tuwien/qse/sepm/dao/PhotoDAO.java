@@ -56,4 +56,11 @@ public interface PhotoDAO {
      */
     List<Photo> readPhotosByMonth(YearMonth month) throws DAOException;
 
+    /**
+     * Retrieve a list of those months for which there are photos.
+     *
+     * @return a list of months with available photos
+     */
+    List<YearMonth> getMonthsWithPhotos() throws DAOException;
+
 }
