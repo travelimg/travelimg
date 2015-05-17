@@ -1,21 +1,28 @@
 package at.ac.tuwien.qse.sepm.entities;
 
+import java.time.LocalDate;
+
 public class Photo {
 
     private Integer id;
     private Photographer photographer;
     private String path;
     private Integer rating;
-    private Exif exif;
+    private LocalDate date;
+    private double latitude;
+    private double longitude;
 
     public Photo() {
     }
 
-    public Photo(Integer id, Photographer photographer, String path, Integer rating) {
-            this.id = id;
-            this.photographer = photographer;
-            this.path = path;
-            this.rating = rating;
+    public Photo(Integer id, Photographer photographer, String path, Integer rating, LocalDate date, double latitude, double longitude) {
+        this.id = id;
+        this.photographer = photographer;
+        this.path = path;
+        this.rating = rating;
+        this.date = date;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public Integer getId() {
@@ -26,20 +33,20 @@ public class Photo {
         this.id = id;
     }
 
-    public Photographer getPhotographer() {
-        return photographer;
-    }
-
-    public void setPhotographer(Photographer photographer) {
-        this.photographer = photographer;
-    }
-
     public String getPath() {
         return path;
     }
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public Photographer getPhotographer() {
+        return photographer;
+    }
+
+    public void setPhotographer(Photographer photographer) {
+        this.photographer = photographer;
     }
 
     public Integer getRating() {
@@ -50,12 +57,28 @@ public class Photo {
         this.rating = rating;
     }
 
-    public Exif getExif() {
-        return exif;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setExif(Exif exif) {
-        this.exif = exif;
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     @Override
@@ -65,6 +88,9 @@ public class Photo {
                 ", photographer=" + photographer +
                 ", path='" + path + '\'' +
                 ", rating=" + rating +
+                ", date=" + date +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
                 '}';
     }
 }

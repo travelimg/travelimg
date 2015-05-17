@@ -128,7 +128,7 @@ public class Organizer {
     private void handleImportedPhoto(Photo photo) {
         // queue an update in the main gui
         Platform.runLater(() -> {
-            updateMonthListWithDate(photo.getExif().getDate());
+            updateMonthListWithDate(photo.getDate());
 
             // Ignore photos that are not part of the current filter.
             if (!monthSelector.matches(photo)) {
@@ -232,7 +232,7 @@ public class Organizer {
                 return false;
             }
 
-            return month.equals(YearMonth.from(photo.getExif().getDate()));
+            return month.equals(YearMonth.from(photo.getDate()));
         }
     }
 }
