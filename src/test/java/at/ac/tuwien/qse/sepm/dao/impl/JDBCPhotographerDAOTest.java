@@ -24,7 +24,7 @@ public class JDBCPhotographerDAOTest extends AbstractJDBCDAOTest {
     @Test
     @WithData
     public void testWithData() throws DAOException {
-        assertEquals(3, countRows());
+        assertEquals(photographerDAO.readAll(), countRows());
     }
 
     @Test(expected = ValidationException.class)
@@ -36,9 +36,9 @@ public class JDBCPhotographerDAOTest extends AbstractJDBCDAOTest {
     @Test
     @WithData
     public void createWithValidParameterShouldPersist() throws ValidationException, DAOException {
+        int nrOfRows = countRows();
         Photographer p = photographerDAO.create(new Photographer(null, "Enri"));
-        assertEquals(4, countRows());
-        assertTrue(4 == p.getId());
+        assertEquals(nrOfRows+1, countRows());
     }
 
     @Test(expected = ValidationException.class)
