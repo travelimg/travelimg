@@ -30,6 +30,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 
@@ -42,11 +43,11 @@ import java.util.Map;
 
 public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
-    private static final String READ_ALL_STATEMENT = "SELECT id, photographer_id, path, rating, date, latitude, longitude FROM PHOTO;";
+    private static final String READ_ALL_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude FROM PHOTO;";
     private static final String DELETE_STATEMENT = "Delete from Photo where id =?";
-    private static final String READ_BY_YEAR_AND_MONTH_STATEMENT = "SELECT id, photographer_id, path, rating, date, latitude, longitude FROM PHOTO WHERE YEAR(DATE)=? AND MONTH(DATE)=?;";
-    private static final String READ_MONTH_STATEMENT = "SELECT YEAR(date), MONTH(date) from Photo;";
-    private static final String GET_BY_ID_STATEMENT = "SELECT id, photographer_id, path, rating, date, latitude, longitude FROM Photo where id=?";
+    private static final String READ_BY_YEAR_AND_MONTH_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude FROM PHOTO WHERE YEAR(datetime)=? AND MONTH(datetime)=?;";
+    private static final String READ_MONTH_STATEMENT = "SELECT YEAR(datetime), MONTH(datetime) from Photo;";
+    private static final String GET_BY_ID_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude FROM Photo where id=?";
     private static final String UPDATE_STATEMENT = "UPDATE Photo SET path = ?, rating = ? WHERE id = ?";
 
 
@@ -88,9 +89,9 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
         Map<String, Object> parameters = new HashMap<String, Object>(1);
         parameters.put("photographer_id", photo.getPhotographer().getId());
-        parameters.put("path",photo.getPath());
-        parameters.put("rating",photo.getRating().ordinal());
-        parameters.put("date", Date.valueOf(photo.getDate()));
+        parameters.put("path", photo.getPath());
+        parameters.put("rating", photo.getRating().ordinal());
+        parameters.put("datetime", Timestamp.valueOf(photo.getDatetime()));
         parameters.put("latitude", photo.getLatitude());
         parameters.put("longitude", photo.getLongitude());
 
@@ -221,7 +222,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private String copyToPhotoDirectory(Photo photo) throws IOException {
         File source = new File(photo.getPath());
         String filename = source.getName();
-        String date = dateFormatter.format(photo.getDate());
+        String date = dateFormatter.format(photo.getDatetime());
 
         Path path = Paths.get(photoDirectory, date, filename);
         File dest = path.toFile();
@@ -255,7 +256,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
                     photographer,
                     rs.getString(3),
                     rating,
-                    rs.getTimestamp(5).toLocalDateTime().toLocalDate(),
+                    rs.getTimestamp(5).toLocalDateTime(),
                     rs.getDouble(6),
                     rs.getDouble(7)
             );
