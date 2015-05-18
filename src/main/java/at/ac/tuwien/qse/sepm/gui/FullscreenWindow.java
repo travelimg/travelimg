@@ -2,10 +2,12 @@ package at.ac.tuwien.qse.sepm.gui;
 
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.scene.image.ImageView;
@@ -18,43 +20,29 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 
 
-
-public class FullscreenWindow extends Pane {
+public class FullscreenWindow extends BorderPane {
 
     private static final Logger logger = LogManager.getLogger();
 
     private Stage stage;
     private Scene scene;
-    private Photo photo;
-    private Image image;
-
-    int slideshowcount=0;
 
     @FXML
-    private ImageView current;
-
+    private BorderPane root;
     @FXML
     private ImageView imageView;
 
-    @FXML
-    private ImageView next;
+    private List<Photo> photos;
+    private Image image;
 
-    @FXML
-    private Button bt_next;
+    private int activeIndex = 0;
 
-    @FXML
-    private Button bt_previous;
-
-    private ArrayList<Photo> ListofPhotos = new ArrayList<>();
-
-    MainController mainController = new MainController();
 
     public FullscreenWindow() {
         FXMLLoadHelper.load(this, this, FullscreenWindow.class, "view/FullScreenDialog.fxml");
-
-
     }
 
     @FXML
@@ -63,81 +51,67 @@ public class FullscreenWindow extends Pane {
         this.scene = new Scene(this);
 
         stage.setScene(scene);
-        //stage.setFullScreen(true);
 
+        imageView.fitWidthProperty().bind(Bindings.subtract(root.widthProperty(), 100));
+        imageView.fitHeightProperty().bind(root.heightProperty());
     }
 
-    public void present(Photo photo, ArrayList<Photo> photoListe)
-    {
-        ListofPhotos = photoListe;
+    public void present(List<Photo> photos) {
+        this.photos = photos;
 
-            try {
-                image = new Image(new FileInputStream(new File(photoListe.get(slideshowcount).getPath())), 0, 0, true, true);
-            } catch (FileNotFoundException ex) {
-                logger.error("Could not find photo", ex);
-                return;
-            }
+        if(activeIndex >= photos.size()) {
+            activeIndex = 0;
+        }
 
-            imageView.setImage(image);
-            slideshowcount++;
+        loadImage();
 
-            if(slideshowcount >= photoListe.size())
-                slideshowcount = 0;
-
-        this.photo = photo;
+        stage.setFullScreen(true);
         stage.show();
-
-
     }
 
-    public void bt_nextPressed(ActionEvent event)
-    {
+    @FXML
+    private void bt_nextPressed(ActionEvent event) {
         logger.info("Button next pressed!");
 
-        logger.info(ListofPhotos.size());
+        activeIndex++;
+        activeIndex = activeIndex % photos.size();
 
-
-        if(slideshowcount<ListofPhotos.size()-1) {
-            try {
-                slideshowcount++;
-                image = new Image(new FileInputStream(new File(ListofPhotos.get(slideshowcount).getPath())), 0, 0, true, true);
-
-            } catch (FileNotFoundException ex) {
-                logger.error("Could not find photo", ex);
-                return;
-            }
-
-            imageView.setImage(image);
-            logger.info(slideshowcount);
-        }
-        else
-            logger.info("Album Ende erreicht!");
-
-
+        loadImage();
     }
 
-    public void bt_previousPressed(ActionEvent event) {
+    @FXML
+    private void bt_previousPressed(ActionEvent event) {
         logger.info("Button previous pressed!");
 
+        activeIndex--;
+        if(activeIndex < 0)
+            activeIndex += photos.size();
+        activeIndex = activeIndex % photos.size();
 
-        if ((slideshowcount == ListofPhotos.size() || slideshowcount <= ListofPhotos.size()) && slideshowcount >0)
-        {
-            try {
-                slideshowcount--;
-                image = new Image(new FileInputStream(new File(ListofPhotos.get(slideshowcount).getPath())), 0, 0, true, true);
+        loadImage();
+    }
 
-            } catch (FileNotFoundException ex) {
-                logger.error("Could not find photo", ex);
-                return;
-            }
-
-
-        imageView.setImage(image);
-            logger.info(slideshowcount);
-
+    private void loadImage() {
+        if (photos.size() == 0 || photos.size() <= activeIndex) {
+            // out of bounds
+            return;
         }
-        else
-           logger.info("Album Ende erreicht!");
+
+        try {
+            image = new Image(
+                    new FileInputStream(
+                            new File(
+                                    photos.get(activeIndex).getPath())),
+                    0,
+                    0,
+                    true,
+                    true
+            );
+
+            imageView.setImage(image);
+        } catch (FileNotFoundException ex) {
+            logger.error("Could not find photo", ex);
+        }
     }
 
 }

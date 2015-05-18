@@ -175,17 +175,9 @@ public class Organizer {
      * Show the current photo selection in fullscreen.
      * @param event The event triggering the request.
      */
-    private void handlePresent(Event event)
-    {
-
-
-        mainController.fullsizePhotos();
-
-
-
-
-
-
+    private void handlePresent(Event event) {
+        FullscreenWindow fullscreen = new FullscreenWindow();
+        fullscreen.present(mainController.getActivePhotos());
     }
 
     /**
