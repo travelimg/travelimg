@@ -20,7 +20,7 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
     private static final String DELETE_STRING = "DELETE FROM phototag WHERE "
             + "photo_id = ? AND tag_id = ?";
     private static final String READ_TAGS_BY_PHOTO_STRING = "SELECT DISTINCT tag_id, name FROM "
-            + "(tag JOIN phototag ON id = tag_id) WHERE photo_id = ?";
+            + "(tag t JOIN phototag ON id = tag_id) WHERE photo_id = ?";
     private static final String READ_PHOTOS_BY_TAG_STRING = "SELECT DISTINCT * FROM (photo JOIN "
             + "phototag ON id = photo_id) where tag_id = ?";
 
@@ -90,11 +90,12 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
         try {
             tagList = jdbcTemplate.query(READ_TAGS_BY_PHOTO_STRING ,new Object[] {photo.getId()},
                     (rs, rowNum) -> {
-                    return new Tag(rs.getInt("id"), rs.getString("name"));
+                    return new Tag(rs.getInt("tag_id"), rs.getString("name"));
                 });
             LOGGER.info("Successfully read tags for {}", photo);
         } catch (DataAccessException ex) {
             LOGGER.error("Reading Tags failed due to DataAccessException");
+            ex.printStackTrace();
             throw new DAOException("Could not read tags.", ex);
         }
         LOGGER.debug("Leaving readTagsByPhoto with {}", photo);
