@@ -25,7 +25,7 @@ public class JDBCTagDAOTest extends AbstractJDBCDAOTest {
     @Test
     @WithData
     public void testWithData() throws DAOException {
-        assertEquals(2, countRows());
+        assertEquals(tagDAO.readAll().size(), countRows());
     }
 
     @Test(expected = ValidationException.class)
@@ -43,9 +43,9 @@ public class JDBCTagDAOTest extends AbstractJDBCDAOTest {
     @Test
     @WithData
     public void createWithValidParameterShouldPersist() throws ValidationException, DAOException {
+        int nrOfRows = countRows();
         Tag t = tagDAO.create(new Tag(null, "Strand"));
-        assertEquals(3, countRows());
-        assertTrue(3 == t.getId());
+        assertEquals(nrOfRows+1, countRows());
     }
 
     @Test(expected = DAOException.class)
@@ -62,12 +62,19 @@ public class JDBCTagDAOTest extends AbstractJDBCDAOTest {
         assertEquals(1, countRowsWhere("name = 'Person'"));
     }
 
+    @WithData
+    public void deleteWithNonExistingIdShouldNotChangeAnything() throws DAOException {
+        int nrOfRows = countRows();
+        tagDAO.delete(new Tag(-1, null));
+        assertEquals(nrOfRows,countRows());
+    }
+
     @Test
     @WithData
     public void deleteShouldRemoveOneRow() throws DAOException {
+        int nrOfRows = countRows();
         tagDAO.delete(new Tag(1, null));
-        tagDAO.readAll();
-        assertEquals(countRows(), 1);
+        assertEquals(countRows(), nrOfRows-1);
     }
 
     @Test
