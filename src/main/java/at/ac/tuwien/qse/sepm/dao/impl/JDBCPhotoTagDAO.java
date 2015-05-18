@@ -88,7 +88,8 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
         PhotoValidator.validateID(photo);
         List<Tag> tagList;
         try {
-            tagList = jdbcTemplate.query(READ_TAGS_BY_PHOTO_STRING, (rs, rowNum) -> {
+            tagList = jdbcTemplate.query(READ_TAGS_BY_PHOTO_STRING ,new Object[] {photo.getId()},
+                    (rs, rowNum) -> {
                     return new Tag(rs.getInt("id"), rs.getString("name"));
                 });
             LOGGER.info("Successfully read tags for {}", photo);
@@ -113,8 +114,11 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
         TagValidator.validateID(tag);
         List<Photo> photoList;
         try {
-            photoList = jdbcTemplate.query(READ_PHOTOS_BY_TAG_STRING, (rs, rowNum) -> {
-                Photo photo = new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4),rs.getTimestamp(5).toLocalDateTime().toLocalDate(),rs.getDouble(6),rs.getDouble(7));
+            photoList = jdbcTemplate.query(READ_PHOTOS_BY_TAG_STRING, new Object[] {tag.getId()},
+                    (rs, rowNum) -> {
+                Photo photo = new Photo(rs.getInt(1), null, rs.getString(3), rs.getInt(4),
+                        rs.getTimestamp(5).toLocalDateTime().toLocalDate(),rs.getDouble(6),
+                        rs.getDouble(7));
                 return photo;
                 });
             LOGGER.info("Successfully read photos for {}", tag);
