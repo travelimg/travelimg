@@ -24,7 +24,7 @@ public class JDBCPhotographerDAOTest extends AbstractJDBCDAOTest {
     @Test
     @WithData
     public void testWithData() throws DAOException {
-        assertEquals(photographerDAO.readAll(), countRows());
+        assertEquals(photographerDAO.readAll().size(), countRows());
     }
 
     @Test(expected = ValidationException.class)
