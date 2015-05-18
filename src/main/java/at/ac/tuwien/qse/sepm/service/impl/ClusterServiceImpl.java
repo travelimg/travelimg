@@ -1,12 +1,13 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Reise;
-import at.ac.tuwien.qse.sepm.service.ClusterService;
+import at.ac.tuwien.qse.sepm.entities.Place;
+import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.wrapper.TimeWrapper;
 import org.apache.commons.math3.ml.clustering.Cluster;
 import org.apache.commons.math3.ml.clustering.DBSCANClusterer;
 import org.apache.logging.log4j.LogManager;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,13 +21,15 @@ public class ClusterServiceImpl implements ClusterService {
             .getLogger(ClusterServiceImpl.class);
     private static final DBSCANClusterer dbscan = new DBSCANClusterer(604800, 0);
 
-    @Override public List<Reise> cluster(List<Photo> photos) {
+    @Autowired private GeoService geoService;
+
+    @Override public List<Place> cluster(List<Photo> photos) throws ServiceException {
         logger.debug("photoList-size: " + photos.size());
 
         List<TimeWrapper> pointList = new ArrayList<TimeWrapper>();
-        List<Reise> reiseList = new ArrayList<Reise>();
+        List<Place> reiseList = new ArrayList<Place>();
 
-        for(Photo photo: photos) {
+        for (Photo photo : photos) {
             pointList.add(new TimeWrapper(photo));
         }
 
@@ -34,20 +37,20 @@ public class ClusterServiceImpl implements ClusterService {
 
         List<Cluster<TimeWrapper>> clusterResults = dbscan.cluster(pointList);
 
-        for (int i=0; i<clusterResults.size(); i++) {
+        for (int i = 0; i < clusterResults.size(); i++) {
             double latitude, longitude;
             int count;
             latitude = longitude = count = 0;
-//            System.out.println("Cluster " + i);
+
             for (TimeWrapper timeWrapper : clusterResults.get(i).getPoints()) {
                 latitude += timeWrapper.getPhoto().getLatitude();
                 longitude += timeWrapper.getPhoto().getLongitude();
+                count++;
             }
-            reiseList.add(new Reise(latitude/count, longitude/count, ""));
-//                System.out.println(timeWrapper.getPhoto().getDate());
-//            System.out.println();
+            logger.debug("latCentroid: " + latitude/count + " longCentroid: " + longitude/count);
+            reiseList.add(geoService.getPlaceByGeoData(latitude / count, longitude / count));
+            logger.debug("Reise " + 1 + " " + reiseList.get(i).getCountry());
         }
-
 
         return reiseList;
     }

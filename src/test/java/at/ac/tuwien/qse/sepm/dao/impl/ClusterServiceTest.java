@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.dao.UsingTable;
 import at.ac.tuwien.qse.sepm.dao.WithData;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +41,8 @@ public class ClusterServiceTest {
         } catch (DAOException e) {
             e.printStackTrace();
         } catch (ValidationException e) {
+            e.printStackTrace();
+        } catch (ServiceException e) {
             e.printStackTrace();
         }
     }
