@@ -40,6 +40,16 @@ public interface PhotoDAO {
     void delete(Photo photo) throws DAOException, ValidationException;
 
     /**
+     * Get a photo by its id
+     *
+     * @param id the id of the photo
+     * @return The photo belonging to the id
+     * @throws DAOException If the photo can not be retrived.
+     * @throws ValidationException If the id is invalid.
+     */
+    Photo getById(int id) throws DAOException, ValidationException;
+
+    /**
      * Retrieve all existing photos.
      *
      * @return A List of all currently known photos.
