@@ -13,9 +13,6 @@ public class PhotoValidator {
         if (entity.getPhotographer() == null)
             throw new ValidationException("Photographer can not be null");
 
-        if (entity.getRating() < 0 || entity.getRating() > 4)
-            throw new ValidationException("Rating must be between 0 and 4");
-
         if (entity.getPath() == null)
             throw new ValidationException("Photo path can not be null");
 
@@ -27,19 +24,14 @@ public class PhotoValidator {
     /**
      * Validate ID of photo <tt>entity</tt>.
      *
-     * @param entity must not be null;
-     *               entity.id must not be null;
-     *               entity.id must be non-negative
+     * @param id must not be null and must be non-negative
      * @throws ValidationException if any precondition is violated
      */
-    public static void validateID(Photo entity) throws ValidationException {
-        if (entity == null) {
-            throw new ValidationException("Entity must not be null");
-        }
-        if (entity.getId() == null) {
+    public static void validateID(Integer id) throws ValidationException {
+        if (id == null) {
             throw new ValidationException("ID must not be null");
         }
-        if (entity.getId() < 0) {
+        if (id < 0) {
             throw new ValidationException("ID must be non-negative");
         }
     }
