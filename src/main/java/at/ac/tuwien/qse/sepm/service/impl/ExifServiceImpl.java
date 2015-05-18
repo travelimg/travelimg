@@ -90,7 +90,7 @@ public class ExifServiceImpl implements ExifService {
     }
 
     @Override
-    public void attachDateAndGeoData(Photo photo) throws ServiceException{
+    public void attachDateAndGeoData(Photo photo) throws ServiceException {
         File file = new File(photo.getPath());
         LocalDateTime datetime;
         double latitude = 0.0;
@@ -98,12 +98,12 @@ public class ExifServiceImpl implements ExifService {
         final TiffImageMetadata exifMetadata;
         try {
             final ImageMetadata metadata = Imaging.getMetadata(file);
-            if(metadata==null){
+            if (metadata == null) {
                 throw new ServiceException("No metadata found");
             }
             final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
             exifMetadata = jpegMetadata.getExif();
-            if(jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL)!=null){
+            if(jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL) != null) {
                 String tempDate = jpegMetadata
                         .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL)
                         .getValueDescription();
@@ -125,9 +125,8 @@ public class ExifServiceImpl implements ExifService {
                     latitude = gpsInfo.getLatitudeAsDegreesNorth();
                 }
             }
-        }
-        catch(ImageReadException e){
-            //intentionally ignore this, at least we have successfully read the date at this point ;)
+        } catch (ImageReadException e) {
+            //intentionally ignore this, at least we have successfully read the datetime at this point ;)
             LOGGER.debug(e);
         }
         photo.setDatetime(datetime);
