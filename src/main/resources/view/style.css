@@ -113,10 +113,8 @@
 
 /* lists */
 .list-view, .list-view * {
-    -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-border-width: 0;
-    -fx-padding: 0;
     -fx-background-insets: 0;
 }
 .list-view {
