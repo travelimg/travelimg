@@ -2,6 +2,9 @@ package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.service.ClusterService;
+import at.ac.tuwien.qse.sepm.service.wrapper.LocationWrapper;
+import at.ac.tuwien.qse.sepm.service.wrapper.TimeWrapper;
+import org.apache.commons.math3.ml.clustering.CentroidCluster;
 import org.apache.commons.math3.ml.clustering.Cluster;
 import org.apache.commons.math3.ml.clustering.DBSCANClusterer;
 import org.apache.commons.math3.ml.clustering.DoublePoint;
@@ -21,22 +24,26 @@ public class ClusterServiceImpl implements ClusterService {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager
             .getLogger(ClusterServiceImpl.class);
-    private static final DBSCANClusterer dbscan = new DBSCANClusterer(.05, 1);
+    private static final DBSCANClusterer dbscan = new DBSCANClusterer(604800, 0);
 
     @Override public void cluster(List<Photo> photos) {
         logger.debug("photoList-size: " + photos.size());
-        List<DoublePoint> pointList = new ArrayList<DoublePoint>();
-        ZoneId zoneId = ZoneId.systemDefault();
+
+        List<TimeWrapper> pointList = new ArrayList<TimeWrapper>();
+
         for(Photo photo: photos) {
-            double[] date ={photo.getDate().atStartOfDay(zoneId).toEpochSecond()};
-            pointList.add(new DoublePoint(date));
+            pointList.add(new TimeWrapper(photo));
         }
+
         logger.debug("pointList-size: " + pointList.size());
 
-        List<Cluster<DoublePoint>> cluster = dbscan.cluster(pointList);
+        List<Cluster<TimeWrapper>> clusterResults = dbscan.cluster(pointList);
 
-        for(Cluster<DoublePoint> c : cluster){
-            logger.debug(c.getPoints().get(0));
+        for (int i=0; i<clusterResults.size(); i++) {
+            System.out.println("Cluster " + i);
+            for (TimeWrapper timeWrapper : clusterResults.get(i).getPoints())
+                System.out.println(timeWrapper.getPhoto().getDate());
+            System.out.println();
         }
 
     }
