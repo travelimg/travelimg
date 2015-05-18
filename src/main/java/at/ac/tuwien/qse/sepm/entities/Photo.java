@@ -1,6 +1,6 @@
 package at.ac.tuwien.qse.sepm.entities;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Photo {
 
@@ -8,19 +8,19 @@ public class Photo {
     private Photographer photographer;
     private String path;
     private Rating rating;
-    private LocalDate date;
+    private LocalDateTime datetime;
     private double latitude;
     private double longitude;
 
     public Photo() {
     }
 
-    public Photo(Integer id, Photographer photographer, String path, Rating rating, LocalDate date, double latitude, double longitude) {
+    public Photo(Integer id, Photographer photographer, String path, Rating rating, LocalDateTime datetime, double latitude, double longitude) {
         this.id = id;
         this.photographer = photographer;
         this.path = path;
         this.rating = rating;
-        this.date = date;
+        this.datetime = datetime;
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -30,7 +30,7 @@ public class Photo {
         this.photographer = other.photographer;
         this.path = other.path;
         this.rating = other.rating;
-        this.date = other.date;
+        this.datetime = other.datetime;
         this.latitude = other.latitude;
         this.longitude = other.longitude;
     }
@@ -67,12 +67,12 @@ public class Photo {
         this.rating = rating;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalDateTime getDatetime() {
+        return datetime;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setDatetime(LocalDateTime datetime) {
+        this.datetime = datetime;
     }
 
     public double getLatitude() {
@@ -104,7 +104,7 @@ public class Photo {
         if (photographer != null ? !photographer.equals(photo.photographer) : photo.photographer != null) return false;
         if (path != null ? !path.equals(photo.path) : photo.path != null) return false;
         if (rating != null ? !rating.equals(photo.rating) : photo.rating != null) return false;
-        return !(date != null ? !date.equals(photo.date) : photo.date != null);
+        return !(datetime != null ? !datetime.equals(photo.datetime) : photo.datetime != null);
 
     }
 
@@ -116,7 +116,7 @@ public class Photo {
         result = 31 * result + (photographer != null ? photographer.hashCode() : 0);
         result = 31 * result + (path != null ? path.hashCode() : 0);
         result = 31 * result + (rating != null ? rating.hashCode() : 0);
-        result = 31 * result + (date != null ? date.hashCode() : 0);
+        result = 31 * result + (datetime != null ? datetime.hashCode() : 0);
         temp = Double.doubleToLongBits(latitude);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(longitude);
@@ -131,7 +131,7 @@ public class Photo {
                 ", photographer=" + photographer +
                 ", path='" + path + '\'' +
                 ", rating=" + rating +
-                ", date=" + date +
+                ", datetime=" + datetime +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 '}';

@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class ExifServiceImpl implements ExifService {
@@ -90,33 +90,31 @@ public class ExifServiceImpl implements ExifService {
     }
 
     @Override
-    public void attachDateAndGeoData(Photo photo) throws ServiceException{
+    public void attachDateAndGeoData(Photo photo) throws ServiceException {
         File file = new File(photo.getPath());
-        LocalDate date;
+        LocalDateTime datetime;
         double latitude = 0.0;
         double longitude = 0.0;
         final TiffImageMetadata exifMetadata;
         try {
             final ImageMetadata metadata = Imaging.getMetadata(file);
-            if(metadata==null){
+            if (metadata == null) {
                 throw new ServiceException("No metadata found");
             }
             final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
             exifMetadata = jpegMetadata.getExif();
-            if(jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL)!=null){
+            if(jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL) != null) {
                 String tempDate = jpegMetadata
                         .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL)
                         .getValueDescription();
                 tempDate = tempDate.substring(1, tempDate.length() - 1); // remove enclosing single quotes
 
-                date = dateFormatter.parse(tempDate, LocalDate::from);
-
-            }
-            else{
-                throw new ServiceException("Photo has no date");
+                datetime = dateFormatter.parse(tempDate, LocalDateTime::from);
+            } else {
+                throw new ServiceException("Photo has no datetime");
             }
         } catch (IOException | ImageReadException e) {
-            //problem here, an invalid photo or one without a date is useless
+            //problem here, an invalid photo or one without a datetime is useless
             throw new ServiceException(e.getMessage(), e);
         }
         try {
@@ -127,12 +125,11 @@ public class ExifServiceImpl implements ExifService {
                     latitude = gpsInfo.getLatitudeAsDegreesNorth();
                 }
             }
-        }
-        catch(ImageReadException e){
-            //intentionally ignore this, at least we have successfully read the date at this point ;)
+        } catch (ImageReadException e) {
+            //intentionally ignore this, at least we have successfully read the datetime at this point ;)
             LOGGER.debug(e);
         }
-        photo.setDate(date);
+        photo.setDatetime(datetime);
         photo.setLatitude(latitude);
         photo.setLongitude(longitude);
     }
