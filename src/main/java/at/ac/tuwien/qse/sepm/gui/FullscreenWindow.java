@@ -4,22 +4,21 @@ package at.ac.tuwien.qse.sepm.gui;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import javafx.scene.image.Image;
-
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -54,6 +53,16 @@ public class FullscreenWindow extends BorderPane {
 
         imageView.fitWidthProperty().bind(Bindings.subtract(root.widthProperty(), 100));
         imageView.fitHeightProperty().bind(root.heightProperty());
+        root.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            public void handle(final KeyEvent keyEvent) {
+                if (keyEvent.getCode() == KeyCode.RIGHT) {
+                    bt_nextPressed(null);
+                }
+                if(keyEvent.getCode() == KeyCode.LEFT){
+                    bt_previousPressed(null);
+                }
+            }
+        });
     }
 
     public void present(List<Photo> photos) {
