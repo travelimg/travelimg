@@ -61,6 +61,9 @@ public class FullscreenWindow extends BorderPane {
                 if(keyEvent.getCode() == KeyCode.LEFT){
                     bt_previousPressed(null);
                 }
+                if(keyEvent.getCode() == KeyCode.ESCAPE){
+                    stage.close();
+                }
             }
         });
     }
