@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
+import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import javafx.application.Platform;
@@ -22,7 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ public class Organizer {
 
     @Autowired private ImportService importService;
     @Autowired private PhotoService photoService;
+    @Autowired private PhotographerService photographerService;
 
     @Autowired private MainController mainController;
 
@@ -86,7 +88,7 @@ public class Organizer {
     }
 
     private void handleImport(Event event) {
-        ImportDialog dialog = new ImportDialog(root, "Fotos importieren");
+        ImportDialog dialog = new ImportDialog(root, photographerService);
 
         Optional<List<Photo>> photos = dialog.showForResult();
         if (!photos.isPresent()) return;
@@ -128,7 +130,7 @@ public class Organizer {
     private void handleImportedPhoto(Photo photo) {
         // queue an update in the main gui
         Platform.runLater(() -> {
-            updateMonthListWithDate(photo.getDate());
+            updateMonthListWithDate(photo.getDatetime());
 
             // Ignore photos that are not part of the current filter.
             if (!monthSelector.matches(photo)) {
@@ -189,7 +191,7 @@ public class Organizer {
      * Add a new month to the list if it is not already included.
      * @param date represents the month to add
      */
-    private void updateMonthListWithDate(LocalDate date) {
+    private void updateMonthListWithDate(LocalDateTime date) {
         YearMonth month = YearMonth.from(date);
 
         if(!months.contains(month)) {
@@ -232,7 +234,7 @@ public class Organizer {
                 return false;
             }
 
-            return month.equals(YearMonth.from(photo.getDate()));
+            return month.equals(YearMonth.from(photo.getDatetime()));
         }
     }
 }

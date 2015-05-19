@@ -86,9 +86,16 @@ public interface PhotoService {
     List<Tag> getTagsForPhoto(Photo photo) throws ServiceException;
 
     /**
+     * Persists the rating of the specified photo.
+     *
+     * @param photo photo for which the rating should be stored
+     * @throws ServiceException failed to perform operation
+     */
+    void savePhotoRating(Photo photo) throws ServiceException;
+
+    /**
      * @return the list of all available tags
      * @throws ServiceException
      */
     List<Tag> getAllTags() throws ServiceException;
-
 }
