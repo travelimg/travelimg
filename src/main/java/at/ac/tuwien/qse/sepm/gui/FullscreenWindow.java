@@ -2,16 +2,16 @@ package at.ac.tuwien.qse.sepm.gui;
 
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,7 +22,7 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 
-public class FullscreenWindow extends BorderPane {
+public class FullscreenWindow extends AnchorPane {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -30,15 +30,17 @@ public class FullscreenWindow extends BorderPane {
     private Scene scene;
 
     @FXML
-    private BorderPane root;
+    private AnchorPane root;
     @FXML
     private ImageView imageView;
+    @FXML
+    private Button bt_previous, bt_next;
+
 
     private List<Photo> photos;
     private Image image;
 
     private int activeIndex = 0;
-
 
     public FullscreenWindow() {
         FXMLLoadHelper.load(this, this, FullscreenWindow.class, "view/FullScreenDialog.fxml");
@@ -50,8 +52,7 @@ public class FullscreenWindow extends BorderPane {
         this.scene = new Scene(this);
 
         stage.setScene(scene);
-
-        imageView.fitWidthProperty().bind(Bindings.subtract(root.widthProperty(), 100));
+        imageView.fitWidthProperty().bind(root.widthProperty());
         imageView.fitHeightProperty().bind(root.heightProperty());
         root.setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(final KeyEvent keyEvent) {
