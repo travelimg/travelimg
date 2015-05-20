@@ -1,10 +1,13 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.DropboxService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
+import at.ac.tuwien.qse.sepm.util.CancelableTask;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,10 +71,61 @@ public class DropboxServiceImpl implements DropboxService {
 
     @Override
     public Cancelable uploadPhotos(List<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
+        AsyncExporter exporter = new AsyncExporter(photos, destination, callback, errorHandler);
+        executorService.submit(exporter);
+
+        return exporter;
     }
 
     @Override
     public void close() {
         executorService.shutdown();
+    }
+
+    private class AsyncExporter extends CancelableTask {
+        private List<Photo> photos;
+        private String destination;
+        private Consumer<Photo> callback;
+        private ErrorHandler<ServiceException> errorHandler;
+
+        public AsyncExporter(List<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
+            super();
+            this.photos = photos;
+            this.destination = destination;
+            this.callback = callback;
+            this.errorHandler = errorHandler;
+        }
+
+        @Override
+        protected void execute() {
+
+            Path dest;
+            // get the target path by combining dropbox root folder and the destination inside the dropbox folder
+            try {
+                dest = Paths.get(getDropboxFolder(), destination);
+                if(!Files.exists(dest)) {
+                    throw new ServiceException("Can't upload to dropboxfolder which does not exist: " + dest.toString());
+                }
+            } catch (ServiceException ex) {
+                LOGGER.error("Failed to upload photos to dropbox", ex);
+                errorHandler.propagate(ex);
+                return;
+            }
+
+            for(Photo photo: photos) {
+                if (!isRunning())
+                    return;
+
+                try {
+                    Path source = Paths.get(photo.getPath());
+                    String fileName = source.getFileName().toString();
+                    Path target = Paths.get(dest.toString(), fileName);
+
+                } catch (Exception ex) {
+                    LOGGER.error("Failed to export photo to dropbox", ex);
+                    errorHandler.propagate(new ServiceException("Failed to export photo to dropbox", ex));
+                }
+            }
+        }
     }
 }
