@@ -5,15 +5,32 @@ import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
+import com.lynden.gmapsfx.MapReadyListener;
+import com.lynden.gmapsfx.javascript.event.MapStateEventType;
+import com.lynden.gmapsfx.javascript.event.StateEventHandler;
+import com.lynden.gmapsfx.javascript.event.UIEventHandler;
+import com.lynden.gmapsfx.javascript.event.UIEventType;
 import com.lynden.gmapsfx.javascript.object.*;
+import com.sun.media.jfxmedia.events.MarkerEvent;
+import javafx.event.*;
+import netscape.javascript.JSObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import javafx.beans.binding.Bindings;
 
+import java.awt.*;
+import java.awt.Event;
+import java.awt.event.*;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.BeanInstantiationException;
+
+import javafx.scene.Node;
+
+import static java.awt.event.MouseEvent.MOUSE_CLICKED;
+
 /**
  * Created by christoph on 08.05.15.
  */
@@ -25,9 +42,12 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     private GoogleMap map;
     private ArrayList<Photo> markers =null;
     private ArrayList<Marker> aktivMarker;
+
     //new LatLong(40.7033127, -73.979681); // the default Location
     private Marker actualMarker;
     private Marker m;
+    private StateEventHandler h;
+
     /**
      * Default Constructor
      *
@@ -54,6 +74,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     @Override
     public void mapInitialized() {
         //Set the initial properties of the map.
+
         logger.debug("Initializing Map ");
         MapOptions mapOptions = new MapOptions();
         mapOptions.center(new LatLong(39.7385, -104.9871))
@@ -61,19 +82,29 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
                 .scaleControl(false)
                 .streetViewControl(false)
                 .zoomControl(true)
-                .zoom(2);
+                .zoom(2)
+                .mapMarker(true);
         map = mapView.createMap(mapOptions);
+
 
         if(markers!=null){
             for(Photo photo : markers){
                 Marker m = new Marker(new MarkerOptions().position(new LatLong(photo.getLatitude(),
-                        photo.getLongitude())).visible(Boolean.TRUE));
+                        photo.getLongitude())).visible(Boolean.TRUE).animation(Animation.BOUNCE));
+                m.setTitle("Marker");
+                m.setAnimation(Animation.BOUNCE);
                 aktivMarker.add(m);
+
                 map.addMarker(m);
+
+
             }
+
+
         }
 
     }
+
 
     /**
      *
@@ -105,7 +136,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         if(actualMarker!=null)
             map.removeMarker(actualMarker);
         actualMarker = new Marker(new MarkerOptions().position(new LatLong(photo.getLatitude(),
-                photo.getLongitude())).visible(Boolean.TRUE));
+                photo.getLongitude())).visible(Boolean.TRUE).animation(Animation.BOUNCE));
         mapView.setCenter(photo.getLatitude(), photo.getLongitude());
         mapView.setZoom(1);//workaround to remove the old marker from the view
         mapView.setZoom(12);
@@ -113,5 +144,6 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         map.addMarker(actualMarker);
 
     }
+
 
 }
