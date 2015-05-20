@@ -205,9 +205,9 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
             area += help;
         }
-        area /= 2.;
-        x *= 1/6. * area;
-        y *= 1/6. *area;
+        area /= 2.0;
+        x *= 1/6.0 *area;
+        y *= 1/6.0 *area;
 
         erg[0]=x;
         erg[1]=y;
