@@ -16,6 +16,11 @@
                 <FontAwesomeIconView glyphName="PLUS"/>
             </graphic>
         </ToggleButton>
+        <Button fx:id="deleteTagBtn">
+            <graphic>
+                <FontAwesomeIconView glyphName="MINUS"/>
+            </graphic>
+        </Button>
     </HBox>
     <CheckListView fx:id="tagList" prefWidth="240.0"/>
 </fx:root>

@@ -33,6 +33,7 @@ public class TagSelector extends VBox {
     @FXML private CheckListView<Tag> tagList;
     @FXML private TextField newCatName;
     @FXML private ToggleButton addCategoryBtn;
+    @FXML private Button deleteTagBtn;
     private ListChangeListener<Tag> tagListChangeListener;
 
     private PhotoService photoservice;
@@ -51,6 +52,7 @@ public class TagSelector extends VBox {
         FXMLLoadHelper.load(this, this, TagSelector.class, "view/TagSelector.fxml");
         initializeTagList();
         addCategoryBtn.setOnAction(this::addCategory);
+        deleteTagBtn.setOnAction(this::deleteSelectedTag);
         newCatName.setOnKeyReleased(this::highlightAddCategoryBtn);
     }
 
@@ -181,6 +183,7 @@ public class TagSelector extends VBox {
         }
         LOGGER.info("Successfully added new Tag to shown list");
 
+        setPrefTagListHeight();
         tagList.getCheckModel().getCheckedItems().addListener(tagListChangeListener);
     }
 
@@ -191,6 +194,55 @@ public class TagSelector extends VBox {
         } else {
             addCategoryBtn.setSelected(false);
         }
+    }
+
+    @FXML
+    @Deprecated
+    private void deleteSelectedTag(ActionEvent event) {
+        Tag oldTag = tagList.getSelectionModel().getSelectedItem();
+
+        if (oldTag != null) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Löschen bestätigen");
+            alert.setHeaderText("Wollen Sie die Kategorie \"" + oldTag.getName() + "\" wirklich"
+                    + " löschen?");
+            alert.setContentText("Alle damit verbundenen Daten gehen unwiderruflich verloren.");
+
+            Optional<ButtonType> result = alert.showAndWait();
+
+            if (result.get() == ButtonType.OK){
+                try {
+                    tagService.delete(oldTag);
+                    LOGGER.info("Successfully deleted category: \"{}\"", oldTag);
+                    removeFromList(oldTag);
+                } catch (ServiceException ex) {
+                    LOGGER.error("Failed to delete category: \"{}\"", oldTag);
+                }
+            } else {
+                LOGGER.debug("User did not confirm deletion of category: \"{}\"", oldTag);
+            }
+        }
+    }
+
+    private void removeFromList(Tag oldTag) {
+        tagList.getCheckModel().getCheckedItems().removeListener(tagListChangeListener);
+
+        List<Tag> checkedTags = new ArrayList<>();
+        for (Tag tag : tagList.getCheckModel().getCheckedItems()) {
+            checkedTags.add(tag);
+        }
+
+        tagList.getCheckModel().clearChecks();
+        tagList.getItems().remove(oldTag);
+        checkedTags.remove(oldTag);
+
+        for (Tag tag : checkedTags) {
+            tagList.getCheckModel().check(tag);
+        }
+        LOGGER.info("Successfully deleted tag from shown list");
+        setPrefTagListHeight();
+
+        tagList.getCheckModel().getCheckedItems().addListener(tagListChangeListener);
     }
 
     private boolean isValidInput(String string) {
