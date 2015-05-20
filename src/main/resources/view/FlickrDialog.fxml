@@ -20,17 +20,19 @@
               <ProgressBar fx:id="progressBar" layoutX="381.0" layoutY="424.0" progress="0.0" />
          </children>
       </HBox>
-      <ScrollPane hbarPolicy="NEVER" layoutX="134.0" layoutY="58.0" prefHeight="422.0" prefWidth="495.0" vbarPolicy="AS_NEEDED" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <ScrollPane hbarPolicy="NEVER" layoutX="134.0" layoutY="58.0" prefHeight="409.0" prefWidth="295.0" vbarPolicy="AS_NEEDED" AnchorPane.bottomAnchor="48.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="205.0" AnchorPane.topAnchor="0.0">
          <content>
-             <TilePane fx:id="tilePane" hgap="15" prefHeight="407.0" prefWidth="489.0" styleClass="image-grid" vgap="15">
+             <TilePane fx:id="tilePane" hgap="15" prefHeight="407.0" prefWidth="327.0" styleClass="image-grid" vgap="15">
                  <padding>
                      <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                  </padding>
-   
+
              </TilePane>
          </content>
       </ScrollPane>
             <Button fx:id="button" layoutX="210.0" layoutY="415.0" mnemonicParsing="false" onAction="#handleOnLoadMoreButtonClicked" text="Load more..." />
+            <VBox fx:id="mapContainer" layoutX="324.0" layoutY="-4.0" prefHeight="241.0" prefWidth="176.0" />
+
    </children>
 </AnchorPane>
     </children>
