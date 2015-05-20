@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+
+<fx:root fx:id="root" styleClass="dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <BorderPane prefWidth="320.0">
+            <top>
+                <Label fx:id="headerText" maxWidth="Infinity" styleClass="header" text="HEADER TEXT" BorderPane.alignment="CENTER" />
+            </top>
+            <center>
+                <HBox maxHeight="Infinity" maxWidth="Infinity" styleClass="body">
+                    <children>
+                        <Label fx:id="contentText" text="CONTENT TEXT" wrapText="true" BorderPane.alignment="CENTER" />
+                    </children>
+                </HBox>
+            </center>
+            <bottom>
+                <HBox fx:id="actionBar" alignment="CENTER_RIGHT" maxWidth="Infinity" styleClass="footer">
+                    <children>
+                        <Button fx:id="cancelButton" cancelButton="true" text="Abbrechen"/>
+                        <Button fx:id="deleteP" cancelButton="true" text="Entfernen" />
+
+                    </children>
+                </HBox>
+            </bottom>
+        </BorderPane>
+    </children>
+</fx:root>

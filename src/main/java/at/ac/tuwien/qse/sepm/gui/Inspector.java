@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 
 import at.ac.tuwien.qse.sepm.entities.Rating;
+import at.ac.tuwien.qse.sepm.gui.dialogs.DeleteDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
@@ -91,15 +92,9 @@ public class Inspector {
 
     private void handleDelete(Event event) {
         if (photo == null) return;
-
-        List<Photo> photos = new ArrayList<>();
-        photos.add(photo);
+        DeleteDialog dialog = new DeleteDialog(root, photoservice, photo);
+        dialog.showAndWait();
         organizer.reloadPhotos();
-        try {
-            photoservice.deletePhotos(photos);
-        } catch (ServiceException e) {
-            System.out.println(e);
-        }
     }
 
     private void handleCancel(Event event) {
