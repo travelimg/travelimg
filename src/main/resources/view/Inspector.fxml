@@ -15,7 +15,7 @@
             <VBox fx:id="details" visible="false">
                 <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0"
                       prefHeight="Infinity"/>
-                <Pane fx:id="ratingPickerContainer"/>
+                <HBox fx:id="ratingPickerContainer"/>
                 <VBox fx:id="tagSelectionContainer"/>
                 <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="200">
                     <columns>
