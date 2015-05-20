@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.layout.HBox?>
+<?import org.controlsfx.control.CheckListView?>
+<fx:root fx:id="root" stylesheets="@style.css" styleClass="rating-picker" type="javafx.scene.layout.VBox"
+         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+
+    <HBox prefWidth="200.0" styleClass="add-category">
+        <TextField promptText="neue Kategorie"/>
+        <Button fx:id="addCategory" styleClass="add-category-Btn">
+            <graphic>
+                <FontAwesomeIconView glyphName="PLUS"/>
+            </graphic>
+        </Button>
+    </HBox>
+    <CheckListView fx:id="tagList" prefWidth="240.0"/>
+</fx:root>

@@ -5,63 +5,47 @@
 
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
-<?import org.controlsfx.control.CheckListView?>
-<BorderPane fx:id="root" prefWidth="240.0" styleClass="inspector" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.Inspector">
+<BorderPane fx:id="root" prefWidth="240.0" styleClass="inspector" stylesheets="@style.css"
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="at.ac.tuwien.qse.sepm.gui.Inspector">
     <center>
         <VBox>
-            <children>
-                <Label fx:id="placeholder" text="Kein Foto ausgewählt." VBox.vgrow="ALWAYS" alignment="CENTER" maxWidth="Infinity" maxHeight="Infinity"/>
-                <VBox fx:id="details" visible="false">
-                    <children>
-                    <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0" prefHeight="Infinity"/>
-                        <Pane fx:id="ratingPickerContainer"/>
-                        <VBox prefHeight="163.0" prefWidth="240.0">
-                            <children>
-                                <HBox fillHeight="false" prefHeight="100.0" prefWidth="200.0" styleClass="add-category">
-                                    <children>
-                                        <TextField promptText="neue Kategorie" />
-                                        <Button fx:id="addCategory" styleClass="add-category-Btn">
-                                            <graphic>
-                                                <FontAwesomeIconView/>
-                                            </graphic>
-                                        </Button>
-                                    </children>
-                                </HBox>
-                            </children>
-                            <children>
-                                <CheckListView fx:id="tagList" prefWidth="240.0" />
-                            </children>
-                        </VBox>
-                        <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="200">
-                            <columns>
-                                <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
-                                <TableColumn fx:id="exifValue" prefWidth="100.0" text="Wert"/>
-                            </columns>
-                        </TableView>
-                    </children>
-                </VBox>
-            </children>
+            <Label fx:id="placeholder" text="Kein Foto ausgewählt." VBox.vgrow="ALWAYS"
+                   alignment="CENTER" maxWidth="Infinity" maxHeight="Infinity"/>
+            <VBox fx:id="details" visible="false">
+                <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0"
+                      prefHeight="Infinity"/>
+                <Pane fx:id="ratingPickerContainer"/>
+                <VBox fx:id="tagSelectionContainer"/>
+                <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="200">
+                    <columns>
+                        <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
+                        <TableColumn fx:id="exifValue" prefWidth="100.0" text="Wert"/>
+                    </columns>
+                </TableView>
+            </VBox>
         </VBox>
     </center>
     <bottom>
         <HBox prefHeight="40.0" styleClass="navbar">
-            <children>
-                <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity" styleClass="delete" HBox.hgrow="ALWAYS">
-                    <graphic>
-                        <FontAwesomeIconView/>
-                    </graphic>
-                </Button>
-                <Button fx:id="cancelButton" maxHeight="Infinity" maxWidth="Infinity" styleClass="cancel" HBox.hgrow="ALWAYS">
-                    <graphic>
-                        <FontAwesomeIconView/>
-                    </graphic>
-                </Button>
-                <Button fx:id="confirmButton" maxHeight="Infinity" maxWidth="Infinity" styleClass="confirm" HBox.hgrow="ALWAYS">
-                    <graphic>
-                        <FontAwesomeIconView/>
-                    </graphic>
-                </Button>
-            </children>
+            <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity"
+                    styleClass="delete" HBox.hgrow="ALWAYS">
+                <graphic>
+                    <FontAwesomeIconView/>
+                </graphic>
+            </Button>
+            <Button fx:id="cancelButton" maxHeight="Infinity" maxWidth="Infinity"
+                    styleClass="cancel" HBox.hgrow="ALWAYS">
+                <graphic>
+                    <FontAwesomeIconView/>
+                </graphic>
+            </Button>
+            <Button fx:id="confirmButton" maxHeight="Infinity" maxWidth="Infinity"
+                    styleClass="confirm" HBox.hgrow="ALWAYS">
+                <graphic>
+                    <FontAwesomeIconView/>
+                </graphic>
+            </Button>
         </HBox>
     </bottom>
 </BorderPane>

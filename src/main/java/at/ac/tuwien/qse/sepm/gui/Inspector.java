@@ -21,6 +21,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
@@ -28,7 +29,6 @@ import javafx.scene.layout.Pane;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
 import org.controlsfx.control.CheckListView;
-import org.controlsfx.control.PropertySheet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,8 +50,7 @@ public class Inspector {
     @FXML private Button deleteButton;
     @FXML private Button cancelButton;
     @FXML private Button confirmButton;
-    @FXML private CheckListView<Tag> tagList;
-    private ListChangeListener<Tag> tagListChangeListener;
+    @FXML private VBox tagSelectionContainer;
     @FXML private VBox mapContainer;
     @FXML private Pane ratingPickerContainer;
     @FXML private TableColumn<String, String> exifName;
@@ -59,6 +58,9 @@ public class Inspector {
     @FXML private TableView<Pair<String, String>> exifTable;
 
     private final RatingPicker ratingPicker = new RatingPicker();
+    private TagSelector tagSelector;
+    //tagListChangeListener must not be changed after first initialization
+    private ListChangeListener<Tag> tagListChangeListener;
     private GoogleMapsScene mapsScene;
 
     private Photo photo;
@@ -82,7 +84,8 @@ public class Inspector {
 
     @FXML private void initialize() {
         mapsScene = new GoogleMapsScene();
-        initializeTagList();
+        initializeTagListChangeListener();
+        tagSelector = new TagSelector(tagListChangeListener, photoservice);
         // if placeholder is hidden then it should not take up any space
         placeholder.managedProperty().bind(placeholder.visibleProperty());
         // hide placeholder when details are visible
@@ -95,41 +98,10 @@ public class Inspector {
         ratingPicker.ratingProperty().addListener(this::handleRatingChanged);
         mapContainer.getChildren().add(mapsScene.getMapView());
         setActivePhoto(null);
+        tagSelectionContainer.getChildren().add(tagSelector);
     }
 
-    /**
-     * Initialize tagList and tagListChangeListener.
-     * Do not yet add tagListChangeListener to tagList (this shall be done in
-     * method <tt>showCurrentlySetTags</tt>)
-     */
-    private void initializeTagList() {
-        ObservableList<Tag> tagNames = FXCollections.observableArrayList();
-        try {
-            for (Tag tag : photoservice.getAllTags()) {
-                tagNames.add(tag);
-            }
-        } catch (ServiceException ex) {
-            //TODO Dialog
-        }
-        tagList.setItems(tagNames);
-
-        tagList.setCellFactory(new Callback<ListView<Tag>, ListCell<Tag>>() {
-            @Override public ListCell<Tag> call(ListView<Tag> p) {
-                return new CheckBoxListCell<Tag>(item -> tagList.getItemBooleanProperty(item),
-                        new StringConverter<Tag>() {
-
-                            @Override public Tag fromString(String string) {
-                                return null;
-                            }
-
-                            @Override public String toString(Tag tag) {
-                                return tag.getName();
-                            }
-                        });
-            }
-        });
-
-        //initialize tagListChangeListener
+    private void initializeTagListChangeListener() {
         tagListChangeListener = new ListChangeListener<Tag>() {
             public void onChanged(ListChangeListener.Change<? extends Tag> c) {
                 while(c.next()) {
@@ -229,7 +201,7 @@ public class Inspector {
 
         details.setVisible(true);
         mapsScene.addMarker(photo);
-        showCurrentlySetTags(photo);
+        tagSelector.showCurrentlySetTags(photo);
         ratingPicker.setRating(photo.getRating());
 
         try {
@@ -250,19 +222,5 @@ public class Inspector {
         } catch (ServiceException e) {
             //TODO Dialog
         }
-    }
-
-    private void showCurrentlySetTags(Photo photo) {
-        tagList.getCheckModel().getCheckedItems().removeListener(tagListChangeListener);
-        tagList.getCheckModel().clearChecks();
-        try {
-            List<Tag> currentTags = photoservice.getTagsForPhoto(photo);
-            for (Tag tag : currentTags) {
-                tagList.getCheckModel().check(tag);
-            }
-        } catch (ServiceException ex) {
-            //TODO Dialog
-        }
-        tagList.getCheckModel().getCheckedItems().addListener(tagListChangeListener);
     }
 }
