@@ -142,10 +142,20 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         }
 
         try {
-            jdbcTemplate.update(DELETE_STATEMENT, id);
+            int affected = jdbcTemplate.update(DELETE_STATEMENT, id);
 
+            if (affected != 1) {
+                throw new DAOException("Could not delete photo");
+            }
         } catch (DataAccessException e) {
             throw new DAOException("Failed to delete photo", e);
+        }
+
+        try {
+            ioHandler.delete(Paths.get(photo.getPath()));
+        } catch (IOException ex) {
+            logger.error("Failed to delete photo", ex);
+            throw new DAOException("Failed to delete photo", ex);
         }
     }
 
@@ -222,6 +232,11 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
      */
     private String copyToPhotoDirectory(Photo photo) throws IOException {
         File source = new File(photo.getPath());
+
+        if(!source.exists()) {
+            throw new IOException("File " + source.getPath() + " does not exist");
+        }
+
         String filename = source.getName();
         String date = dateFormatter.format(photo.getDatetime());
 
