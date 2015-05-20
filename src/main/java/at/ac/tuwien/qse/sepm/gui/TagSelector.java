@@ -129,7 +129,8 @@ public class TagSelector extends VBox {
             alert.setTitle("Hinzufügen bestätigen");
             alert.setHeaderText("Wollen Sie die Kategorie \"" + newCategoryName + "\" wirklich"
                     + " hinzufügen?");
-            alert.setContentText("Im Moment kann die Kategorie dann nicht mehr gelöscht werden");
+            alert.setContentText("Die Kategorie wird dann für alle verwalteten Fotos als Auswahl"
+                    + " zur Verfügung stehen");
 
             Optional<ButtonType> result = alert.showAndWait();
 
