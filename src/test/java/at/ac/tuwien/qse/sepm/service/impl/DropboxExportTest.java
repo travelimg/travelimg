@@ -109,12 +109,12 @@ public class DropboxExportTest {
         List<Photo> photos = photoService.getAllPhotos();
 
         String root = dropboxService.getDropboxFolder();
-        Path target = Paths.get(root, "images", "holiday", "beach");
+        String destination = ""; // copy to main folder
 
         TestPhotoAcceptor acceptor = new TestPhotoAcceptor();
         TestErrorHandler errorHandler = new TestErrorHandler();
 
-        Cancelable task = dropboxService.uploadPhotos(photos, target.toString(), acceptor, errorHandler);
+        Cancelable task = dropboxService.uploadPhotos(photos, destination, acceptor, errorHandler);
 
         awaitCompletion(task);
 
@@ -133,7 +133,7 @@ public class DropboxExportTest {
         // expected dest path is selected dropbox directory/filename
         List<Path> expectedDestPaths = photos.stream()
                 .map(p -> Paths.get(p.getPath()).getFileName().toString())
-                .map(filename -> Paths.get(target.toString(), filename))
+                .map(filename -> Paths.get(destination, filename))
                 .collect(Collectors.toList());
 
         List<Pair<Path, Path>> copyOperations = ioHandler.copiedFiles;
