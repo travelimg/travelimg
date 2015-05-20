@@ -25,7 +25,10 @@ import java.awt.Event;
 import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+
 import org.springframework.beans.BeanInstantiationException;
 
 import javafx.scene.Node;
@@ -43,7 +46,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     private GoogleMap map;
     private ArrayList<Photo> markers =null;
     private ArrayList<Marker> aktivMarker;
-
+    private HashMap<String,LatLong> displayedMarker;
     //new LatLong(40.7033127, -73.979681); // the default Location
     private Marker actualMarker;
     private Marker m;
@@ -69,6 +72,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         this.mapView = new GoogleMapView();
         markers = l;
         aktivMarker = new ArrayList<Marker>();
+        displayedMarker = new HashMap<>();
         this.mapView.addMapInializedListener(this);
     }
 
@@ -86,7 +90,11 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
                 .zoom(2)
                 .mapMarker(true);
         map = mapView.createMap(mapOptions);
-
+        map.addUIEventHandler(UIEventType.dblclick, (JSObject obj) -> {
+            LatLong ll = new LatLong((JSObject) obj.getMember("latLng"));
+            //System.out.println("LatLong: lat: " + ll.getLatitude() + " lng: " + ll.getLongitude());
+            System.out.println(ll.toString());
+        });
 
         if(markers!=null){
             for(Photo photo : markers){
@@ -94,14 +102,22 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
                         photo.getLongitude())).visible(Boolean.TRUE).animation(Animation.BOUNCE));
                 m.setTitle("Marker");
                 m.setAnimation(Animation.BOUNCE);
-                aktivMarker.add(m);
-
+               aktivMarker.add(m);
+                displayedMarker.put(m.getVariableName(),new LatLong(photo.getLatitude(),
+                        photo.getLongitude()));
                 map.addMarker(m);
+                map.addUIEventHandler(m,UIEventType.click,(JSObject obj) ->{System.out.println(m.getVariableName());
+                    System.out.println("AKTIVE MARKER");
 
+                    System.out.println(displayedMarker.get(m.getVariableName()));
+
+                });
 
             }
 
+
         }
+
 
 
     }
@@ -129,9 +145,10 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      * removes all Marker from Map
      */
     public void removeAktiveMarker(){
-        for(Marker m : aktivMarker){
-            map.removeMarker(m);
+      for(Marker m : aktivMarker){
+           map.removeMarker(m);
         }
+        displayedMarker = new HashMap<>();
     }
     public void addMarker(Photo photo){
         if(actualMarker!=null)
