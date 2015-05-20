@@ -43,4 +43,20 @@ public class JDBCPhotoTagDAOTest extends AbstractJDBCDAOTest {
         assertTrue(true);
 
     }
+    @Test
+    @WithData
+    public void removeTagFromPhotoShouldPersist() throws ValidationException, DAOException
+    {
+        Photo p = new Photo();
+        p.setId(1);
+
+        Tag t = new Tag(1,"Strand");
+
+        photoTagDAO.removeTagFromPhoto(p,t);
+        assertTrue(true);
+
+    }
+
+
+
 }
