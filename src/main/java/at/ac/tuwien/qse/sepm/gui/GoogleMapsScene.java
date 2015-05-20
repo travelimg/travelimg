@@ -90,6 +90,8 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
                 .zoom(2)
                 .mapMarker(true);
         map = mapView.createMap(mapOptions);
+
+
         map.addUIEventHandler(UIEventType.dblclick, (JSObject obj) -> {
             LatLong ll = new LatLong((JSObject) obj.getMember("latLng"));
             //System.out.println("LatLong: lat: " + ll.getLatitude() + " lng: " + ll.getLongitude());
