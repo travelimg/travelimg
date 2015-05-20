@@ -194,7 +194,7 @@ public class PhotoServiceImpl implements PhotoService {
             }
 
             for (Photo p : photos) {
-                if (!getIsRunning())
+                if (!isRunning())
                     return;
                 try {
                     Thread.sleep(20);

@@ -59,7 +59,7 @@ public class ImportServiceImpl implements ImportService {
         @Override
         protected void execute() {
             for(Photo p: photos) {
-                if(!getIsRunning())
+                if(!isRunning())
                     return;
 
                 try {
