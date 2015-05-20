@@ -1,39 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <BorderPane fx:id="root" prefWidth="240.0" styleClass="inspector" stylesheets="@style.css"
-            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.Inspector">
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="at.ac.tuwien.qse.sepm.gui.Inspector">
     <center>
-        <VBox maxHeight="Infinity" maxWidth="Infinity" styleClass="section" BorderPane.alignment="CENTER">
-         <children>
-            <Button mnemonicParsing="false" styleClass="raised" text="TODO" />
-             <VBox fx:id="contentBox2">
-                 <children>
-
-                 </children>
-             </VBox>
-             <Label fx:id="proofOfConceptLabel" wrapText="true"></Label>
-         </children></VBox>
+        <VBox>
+            <children>
+                <Label fx:id="placeholder" text="Kein Foto ausgewählt." VBox.vgrow="ALWAYS" alignment="CENTER" maxWidth="Infinity" maxHeight="Infinity"/>
+                <VBox fx:id="details" visible="false">
+                    <children>
+                    <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0" prefHeight="Infinity"/>
+                        <Pane fx:id="ratingPickerContainer"/>
+                        <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="200">
+                            <columns>
+                                <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
+                                <TableColumn fx:id="exifValue" prefWidth="100.0" text="Wert"/>
+                            </columns>
+                        </TableView>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
     </center>
     <bottom>
-        <HBox prefHeight="56.0" styleClass="navbar">
+        <HBox prefHeight="40.0" styleClass="navbar">
             <children>
                 <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity" styleClass="delete" HBox.hgrow="ALWAYS">
                     <graphic>
-                        <Label maxHeight="Infinity" maxWidth="Infinity" />
+                        <FontAwesomeIconView/>
                     </graphic>
                 </Button>
                 <Button fx:id="cancelButton" maxHeight="Infinity" maxWidth="Infinity" styleClass="cancel" HBox.hgrow="ALWAYS">
                     <graphic>
-                        <Label maxHeight="Infinity" maxWidth="Infinity" />
+                        <FontAwesomeIconView/>
                     </graphic>
                 </Button>
                 <Button fx:id="confirmButton" maxHeight="Infinity" maxWidth="Infinity" styleClass="confirm" HBox.hgrow="ALWAYS">
                     <graphic>
-                        <Label maxHeight="Infinity" maxWidth="Infinity" />
+                        <FontAwesomeIconView/>
                     </graphic>
                 </Button>
             </children>

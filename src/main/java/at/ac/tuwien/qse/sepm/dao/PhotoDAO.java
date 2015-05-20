@@ -3,7 +3,7 @@ package at.ac.tuwien.qse.sepm.dao;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 
-import java.util.Date;
+import java.time.YearMonth;
 import java.util.List;
 
 public interface PhotoDAO {
@@ -40,6 +40,16 @@ public interface PhotoDAO {
     void delete(Photo photo) throws DAOException, ValidationException;
 
     /**
+     * Get a photo by its id
+     *
+     * @param id the id of the photo
+     * @return The photo belonging to the id
+     * @throws DAOException If the photo can not be retrived.
+     * @throws ValidationException If the id is invalid.
+     */
+    Photo getById(int id) throws DAOException, ValidationException;
+
+    /**
      * Retrieve all existing photos.
      *
      * @return A List of all currently known photos.
@@ -48,11 +58,19 @@ public interface PhotoDAO {
     List<Photo> readAll() throws DAOException, ValidationException;
 
     /**
-     * Retrieve a list of photos from a given date
-     * @param date
+     * Retrieve a list of photos from a givenn month
+     *
+     * @param month the month for which to retrieve the photos.
      * @return the list with the photos
      * @throws DAOException If the data store fails to retrieve the records.
      */
-    public List<Photo> readPhotosByDate(Date date) throws DAOException;
+    List<Photo> readPhotosByMonth(YearMonth month) throws DAOException;
+
+    /**
+     * Retrieve a list of those months for which there are photos.
+     *
+     * @return a list of months with available photos
+     */
+    List<YearMonth> getMonthsWithPhotos() throws DAOException;
 
 }
