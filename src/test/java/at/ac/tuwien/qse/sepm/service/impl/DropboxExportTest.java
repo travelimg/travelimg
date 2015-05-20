@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,6 +35,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:test-config.xml")
+@Transactional(propagation = Propagation.REQUIRES_NEW)
 @TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
 public class DropboxExportTest {
 
