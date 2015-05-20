@@ -13,6 +13,7 @@ import at.ac.tuwien.qse.sepm.entities.Rating;
 
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+import at.ac.tuwien.qse.sepm.util.IOHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 
@@ -50,13 +51,13 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private static final String GET_BY_ID_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude FROM Photo where id=?";
     private static final String UPDATE_STATEMENT = "UPDATE Photo SET path = ?, rating = ? WHERE id = ?";
 
-
     private final String photoDirectory;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.ENGLISH);
     private SimpleJdbcInsert insertPhoto;
 
     @Autowired private PhotoTagDAO photoTagDAO;
     @Autowired private PhotographerDAO photographerDAO;
+    @Autowired private IOHandler ioHandler;
 
     public JDBCPhotoDAO(String photoDirectory) {
         this.photoDirectory = photoDirectory;
@@ -233,9 +234,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         if(source.getPath().equals(dest.getPath()))
             return photo.getPath();
 
-        logger.debug("Copying {} to {}", source.getPath(), dest.getPath());
-
-        Files.copy(source.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        ioHandler.copyFromTo(source.toPath(), dest.toPath());
 
         return dest.getPath();
     }

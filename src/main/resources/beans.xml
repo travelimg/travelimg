@@ -24,6 +24,8 @@
         <jdbc:script location="classpath:db/create.sql" />
         <jdbc:script location="classpath:db/insert.sql" />
     </jdbc:initialize-database>
+
+	<bean id="ioHandler" class="at.ac.tuwien.qse.sepm.util.DefaultIOHandler"></bean>
 	
 	<bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"
 			destroy-method="close">
