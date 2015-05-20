@@ -20,10 +20,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controller for the main view.
@@ -39,6 +40,10 @@ public class MainController {
 
     @FXML private TilePane tilePane;
     private ImageTile selectedTile = null;
+
+    // TODO: temp until fullscreen1 is merged
+    private List<Photo> activePhotos = new ArrayList<>();
+
 
     public MainController() {
 
@@ -56,6 +61,9 @@ public class MainController {
     public void addPhoto(Photo photo) {
         ImageTile imageTile = new ImageTile(photo);
 
+        // TODO: temp until fullscreen1 is merged
+        activePhotos.add(photo);
+
         imageTile.getSelectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -71,10 +79,21 @@ public class MainController {
         tilePane.getChildren().add(imageTile);
     }
 
+    /** TODO: temp until fullscreen1 is merged
+     * Return the List of active photos.
+     *
+     * @return the currently active photos
+     */
+    public List<Photo> getActivePhotos() {
+        return activePhotos;
+    }
+
     /**
      * Clear the image grid and don't show any photos.
      */
     public void clearPhotos() {
+        // TODO: temp until fullscreen1 is merged
+        activePhotos.clear();
         tilePane.getChildren().clear();
     }
 

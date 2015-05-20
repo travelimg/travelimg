@@ -4,7 +4,9 @@ import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 
 import at.ac.tuwien.qse.sepm.entities.Rating;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ExportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
+import at.ac.tuwien.qse.sepm.service.DropboxService;
 import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -31,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Controller for the inspector view which is used for modifying meta-data of a photo.
@@ -57,8 +60,10 @@ public class Inspector {
     private Photo photo;
 
     @Autowired private Organizer organizer;
+    @Autowired private MainController mainController;
     @Autowired private PhotoService photoservice;
     @Autowired private ExifService exifService;
+    @Autowired private DropboxService dropboxService;
     /**
      * Set the active photo.
      *
@@ -108,6 +113,31 @@ public class Inspector {
 
     private void handleConfirm(Event event) {
         // TODO
+    }
+
+    @FXML
+    private void handleExport(Event event) {
+        String dropboxFolder = "";
+        try {
+            dropboxFolder = dropboxService.getDropboxFolder();
+        } catch (ServiceException ex) {
+            // TODO: handle error
+        }
+
+        ExportDialog dialog = new ExportDialog(root, dropboxFolder);
+
+        Optional<String> destinationPath = dialog.showForResult();
+        if(!destinationPath.isPresent()) return;
+
+        List<Photo> photos = mainController.getActivePhotos();
+        dropboxService.uploadPhotos(photos, destinationPath.get(),
+                photo -> {
+                    // TODO: progressbar
+                },
+                exception -> {
+                    // TODO: handle error
+                }
+        );
     }
 
     private void handleRatingChanged(ObservableValue<? extends Rating> observable, Rating oldValue, Rating newValue) {

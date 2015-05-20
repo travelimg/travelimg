@@ -342,6 +342,10 @@
     -glyph-name: "CHECK";
 }
 
+.inspector .export .glyph-icon {
+    -glyph-name: "CLOUD_UPLOAD";
+}
+
 .image-grid {
     -fx-background-color: #e7e7e7;
 }
@@ -387,4 +391,8 @@
 }
 .import-dialog .note .glyph-icon {
     -glyph-name: "INFO_CIRCLE";
+}
+
+.export-dialog .search .glyph-icon {
+    -glyph-name: "FOLDER";
 }

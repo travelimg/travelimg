@@ -1,0 +1,55 @@
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.geometry.Insets?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.layout.VBox?>
+<fx:root styleClass="dialog,export-dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane"
+         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" minHeight="400">
+    <children>
+        <BorderPane prefWidth="560.0" maxHeight="Infinity">
+            <top>
+                <Label maxWidth="Infinity" styleClass="header" text="Fotos nach Dropbox exportieren"/>
+            </top>
+            <center>
+                <VBox maxWidth="Infinity" styleClass="body" maxHeight="Infinity">
+                    <children>
+                        <Label text="Dropbox Ordner auswählen"/>
+                        <HBox prefHeight="0.0" prefWidth="0.0" VBox.vgrow="ALWAYS">
+                            <children>
+                                <Button fx:id="browseButton" styleClass="search,raised" HBox.hgrow="ALWAYS" onAction="#handleBrowse">
+                                    <graphic>
+                                        <FontAwesomeIconView/>
+                                    </graphic>
+                                    <HBox.margin>
+                                        <Insets right="16.0"/>
+                                    </HBox.margin>
+                                </Button>
+                                <TextField fx:id="directoryField" HBox.hgrow="ALWAYS"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </center>
+            <bottom>
+                <BorderPane maxWidth="Infinity" styleClass="footer">
+                    <left>
+                        <Label fx:id="statusText" text="X Fotos ausgewählt"/>
+                    </left>
+                    <right>
+                        <HBox spacing="8.0">
+                            <children>
+                                <Button fx:id="cancelButton" alignment="CENTER_RIGHT"
+                                        text="ABBRECHEN" onAction="#handleCancel"/>
+                                <Button fx:id="importButton" alignment="CENTER_RIGHT"
+                                        styleClass="primary" text="EXPORTIEREN" onAction="#handleExport"/>
+                            </children>
+                        </HBox>
+                    </right>
+                </BorderPane>
+            </bottom>
+        </BorderPane>
+    </children>
+</fx:root>
