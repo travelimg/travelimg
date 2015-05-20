@@ -115,7 +115,7 @@ public class ImportTest {
 
     @Test
     @WithData
-    public void testImport() throws Exception {
+    public void testImport() throws ServiceException {
         List<Photo> toBeImported = duplicateList(inputPhotos);
 
         TestPhotoAcceptor acceptor = new TestPhotoAcceptor();
