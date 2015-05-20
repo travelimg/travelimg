@@ -24,8 +24,14 @@ public class DropboxServiceImpl implements DropboxService {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final Path DROPBOX_INFO_PATH_POSIX = Paths.get(System.getProperty("user.home"), ".dropbox/info.json");
-    private static final Path DROPBOX_INFO_PATH_WIN = Paths.get(System.getProperty("user.home"), "Dropbox/info.json");
+    private static final Path DROPBOX_INFO_PATH_POSIX = Paths.get(
+            System.getProperty("user.home"),
+            ".dropbox/info.json"
+    );
+    private static final Path DROPBOX_INFO_PATH_WIN = Paths.get(
+            System.getProperty("user.home"),
+            "Dropbox/info.json"
+    );
 
     ExecutorService executorService = Executors.newFixedThreadPool(1);
 
@@ -33,11 +39,11 @@ public class DropboxServiceImpl implements DropboxService {
     public String getDropboxFolder() throws ServiceException {
         Path dropboxInfoPath;
 
-        if (Files.exists(DROPBOX_INFO_PATH_POSIX))
+        if (Files.exists(DROPBOX_INFO_PATH_POSIX)) {
             dropboxInfoPath = DROPBOX_INFO_PATH_POSIX;
-        else if (Files.exists(DROPBOX_INFO_PATH_WIN))
+        } else if (Files.exists(DROPBOX_INFO_PATH_WIN)) {
             dropboxInfoPath = DROPBOX_INFO_PATH_WIN;
-        else {
+        } else {
             LOGGER.error("Could not find dropbox configuration file");
             throw new ServiceException("Could not find dropbox configuration file");
         }
