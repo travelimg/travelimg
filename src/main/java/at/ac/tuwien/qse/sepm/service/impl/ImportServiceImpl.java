@@ -31,11 +31,6 @@ public class ImportServiceImpl implements ImportService {
 
     }
 
-    //@Autowired
-    //public void setPhotoDAO(PhotoDAO photoDAO) {
-    //    this.photoDAO = photoDAO;
-    //}
-
     public Cancelable importPhotos(List<Photo> photos, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler)  {
         logger.debug("Importing photos");
         AsyncImporter importer = new AsyncImporter(photos, callback, errorHandler);
