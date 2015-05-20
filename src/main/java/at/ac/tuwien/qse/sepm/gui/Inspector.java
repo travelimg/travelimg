@@ -52,15 +52,13 @@ public class Inspector {
     @FXML private Button confirmButton;
     @FXML private VBox tagSelectionContainer;
     @FXML private VBox mapContainer;
-    @FXML private Pane ratingPickerContainer;
+    @FXML private HBox ratingPickerContainer;
     @FXML private TableColumn<String, String> exifName;
     @FXML private TableColumn<String, String> exifValue;
     @FXML private TableView<Pair<String, String>> exifTable;
 
     private final RatingPicker ratingPicker = new RatingPicker();
     private TagSelector tagSelector;
-    //tagListChangeListener must not be changed after first initialization
-    private ListChangeListener<Tag> tagListChangeListener;
     private GoogleMapsScene mapsScene;
 
     private Photo photo;
@@ -84,8 +82,7 @@ public class Inspector {
 
     @FXML private void initialize() {
         mapsScene = new GoogleMapsScene();
-        initializeTagListChangeListener();
-        tagSelector = new TagSelector(tagListChangeListener, photoservice);
+        tagSelector = new TagSelector(new TagListChangeListener(), photoservice);
         // if placeholder is hidden then it should not take up any space
         placeholder.managedProperty().bind(placeholder.visibleProperty());
         // hide placeholder when details are visible
@@ -99,38 +96,6 @@ public class Inspector {
         mapContainer.getChildren().add(mapsScene.getMapView());
         setActivePhoto(null);
         tagSelectionContainer.getChildren().add(tagSelector);
-    }
-
-    private void initializeTagListChangeListener() {
-        tagListChangeListener = new ListChangeListener<Tag>() {
-            public void onChanged(ListChangeListener.Change<? extends Tag> c) {
-                while(c.next()) {
-                    List<Photo> photoList = new ArrayList<>();
-                    if (photo != null) {
-                        photoList.add(photo);
-                    }
-
-                    if (c.wasAdded()) {
-                        System.out.println("add " + c.getAddedSize());
-                        Tag added = c.getAddedSubList().get(0);
-                        try {
-                            photoservice.addTagToPhotos(photoList, added);
-                        } catch (ServiceException ex) {
-                            //TODO Dialog
-                        }
-                    }
-                    if (c.wasRemoved()) {
-                        System.out.println("remove " + c.getRemovedSize());
-                        Tag removed = c.getRemoved().get(0);
-                        try {
-                            photoservice.removeTagFromPhotos(photoList, removed);
-                        } catch (ServiceException ex) {
-                            //TODO Dialog
-                        }
-                    }
-                }
-            }
-        };
     }
 
     private void handleDelete(Event event) {
@@ -221,6 +186,36 @@ public class Inspector {
             exifTable.setItems(exifData);
         } catch (ServiceException e) {
             //TODO Dialog
+        }
+    }
+
+    private class TagListChangeListener implements ListChangeListener<Tag> {
+        public void onChanged(ListChangeListener.Change<? extends Tag> c) {
+            while(c.next()) {
+                List<Photo> photoList = new ArrayList<>();
+                if (photo != null) {
+                    photoList.add(photo);
+                }
+
+                if (c.wasAdded()) {
+                    System.out.println("add " + c.getAddedSize());
+                    Tag added = c.getAddedSubList().get(0);
+                    try {
+                        photoservice.addTagToPhotos(photoList, added);
+                    } catch (ServiceException ex) {
+                        //TODO Dialog
+                    }
+                }
+                if (c.wasRemoved()) {
+                    System.out.println("remove " + c.getRemovedSize());
+                    Tag removed = c.getRemoved().get(0);
+                    try {
+                        photoservice.removeTagFromPhotos(photoList, removed);
+                    } catch (ServiceException ex) {
+                        //TODO Dialog
+                    }
+                }
+            }
         }
     }
 }
