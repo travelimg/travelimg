@@ -378,11 +378,7 @@
 
 .add-category {
     -fx-padding: 10px 8px;
-    -fx-effect: -fx-dropshadow-1;
-}
-
-.add-category-Btn {
-    -glyph-name: "fa fa-plus-square-o";
+    -fx-fill: white;
 }
 
 .import-dialog .add .glyph-icon {

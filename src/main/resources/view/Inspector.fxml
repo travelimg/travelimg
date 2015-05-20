@@ -5,6 +5,7 @@
 
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
+<?import javafx.geometry.Insets?>
 <BorderPane fx:id="root" prefWidth="240.0" styleClass="inspector" stylesheets="@style.css"
             xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="at.ac.tuwien.qse.sepm.gui.Inspector">
@@ -16,7 +17,11 @@
                 <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0"
                       prefHeight="Infinity"/>
                 <HBox fx:id="ratingPickerContainer"/>
-                <VBox fx:id="tagSelectionContainer"/>
+                <VBox fx:id="tagSelectionContainer">
+                    <VBox.margin>
+                        <Insets bottom="5"/>
+                    </VBox.margin>
+                </VBox>
                 <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="200">
                     <columns>
                         <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>

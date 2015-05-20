@@ -5,16 +5,17 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.layout.HBox?>
 <?import org.controlsfx.control.CheckListView?>
-<fx:root fx:id="root" stylesheets="@style.css" styleClass="rating-picker" type="javafx.scene.layout.VBox"
+<?import javafx.geometry.Insets?>
+<fx:root fx:id="root" stylesheets="@style.css" type="javafx.scene.layout.VBox"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
 
     <HBox prefWidth="200.0" styleClass="add-category">
-        <TextField promptText="neue Kategorie"/>
-        <Button fx:id="addCategory" styleClass="add-category-Btn">
+        <TextField fx:id="newCatName" promptText="neue Kategorie"/>
+        <Button fx:id="addCategoryBtn" styleClass="add-category-Btn">
             <graphic>
                 <FontAwesomeIconView glyphName="PLUS"/>
             </graphic>
         </Button>
     </HBox>
-    <CheckListView fx:id="tagList" prefWidth="240.0"/>
+    <CheckListView fx:id="tagList" prefHeight="100.0" prefWidth="240.0"/>
 </fx:root>
