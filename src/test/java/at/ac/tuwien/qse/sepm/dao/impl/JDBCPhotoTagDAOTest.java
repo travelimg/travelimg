@@ -34,7 +34,7 @@ public class JDBCPhotoTagDAOTest extends AbstractJDBCDAOTest {
 
     @Test
     @WithData
-    public void createNewPhotoTagWithValidParamShouldPersist() throws ValidationException, DAOException
+    public void testcreateNewPhotoTagWithValidParamShouldPersist() throws ValidationException, DAOException
     {
         Photo p = new Photo();
         p.setId(1);
