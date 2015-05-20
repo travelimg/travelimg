@@ -92,10 +92,4 @@ public interface PhotoService {
      * @throws ServiceException failed to perform operation
      */
     void savePhotoRating(Photo photo) throws ServiceException;
-
-    /**
-     * @return the list of all available tags
-     * @throws ServiceException
-     */
-    List<Tag> getAllTags() throws ServiceException;
 }
