@@ -11,6 +11,8 @@ public class Photo {
     private LocalDateTime datetime;
     private double latitude;
     private double longitude;
+    private Journey journey;
+    private Place place;
 
     public Photo() {
     }
@@ -33,6 +35,24 @@ public class Photo {
         this.datetime = other.datetime;
         this.latitude = other.latitude;
         this.longitude = other.longitude;
+        this.journey = other.journey;
+        this.place = other.place;
+    }
+
+    public Journey getJourney() {
+        return journey;
+    }
+
+    public void setJourney(Journey journey) {
+        this.journey = journey;
+    }
+
+    public Place getPlace() {
+        return place;
+    }
+
+    public void setPlace(Place place) {
+        this.place = place;
     }
 
     public Integer getId() {

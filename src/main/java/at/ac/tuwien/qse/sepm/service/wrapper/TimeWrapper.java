@@ -14,7 +14,7 @@ public class TimeWrapper implements Clusterable{
 
     public TimeWrapper(Photo photo) {
         this.photo = photo;
-        this.points = new double[] {photo.getDate().atStartOfDay(ZoneId.systemDefault()).toEpochSecond()};
+        this.points = new double[] {photo.getDatetime().atZone(ZoneId.systemDefault()).toEpochSecond()};
     }
 
     @Override public double[] getPoint() {
