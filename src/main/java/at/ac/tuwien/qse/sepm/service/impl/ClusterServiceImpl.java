@@ -22,8 +22,10 @@ public class ClusterServiceImpl implements ClusterService {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager
             .getLogger(ClusterServiceImpl.class);
-    private static final DBSCANClusterer dbscanTime = new DBSCANClusterer(604800, 0);
-    private static final DBSCANClusterer dbscanLocation = new DBSCANClusterer(1000, 0);
+
+    // TODO: find good parameter intervalls for the GUI
+    private static final DBSCANClusterer dbscanTime = new DBSCANClusterer(604800, 1);
+    private static final DBSCANClusterer dbscanLocation = new DBSCANClusterer(0.00000009, 1);
 
     @Autowired private GeoService geoService;
 
@@ -75,7 +77,7 @@ public class ClusterServiceImpl implements ClusterService {
                     geoService.getPlaceByGeoData(latitude / count, longitude / count)
                             .getCountry()));
             logger.debug(
-                    "Reise " + i + " " + journeyList.get(i).getName() + " Start: " + journeyList
+                    "Reise " + (i+1)  + " " + journeyList.get(i).getName() + " Start: " + journeyList
                             .get(i).getStartDate() + " Ende: " + journeyList.get(i).getEndDate());
 
             // cluster for places

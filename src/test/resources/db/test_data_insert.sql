@@ -12,7 +12,7 @@ INSERT INTO Photo(id, photographer_id, path, rating, datetime, latitude, longitu
 INSERT INTO Photo(id, photographer_id, path, rating, datetime, latitude, longitude) VALUES (5, 1,	'$DIR/2015/03/06/1.jpg', 0,	'2015-03-06 00:00:00.0', 41.5, 19.5);
 INSERT INTO Photo(id, photographer_id, path, rating, datetime, latitude, longitude) VALUES (6, 1,	'$DIR/2015/03/06/1.jpg', 0,	'2015-03-07 00:00:00.0', 41.5, 19.5);
 INSERT INTO Photo(id, photographer_id, path, rating, datetime, latitude, longitude) VALUES (7, 1,	'$DIR/2005/09/11/4.jpg', 0,	'2005-09-11 00:00:00.0', 39.5, -104.5);
-INSERT INTO Photo(id, photographer_id, path, rating, datetime, latitude, longitude) VALUES (8, 1,	'$DIR/2005/09/11/4.jpg', 0,	'2005-10-05 00:00:00.0', 39.5, 94.1);
-INSERT INTO Photo(id, photographer_id, path, rating, datetime, latitude, longitude) VALUES (9, 1,	'$DIR/2005/09/11/4.jpg', 0,	'2005-10-04 00:00:00.0', 39.5, 94.6);
+INSERT INTO Photo(id, photographer_id, path, rating, datetime, latitude, longitude) VALUES (8, 1,	'$DIR/2005/09/11/4.jpg', 0,	'2006-10-05 00:00:00.0', 39.5, 94.1);
+INSERT INTO Photo(id, photographer_id, path, rating, datetime, latitude, longitude) VALUES (9, 1,	'$DIR/2005/09/11/4.jpg', 0,	'2006-10-04 00:00:00.0', 39.5, 94.6);
 INSERT INTO Photo(id, photographer_id, path, rating, datetime, latitude, longitude) VALUES (10, 1,	'$DIR/2005/09/11/4.jpg', 0,	'2006-10-03 00:00:00.0', 39.5, 94.5);
-INSERT INTO Photo(id, photographer_id, path, rating, datetime, latitude, longitude) VALUES (11, 1,	'$DIR/2005/09/11/4.jpg', 0,	'2006-10-03 00:00:00.0', 39.933333, 116.383333);
+INSERT INTO Photo(id, photographer_id, path, rating, datetime, latitude, longitude) VALUES (11, 1,	'$DIR/2005/09/11/4.jpg', 0,	'2006-10-03 00:00:00.0', 39.03, 125.73);
