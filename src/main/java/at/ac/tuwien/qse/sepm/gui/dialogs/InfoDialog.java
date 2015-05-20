@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.stage.Stage;
 
 /**
  * Dialog that provides the user with a short message.
@@ -70,6 +71,7 @@ public class InfoDialog extends Dialog {
             root.getStyleClass().add("error");
         } else {
             root.getStyleClass().remove("error");
+
         }
     }
 

@@ -4,7 +4,6 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.geometry.*;
@@ -24,6 +23,8 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controller for the main view.
@@ -39,6 +40,9 @@ public class MainController {
 
     @FXML private TilePane tilePane;
     private ImageTile selectedTile = null;
+
+    private List<Photo> activePhotos = new ArrayList<>();
+
 
     public MainController() {
 
@@ -56,6 +60,8 @@ public class MainController {
     public void addPhoto(Photo photo) {
         ImageTile imageTile = new ImageTile(photo);
 
+        activePhotos.add(photo);
+
         imageTile.getSelectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -72,9 +78,19 @@ public class MainController {
     }
 
     /**
+     * Return the List of active photos.
+     *
+     * @return the currently active photos
+     */
+    public List<Photo> getActivePhotos()
+    {
+        return activePhotos;
+    }
+    /**
      * Clear the image grid and don't show any photos.
      */
     public void clearPhotos() {
+        activePhotos.clear();
         tilePane.getChildren().clear();
     }
 
@@ -105,6 +121,7 @@ public class MainController {
             imageView.setOnMouseClicked(this::handleSelected);
 
             getStyleClass().add("image-tile-non-selected");
+
 
             this.getChildren().add(imageView);
         }
