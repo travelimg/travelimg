@@ -125,7 +125,7 @@ public class ImportTest {
         awaitCompletion(task);
 
         // ensure that import worked without errors
-        assertThat(errorHandler.isExceptionOccured(), is(false));
+        assertThat(errorHandler.exceptionOccured(), is(false));
         assertThat(acceptor.getAccepted().size(), is(3));
 
         // test that the photos have been imported correctly
@@ -167,15 +167,13 @@ public class ImportTest {
     }
 
     private class TestErrorHandler implements ErrorHandler<ServiceException> {
-        boolean exceptionOccured = false;
+        public List<ServiceException> exceptions = new ArrayList<>();
 
         @Override
         public void handle(ServiceException exception) {
-            exceptionOccured = true;
+            exceptions.add(exception);
         }
 
-        public boolean isExceptionOccured() {
-            return exceptionOccured;
-        }
+        public boolean exceptionOccured() { return exceptions.size() > 0; }
     }
 }
