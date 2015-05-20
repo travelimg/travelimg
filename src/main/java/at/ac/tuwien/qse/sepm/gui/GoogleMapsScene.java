@@ -98,6 +98,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
             System.out.println(ll.toString());
         });
 
+
         if(markers!=null){
             for(Photo photo : markers){
                 Marker m = new Marker(new MarkerOptions().position(new LatLong(photo.getLatitude(),
@@ -162,6 +163,55 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         mapView.setZoom(12);
         //actualMarker.setTitle(photo.getPhotographer().getName());
         map.addMarker(actualMarker);
+
+    }
+    public void addMarkerList(ArrayList<Photo> list){
+            if(aktivMarker.size()!=0){
+                aktivMarker = new ArrayList<>();
+            }
+            if(displayedMarker.size()!=0){
+                displayedMarker = new HashMap<>();
+            }
+        ArrayList<LatLong> centerPoint = new ArrayList<>();
+        for(Photo photo:list){
+            Marker m = new Marker(new MarkerOptions().position(new LatLong(photo.getLatitude(),
+                    photo.getLongitude())).visible(Boolean.TRUE).animation(Animation.BOUNCE));
+            m.setTitle("Marker");
+            aktivMarker.add(m);
+            displayedMarker.put(m.getVariableName(),
+                    new LatLong(photo.getLatitude(), photo.getLongitude()));
+            centerPoint.add(new LatLong(photo.getLatitude(),
+                    photo.getLongitude()));
+            map.addMarker(m);
+        }
+        double [] center = calculateCenter(centerPoint);
+        mapView.setCenter(center[0],center[1]);
+        mapView.setZoom(10);
+
+
+    }
+    public double[] calculateCenter(ArrayList<LatLong> centerPoint){
+        double x=0;
+        double y=0;
+        double area=0;
+        double[] erg = new double[2];
+        for(int i =0; i<centerPoint.size()-1;i++){
+            LatLong point = centerPoint.get(i);
+            LatLong pointN = centerPoint.get(i+1);
+            double help = point.getLatitude() * pointN.getLongitude() + pointN.getLatitude()*point.getLongitude();
+
+            x += (point.getLatitude() + pointN.getLatitude())*help;
+            y += (point.getLongitude() + pointN.getLongitude())*help;
+
+            area += help;
+        }
+        area /= 2.;
+        x *= 1/6. * area;
+        y *= 1/6. *area;
+
+        erg[0]=x;
+        erg[1]=y;
+        return erg;
 
     }
 
