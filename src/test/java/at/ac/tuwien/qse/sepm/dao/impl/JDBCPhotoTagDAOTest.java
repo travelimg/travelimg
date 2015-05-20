@@ -34,7 +34,7 @@ public class JDBCPhotoTagDAOTest extends AbstractJDBCDAOTest {
 
     @Test
     @WithData
-    public void createNewPhotoTagWithValidParamShouldPersist() throws ValidationException, DAOException
+    public void testcreateNewPhotoTagWithValidParamShouldPersist() throws ValidationException, DAOException
     {
         Photo p = new Photo();
         p.setId(1);
@@ -46,7 +46,7 @@ public class JDBCPhotoTagDAOTest extends AbstractJDBCDAOTest {
     }
     @Test
     @WithData
-    public void removeTagFromPhotoShouldPersist() throws ValidationException, DAOException {
+    public void testremoveTagFromPhotoShouldPersist() throws ValidationException, DAOException {
         Photo p = new Photo();
         p.setId(1);
 
@@ -56,11 +56,27 @@ public class JDBCPhotoTagDAOTest extends AbstractJDBCDAOTest {
         assertEquals(0,countRows());
 
     }
-    public void deleteAllEntriesOfTagShouldPersist() throws ValidationException, DAOException {
+
+    @Test
+    @WithData
+    public void testdeleteAllEntriesOfTagShouldPersist() throws ValidationException, DAOException {
 
         Tag t = new Tag(1,"Sonne");
 
         photoTagDAO.deleteAllEntriesOfSpecificTag(t);
+        assertTrue(true);
+
+    }
+    @Test
+    @WithData
+    public void testdeleteAllEntriesOfPhotoShouldPersist() throws ValidationException, DAOException {
+
+        Photo p = new Photo();
+        p.setId(1);
+        p.setLatitude(12);
+        p.setLongitude(12);
+
+        photoTagDAO.deleteAllEntriesOfSpecificPhoto(p);
         assertTrue(true);
 
     }
