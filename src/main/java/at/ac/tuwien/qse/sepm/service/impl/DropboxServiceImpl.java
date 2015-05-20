@@ -8,6 +8,7 @@ import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -56,8 +57,13 @@ public class DropboxServiceImpl implements DropboxService {
             throw new ServiceException("Failed to read dropbox configuration file", ex);
         }
 
-        JSONObject obj = new JSONObject(info);
-        return obj.getJSONObject("personal").getString("path");
+        try {
+            JSONObject obj = new JSONObject(info);
+            return obj.getJSONObject("personal").getString("path");
+        } catch (JSONException ex) {
+            LOGGER.error("Failed to retrieve dropbox folder location", ex);
+            return "";
+        }
     }
 
     @Override
