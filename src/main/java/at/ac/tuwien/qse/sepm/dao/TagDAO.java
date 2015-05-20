@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao;
 
 import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public interface TagDAO {
      * @return the created Tag
      * @throws DAOException If the Tag can not be created or the data store fails to create a record.
      */
-    public Tag create(Tag t) throws DAOException;
+    public Tag create(Tag t) throws DAOException, ValidationException;
 
     /**
      * Retrieve an existing Tag

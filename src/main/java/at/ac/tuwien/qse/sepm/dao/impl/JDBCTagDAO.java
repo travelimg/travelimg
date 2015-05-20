@@ -2,8 +2,9 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.TagDAO;
-import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.validators.TagValidator;
+import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +47,9 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
      * @return the created Tag
      * @throws DAOException If the Tag can not be created or the data store fails to create a record.
      */
-    public Tag create(Tag t) throws DAOException {
-
+    public Tag create(Tag t) throws DAOException, ValidationException {
         logger.debug("Creating Tag {}",t);
+        TagValidator.validate(t);
         try {
             Map<String, Object> parameters = new HashMap<String, Object>(1);
             parameters.put("name", t.getName());
