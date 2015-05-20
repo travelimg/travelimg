@@ -23,4 +23,9 @@ public class DefaultIOHandler implements IOHandler {
 
         Files.copy(source, dest, StandardCopyOption.REPLACE_EXISTING);
     }
+
+    @Override
+    public void delete(Path path) throws IOException {
+        Files.delete(path);
+    }
 }

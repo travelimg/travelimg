@@ -11,4 +11,5 @@ import java.nio.file.Path;
 public interface IOHandler {
 
     void copyFromTo(Path source, Path dest) throws IOException;
+    void delete(Path path) throws IOException;
 }
