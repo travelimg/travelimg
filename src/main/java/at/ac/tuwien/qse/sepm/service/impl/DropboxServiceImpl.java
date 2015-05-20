@@ -9,10 +9,12 @@ import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.CancelableTask;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
+import at.ac.tuwien.qse.sepm.util.IOHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +40,9 @@ public class DropboxServiceImpl implements DropboxService {
     );
 
     ExecutorService executorService = Executors.newFixedThreadPool(1);
+
+    @Autowired
+    private IOHandler ioHandler;
 
     @Override
     public String getDropboxFolder() throws ServiceException {
@@ -120,6 +125,9 @@ public class DropboxServiceImpl implements DropboxService {
                     Path source = Paths.get(photo.getPath());
                     String fileName = source.getFileName().toString();
                     Path target = Paths.get(dest.toString(), fileName);
+
+                    ioHandler.copyFromTo(source, target);
+                    callback.accept(photo);
 
                 } catch (Exception ex) {
                     LOGGER.error("Failed to export photo to dropbox", ex);
