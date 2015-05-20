@@ -37,6 +37,10 @@
           destroy-method="close">
     </bean>
 
+    <bean id="dropboxService" class="at.ac.tuwien.qse.sepm.service.impl.DropboxServiceImpl"
+          destroy-method="close">
+    </bean>
+
     <bean id="exifService" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
 
     <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
