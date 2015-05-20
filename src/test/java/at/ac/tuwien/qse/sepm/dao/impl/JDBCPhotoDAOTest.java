@@ -5,8 +5,10 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+import at.ac.tuwien.qse.sepm.util.TestIOHandler;
 import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +28,19 @@ import java.util.Locale;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 
 @UsingTable("Photo")
 public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
     @Autowired
     PhotoDAO photoDAO;
+    @Autowired
+    TestIOHandler ioHandler;
 
     private static final Photographer defaultPhotographer = new Photographer(1, "Test Photographer");
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.ENGLISH);
@@ -103,6 +109,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
     @Before
     public void setUp() throws Exception {
+        ioHandler.reset();
         FileUtils.deleteDirectory(new File(dataDir));
         FileUtils.copyDirectory(new File(Paths.get(sourceDir, "prepared").toString()), new File(dataDir));
     }
@@ -145,10 +152,16 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
         Photo value = photoDAO.create(photo);
 
         assertEquals(expected.getPath(), value.getPath());
-        assertTrue(Files.exists(Paths.get(expected.getPath())));
+
+        Pair<Path, Path> copyOperation = ioHandler.copiedFiles.get(0);
+
+        // ensure that the files are copied correctly
+        assertThat(copyOperation.getKey().toString(), equalTo(getInputPhoto(1).getPath()));
+        assertThat(copyOperation.getValue().toString(), equalTo(expected.getPath()));
+
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = DAOException.class)
     @WithData
     public void testCreateWithNonexistingPathThrows() throws DAOException, ValidationException {
         Photo photo = getInputPhoto(2);
@@ -270,14 +283,28 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
         Photo photo = getExpectedPhoto(1);
         photo.setId(1337);
-        photoDAO.delete(photo);
 
+        boolean didThrow = false;
+        try {
+            photoDAO.delete(photo);
+        } catch (DAOException ex) {
+            didThrow = true;
+        }
+
+        if(!didThrow) {
+            throw new AssertionError("Expected DAOException");
+        }
+
+        // ensure that no files were deleted
+        assertThat(ioHandler.deletedFiles, empty());
+
+        // ensure that the number of photos did not change
         assertEquals(initial, countRows());
     }
 
     @Test(expected = ValidationException.class)
     @WithData
-    public void testDeleteWithINvalidIdThrows() throws DAOException, ValidationException {
+    public void testDeleteWithInvalidIdThrows() throws DAOException, ValidationException {
         Photo photo = getExpectedPhoto(5);
         photo.setId(-2);
 
@@ -294,8 +321,11 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
         photoDAO.delete(photo);
 
+        // ensure that entry was deleted
         assertEquals(initial - 1, countRows());
         assertThat(setPrefix(photoDAO.readAll()), not(hasItem(photo)));
-    }
 
+        // ensure that file was deleted
+        assertThat(ioHandler.deletedFiles, hasItem(Paths.get(getExpectedPhoto(3).getPath())));
+    }
 }
