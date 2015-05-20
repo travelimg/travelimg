@@ -82,30 +82,6 @@ public class TagServiceImpl implements TagService {
         }
     }
 
-    @Override public List<Tag> getMostFrequentTags(List<Photo> photos) throws ServiceException {
-        HashMap<Tag, Integer> counter = new HashMap<>();
-
-        // count the frequency of each tag
-        for (Photo photo : photos) {
-            for (Tag tag : photo.getTags()) {
-                if (counter.containsKey(tag)) {
-                    counter.put(tag, counter.get(tag) + 1);
-                } else {
-                    counter.put(tag, 1);
-                }
-            }
-        }
-        if (counter.size() == 0) {
-            throw new ServiceException("Keine Tags vorhanden");
-        }
-        // return the most frequent tags
-        return counter.entrySet().stream()
-                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                .limit(5)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
-    }
-
     @Override
     public void addTagToPhotos(List<Photo> photos, Tag tag) throws ServiceException {
         LOGGER.debug("Entering addTagToPhotos with {}, {}", photos, tag);

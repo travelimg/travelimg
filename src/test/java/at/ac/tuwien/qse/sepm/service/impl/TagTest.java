@@ -234,7 +234,7 @@ public class TagTest {
         tagService.addTagToPhotos(toList(p0, p2), t4);
         tagService.addTagToPhotos(toList(p0, p1, p2), t5);
         tagService.addTagToPhotos(toList(p1), t6);
-        List<Tag> liste = tagService.getMostWanted(toList(p0,p1,p2));
+        List<Tag> liste = tagService.getMostFrequentTags(toList(p0,p1,p2));
         assertTrue(liste.size()<6);
 
         assertTrue(liste.contains(t0));
@@ -258,7 +258,7 @@ public class TagTest {
                 tagService.removeTagFromPhotos(toList(p0),t);
             }
         }
-        List<Tag> liste = tagService.getMostWanted(toList(p0));
+        List<Tag> liste = tagService.getMostFrequentTags(toList(p0));
     }
     @Test
     @WithData

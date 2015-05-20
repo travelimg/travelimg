@@ -158,7 +158,7 @@ public class ExifServiceImpl implements ExifService {
                     tagService.create(tag);
                     tempTag = tag;
                 }
-                photoService.addTagToPhotos(Arrays.asList(photo), tempTag);
+                tagService.addTagToPhotos(Arrays.asList(photo), tempTag);
             }
 
         } catch (IOException e) {
