@@ -70,12 +70,12 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     public JDBCPhotoDAOTest() {
         for(Photo photo : Arrays.asList(expectedPhotos)) {
             String path = photo.getPath().replace("/", File.separator);
-            photo.setPath(path);;
+            photo.setPath(path);
         }
 
         for(Photo photo : Arrays.asList(inputPhotos)) {
             String path = photo.getPath().replace("/", File.separator);
-            photo.setPath(path);;
+            photo.setPath(path);
         }
 
     }

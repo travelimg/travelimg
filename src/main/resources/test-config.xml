@@ -21,6 +21,8 @@
         <jdbc:script location="classpath:db/create.sql"/>
     </jdbc:embedded-database>
 
+    <bean id="ioHandler" class="at.ac.tuwien.qse.sepm.util.TestIOHandler"></bean>
+
     <bean id="transactionManager"
           class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
           scope="singleton">
