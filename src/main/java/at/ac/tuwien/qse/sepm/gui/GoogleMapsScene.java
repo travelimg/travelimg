@@ -49,7 +49,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      */
     public GoogleMapView getMapView() {
 
-        return mapView;
+        return this.mapView;
     }
 
     /**
