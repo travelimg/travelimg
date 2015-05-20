@@ -22,11 +22,11 @@ public interface DropboxService extends Service {
      * The exact folder is specified by the user and the upload happens in the background.
      *
      * @param photos The photos to upload.
-     * @param path The path relative to the dropbox base where to the photos are uploaded.
+     * @param destination The path relative to the dropbox base where to the photos are uploaded.
      * @param callback Callback which is called after a photo is finished uploading.
      * @param errorHandler Handler for occuring exceptions.
      *
      * @return A cancelable task for aborting the upload if desired.
      */
-    Cancelable uploadPhotos(List<Photo> photos, String path, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler);
+    Cancelable uploadPhotos(List<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler);
 }

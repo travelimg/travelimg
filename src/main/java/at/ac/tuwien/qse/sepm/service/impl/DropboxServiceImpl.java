@@ -67,8 +67,7 @@ public class DropboxServiceImpl implements DropboxService {
     }
 
     @Override
-    public Cancelable uploadPhotos(List<Photo> photos, String path, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
-        return null;
+    public Cancelable uploadPhotos(List<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
     }
 
     @Override
