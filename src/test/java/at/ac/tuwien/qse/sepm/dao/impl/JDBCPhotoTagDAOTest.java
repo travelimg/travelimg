@@ -1,6 +1,10 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
 import at.ac.tuwien.qse.sepm.dao.*;
+import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+import junit.framework.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,5 +28,19 @@ public class JDBCPhotoTagDAOTest extends AbstractJDBCDAOTest {
     public void testWithData() throws DAOException {
         // fails because test_data_insert.sql is incomplete
         assertEquals(1, countRows());
+
+    }
+
+    @Test
+    @WithData
+    public void createNewPhotoTagWithValidParamShouldPersist() throws ValidationException, DAOException
+    {
+        Photo p = new Photo();
+        p.setId(1);
+
+        Tag t = new Tag(1,"Strand");
+        photoTagDAO.createPhotoTag(p,t);
+        assertTrue(true);
+
     }
 }
