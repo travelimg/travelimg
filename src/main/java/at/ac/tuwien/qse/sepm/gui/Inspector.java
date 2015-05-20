@@ -200,7 +200,6 @@ public class Inspector {
                 }
 
                 if (c.wasAdded()) {
-                    System.out.println("add " + c.getAddedSize());
                     Tag added = c.getAddedSubList().get(0);
                     try {
                         photoservice.addTagToPhotos(photoList, added);
@@ -209,7 +208,6 @@ public class Inspector {
                     }
                 }
                 if (c.wasRemoved()) {
-                    System.out.println("remove " + c.getRemovedSize());
                     Tag removed = c.getRemoved().get(0);
                     try {
                         photoservice.removeTagFromPhotos(photoList, removed);
