@@ -66,15 +66,18 @@ public class ImportServiceImpl implements ImportService {
                     exifService.attachDateAndGeoData(p);
                     Photo imported = photoDAO.create(p);
                     callback.accept(imported);
-                } catch(DAOException e) {
-                    errorHandler.propagate(new ServiceException("Failed to import photo", e));
-                    return;
-                } catch(ValidationException e) {
-                    errorHandler.propagate(new ServiceException("Failed to validate photo", e));
-                    return;
-                } catch (ServiceException e) {
-                    errorHandler.propagate(new ServiceException("Failed to attach date", e));
-                    return;
+                } catch (DAOException ex) {
+                    logger.error("Failed to import photo", ex);
+                    errorHandler.propagate(new ServiceException("Failed to import photo", ex));
+                    break;
+                } catch (ValidationException ex) {
+                    logger.error("Failed to validate photo", ex);
+                    errorHandler.propagate(new ServiceException("Failed to validate photo", ex));
+                    break;
+                } catch (ServiceException ex) {
+                    logger.error("Failed to attach date", ex);
+                    errorHandler.propagate(new ServiceException("Failed to attach date", ex));
+                    break;
                 }
             }
         }
