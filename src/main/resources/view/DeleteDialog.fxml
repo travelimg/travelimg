@@ -10,12 +10,12 @@
     <children>
         <BorderPane prefWidth="320.0">
             <top>
-                <Label fx:id="headerText" maxWidth="Infinity" styleClass="header" text="HEADER TEXT" BorderPane.alignment="CENTER" />
+                <Label fx:id="headerText" maxWidth="Infinity" styleClass="header" text="Foto löschen" BorderPane.alignment="CENTER" />
             </top>
             <center>
                 <HBox maxHeight="Infinity" maxWidth="Infinity" styleClass="body">
                     <children>
-                        <Label fx:id="contentText" text="CONTENT TEXT" wrapText="true" BorderPane.alignment="CENTER" />
+                        <Label fx:id="contentText" text="Möchten sie das ausgewählte Foto wirklich löschen?" wrapText="true" BorderPane.alignment="CENTER" />
                     </children>
                 </HBox>
             </center>

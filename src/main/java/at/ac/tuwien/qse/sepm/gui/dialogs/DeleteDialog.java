@@ -46,8 +46,7 @@ public class DeleteDialog extends Dialog {
         deleteP.setOnAction(this::handleDeleteP);
 
         cancelButton.setOnAction(this::handleCancel);
-        headerText.textProperty().set("Foto löschen");
-        contentText.textProperty().set("Möchten sie das ausgewählte Foto wirklich löschen?");
+
     }
 
     /**
