@@ -19,7 +19,7 @@ public class TagValidator {
         if (tag.getName() == null) {
             throw new ValidationException("Name must not be null");
         }
-        if ((tag.getName().isEmpty()) || (tag.getName().trim().length() > 0)) {
+        if ((tag.getName().isEmpty())) {
             throw new ValidationException("Name must not be empty");
         }
         if (tag.getName().trim().length() == 0) {

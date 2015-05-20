@@ -25,7 +25,7 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
     private static final Logger logger = LogManager.getLogger();
 
     private static final String UPDATE_STATEMENT = "UPDATE Photographer SET name=? WHERE id=?";
-    private static final String READ_STATEMENT = "SELECT ID,name FROM Photographer WHERE ID=?;";
+    private static final String GET_BY_ID_STATEMENT = "SELECT ID,name FROM Photographer WHERE ID=?;";
     private static final String READ_ALL_STATEMENT = "SELECT ID,name FROM Photographer;";
 
     private SimpleJdbcInsert insertPhotographer;
@@ -57,6 +57,26 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
     }
 
     @Override
+    public Photographer getById(int id) throws DAOException {
+        try {
+            return this.jdbcTemplate.queryForObject(
+                    GET_BY_ID_STATEMENT,
+                    new Object[]{id},
+                    new RowMapper<Photographer>() {
+                        @Override
+                        public Photographer mapRow(ResultSet rs, int rowNum) throws SQLException {
+                            Photographer photographer = new Photographer();
+                            photographer.setId(rs.getInt(1));
+                            photographer.setName(rs.getString(2));
+                            return photographer;
+                        }
+                    });
+        } catch (DataAccessException ex) {
+            logger.error("Failed to read photographer", ex);
+            throw new DAOException("Failed to read photographer", ex);
+        }
+    }
+
     public void update(Photographer photographer) throws DAOException, ValidationException {
         logger.debug("Updating photographer {}", photographer);
         PhotographerValidator.validate(photographer);
@@ -66,27 +86,6 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
         } catch (DataAccessException ex) {
             logger.error("Failed to update photographer", ex);
             throw new DAOException("Failed to update photographer", ex);
-        }
-    }
-
-    @Override
-    public Photographer read(Photographer photographer) throws DAOException {
-        try {
-            return this.jdbcTemplate.queryForObject(
-                    READ_STATEMENT,
-                    new Object[]{photographer.getId()},
-                    new RowMapper<Photographer>() {
-                        @Override
-                        public Photographer mapRow(ResultSet rs, int rowNum) throws SQLException {
-                            Photographer p = new Photographer();
-                            p.setId(rs.getInt(1));
-                            p.setName(rs.getString(2));
-                            return p;
-                        }
-                    });
-        } catch (DataAccessException ex) {
-            logger.error("Failed to read a photographer", ex);
-            throw new DAOException("Failed to read a photographer", ex);
         }
     }
 
@@ -104,5 +103,4 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
             throw new DAOException("Failed to read all photographers", ex);
         }
     }
-
 }

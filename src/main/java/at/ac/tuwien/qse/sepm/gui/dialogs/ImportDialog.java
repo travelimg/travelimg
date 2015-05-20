@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.gui.dialogs;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
+import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -120,7 +121,7 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
         ArrayList<Photo> photos = new ArrayList<>();
         for (final File file : directory.listFiles(new ImageFileFilter())) {
             if (!file.isDirectory()) {
-                photos.add(new Photo(null, photographer, file.getPath(), 0, null, 0.0, 0.0));
+                photos.add(new Photo(null, photographer, file.getPath(), Rating.NONE, null, 0.0, 0.0));
             }
         }
 
