@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.TagService;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -33,16 +34,18 @@ public class TagSelector extends VBox {
     private ListChangeListener<Tag> tagListChangeListener;
 
     private PhotoService photoservice;
+    private TagService tagService;
 
     /**
      * create Instance and initialize tagList.
      *
      * @param listener defines how to handle the change; must not be null;
      */
-    public TagSelector(ListChangeListener<Tag> listener, PhotoService ps) {
+    public TagSelector(ListChangeListener<Tag> listener, PhotoService ps, TagService ts) {
         LOGGER.debug("Instantiate TagSelector");
         this.tagListChangeListener = listener;
         this.photoservice = ps;
+        this.tagService = ts;
         FXMLLoadHelper.load(this, this, TagSelector.class, "view/TagSelector.fxml");
         initializeTagList();
         addCategoryBtn.setOnAction(this::addCategory);
@@ -52,7 +55,7 @@ public class TagSelector extends VBox {
     private void initializeTagList() {
         ObservableList<Tag> tagNames = FXCollections.observableArrayList();
         try {
-            for (Tag tag : photoservice.getAllTags()) {
+            for (Tag tag : tagService.getAllTags()) {
                 tagNames.add(tag);
             }
         } catch (ServiceException ex) {

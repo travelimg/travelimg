@@ -9,6 +9,7 @@ import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.TagService;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -66,6 +67,7 @@ public class Inspector {
     @Autowired private Organizer organizer;
     @Autowired private PhotoService photoservice;
     @Autowired private ExifService exifService;
+    @Autowired private TagService tagService;
 
     /**
      * Set the active photo.
@@ -82,7 +84,7 @@ public class Inspector {
 
     @FXML private void initialize() {
         mapsScene = new GoogleMapsScene();
-        tagSelector = new TagSelector(new TagListChangeListener(), photoservice);
+        tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService);
         // if placeholder is hidden then it should not take up any space
         placeholder.managedProperty().bind(placeholder.visibleProperty());
         // hide placeholder when details are visible

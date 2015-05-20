@@ -35,6 +35,8 @@
           destroy-method="close">
     </bean>
 
+    <bean id="tagService" class="at.ac.tuwien.qse.sepm.service.impl.TagServiceImpl"></bean>
+
     <bean id="exifService" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
 
     <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
