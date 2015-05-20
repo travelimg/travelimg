@@ -1,9 +1,11 @@
 package at.ac.tuwien.qse.sepm.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
-
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.ExifService;
@@ -19,24 +21,14 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.util.Callback;
-
-import javafx.scene.layout.Pane;
 import javafx.util.Pair;
-import javafx.util.StringConverter;
-import org.controlsfx.control.CheckListView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Controller for the inspector view which is used for modifying meta-data of a photo.
@@ -192,23 +184,23 @@ public class Inspector {
     }
 
     private class TagListChangeListener implements ListChangeListener<Tag> {
-        public void onChanged(ListChangeListener.Change<? extends Tag> c) {
-            while(c.next()) {
+        public void onChanged(ListChangeListener.Change<? extends Tag> change) {
+            while(change.next()) {
                 List<Photo> photoList = new ArrayList<>();
                 if (photo != null) {
                     photoList.add(photo);
                 }
 
-                if (c.wasAdded()) {
-                    Tag added = c.getAddedSubList().get(0);
+                if (change.wasAdded()) {
+                    Tag added = change.getAddedSubList().get(0);
                     try {
                         photoservice.addTagToPhotos(photoList, added);
                     } catch (ServiceException ex) {
                         //TODO Dialog
                     }
                 }
-                if (c.wasRemoved()) {
-                    Tag removed = c.getRemoved().get(0);
+                if (change.wasRemoved()) {
+                    Tag removed = change.getRemoved().get(0);
                     try {
                         photoservice.removeTagFromPhotos(photoList, removed);
                     } catch (ServiceException ex) {
