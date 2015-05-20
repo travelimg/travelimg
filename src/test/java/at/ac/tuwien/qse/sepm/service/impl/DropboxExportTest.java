@@ -133,7 +133,7 @@ public class DropboxExportTest {
         // expected dest path is selected dropbox directory/filename
         List<Path> expectedDestPaths = photos.stream()
                 .map(p -> Paths.get(p.getPath()).getFileName().toString())
-                .map(filename -> Paths.get(destination, filename))
+                .map(filename -> Paths.get(root, destination, filename))
                 .collect(Collectors.toList());
 
         List<Pair<Path, Path>> copyOperations = ioHandler.copiedFiles;
