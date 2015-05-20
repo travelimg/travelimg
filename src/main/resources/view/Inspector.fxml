@@ -22,7 +22,7 @@
                         <Insets bottom="5"/>
                     </VBox.margin>
                 </VBox>
-                <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="200">
+                <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="260">
                     <columns>
                         <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
                         <TableColumn fx:id="exifValue" prefWidth="100.0" text="Wert"/>

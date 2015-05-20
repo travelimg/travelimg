@@ -376,9 +376,11 @@
     -fx-fill: white;
 }
 
+.add-category-Btn .toggle-button {
+}
+
 .add-category {
     -fx-padding: 10px 8px;
-    -fx-fill: white;
 }
 
 .import-dialog .add .glyph-icon {

@@ -10,12 +10,12 @@
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
 
     <HBox prefWidth="200.0" styleClass="add-category">
-        <TextField fx:id="newCatName" promptText="neue Kategorie"/>
-        <Button fx:id="addCategoryBtn" styleClass="add-category-Btn">
+        <TextField fx:id="newCatName" promptText="Kategorie hinzufügen"/>
+        <ToggleButton fx:id="addCategoryBtn" styleClass="add-category-Btn">
             <graphic>
                 <FontAwesomeIconView glyphName="PLUS"/>
             </graphic>
-        </Button>
+        </ToggleButton>
     </HBox>
-    <CheckListView fx:id="tagList" prefHeight="100.0" prefWidth="240.0"/>
+    <CheckListView fx:id="tagList" prefWidth="240.0"/>
 </fx:root>

@@ -80,6 +80,22 @@ public class TagSelector extends VBox {
                         });
             }
         });
+        setPrefTagListHeight();
+    }
+
+    /**
+     * calculate and set a good height according to nr of elements
+     */
+    private void setPrefTagListHeight() {
+        double height = 60.0;
+        int nrOfElements = tagList.getItems().size();
+        height += 38.0 * nrOfElements;
+
+        if (height >= 300) {
+            height = 300;
+        }
+
+        tagList.setPrefHeight(height);
     }
 
     /**
