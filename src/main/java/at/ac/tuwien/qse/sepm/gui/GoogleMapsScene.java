@@ -13,6 +13,7 @@ import com.lynden.gmapsfx.javascript.event.UIEventType;
 import com.lynden.gmapsfx.javascript.object.*;
 import com.sun.media.jfxmedia.events.MarkerEvent;
 import javafx.event.*;
+
 import netscape.javascript.JSObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -100,8 +101,8 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
             }
 
-
         }
+
 
     }
 
