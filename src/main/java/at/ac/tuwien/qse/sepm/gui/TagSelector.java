@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.gui;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
+import at.ac.tuwien.qse.sepm.service.Service;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.TagService;
 import javafx.collections.FXCollections;
@@ -21,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.CheckListView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -114,8 +116,14 @@ public class TagSelector extends VBox {
             Optional<ButtonType> result = alert.showAndWait();
 
             if (result.get() == ButtonType.OK){
-                LOGGER.info("Successfully added new category: \"{}\"", newCategoryName);
-                newCatName.clear();
+                try {
+                    Tag newTag = tagService.create(new Tag(null, newCategoryName));
+                    LOGGER.info("Successfully added new category: \"{}\"", newCategoryName);
+                    addTagToList(newTag);
+                    newCatName.clear();
+                } catch (ServiceException ex) {
+                    LOGGER.error("Failed to add new category: \"{}\"", newCategoryName);
+                }
             } else {
                 LOGGER.debug("User did not confirm addition of category: \"{}\"", newCategoryName);
                 newCatName.requestFocus();
@@ -134,6 +142,30 @@ public class TagSelector extends VBox {
             newCatName.selectAll();
         }
         highlightAddCategoryBtn(null);
+    }
+
+    /**
+     * Only concerns the GUI-list, not the persistence layer.
+     *
+     * @param newTag the Tag to add; must not be null;
+     */
+    private void addTagToList(Tag newTag) {
+        tagList.getCheckModel().getCheckedItems().removeListener(tagListChangeListener);
+
+        List<Tag> checkedTags = new ArrayList<>();
+        for (Tag tag : tagList.getCheckModel().getCheckedItems()) {
+            checkedTags.add(tag);
+        }
+
+        tagList.getCheckModel().clearChecks();
+        tagList.getItems().add(newTag);
+
+        for (Tag tag : checkedTags) {
+            tagList.getCheckModel().check(tag);
+        }
+        LOGGER.info("Successfully added new Tag to shown list");
+
+        tagList.getCheckModel().getCheckedItems().addListener(tagListChangeListener);
     }
 
     @FXML
