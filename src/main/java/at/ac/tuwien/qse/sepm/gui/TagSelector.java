@@ -7,10 +7,11 @@ import at.ac.tuwien.qse.sepm.service.ServiceException;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 
 import javafx.util.Callback;
@@ -18,16 +19,17 @@ import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.CheckListView;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-
+import java.util.Optional;
 
 public class TagSelector extends VBox {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     @FXML private CheckListView<Tag> tagList;
+    @FXML private TextField newCatName;
+    @FXML private ToggleButton addCategoryBtn;
     private ListChangeListener<Tag> tagListChangeListener;
 
     private PhotoService photoservice;
@@ -43,6 +45,8 @@ public class TagSelector extends VBox {
         this.photoservice = ps;
         FXMLLoadHelper.load(this, this, TagSelector.class, "view/TagSelector.fxml");
         initializeTagList();
+        addCategoryBtn.setOnAction(this::addCategory);
+        newCatName.setOnKeyReleased(this::highlightAddCategoryBtn);
     }
 
     private void initializeTagList() {
@@ -73,6 +77,11 @@ public class TagSelector extends VBox {
         });
     }
 
+    /**
+     * Load and show the tags which are currently set for <tt>photo</tt>.
+     *
+     * @param photo selected Photo
+     */
     public void showCurrentlySetTags(Photo photo) {
         tagList.getCheckModel().getCheckedItems().removeListener(tagListChangeListener);
         tagList.getCheckModel().clearChecks();
@@ -85,5 +94,57 @@ public class TagSelector extends VBox {
             //TODO Dialog
         }
         tagList.getCheckModel().getCheckedItems().addListener(tagListChangeListener);
+    }
+
+    @FXML
+    private void addCategory(ActionEvent event) {
+        String newCategoryName = newCatName.getText();
+        highlightAddCategoryBtn(null);
+
+        if (isValidInput(newCategoryName)) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Hinzufügen bestätigen");
+            alert.setHeaderText("Wollen Sie die Kategorie \"" + newCategoryName + "\" wirklich"
+                    + " hinzufügen?");
+            alert.setContentText("Im Moment kann die Kategorie dann nicht mehr gelöscht werden");
+
+            Optional<ButtonType> result = alert.showAndWait();
+
+            if (result.get() == ButtonType.OK){
+                LOGGER.info("Successfully added new category: \"{}\"", newCategoryName);
+                newCatName.clear();
+            } else {
+                LOGGER.debug("User did not confirm addition of category: \"{}\"", newCategoryName);
+                newCatName.requestFocus();
+                newCatName.selectAll();
+            }
+        } else {
+            /*
+            alert.setTitle("Fehlende Eingabe");
+            alert.setHeaderText("Es wurde noch kein gültiger Name für die Kategorie gewählt");
+            alert.setContentText("Bitte geben Sie den gewünschten Namen in das Textfeld links "
+                    + "des 'Plus'-Buttons ein und versuchen Sie es erneut.");
+
+            alert.showAndWait();
+            */
+            newCatName.requestFocus();
+            newCatName.selectAll();
+        }
+        highlightAddCategoryBtn(null);
+    }
+
+    @FXML
+    private void highlightAddCategoryBtn(KeyEvent event) {
+        if (isValidInput(newCatName.getText())) {
+            addCategoryBtn.setSelected(true);
+        } else {
+            addCategoryBtn.setSelected(false);
+        }
+    }
+
+    private boolean isValidInput(String string) {
+        return string != null
+                && !string.isEmpty()
+                && string.trim().length() > 0;
     }
 }
