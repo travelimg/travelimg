@@ -85,6 +85,26 @@ public class DropboxExportTest {
 
     @Test
     @WithData
+    public void testInsideOfDropboxRootBogusDirectoryThrows() throws ServiceException {
+        List<Photo> photos = photoService.getAllPhotos();
+
+        // some path which exists on the system, but is definitely not inside the dropbox folder
+        String target = Paths.get(dropboxService.getDropboxFolder(), "travelimg", "doesnotexist").toString();
+
+        TestPhotoAcceptor acceptor = new TestPhotoAcceptor();
+        TestErrorHandler errorHandler = new TestErrorHandler();
+
+        Cancelable task = dropboxService.uploadPhotos(photos, target, acceptor, errorHandler);
+
+        awaitCompletion(task);
+
+        // assert that no photo was uploaded and an exception was thrown
+        assertThat(acceptor.getAccepted(), empty());
+        assertTrue(errorHandler.exceptionOccured());
+    }
+
+    @Test
+    @WithData
     public void testExport() throws ServiceException {
         List<Photo> photos = photoService.getAllPhotos();
 
