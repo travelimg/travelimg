@@ -36,7 +36,7 @@
     -fx-padding: 11px 8px;
     -fx-background-radius: 3px;
     -fx-font-size: 14px;
-    -fx-min-width: 64px;
+    -fx-min-width: 48px;
 }
 .button:hover {
     -fx-background-color: -fx-default-hover;
@@ -46,6 +46,10 @@
 }
 .button:pressed {
     -fx-background-color: -fx-default-press;
+}
+.button .glyph-icon {
+    -glyph-size: 20;
+    -fx-fill: -fx-text;
 }
 .button.primary {
     -fx-text-fill: -fx-primary;
@@ -58,6 +62,9 @@
 }
 .button.primary:pressed {
     -fx-background-color: -fx-primary-light-press;
+}
+.button.primary .glyph-icon {
+    -fx-fill: -fx-primary;
 }
 .button:disabled {
     -fx-opacity: 0.5;
@@ -96,12 +103,45 @@
 .button.raised.primary:pressed {
     -fx-background-color: -fx-primary-press;
 }
+.button.raised.primary .glyph-icon {
+    -fx-fill: white;
+}
+
+/* toggle button */
+.toggle-button {
+    -fx-padding: 11px 8px;
+    -fx-background-radius: 3px;
+    -fx-font-size: 14px;
+    -fx-background-color: -fx-default;
+    -fx-effect: -fx-dropshadow-1;
+}
+.toggle-button:focused {
+    -fx-background-color: -fx-default-focus;
+    -fx-effect: -fx-dropshadow-3;
+}
+.toggle-button:hover {
+    -fx-background-color: -fx-default-hover;
+}
+.toggle-button:pressed {
+    -fx-effect: -fx-dropshadow-3;
+    -fx-background-color: -fx-default-press;
+}
+.toggle-button:disabled {
+    -fx-effect: none;
+    -fx-background-color: -fx-default-disabled;
+}
+.toggle-button:selected {
+    -fx-background-color: -fx-primary;
+}
+.toggle-button:selected * {
+    -fx-text-fill: white;
+}
 
 /* input fields */
 .text-field {
     -fx-background-color: transparent;
     -fx-background-radius: 0;
-    -fx-border-color: -fx-background-alt;
+    -fx-border-color: -fx-text;
     -fx-border-style: solid;
     -fx-border-width: 0 0 2px 0;
     -fx-font-size: 14px;
@@ -109,6 +149,66 @@
 }
 .text-field:focused {
     -fx-border-color: -fx-primary;
+}
+
+.combo-box {
+    -fx-border-color: -fx-text;
+    -fx-border-style: solid;
+    -fx-border-width: 0 0 2px 0;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-font-size: 16px;
+    -fx-padding: 11px 0 0 0;
+}
+.combo-box:focused {
+    -fx-border-color: -fx-primary;
+}
+.combo-box .text-input {
+    -fx-padding: 0 0 4px 0;
+    -fx-border-width: 0;
+}
+.combo-box .combo-box-popup {
+    -fx-background-color: -fx-default;
+    -fx-border-width: 0;
+    -fx-effect: -fx-dropshadow-3;
+    -fx-background-insets: 0;
+    -fx-padding: 0px;
+}
+.combo-box .list-cell {
+    -fx-padding: 0;
+    -fx-padding: 6px 20px 6px 10px;
+    -fx-text-fill: -fx-text;
+}
+.combo-box .list-cell:hover {
+    -fx-background-color: -fx-default-hover;
+}
+.combo-box .list-cell:focused {
+    -fx-background-color: -fx-default-focus;
+}
+.combo-box .list-cell:selected {
+    -fx-background-color: -fx-default-press;
+}
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 11px 8px;
+    -fx-background-radius: 3px;
+    -fx-font-size: 14px;
+    -fx-min-width: 64px;
+ }
+.combo-box .arrow-button:hover {
+    -fx-background-color: -fx-default-hover;
+}
+.combo-box .arrow-button:focused {
+    -fx-background-color: -fx-default-focus;
+}
+.combo-box .arrow-button:pressed {
+    -fx-background-color: -fx-default-press;
+}
+.combo-box .arrow {
+    -fx-background-color: -fx-text;
+}
+.combo-box:focused .arrow {
+    -fx-background-color: -fx-primary;
 }
 
 /* lists */
@@ -186,9 +286,6 @@
     -fx-fill: white;
     -fx-opacity: 0.5;
 }
-.dialog .note.info .glyph-icon {
-    -glyph-name: "INFO_CIRCLE";
-}
 
 .navbar {
     -fx-background-color: -fx-primary;
@@ -254,4 +351,46 @@
 .image-tile-selected {
     -fx-padding: 5px;
     -fx-background-color: #1E88E5;
+}
+
+.rating-picker {
+    -fx-effect: -fx-dropshadow-1;
+    -fx-padding: 16px;
+}
+.rating-picker .toggle-button {
+    -fx-effect: none;
+    -fx-background-radius: 0;
+    -fx-pref-width: 48px;
+}
+.rating-picker .toggle-button.bad {
+    -fx-background-radius: 3 0 0 3;
+}
+.rating-picker .toggle-button.good {
+    -fx-background-radius: 0 3 3 0;
+}
+.rating-picker .toggle-button .glyph-icon {
+    -glyph-size: 16;
+    -fx-fill: -fx-text;
+}
+.rating-picker .toggle-button:selected .glyph-icon {
+    -fx-fill: white;
+}
+
+.add-category {
+    -fx-padding: 10px 8px;
+    -fx-effect: -fx-dropshadow-1;
+}
+
+.add-category-Btn {
+    -glyph-name: "fa fa-plus-square-o";
+}
+
+.import-dialog .add .glyph-icon {
+    -glyph-name: "PLUS";
+}
+.import-dialog .search .glyph-icon {
+    -glyph-name: "FOLDER";
+}
+.import-dialog .note .glyph-icon {
+    -glyph-name: "INFO_CIRCLE";
 }

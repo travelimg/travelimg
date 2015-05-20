@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -11,19 +10,32 @@
     <center>
         <VBox>
             <children>
-                <Label fx:id="placeholder" alignment="CENTER" maxHeight="Infinity" maxWidth="Infinity" text="Kein Foto ausgewählt." visible="false" VBox.vgrow="ALWAYS" />
-                <VBox fx:id="details">
+                <Label fx:id="placeholder" text="Kein Foto ausgewählt." VBox.vgrow="ALWAYS" alignment="CENTER" maxWidth="Infinity" maxHeight="Infinity"/>
+                <VBox fx:id="details" visible="false">
                     <children>
-                        <VBox fx:id="mapContainer" maxHeight="200.0" prefHeight="Infinity" styleClass="map" />
-                  <VBox prefHeight="163.0" prefWidth="240.0">
-                     <children>
-                        <CheckListView fx:id="tagList" prefWidth="240.0" />
-                     </children>
-                  </VBox>
-                        <TableView fx:id="exifTable" prefHeight="262.0" prefWidth="240.0">
+                    <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0" prefHeight="Infinity"/>
+                        <Pane fx:id="ratingPickerContainer"/>
+                        <VBox prefHeight="163.0" prefWidth="240.0">
+                            <children>
+                                <HBox fillHeight="false" prefHeight="100.0" prefWidth="200.0" styleClass="add-category">
+                                    <children>
+                                        <TextField promptText="neue Kategorie" />
+                                        <Button fx:id="addCategory" styleClass="add-category-Btn">
+                                            <graphic>
+                                                <FontAwesomeIconView/>
+                                            </graphic>
+                                        </Button>
+                                    </children>
+                                </HBox>
+                            </children>
+                            <children>
+                                <CheckListView fx:id="tagList" prefWidth="240.0" />
+                            </children>
+                        </VBox>
+                        <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="200">
                             <columns>
-                                <TableColumn fx:id="exifName" prefWidth="100.0" text="Name" />
-                                <TableColumn fx:id="exifValue" prefWidth="100.0" text="Wert" />
+                                <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
+                                <TableColumn fx:id="exifValue" prefWidth="100.0" text="Wert"/>
                             </columns>
                         </TableView>
                     </children>
