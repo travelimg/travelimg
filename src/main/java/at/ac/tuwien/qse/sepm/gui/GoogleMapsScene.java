@@ -159,7 +159,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         }
         displayedMarker = new HashMap<>();
     }
-    public void addMarker(Photo photo){
+   /* public void addMarker(Photo photo){
         if(actualMarker!=null)
             map.removeMarker(actualMarker);
         actualMarker = new Marker(new MarkerOptions().position(new LatLong(photo.getLatitude(),
@@ -170,6 +170,24 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         //actualMarker.setTitle(photo.getPhotographer().getName());
         map.addMarker(actualMarker);
 
+    }*/
+
+    public void addMarker(Photo photo){
+        if(aktivMarker.size()!=0){
+            aktivMarker = new ArrayList<>();
+        }
+        if(displayedMarker.size()!=0){
+            displayedMarker = new HashMap<>();
+        }
+        Marker m =new Marker(new MarkerOptions().position(new LatLong(photo.getLatitude(),
+                photo.getLongitude())).visible(Boolean.TRUE).animation(Animation.BOUNCE));
+        m.setTitle("Marker");
+        aktivMarker.add(m);
+        displayedMarker.put(m.getVariableName(),
+                new LatLong(photo.getLatitude(), photo.getLongitude()));
+        mapView.setCenter(photo.getLatitude(), photo.getLongitude());
+        mapView.setZoom(12);
+        map.addMarker(m);
     }
     public void addMarkerList(ArrayList<Photo> list){
             if(aktivMarker.size()!=0){

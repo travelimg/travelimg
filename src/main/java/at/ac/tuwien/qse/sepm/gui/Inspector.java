@@ -103,7 +103,10 @@ public class Inspector {
     private void handleConfirm(Event event) {
         // TODO
     }
+    public void desableDetails(){
 
+        this.details.setVisible(false);
+    }
     private void showDetails(Photo photo) {
         if (photo == null) {
             details.setVisible(false);

@@ -9,10 +9,13 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
+import javafx.event.*;
 import javafx.fxml.FXML;
 import javafx.geometry.*;
 import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -24,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.awt.*;
+import java.awt.Event;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -45,36 +49,42 @@ public class MainController {
     @FXML private TilePane tilePane;
     @FXML private Insets in;
     @FXML private BorderPane root;
+    @FXML private Tab gitter;
+    @FXML private Tab weltkarte;
+    @FXML private Tab timeline;
+    @FXML private TabPane tabs;
     private GoogleMapsScene worldMap;
     private ImageTile selectedTile = null;
 
     public MainController() {
-        //scrollPane = new ScrollPane();
-        // in = new Insets(15,15,15,15);
-        //tilePane = new TilePane();
-        //scrollPane.setPrefWidth(500);
-        //scrollPane.setPrefHeight(400);
-        //scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        //scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        //scrollPane.setFitToHeight(true);
-        ////scrollPane.setFitToWidth(true);
-        ////tilePane.setHgap(15);
-        //tilePane.setVgap(15);
-        //tilePane.setPadding(in);
-        //scrollPane.setContent(tilePane);
+        scrollPane = new ScrollPane();
+        in = new Insets(15,15,15,15);
+        tilePane = new TilePane();
+        scrollPane.setPrefWidth(500);
+        scrollPane.setPrefHeight(400);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        tilePane.setHgap(15);
+        tilePane.setVgap(15);
+        tilePane.setPadding(in);
+        scrollPane.setContent(tilePane);
 
     }
 
     @FXML
     private void initialize() {
 
-        //worldMap = new GoogleMapsScene(getAllPhotos());
-
-        //root.setCenter(worldMap.getMapView());
+        worldMap = new GoogleMapsScene(getAllPhotos());
+        weltkarte.setContent(worldMap.getMapView());
+        gitter.setContent(scrollPane);
 
 
 
     }
+
+   
 
     /**
      * returns a ArrayList with all Photos
@@ -100,7 +110,8 @@ public class MainController {
      * @param photo The photo to be added.
      */
     public void addPhoto(Photo photo) {
-        root.setCenter(scrollPane);
+
+        //root.setCenter(scrollPane);
         ImageTile imageTile = new ImageTile(photo);
 
         imageTile.getSelectedProperty().addListener(new ChangeListener<Boolean>() {
@@ -162,7 +173,7 @@ public class MainController {
         public void select() {
             getStyleClass().remove("image-tile-non-selected");
             getStyleClass().add("image-tile-selected");
-            //inspector.setMap(worldMap);
+            inspector.setMap(worldMap);
             inspector.setActivePhoto(photo);
 
             this.selected.set(true);

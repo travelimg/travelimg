@@ -4,6 +4,8 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.TilePane?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.Tab?>
 <BorderPane fx:id="root" stylesheets="@/view/style.css"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.MainController">
 
@@ -11,7 +13,25 @@
         <fx:include source="/view/Organizer.fxml"></fx:include>
     </left>
     <center>
-        <fx:include source="/view/MainNavigation.fxml"></fx:include>
+       <TabPane fx:id="Tabs">
+           <tabs>
+               <Tab fx:id="weltkarte" text="Weltkarte" closable="false">
+                   <content>
+
+                   </content>
+               </Tab>
+               <Tab fx:id="timeline" text="TimeLine" closable="false">
+                   <content>
+
+                   </content>
+               </Tab>
+               <Tab fx:id="gitter" text="Gitter" closable="false">
+                   <content>
+
+                   </content>
+               </Tab>
+           </tabs>
+       </TabPane>
     </center>
 
     <right>
