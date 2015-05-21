@@ -33,7 +33,7 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
     @Override @Autowired public void setDataSource(DataSource dataSource) {
         super.setDataSource(dataSource);
         this.insertJourney = new SimpleJdbcInsert(dataSource).withTableName("Journey")
-                .usingGeneratedKeyColumns("name");
+                .usingGeneratedKeyColumns("id");
     }
 
     @Override public Journey create(Journey journey) throws DAOException, ValidationException {
@@ -52,8 +52,8 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
             insertJourney.execute(parameters);
             return journey;
         } catch (DataAccessException ex) {
-            logger.error("Failed to create photo", ex);
-            throw new DAOException("Failed to create photo", ex);
+            logger.error("Failed to create journey", ex);
+            throw new DAOException("Failed to create journey", ex);
         }
 
     }
