@@ -11,7 +11,7 @@
         <fx:include source="/view/Organizer.fxml"></fx:include>
     </left>
     <center>
-
+        <fx:include source="/view/MainNavigation.fxml"></fx:include>
     </center>
 
     <right>

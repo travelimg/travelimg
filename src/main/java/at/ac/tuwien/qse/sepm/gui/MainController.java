@@ -49,28 +49,28 @@ public class MainController {
     private ImageTile selectedTile = null;
 
     public MainController() {
-        scrollPane = new ScrollPane();
-        in = new Insets(15,15,15,15);
-        tilePane = new TilePane();
-        scrollPane.setPrefWidth(500);
-        scrollPane.setPrefHeight(400);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setFitToHeight(true);
-        scrollPane.setFitToWidth(true);
-        tilePane.setHgap(15);
-        tilePane.setVgap(15);
-        tilePane.setPadding(in);
-        scrollPane.setContent(tilePane);
+        //scrollPane = new ScrollPane();
+        // in = new Insets(15,15,15,15);
+        //tilePane = new TilePane();
+        //scrollPane.setPrefWidth(500);
+        //scrollPane.setPrefHeight(400);
+        //scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        //scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        //scrollPane.setFitToHeight(true);
+        ////scrollPane.setFitToWidth(true);
+        ////tilePane.setHgap(15);
+        //tilePane.setVgap(15);
+        //tilePane.setPadding(in);
+        //scrollPane.setContent(tilePane);
 
     }
 
     @FXML
     private void initialize() {
 
-        worldMap = new GoogleMapsScene(getAllPhotos());
+        //worldMap = new GoogleMapsScene(getAllPhotos());
 
-        root.setCenter(worldMap.getMapView());
+        //root.setCenter(worldMap.getMapView());
 
 
 
@@ -162,7 +162,7 @@ public class MainController {
         public void select() {
             getStyleClass().remove("image-tile-non-selected");
             getStyleClass().add("image-tile-selected");
-            inspector.setMap(worldMap);
+            //inspector.setMap(worldMap);
             inspector.setActivePhoto(photo);
 
             this.selected.set(true);
