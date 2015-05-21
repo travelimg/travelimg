@@ -63,7 +63,13 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         this.mapView.addMapInializedListener(this);
 
     }
-
+    public int sizeOfActiveMarker(){
+        if(aktivMarker ==null){
+            return 0;
+        }else {
+            return this.aktivMarker.size();
+        }
+    }
     /**
      * WorldMap Constructor
      * @param l
