@@ -11,7 +11,7 @@ public class Journey {
     private LocalDateTime endDate;
     private String name;
 
-    public Journey(LocalDateTime startDate, LocalDateTime endDate, String name) {
+    public Journey(String name, LocalDateTime startDate, LocalDateTime endDate) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.name = name;

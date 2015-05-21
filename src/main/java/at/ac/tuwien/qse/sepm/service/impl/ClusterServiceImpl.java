@@ -9,6 +9,7 @@ import at.ac.tuwien.qse.sepm.service.wrapper.TimeWrapper;
 import org.apache.commons.math3.ml.clustering.Cluster;
 import org.apache.commons.math3.ml.clustering.DBSCANClusterer;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
@@ -20,7 +21,7 @@ import java.util.List;
  */
 public class ClusterServiceImpl implements ClusterService {
 
-    private static final org.apache.logging.log4j.Logger logger = LogManager
+    private static final Logger logger = LogManager
             .getLogger(ClusterServiceImpl.class);
 
     // TODO: find good parameter intervalls for the GUI
