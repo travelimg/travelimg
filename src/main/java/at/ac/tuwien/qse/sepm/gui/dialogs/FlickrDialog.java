@@ -166,7 +166,7 @@ public class FlickrDialog extends Dialog {
                 useGeoData = true;
             }
             flickrService.downloadPhotos(tags,latitude, longitude,true,useGeoData,new Consumer<Photo>() {
-                double d = 0.0;
+
                 public void accept(Photo photo) {
 
                     Platform.runLater(new Runnable() {
@@ -182,13 +182,35 @@ public class FlickrDialog extends Dialog {
                                 e.printStackTrace();
                             }
                             photosFlowPane.getChildren().add(imageView);
-                            d++;
-                            progressBar.setProgress(d / 10.0);
                         }
                     });
 
                 }
-            }, new ErrorHandler<ServiceException>() {
+
+            },
+                    new Consumer<Double>() {
+
+                        public void accept(Double downloadProgress) {
+
+                            Platform.runLater(new Runnable() {
+
+                                public void run() {
+                                    progressBar.setProgress(downloadProgress);
+                                    if(downloadProgress==1.0){
+                                        progress.setVisible(false);
+                                        progressBar.setProgress(0.0);
+                                        downloadButton.setDisable(false);
+                                        downloadButton.setText("Mehr herunterladen");
+                                    }
+                                }
+                            });
+
+                        }
+
+                    }
+
+
+                    ,new ErrorHandler<ServiceException>() {
 
                 public void handle(ServiceException exception) {
                     //handle errors here

@@ -15,6 +15,7 @@ import com.flickr4java.flickr.photos.SearchParameters;
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,9 +35,9 @@ public class FlickrServiceImpl implements FlickrService {
     }
 
     @Override
-    public Cancelable downloadPhotos(String tags[], double latitude, double longitude, boolean useTags, boolean useGeoData, Consumer<at.ac.tuwien.qse.sepm.entities.Photo> callback, ErrorHandler<ServiceException> errorHandler) throws ServiceException{
+    public Cancelable downloadPhotos(String tags[], double latitude, double longitude, boolean useTags, boolean useGeoData, Consumer<at.ac.tuwien.qse.sepm.entities.Photo> callback,  Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler) throws ServiceException{
         if(i==0){
-            downloader = new AsyncDownloader(tags, latitude, longitude, useTags, useGeoData, callback, errorHandler);
+            downloader = new AsyncDownloader(tags, latitude, longitude, useTags, useGeoData, callback, progressCallback, errorHandler);
         }
         executorService.submit(downloader);
         return downloader;
@@ -60,10 +61,11 @@ public class FlickrServiceImpl implements FlickrService {
         private boolean useTags;
         private boolean useGeoData;
         private Consumer<at.ac.tuwien.qse.sepm.entities.Photo> callback;
+        private Consumer<Double> progressCallback;
         private ErrorHandler<ServiceException> errorHandler;
         private PhotoList<Photo> list;
 
-        public AsyncDownloader(String tags[], double latitude, double longitude, boolean useTags, boolean useGeoData, Consumer<at.ac.tuwien.qse.sepm.entities.Photo> callback, ErrorHandler<ServiceException> errorHandler) {
+        public AsyncDownloader(String tags[], double latitude, double longitude, boolean useTags, boolean useGeoData, Consumer<at.ac.tuwien.qse.sepm.entities.Photo> callback,  Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler) {
             super();
             this.tags = tags;
             this.latitude = latitude;
@@ -71,6 +73,7 @@ public class FlickrServiceImpl implements FlickrService {
             this.useTags = useTags;
             this.useGeoData = useGeoData;
             this.callback = callback;
+            this.progressCallback = progressCallback;
             this.errorHandler = errorHandler;
 
         }
@@ -78,6 +81,8 @@ public class FlickrServiceImpl implements FlickrService {
         @Override
         protected void execute() {
             try {
+
+
                 if(i==0){
                     SearchParameters searchParameters = new SearchParameters();
                     if(useTags){
@@ -91,12 +96,17 @@ public class FlickrServiceImpl implements FlickrService {
 
                     searchParameters.setHasGeo(true);
                     list = flickr.getPhotosInterface().search(searchParameters, 250, 1);
-                    System.out.println(list.size());
+                    //System.out.println(list.size());
                 }
-                int nrOfDownloadedFotos = 0;
+                int nrOfDownloadedPhotos = 0;
+                int nrOfPhotosToDownload = 10;
+                if(list.size()<10){
+                    nrOfPhotosToDownload = list.size();
+                }
                 for (;i<list.size();i++) {
+
                     Photo p = list.get(i);
-                    if(nrOfDownloadedFotos==10){
+                    if(nrOfDownloadedPhotos==10){
                         break;
                     }
                     if(!getIsRunning())
@@ -112,18 +122,23 @@ public class FlickrServiceImpl implements FlickrService {
                         BufferedInputStream in = null;
                         FileOutputStream fout = null;
                         try {
-                            in = new BufferedInputStream(new URL(url).openStream());
+                            HttpURLConnection httpConnection = (HttpURLConnection) (new URL(url).openConnection());
+                            long completeFileSize = httpConnection.getContentLength();
+                            in = new BufferedInputStream((httpConnection.getInputStream()));
                             fout = new FileOutputStream("src/main/resources/tmp/"+id+"."+format);
 
-                            final byte data[] = new byte[1024];
+                            final byte data[] = new byte[64];
                             int count;
-                            while ((count = in.read(data, 0, 1024)) != -1) {
+                            long downloadedFileSize = 0;
+                            while ((count = in.read(data, 0, 64)) != -1) {
                                 fout.write(data, 0, count);
+                                downloadedFileSize = downloadedFileSize + count;
+                                progressCallback.accept((nrOfDownloadedPhotos/(double)nrOfPhotosToDownload)+((((double)downloadedFileSize) / ((double)completeFileSize))/100.0));
                             }
                             at.ac.tuwien.qse.sepm.entities.Photo downloaded = new at.ac.tuwien.qse.sepm.entities.Photo();
                             downloaded.setPath("src/main/resources/tmp/"+id+"."+format);
                             callback.accept(downloaded);
-                            nrOfDownloadedFotos++;
+                            nrOfDownloadedPhotos++;
                         } finally {
                             if (in != null) {
                                 in.close();
@@ -134,6 +149,7 @@ public class FlickrServiceImpl implements FlickrService {
                         }
                     }
                 }
+                progressCallback.accept(1.0);
 
             } catch (FlickrException e) {
                 errorHandler.propagate(new ServiceException("Failed to download photo", e));

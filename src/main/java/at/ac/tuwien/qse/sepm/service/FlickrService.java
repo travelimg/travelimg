@@ -21,7 +21,7 @@ public interface FlickrService extends Service {
      * @return a Cancelable object, that can be used to interrupt the download
      * @throws ServiceException
      */
-    public Cancelable downloadPhotos(String tags[],double latitude, double longitude, boolean useTags, boolean useGeoData, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) throws ServiceException;
+    public Cancelable downloadPhotos(String tags[],double latitude, double longitude, boolean useTags, boolean useGeoData, Consumer<Photo> callback, Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler) throws ServiceException;
 
     /**
      * After calling this method, the service will be ready to load photos again from the beginning.
