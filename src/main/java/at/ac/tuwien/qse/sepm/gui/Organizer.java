@@ -3,16 +3,15 @@ package at.ac.tuwien.qse.sepm.gui;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
-import at.ac.tuwien.qse.sepm.service.ImportService;
-import at.ac.tuwien.qse.sepm.service.PhotoService;
-import at.ac.tuwien.qse.sepm.service.PhotographerService;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.gui.dialogs.JourneyDialog;
+import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -37,17 +36,19 @@ import java.util.Optional;
  */
 public class Organizer {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger(Organizer.class);
 
     @Autowired private ImportService importService;
     @Autowired private PhotoService photoService;
     @Autowired private PhotographerService photographerService;
+    @Autowired private ClusterService clusterService;
 
     @Autowired private MainController mainController;
 
     @FXML private BorderPane root;
     @FXML private Button importButton;
     @FXML private Button presentButton;
+    @FXML private Button journeyButton;
     @FXML private ListView<YearMonth> monthList;
 
     private final ObservableList<YearMonth> months = FXCollections.observableArrayList();
@@ -63,6 +64,7 @@ public class Organizer {
     private void initialize() {
         importButton.setOnAction(this::handleImport);
         presentButton.setOnAction(this::handlePresent);
+        journeyButton.setOnAction(this::handleJourney);
 
         SortedList<YearMonth> monthsSorted = new SortedList<>(months);
         monthsSorted.setComparator((a, b) -> b.compareTo(a));
@@ -82,6 +84,12 @@ public class Organizer {
         months.addAll(getAvailableMonths());
     }
 
+    private void handleJourney(Event event) {
+        logger.debug("handle Journey()");
+        JourneyDialog dialog = new JourneyDialog(root, clusterService);
+        dialog.showForResult();
+    }
+
     public void reloadPhotos() {
         YearMonth selected = monthList.getSelectionModel().getSelectedItem();
         handleMonthChange(null, null, selected);
@@ -97,7 +105,7 @@ public class Organizer {
     }
 
     private void handleImportError(Throwable error) {
-        LOGGER.error("Import error", error);
+        logger.error("Import error", error);
 
         // queue an update in the main gui
         Platform.runLater(() -> {
@@ -111,7 +119,7 @@ public class Organizer {
     }
 
     private void handleLoadError(Throwable error) {
-        LOGGER.error("Load error", error);
+        logger.error("Load error", error);
 
         // queue an update in the main gui
         Platform.runLater(() -> {

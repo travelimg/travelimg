@@ -11,4 +11,5 @@ import java.util.List;
  */
 public interface ClusterService {
     void cluster(List<Photo> photos) throws ServiceException;
+    Journey addJourney(Journey journey) throws ServiceException;
 }

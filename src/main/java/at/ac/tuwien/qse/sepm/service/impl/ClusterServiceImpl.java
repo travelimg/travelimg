@@ -1,8 +1,11 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.JourneyDAO;
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
+import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.wrapper.LocationWrapper;
 import at.ac.tuwien.qse.sepm.service.wrapper.TimeWrapper;
@@ -28,6 +31,7 @@ public class ClusterServiceImpl implements ClusterService {
     private static final DBSCANClusterer dbscanLocation = new DBSCANClusterer(0.00000009, 1);
 
     @Autowired private GeoService geoService;
+    @Autowired private JourneyDAO journeyDAO;
 
     @Override public void cluster(List<Photo> photos) throws ServiceException {
         logger.debug("photoList-size: " + photos.size());
@@ -98,6 +102,12 @@ public class ClusterServiceImpl implements ClusterService {
         }
     }
 
-    //    private Point getCenter(Cluster<Clusterable> input) {
-    //    }
+    @Override public Journey addJourney(Journey journey) throws ServiceException {
+        try {
+            return journeyDAO.create(journey);
+        } catch (DAOException | ValidationException e) {
+            e.printStackTrace();
+            throw new ServiceException("Failed to create new Journey", e);
+        }
+    }
 }

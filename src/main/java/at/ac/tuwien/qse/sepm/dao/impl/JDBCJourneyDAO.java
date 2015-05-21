@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.JourneyDAO;
 import at.ac.tuwien.qse.sepm.entities.Journey;
+import at.ac.tuwien.qse.sepm.entities.validators.JourneyValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,6 +15,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,13 +42,14 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         logger.debug("Creating Journey", journey);
         if (journey == null)
             throw new IllegalArgumentException();
-        // TODO: Validator
+        // TODO: handle validator exception
+        JourneyValidator.validate(journey);
 
         Map<String, Object> parameters = new HashMap<String, Object>(1);
         parameters.put("id", journey.getId());
         parameters.put("name", journey.getName());
-        parameters.put("start", journey.getStartDate());
-        parameters.put("end", journey.getEndDate());
+        parameters.put("start", Timestamp.valueOf(journey.getStartDate()));
+        parameters.put("end", Timestamp.valueOf(journey.getEndDate()));
 
         try {
             insertJourney.execute(parameters);
@@ -74,6 +77,8 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         logger.debug("Updating Journey", journey);
         if (journey == null)
             throw new IllegalArgumentException();
+
+        JourneyValidator.validate(journey);
 
         try {
             jdbcTemplate.update(updateStatement, journey.getName(), journey.getStartDate(), journey.getEndDate(),

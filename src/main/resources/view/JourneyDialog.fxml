@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>-->
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root minHeight="400" styleClass="dialog,import-dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <BorderPane prefWidth="560.0">
+            <top>
+                <Label maxWidth="Infinity" styleClass="header" text="Reise hinzufügen" />
+            </top>
+            <center>
+                <VBox maxWidth="Infinity" styleClass="body">
+                    <children>
+                        <Label text="Neue Reise bennen:" />
+                          <TextField fx:id="journeyNameField" />
+                        <HBox prefHeight="0.0" prefWidth="0.0" VBox.vgrow="ALWAYS" />
+
+                        <HBox alignment="CENTER" prefHeight="93.0" prefWidth="512.0" spacing="16.0" styleClass="note">
+                            <VBox.margin>
+                                <Insets top="16.0" />
+                            </VBox.margin>
+                     <children>
+                        <VBox prefHeight="200.0" prefWidth="100.0">
+                           <children>
+                              <Label text="Reisebeginn:" />
+                              <DatePicker fx:id="journeyBeginDate" />
+                           </children>
+                        </VBox>
+                        <VBox layoutX="26.0" layoutY="26.0" prefHeight="200.0" prefWidth="100.0">
+                           <children>
+            
+                                    <Label text="Reiseende:" />
+                              <DatePicker fx:id="journeyEndDate" />
+                           </children>
+                        </VBox>
+                     </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </center>
+            <bottom>
+                <BorderPane maxWidth="Infinity" styleClass="footer">
+                    <right>
+                        <HBox maxWidth="-Infinity" spacing="8.0" BorderPane.alignment="CENTER_RIGHT">
+                            <children>
+                                <Button fx:id="journeyCancel" alignment="CENTER_RIGHT" text="ABBRECHEN" />
+                                <Button fx:id="journeyAdd" alignment="CENTER_RIGHT" styleClass="primary" text="HINZUFÜGEN" />
+                            </children>
+                        </HBox>
+                    </right>
+                </BorderPane>
+            </bottom>
+        </BorderPane>
+    </children>
+</fx:root>
