@@ -24,10 +24,10 @@ import java.util.Map;
 public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
     private static final Logger logger = LogManager.getLogger(JDBCJourneyDAO.class);
 
-    private static final String readStatement = "SELECT start, end FROM JOURNEY WHERE name=?;";
-    private static final String readAllStatement = "SELECT start, end FROM JOURNEY;";
-    private static final String deleteStatement = "DELETE FROM JOURNEY WHERE name=?;";
-    private static final String updateStatement = "UPDATE Journey SET start = ?, end = ? WHERE name = ?";
+    private static final String readStatement = "SELECT name, start, end FROM JOURNEY WHERE id=?;";
+    private static final String readAllStatement = "SELECT name, start, end FROM JOURNEY;";
+    private static final String deleteStatement = "DELETE FROM JOURNEY WHERE id=?;";
+    private static final String updateStatement = "UPDATE Journey SET name = ?, start = ?, end = ? WHERE id = ?";
     private SimpleJdbcInsert insertJourney;
 
     @Override @Autowired public void setDataSource(DataSource dataSource) {
@@ -43,6 +43,7 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         // TODO: Validator
 
         Map<String, Object> parameters = new HashMap<String, Object>(1);
+        parameters.put("id", journey.getId());
         parameters.put("name", journey.getName());
         parameters.put("start", journey.getStartDate());
         parameters.put("end", journey.getEndDate());
@@ -62,7 +63,7 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         if (journey == null)
             throw new IllegalArgumentException();
         try {
-            jdbcTemplate.update(deleteStatement, journey.getName());
+            jdbcTemplate.update(deleteStatement, journey.getId());
         } catch (DataAccessException ex) {
             logger.error("Failed to delete Journey", ex);
             throw new DAOException("Failed to delete Journey", ex);
@@ -75,8 +76,8 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
             throw new IllegalArgumentException();
 
         try {
-            jdbcTemplate.update(updateStatement, journey.getStartDate(), journey.getEndDate(),
-                    journey.getName());
+            jdbcTemplate.update(updateStatement, journey.getName(), journey.getStartDate(), journey.getEndDate(),
+                    journey.getId());
             logger.debug("Successfully updated Journey", journey);
         } catch (DataAccessException ex) {
             logger.error("Failed updating Journey", journey);
@@ -90,9 +91,9 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
             List<Journey> journeys = jdbcTemplate.query(readAllStatement, new RowMapper<Journey>() {
 
                 @Override public Journey mapRow(ResultSet resultSet, int i) throws SQLException {
-                    return new Journey(resultSet.getString(1),
-                            resultSet.getTimestamp(2).toLocalDateTime(),
-                            resultSet.getTimestamp(3).toLocalDateTime());
+                    return new Journey(resultSet.getInt(1), resultSet.getString(2),
+                            resultSet.getTimestamp(3).toLocalDateTime(),
+                            resultSet.getTimestamp(4).toLocalDateTime());
                 }
             });
 
@@ -116,9 +117,9 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
 
                         @Override public Journey mapRow(ResultSet resultSet, int i)
                                 throws SQLException {
-                            return new Journey(resultSet.getString(1),
-                                    resultSet.getTimestamp(2).toLocalDateTime(),
-                                    resultSet.getTimestamp(3).toLocalDateTime());
+                            return new Journey(resultSet.getInt(1), resultSet.getString(2),
+                                    resultSet.getTimestamp(3).toLocalDateTime(),
+                                    resultSet.getTimestamp(4).toLocalDateTime());
                         }
                     });
         }catch (DataAccessException ex) {

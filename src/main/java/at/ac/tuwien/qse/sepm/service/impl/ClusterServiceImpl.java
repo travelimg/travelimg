@@ -21,8 +21,7 @@ import java.util.List;
  */
 public class ClusterServiceImpl implements ClusterService {
 
-    private static final Logger logger = LogManager
-            .getLogger(ClusterServiceImpl.class);
+    private static final Logger logger = LogManager.getLogger(ClusterServiceImpl.class);
 
     // TODO: find good parameter intervalls for the GUI
     private static final DBSCANClusterer dbscanTime = new DBSCANClusterer(604800, 1);
@@ -74,12 +73,12 @@ public class ClusterServiceImpl implements ClusterService {
             }
             logger.debug(
                     "latCentroid: " + latitude / count + " longCentroid: " + longitude / count);
-            journeyList.add(new Journey(startDate, endDate,
-                    geoService.getPlaceByGeoData(latitude / count, longitude / count)
-                            .getCountry()));
-            logger.debug(
-                    "Reise " + (i+1)  + " " + journeyList.get(i).getName() + " Start: " + journeyList
-                            .get(i).getStartDate() + " Ende: " + journeyList.get(i).getEndDate());
+            journeyList.add(new Journey(-1,
+                    geoService.getPlaceByGeoData(latitude / count, longitude / count).getCountry(),
+                    startDate, endDate));
+            logger.debug("Reise " + (i + 1) + " " + journeyList.get(i).getName() + " Start: "
+                    + journeyList.get(i).getStartDate() + " Ende: " + journeyList.get(i)
+                    .getEndDate());
 
             // cluster for places
             List<Cluster<LocationWrapper>> clusterResultsLocation = dbscanTime

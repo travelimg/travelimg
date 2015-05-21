@@ -2,15 +2,22 @@ package at.ac.tuwien.qse.sepm.entities;
 
 public class Place {
 
+    private int id;
     private String city;
     private String country;
 
-    public Place() {
-    }
-
-    public Place(String city, String country) {
+    public Place(int id, String city, String country) {
+        this.id = id;
         this.city = city;
         this.country = country;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getCity() {

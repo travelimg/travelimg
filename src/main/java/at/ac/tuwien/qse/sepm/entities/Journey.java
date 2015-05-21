@@ -7,14 +7,24 @@ import java.time.LocalDateTime;
  * Created by David on 19.05.2015.
  */
 public class Journey {
+    private int id;
+    private String name;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private String name;
 
-    public Journey(String name, LocalDateTime startDate, LocalDateTime endDate) {
+    public Journey(int id, String name, LocalDateTime startDate, LocalDateTime endDate) {
+        this.id = id;
+        this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.name = name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public LocalDateTime getStartDate() {
