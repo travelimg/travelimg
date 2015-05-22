@@ -36,7 +36,7 @@ public class DropboxServiceImpl implements DropboxService {
     );
     private static final Path DROPBOX_INFO_PATH_WIN = Paths.get(
             System.getProperty("user.home"),
-            "Dropbox/info.json"
+            "AppData/Roaming/Dropbox/info.json"
     );
 
     ExecutorService executorService = Executors.newFixedThreadPool(1);
