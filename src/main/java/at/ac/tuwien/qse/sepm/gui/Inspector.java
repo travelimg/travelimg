@@ -74,12 +74,14 @@ public class Inspector {
     public void addActivePhoto(Photo photo) {
         LOGGER.debug("addActivePhoto({})", photo);
         activePhotos.add(photo);
+        mapsScene.addMarker(photo);
         showDetails(activePhotos.get(0));
     }
 
     public void removeActivePhoto(Photo photo){
         LOGGER.debug("removeActivePhoto({})", photo);
         activePhotos.remove(photo);
+        mapsScene.removeMarker(photo);
     }
 
     @FXML private void initialize() {
@@ -112,6 +114,7 @@ public class Inspector {
 
         }
         mainController.deletePhotos();
+        mapsScene.clearMarkers();
     }
 
     private void handleCancel(Event event) {
@@ -167,7 +170,6 @@ public class Inspector {
         }
 
         details.setVisible(true);
-        mapsScene.addMarker(photo);
         tagSelector.showCurrentlySetTags(photo);
         ratingPicker.setRating(photo.getRating());
 
