@@ -55,7 +55,7 @@ public interface PhotoDAO {
      * @return A List of all currently known photos.
      * @throws DAOException If the data store fails to retrieve the records.
      */
-    List<Photo> readAll() throws DAOException, ValidationException;
+    List<Photo> readAll() throws DAOException;
 
     /**
      * Retrieve a list of photos from a givenn month

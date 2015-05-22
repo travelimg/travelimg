@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<BorderPane fx:id="root" stylesheets="@style.css" prefWidth="160.0" styleClass="organizer"
-         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.Organizer">
+<BorderPane fx:id="root" prefWidth="160.0" styleClass="organizer" stylesheets="@style.css"
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="at.ac.tuwien.qse.sepm.gui.Organizer">
     <center>
-        <ListView fx:id="monthList" maxWidth="Infinity" maxHeight="Infinity" BorderPane.alignment="CENTER"/>
+        <Accordion BorderPane.alignment="CENTER">
+            <panes>
+                <TitledPane fx:id="ratingPane" animated="false" text="Bewertung"/>
+                <TitledPane fx:id="categoryPane" animated="false" text="Kategorien"/>
+                <TitledPane fx:id="photographerPane" animated="false" text="Fotografen"/>
+                <TitledPane fx:id="monthPane" animated="false" text="Monate"/>
+            </panes>
+        </Accordion>
     </center>
     <bottom>
         <HBox prefHeight="40.0" styleClass="navbar">

@@ -5,8 +5,10 @@ import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.dao.TagDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.PhotoFilter;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+import at.ac.tuwien.qse.sepm.gui.PhotoSelector;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.Service;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -42,11 +44,10 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public Cancelable loadPhotosByMonth(YearMonth month, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
-        LOGGER.debug("Loading photos for month {}",month);
-        AsyncLoader loader = new AsyncLoader(month, callback, errorHandler);
+    public Cancelable loadPhotos(PhotoSelector filter, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
+        LOGGER.debug("Loading photos with filter {}", filter);
+        AsyncLoader loader = new AsyncLoader(filter, callback, errorHandler);
         executorService.submit(loader);
-
         return loader;
     }
 
@@ -79,8 +80,16 @@ public class PhotoServiceImpl implements PhotoService {
             return photoDAO.readAll();
         } catch (DAOException e) {
             throw new ServiceException(e);
-        } catch (ValidationException e) {
-            throw new ServiceException("Failed to validate entity", e);
+        }
+    }
+
+    @Override
+    public List<Photo> getAllPhotos(PhotoFilter filter) throws ServiceException {
+        LOGGER.debug("Entering getAllPhotos with {}", filter);
+        try {
+            throw new UnsupportedOperationException(); // TODO
+        } catch (Exception e) { // TODO
+            throw new ServiceException(e);
         }
     }
 
@@ -162,14 +171,14 @@ public class PhotoServiceImpl implements PhotoService {
 
 
     private class AsyncLoader extends CancelableTask {
-        private YearMonth month;
+        private PhotoSelector filter;
         private Consumer<Photo> callback;
         private ErrorHandler<ServiceException> errorHandler;
 
-        public AsyncLoader(YearMonth month, Consumer<Photo> callback,
+        public AsyncLoader(PhotoSelector filter, Consumer<Photo> callback,
                 ErrorHandler<ServiceException> errorHandler) {
             super();
-            this.month = month;
+            this.filter = filter;
             this.callback = callback;
             this.errorHandler = errorHandler;
         }
@@ -177,13 +186,14 @@ public class PhotoServiceImpl implements PhotoService {
         @Override protected void execute() {
             List<Photo> photos;
             try {
-                photos = photoDAO.readPhotosByMonth(month);
+                photos = photoDAO.readAll();
             } catch (DAOException e) {
                 errorHandler.propagate(new ServiceException("Failed to load photos", e));
                 return;
             }
 
             for (Photo p : photos) {
+                if (!filter.matches(p)) continue;
                 if (!getIsRunning())
                     return;
                 try {

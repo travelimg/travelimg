@@ -90,6 +90,7 @@ public class MainController {
      * Clear the image grid and don't show any photos.
      */
     public void clearPhotos() {
+        if (tilePane == null) return;
         activePhotos.clear();
         tilePane.getChildren().clear();
     }

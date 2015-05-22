@@ -1,7 +1,9 @@
 package at.ac.tuwien.qse.sepm.service;
 
+import at.ac.tuwien.qse.sepm.entities.PhotoFilter;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.gui.PhotoSelector;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 
@@ -19,14 +21,13 @@ public interface PhotoService {
     List<YearMonth> getMonthsWithPhotos() throws ServiceException;
 
     /**
-     * Retrieve a list of photos from a given month.
+     * Loads photos in an asynchronous operation.
      *
-     * @param month Month for which photos will be loaded.
-     * @param callback Called for each matching photo
-     * @param errorHandler Handler for occuring exceptions
-     * @return A list of photos from the given date.
+     * @param callback called for each photo
+     * @param errorHandler handler for occurring exceptions
+     * @return cancelable task that loads photos
      */
-    Cancelable loadPhotosByMonth(YearMonth month, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler);
+    Cancelable loadPhotos(PhotoSelector filter, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler);
 
     /**
      * delete the delivered List of Photos
@@ -49,6 +50,14 @@ public interface PhotoService {
      * @throws ServiceException
      */
     List<Photo> getAllPhotos() throws ServiceException;
+
+    /**
+     * Get all photos that match the specified filter.
+     *
+     * @param filter filter the photos are tested against
+     * @return list of all available photos that match the filter
+     */
+    List<Photo> getAllPhotos(PhotoFilter filter) throws ServiceException;
 
     //TODO comment the method
     void requestFullscreenMode(List<Photo> photos) throws ServiceException;

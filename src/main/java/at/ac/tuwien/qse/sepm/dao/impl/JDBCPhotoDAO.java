@@ -157,7 +157,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     @Override
-    public List<Photo> readAll() throws DAOException, ValidationException {
+    public List<Photo> readAll() throws DAOException {
         logger.debug("retrieving all photos");
 
         try {
