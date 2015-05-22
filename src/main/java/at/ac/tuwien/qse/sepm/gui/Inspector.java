@@ -59,14 +59,16 @@ public class Inspector {
     }
 
     public void setMap(GoogleMapsScene mapsScene){
-        this.mapsScene=mapsScene;
-        if(mapContainer.getChildren().contains(mapsScene.getMapView())){
-            mapContainer.getChildren().remove(mapsScene.getMapView());
-        }
-        mapContainer.getChildren().add(mapsScene.getMapView());
+        mapContainer.getChildren().clear();
+        this.mapsScene =mapsScene;
 
-        this.mapsScene=mapsScene;
-        mapsScene.removeAktiveMarker();
+        if(mapContainer.getChildren().contains(this.mapsScene.getMapView())){
+            mapContainer.getChildren().remove(this.mapsScene.getMapView());
+        }
+
+        mapContainer.getChildren().add(this.mapsScene.getMapView());
+
+        this.mapsScene.removeAktiveMarker();
     }
     @FXML private void initialize() {
 
@@ -103,9 +105,13 @@ public class Inspector {
     private void handleConfirm(Event event) {
         // TODO
     }
-    public void desableDetails(){
+    public void disableDetails(){
 
         this.details.setVisible(false);
+    }
+    public GoogleMapsScene getMap(){
+        return this.mapsScene;
+
     }
     private void showDetails(Photo photo) {
         if (photo == null) {

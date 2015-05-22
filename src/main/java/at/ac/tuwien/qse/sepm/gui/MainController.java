@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
@@ -14,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.*;
 import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
@@ -53,9 +55,11 @@ public class MainController {
     @FXML private Tab weltkarte;
     @FXML private Tab timeline;
     @FXML private TabPane tabs;
+    SelectionModel<Tab> selectionMod;
+    ChangeListener<SelectionModel<Tab>> changer;
     private GoogleMapsScene worldMap;
     private ImageTile selectedTile = null;
-
+    private boolean gitterSelect =false;
     public MainController() {
         scrollPane = new ScrollPane();
         in = new Insets(15,15,15,15);
@@ -70,8 +74,11 @@ public class MainController {
         tilePane.setVgap(15);
         tilePane.setPadding(in);
         scrollPane.setContent(tilePane);
+        tabs = new TabPane();
 
     }
+
+
 
     @FXML
     private void initialize() {
@@ -80,8 +87,21 @@ public class MainController {
         weltkarte.setContent(worldMap.getMapView());
         gitter.setContent(scrollPane);
 
+        root.getCenter().setOnMouseClicked(this::handleClick);
 
+    }
 
+    private void handleClick(MouseEvent mouseEvent) {
+       if(gitter.isSelected()) {
+            gitterSelect = true;
+       }
+           if(weltkarte.isSelected() && gitterSelect){
+               gitterSelect=false;
+               inspector.disableDetails();
+               System.out.println("test");
+               worldMap = new GoogleMapsScene(getAllPhotos());
+               weltkarte.setContent(worldMap.getMapView());
+           }
     }
 
 
@@ -115,9 +135,9 @@ public class MainController {
         ImageTile imageTile = new ImageTile(photo);
 
         imageTile.getSelectedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if(newValue) {
+            @Override public void changed(ObservableValue<? extends Boolean> observable,
+                    Boolean oldValue, Boolean newValue) {
+                if (newValue) {
                     if (selectedTile != null) {
                         selectedTile.unselect();
                     }
@@ -127,7 +147,9 @@ public class MainController {
         });
 
         tilePane.getChildren().add(imageTile);
+
     }
+
 
     /**
      * Clear the image grid and don't show any photos.
