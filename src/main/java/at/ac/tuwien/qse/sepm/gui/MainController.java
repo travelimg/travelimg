@@ -138,8 +138,8 @@ public class MainController {
          * Unselect a photo.
          */
         public void unselect() {
-            getStyleClass().add("image-tile-non-selected");
             getStyleClass().remove("image-tile-selected");
+            getStyleClass().add("image-tile-non-selected");
 
             this.selected.set(false);
         }

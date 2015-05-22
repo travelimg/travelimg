@@ -345,12 +345,11 @@
 }
 
 .image-tile-non-selected {
-    -fx-padding: 5px;
+    -fx-effect: null;
 }
 
 .image-tile-selected {
-    -fx-padding: 5px;
-    -fx-background-color: #1E88E5;
+    -fx-effect: dropshadow(three-pass-box, #1E88E5, 5, 5, 0, 0);
 }
 
 .rating-picker {
