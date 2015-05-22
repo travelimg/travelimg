@@ -4,6 +4,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.TilePane?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.FlowPane?>
 <BorderPane fx:id="root" stylesheets="@/view/style.css"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.MainController">
 
@@ -12,11 +13,11 @@
     </left>
     <center>
         <ScrollPane fx:id="scrollPane" prefWidth="500" prefHeight="400" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
-            <TilePane fx:id="tilePane" hgap="15" vgap="15" styleClass="image-grid">
+            <FlowPane fx:id="flowPane" hgap="15" vgap="15" styleClass="image-grid">
                 <padding>
                     <Insets bottom="15.0" left="15.0" right ="15.0" top="15.0"/>
                 </padding>
-            </TilePane>
+            </FlowPane>
         </ScrollPane>
     </center>
 

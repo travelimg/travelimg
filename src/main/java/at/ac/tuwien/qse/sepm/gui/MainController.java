@@ -6,20 +6,16 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.geometry.*;
-import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.TilePane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -38,7 +34,7 @@ public class MainController {
 
     @FXML private ScrollPane scrollPane;
 
-    @FXML private TilePane tilePane;
+    @FXML private FlowPane flowPane;
     private ImageTile selectedTile = null;
 
     private List<Photo> activePhotos = new ArrayList<>();
@@ -74,7 +70,7 @@ public class MainController {
             }
         });
 
-        tilePane.getChildren().add(imageTile);
+        flowPane.getChildren().add(imageTile);
     }
 
     /**
@@ -91,7 +87,7 @@ public class MainController {
      */
     public void clearPhotos() {
         activePhotos.clear();
-        tilePane.getChildren().clear();
+        flowPane.getChildren().clear();
     }
 
     /**
