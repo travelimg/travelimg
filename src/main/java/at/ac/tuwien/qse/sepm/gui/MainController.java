@@ -3,12 +3,14 @@ package at.ac.tuwien.qse.sepm.gui;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -35,7 +37,7 @@ public class MainController {
     @FXML private ScrollPane scrollPane;
 
     @FXML private FlowPane flowPane;
-    private ImageTile selectedTile = null;
+    private ArrayList<ImageTile> selectedImages = new ArrayList<ImageTile>();
 
     private List<Photo> activePhotos = new ArrayList<>();
 
@@ -46,6 +48,21 @@ public class MainController {
 
     @FXML
     private void initialize() {
+        scrollPane.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if(event.isControlDown() && event.getCode()== KeyCode.A){
+                    for (Node n : flowPane.getChildren()) {
+                        if(n instanceof ImageTile){
+                            if(!((ImageTile) n).getSelectedProperty().getValue()){
+                                ((ImageTile) n).select();
+                                selectedImages.add((ImageTile) n);
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -55,17 +72,26 @@ public class MainController {
      */
     public void addPhoto(Photo photo) {
         ImageTile imageTile = new ImageTile(photo);
-
         activePhotos.add(photo);
 
-        imageTile.getSelectedProperty().addListener(new ChangeListener<Boolean>() {
+        imageTile.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if(newValue) {
-                    if (selectedTile != null) {
-                        selectedTile.unselect();
+            public void handle(MouseEvent event) {
+                if (event.isControlDown()) {
+                    if (imageTile.getSelectedProperty().getValue()) {
+                        imageTile.unselect();
+                        selectedImages.remove(imageTile);
+                    } else {
+                        imageTile.select();
+                        selectedImages.add(imageTile);
                     }
-                    selectedTile = imageTile;
+                } else {
+                    for (ImageTile i : selectedImages) {
+                        i.unselect();
+                    }
+                    selectedImages.clear();
+                    imageTile.select();
+                    selectedImages.add(imageTile);
                 }
             }
         });
@@ -114,7 +140,6 @@ public class MainController {
 
             imageView = new ImageView(image);
             imageView.setFitWidth(150);
-            imageView.setOnMouseClicked(this::handleSelected);
 
             getStyleClass().add("image-tile-non-selected");
 
@@ -128,9 +153,7 @@ public class MainController {
         public void select() {
             getStyleClass().remove("image-tile-non-selected");
             getStyleClass().add("image-tile-selected");
-
-            inspector.setActivePhoto(photo);
-
+            inspector.addActivePhoto(photo);
             this.selected.set(true);
         }
 
@@ -140,7 +163,7 @@ public class MainController {
         public void unselect() {
             getStyleClass().remove("image-tile-selected");
             getStyleClass().add("image-tile-non-selected");
-
+            inspector.removeActivePhoto(photo);
             this.selected.set(false);
         }
 
@@ -150,10 +173,6 @@ public class MainController {
          */
         public BooleanProperty getSelectedProperty() {
             return selected;
-        }
-
-        private void handleSelected(MouseEvent event) {
-            select();
         }
     }
 }

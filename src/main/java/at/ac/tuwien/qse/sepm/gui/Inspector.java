@@ -1,12 +1,9 @@
 package at.ac.tuwien.qse.sepm.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.Rating;
+import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
@@ -20,7 +17,9 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -29,6 +28,9 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controller for the inspector view which is used for modifying meta-data of a photo.
@@ -54,7 +56,7 @@ public class Inspector {
     private TagSelector tagSelector;
     private GoogleMapsScene mapsScene;
 
-    private Photo photo;
+    private ArrayList<Photo> activePhotos = new ArrayList<Photo>();
 
     @Autowired private Organizer organizer;
     @Autowired private PhotoService photoservice;
@@ -62,16 +64,21 @@ public class Inspector {
     @Autowired private TagService tagService;
 
     /**
-     * Set the active photo.
+     * Adds a new photo to the selected ones.
      * <p/>
      * The photos metadata will be displayed in the inspector widget.
      *
-     * @param photo The active photo for which to show further information
+     * @param photo The new added photo.
      */
-    public void setActivePhoto(Photo photo) {
-        LOGGER.debug("setActivePhoto({})", photo);
-        this.photo = photo;
-        showDetails(photo);
+    public void addActivePhoto(Photo photo) {
+        LOGGER.debug("addActivePhoto({})", photo);
+        activePhotos.add(photo);
+        showDetails(activePhotos.get(0));
+    }
+
+    public void removeActivePhoto(Photo photo){
+        LOGGER.debug("removeActivePhoto({})", photo);
+        activePhotos.remove(photo);
     }
 
     @FXML private void initialize() {
@@ -88,22 +95,23 @@ public class Inspector {
         ratingPickerContainer.getChildren().add(ratingPicker);
         ratingPicker.ratingProperty().addListener(this::handleRatingChanged);
         mapContainer.getChildren().add(mapsScene.getMapView());
-        setActivePhoto(null);
+        //addActivePhoto(null);
         tagSelectionContainer.getChildren().add(tagSelector);
     }
 
     private void handleDelete(Event event) {
-        if (photo == null) {
+        System.out.println("delete clicked.");
+        if (activePhotos.get(0) == null) {
             return;
         }
-        List<Photo> photos = new ArrayList<>();
-        photos.add(photo);
-        organizer.reloadPhotos();
+
         try {
-            photoservice.deletePhotos(photos);
+            photoservice.deletePhotos(activePhotos);
+            activePhotos.clear();
         } catch (ServiceException e) {
-            System.out.println(e);
+
         }
+        organizer.reloadPhotos();
     }
 
     private void handleCancel(Event event) {
@@ -117,27 +125,27 @@ public class Inspector {
     private void handleRatingChanged(ObservableValue<? extends Rating> observable, Rating oldValue, Rating newValue) {
         LOGGER.debug("handleRatingChanged(~, {}, {})", oldValue, newValue);
 
-        if (photo == null) {
+        if (activePhotos.get(0) == null) {
             LOGGER.debug("No photo selected.");
             return;
         }
 
-        if (photo.getRating() == newValue) {
+        if (activePhotos.get(0).getRating() == newValue) {
             LOGGER.debug("Photo already has rating of {}.", newValue);
             return;
         }
 
-        LOGGER.debug("Setting photo rating from {} to {}.", photo.getRating(), newValue);
-        photo.setRating(newValue);
+        LOGGER.debug("Setting photo rating from {} to {}.", activePhotos.get(0).getRating(), newValue);
+        activePhotos.get(0).setRating(newValue);
 
         try {
-            photoservice.savePhotoRating(photo);
+            photoservice.savePhotoRating(activePhotos.get(0));
         } catch (ServiceException ex) {
             LOGGER.error("Failed saving photo rating.", ex);
-            LOGGER.debug("Resetting rating from {} to {}.", photo.getRating(), oldValue);
+            LOGGER.debug("Resetting rating from {} to {}.", activePhotos.get(0).getRating(), oldValue);
 
             // Undo changes.
-            photo.setRating(oldValue);
+            activePhotos.get(0).setRating(oldValue);
             // FIXME: Reset the RatingPicker.
             // This is not as simple as expected. Calling ratingPicker.setRating(oldValue) here
             // will complete and finish. But once the below dialog is closed ANOTHER selection-
@@ -187,8 +195,8 @@ public class Inspector {
         public void onChanged(ListChangeListener.Change<? extends Tag> change) {
             while(change.next()) {
                 List<Photo> photoList = new ArrayList<>();
-                if (photo != null) {
-                    photoList.add(photo);
+                if (activePhotos.get(0) != null) {
+                    photoList.add(activePhotos.get(0));
                 }
 
                 if (change.wasAdded()) {
