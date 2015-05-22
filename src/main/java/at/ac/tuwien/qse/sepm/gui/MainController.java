@@ -116,6 +116,13 @@ public class MainController {
         flowPane.getChildren().clear();
     }
 
+    public void deletePhotos(){
+        for(ImageTile i : selectedImages){
+            flowPane.getChildren().remove(i);
+        }
+        selectedImages.clear();
+    }
+
     /**
      * Widget for one widget in the image grid. Can either be in a selected or an unselected state.
      */

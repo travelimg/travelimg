@@ -62,6 +62,7 @@ public class Inspector {
     @Autowired private PhotoService photoservice;
     @Autowired private ExifService exifService;
     @Autowired private TagService tagService;
+    @Autowired private MainController mainController;
 
     /**
      * Adds a new photo to the selected ones.
@@ -100,7 +101,6 @@ public class Inspector {
     }
 
     private void handleDelete(Event event) {
-        System.out.println("delete clicked.");
         if (activePhotos.get(0) == null) {
             return;
         }
@@ -111,7 +111,7 @@ public class Inspector {
         } catch (ServiceException e) {
 
         }
-        organizer.reloadPhotos();
+        mainController.deletePhotos();
     }
 
     private void handleCancel(Event event) {
