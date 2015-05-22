@@ -7,10 +7,13 @@ import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.*;
+import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.Event;
@@ -73,7 +76,7 @@ public class Organizer {
     private final ObservableList<YearMonth> monthList = FXCollections.observableArrayList();
     private final DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy MMM");
 
-    private final PhotoSelector filter = new PhotoFilter();
+    private final PhotoFilter filter = new PhotoFilter();
 
     private Cancelable loadingTask;
 
@@ -93,6 +96,7 @@ public class Organizer {
         presentButton.setOnAction(this::handlePresent);
 
         ratingListView.setItems(ratingList);
+        ratingListView.getCheckModel().getCheckedItems().addListener(this::handleRatingsChange);
         ratingListView.setCellFactory(list -> new CheckBoxListCell<>(
             item -> ratingListView.getItemBooleanProperty(item),
             new StringConverter<Rating>() {
@@ -113,13 +117,15 @@ public class Organizer {
         SortedList<Tag> sortedCategoryList = new SortedList<>(categoryList);
         sortedCategoryList.setComparator((a, b) -> a.getName().compareTo(b.getName()));
         categoryListView.setItems(sortedCategoryList);
+        categoryListView.getCheckModel().getCheckedItems().addListener(this::handleCategoriesChange);
         categoryListView.setCellFactory(list -> new CheckBoxListCell<>(
-            item -> categoryListView.getItemBooleanProperty(item),
-            new StringConverter<Tag>() {
-                @Override public Tag fromString(String string) {
-                    return null;
-                }
-                @Override public String toString(Tag item) {
+                        item -> categoryListView.getItemBooleanProperty(item),
+                        new StringConverter<Tag>() {
+                            @Override public Tag fromString(String string) {
+                                return null;
+                            }
+
+                            @Override public String toString(Tag item) {
                     return item.getName();
                 }
             })
@@ -128,6 +134,7 @@ public class Organizer {
         SortedList<Photographer> sortedPhotographerList = new SortedList<>(photographerList);
         sortedPhotographerList.setComparator((a, b) -> a.getName().compareTo(b.getName()));
         photographerListView.setItems(sortedPhotographerList);
+        photographerListView.getCheckModel().getCheckedItems().addListener(this::handlePhotographersChange);
         photographerListView.setCellFactory(list -> new CheckBoxListCell<>(
             item -> photographerListView.getItemBooleanProperty(item),
             new StringConverter<Photographer>() {
@@ -143,6 +150,7 @@ public class Organizer {
         SortedList<YearMonth> sortedMonthList = new SortedList<>(monthList);
         sortedMonthList.setComparator((a, b) -> b.compareTo(a));
         monthListView.setItems(sortedMonthList);
+        monthListView.getCheckModel().getCheckedItems().addListener(this::handleMonthsChange);
         monthListView.setCellFactory(list -> new CheckBoxListCell<>(
             item -> monthListView.getItemBooleanProperty(item),
             new StringConverter<YearMonth>() {
@@ -170,7 +178,37 @@ public class Organizer {
         mainController.clearPhotos();
 
         // Load photos with current filter.
-        this.loadingTask = photoService.loadPhotos(filter, this::handleLoadedPhoto, this::handleLoadError);
+        this.loadingTask = photoService.loadPhotos(filter, this::handleLoadedPhoto,
+                this::handleLoadError);
+    }
+
+    private void handleFilterChange() {
+        reloadPhotos();
+    }
+    private void handleRatingsChange(ListChangeListener.Change<? extends Rating> change) {
+        LOGGER.debug("rating filter changed");
+        filter.getIncludedRatings().clear();
+        filter.getIncludedRatings().addAll(ratingListView.getCheckModel().getCheckedItems());
+        handleFilterChange();
+    }
+    private void handleCategoriesChange(ListChangeListener.Change<? extends Tag> change) {
+        LOGGER.debug("category filter changed");
+        filter.getIncludedCategories().clear();
+        filter.getIncludedCategories().addAll(categoryListView.getCheckModel().getCheckedItems());
+        handleFilterChange();
+    }
+    private void handlePhotographersChange(ListChangeListener.Change<? extends Photographer> change) {
+        LOGGER.debug("photographer filter changed");
+        filter.getIncludedPhotographers().clear();
+        filter.getIncludedPhotographers().addAll(
+                photographerListView.getCheckModel().getCheckedItems());
+        handleFilterChange();
+    }
+    private void handleMonthsChange(ListChangeListener.Change<? extends YearMonth> change) {
+        LOGGER.debug("month filter changed");
+        filter.getIncludedMonths().clear();
+        filter.getIncludedMonths().addAll(monthListView.getCheckModel().getCheckedItems());
+        handleFilterChange();
     }
 
     private void refreshLists() {
@@ -336,13 +374,5 @@ public class Organizer {
         }
 
         return months;
-    }
-
-    private class PhotoFilter implements PhotoSelector {
-
-        @Override
-        public boolean matches(Photo photo) {
-            return true;
-        }
     }
 }

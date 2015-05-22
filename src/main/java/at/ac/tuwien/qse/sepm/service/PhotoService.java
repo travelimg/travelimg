@@ -1,6 +1,6 @@
 package at.ac.tuwien.qse.sepm.service;
 
-import at.ac.tuwien.qse.sepm.entities.PhotoFilter;
+import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.gui.PhotoSelector;
