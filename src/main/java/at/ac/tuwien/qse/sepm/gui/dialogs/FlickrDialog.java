@@ -1,9 +1,11 @@
 package at.ac.tuwien.qse.sepm.gui.dialogs;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.gui.GoogleMapsScene;
 import at.ac.tuwien.qse.sepm.service.FlickrService;
+import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
@@ -15,6 +17,8 @@ import com.lynden.gmapsfx.javascript.object.LatLong;
 import com.lynden.gmapsfx.javascript.object.Marker;
 import com.lynden.gmapsfx.javascript.object.MarkerOptions;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -26,6 +30,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -38,28 +43,36 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import netscape.javascript.JSObject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
-public class FlickrDialog extends Dialog {
+public class FlickrDialog extends ResultDialog<List<Photo>> {
 
     @FXML private HBox progress;
     @FXML private ProgressBar progressBar;
     @FXML private FlowPane photosFlowPane;
-    @FXML private Button downloadButton;
+    @FXML private Button downloadButton, importButton;
     @FXML private Pane mapContainer;
+    @FXML private ScrollPane scrollPane;
     @FXML private FlowPane keywordsFlowPane;
     @FXML private TextField keywordTextField;
     @Autowired private FlickrService flickrService;
+    @Autowired private ImportService importService;
 
     private GoogleMapView mapView;
     private GoogleMap googleMap;
     private Marker actualMarker;
     private LatLong actualLatLong;
+    private ArrayList<ImageTile> selectedImages = new ArrayList<ImageTile>();
+    private static final Logger logger = LogManager.getLogger();
 
     public FlickrDialog(Node origin, String title) {
         super(origin, title);
@@ -96,6 +109,21 @@ public class FlickrDialog extends Dialog {
                     //googleMap.setZoom(googleMap.getZoom()-1); //workaround to prevent zoom on doubleclick
                     dropMarker(new LatLong((JSObject) obj.getMember("latLng")));
                 });
+            }
+        });
+        scrollPane.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if(event.isControlDown() && event.getCode()== KeyCode.A){
+                    for (Node n : photosFlowPane.getChildren()) {
+                        if(n instanceof ImageTile){
+                            if(!((ImageTile) n).getSelectedProperty().getValue()){
+                                ((ImageTile) n).select();
+                                selectedImages.add((ImageTile) n);
+                            }
+                        }
+                    }
+                }
             }
         });
     }
@@ -147,6 +175,18 @@ public class FlickrDialog extends Dialog {
         downloadPhotos();
     }
 
+    @FXML
+    public void handleOnImportButtonClicked(){
+        ArrayList<Photo> photos = new ArrayList<Photo>();
+        for(ImageTile i: selectedImages){
+            photos.add(i.getPhoto());
+        }
+        //TODO at this point, photos are ready to import
+        setResult(photos);
+        selectedImages.clear();
+        close();
+    }
+
     private void downloadPhotos(){
         ObservableList<Node> test = keywordsFlowPane.getChildren();
         String tags[] = new String[test.size()];
@@ -172,16 +212,39 @@ public class FlickrDialog extends Dialog {
                     Platform.runLater(new Runnable() {
 
                         public void run() {
-                            ImageView imageView = null;
-                            try {
-                                final Image image;
-                                image = new Image(new FileInputStream(new File(photo.getPath())), 150, 0, true, true);
-                                imageView = new ImageView(image);
-                                imageView.setFitWidth(150);
-                            } catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                            }
-                            photosFlowPane.getChildren().add(imageView);
+                            Photographer photographer = new Photographer(1,null);
+                            photo.setPhotographer(photographer);
+                            ImageTile imageTile = new ImageTile(photo);
+                            imageTile.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                                @Override
+                                public void handle(MouseEvent event) {
+                                    if (event.isControlDown()) {
+                                        if (imageTile.getSelectedProperty().getValue()) {
+                                            imageTile.unselect();
+                                            selectedImages.remove(imageTile);
+                                        } else {
+                                            imageTile.select();
+                                            selectedImages.add(imageTile);
+                                        }
+                                    } else {
+                                        for (ImageTile i : selectedImages) {
+                                            i.unselect();
+                                        }
+                                        selectedImages.clear();
+                                        imageTile.select();
+                                        selectedImages.add(imageTile);
+                                    }
+
+                                    if(selectedImages.isEmpty()){
+                                        importButton.setDisable(true);
+                                    }
+                                    else{
+                                        importButton.setDisable(false);
+                                    }
+                                }
+                            });
+
+                            photosFlowPane.getChildren().add(imageTile);
                         }
                     });
 
@@ -218,6 +281,69 @@ public class FlickrDialog extends Dialog {
             });
         } catch (ServiceException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Widget for one widget in the image grid. Can either be in a selected or an unselected state.
+     */
+    private class ImageTile extends HBox {
+
+        private BooleanProperty selected = new SimpleBooleanProperty(false);
+
+        private Photo photo;
+
+        private Image image;
+        private ImageView imageView;
+
+        public ImageTile(Photo photo) {
+
+            this.photo = photo;
+
+            try {
+                image = new Image(new FileInputStream(new File(photo.getPath())), 150, 0, true, true);
+            } catch (FileNotFoundException ex) {
+                logger.error("Could not find photo", ex);
+                return;
+            }
+
+            imageView = new ImageView(image);
+            imageView.setFitWidth(150);
+
+            getStyleClass().add("image-tile-non-selected");
+
+
+            this.getChildren().add(imageView);
+        }
+
+        /**
+         * Select this photo. Triggers an update of the inspector widget.
+         */
+        public void select() {
+            getStyleClass().remove("image-tile-non-selected");
+            getStyleClass().add("image-tile-selected");
+            this.selected.set(true);
+        }
+
+        /**
+         * Unselect a photo.
+         */
+        public void unselect() {
+            getStyleClass().remove("image-tile-selected");
+            getStyleClass().add("image-tile-non-selected");
+            this.selected.set(false);
+        }
+
+        public Photo getPhoto(){
+            return photo;
+        }
+
+        /**
+         * Property which represents if this tile is currently selected or not.
+         * @return The selected property.
+         */
+        public BooleanProperty getSelectedProperty() {
+            return selected;
         }
     }
 }
