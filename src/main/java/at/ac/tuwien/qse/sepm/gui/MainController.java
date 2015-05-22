@@ -84,7 +84,7 @@ public class MainController {
 
     }
 
-   
+
 
     /**
      * returns a ArrayList with all Photos
