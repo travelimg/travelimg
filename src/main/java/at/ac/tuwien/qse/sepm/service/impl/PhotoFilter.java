@@ -20,6 +20,18 @@ public class PhotoFilter implements PhotoSelector {
     private boolean unassignedIncluded = false;
     private boolean unratedIncluded = false;
 
+    public PhotoFilter() { }
+
+    public PhotoFilter(PhotoFilter from) {
+        getIncludedCategories().addAll(from.getIncludedCategories());
+        getIncludedPhotographers().addAll(from.getIncludedPhotographers());
+        getIncludedRatings().addAll(from.getIncludedRatings());
+        getIncludedMonths().addAll(from.getIncludedMonths());
+        setUnassignedIncluded(from.isUnassignedIncluded());
+        setUnratedIncluded(from.isUnratedIncluded());
+        setUntaggedIncluded(from.isUntaggedIncluded());
+    }
+
     /**
      * Get the names of the categories included by the filter. A photo is included if it is tagged
      * with at least one of these categories.
