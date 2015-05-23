@@ -1,164 +1,148 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
+import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
+import at.ac.tuwien.qse.sepm.service.ImportService;
+import at.ac.tuwien.qse.sepm.service.PhotoService;
+import at.ac.tuwien.qse.sepm.service.PhotographerService;
+import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
+import at.ac.tuwien.qse.sepm.util.Cancelable;
+import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.geometry.*;
-import javafx.geometry.Insets;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.TilePane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.awt.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Controller for the main view.
  */
 public class MainController {
 
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
+    @Autowired private PhotoService photoService;
+    @Autowired private ImportService importService;
+    @Autowired private PhotographerService photographerService;
     @Autowired private Organizer organizer;
     @Autowired private Inspector inspector;
 
-    @FXML private ScrollPane scrollPane;
+    @FXML private BorderPane root;
+    @FXML private ScrollPane gridContainer;
 
-    @FXML private TilePane tilePane;
-    private ImageTile selectedTile = null;
+    private final PhotoGrid grid = new PhotoGrid();
+    private PhotoFilter filter = new PhotoFilter();
 
-    private List<Photo> activePhotos = new ArrayList<>();
+    private Cancelable loadingTask;
 
-
-    public MainController() {
-
+    public void close() {
+        grid.close();
     }
 
     @FXML
     private void initialize() {
-    }
+        LOGGER.debug("initializing");
 
-    /**
-     * Add a photo to the image grid
-     *
-     * @param photo The photo to be added.
-     */
-    public void addPhoto(Photo photo) {
-        ImageTile imageTile = new ImageTile(photo);
+        gridContainer.setContent(grid);
 
-        activePhotos.add(photo);
-
-        imageTile.getSelectedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if(newValue) {
-                    if (selectedTile != null) {
-                        selectedTile.unselect();
-                    }
-                    selectedTile = imageTile;
-                }
-            }
+        organizer.setImportAction(() -> {
+            ImportDialog dialog = new ImportDialog(root, photographerService);
+            Optional<List<Photo>> photos = dialog.showForResult();
+            if (!photos.isPresent())
+                return;
+            importService
+                    .importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
         });
 
-        tilePane.getChildren().add(imageTile);
+        organizer.setPresentAction(() -> {
+            FullscreenWindow fullscreen = new FullscreenWindow();
+            fullscreen.present(grid.getPhotos());
+        });
+
+        organizer.setFilterChangeAction(this::handleFilterChange);
+
+        grid.setSelectionChangeAction((selection) -> {
+            if (selection.size() == 0) return;
+            inspector.setActivePhoto(selection.iterator().next());
+        });
+
+        // Apply the initial filter.
+        reloadImages();
+    }
+
+    private void handleImportError(Throwable error) {
+        LOGGER.error("import error", error);
+
+        // queue an update in the main gui
+        Platform.runLater(() -> {
+            InfoDialog dialog = new InfoDialog(root, "Import Fehler");
+            dialog.setError(true);
+            dialog.setHeaderText("Import fehlgeschlagen");
+            dialog.setContentText("Fehlermeldung: " + error.getMessage());
+            dialog.showAndWait();
+        });
+    }
+
+    private void handleLoadError(Throwable error) {
+        LOGGER.error("load error", error);
+
+        // queue an update in the main gui
+        Platform.runLater(() -> {
+            InfoDialog dialog = new InfoDialog(root, "Lade Fehler");
+            dialog.setError(true);
+            dialog.setHeaderText("Laden von Fotos fehlgeschlagen");
+            dialog.setContentText("Fehlermeldung: " + error.getMessage());
+            dialog.showAndWait();
+        });
     }
 
     /**
-     * Return the List of active photos.
-     *
-     * @return the currently active photos
+     * Called whenever a new photo is imported
+     * @param photo The newly imported    photo
      */
-    public List<Photo> getActivePhotos()
-    {
-        return activePhotos;
-    }
-    /**
-     * Clear the image grid and don't show any photos.
-     */
-    public void clearPhotos() {
-        if (tilePane == null) return;
-        activePhotos.clear();
-        tilePane.getChildren().clear();
+    private void handleImportedPhoto(Photo photo) {
+        // queue an update in the main gui
+        Platform.runLater(() -> {
+            // Ignore photos that are not part of the current filter.
+            if (!filter.matches(photo)) return;
+            grid.addPhoto(photo);
+        });
     }
 
     /**
-     * Widget for one widget in the image grid. Can either be in a selected or an unselected state.
+     * Called whenever a new photo is loaded from the service layer
+     * @param photo The newly loaded photo
      */
-    private class ImageTile extends HBox {
+    private void handleLoadedPhoto(Photo photo) {
+        // queue an update in the main gui
+        Platform.runLater(() -> {
+            // Ignore photos that are not part of the current filter.
+            if (!filter.matches(photo)) return;
+            grid.addPhoto(photo);
+        });
+    }
 
-        private Photo photo;
+    private void handleFilterChange(PhotoFilter filter) {
+        this.filter = filter;
+        reloadImages();
+    }
 
-        private Image image;
-        private ImageView imageView;
-
-        private BooleanProperty selected = new SimpleBooleanProperty(false);
-
-        public ImageTile(Photo photo) {
-            this.photo = photo;
-
-            try {
-                image = new Image(new FileInputStream(new File(photo.getPath())), 150, 0, true, true);
-            } catch (FileNotFoundException ex) {
-                logger.error("Could not find photo", ex);
-                return;
-            }
-
-            imageView = new ImageView(image);
-            imageView.setFitWidth(150);
-            imageView.setOnMouseClicked(this::handleSelected);
-
-            getStyleClass().add("image-tile-non-selected");
-
-
-            this.getChildren().add(imageView);
+    private void reloadImages() {
+        if (loadingTask != null) {
+            loadingTask.cancel();
         }
-
-        /**
-         * Select this photo. Triggers an update of the inspector widget.
-         */
-        public void select() {
-            getStyleClass().remove("image-tile-non-selected");
-            getStyleClass().add("image-tile-selected");
-
-            inspector.setActivePhoto(photo);
-
-            this.selected.set(true);
-        }
-
-        /**
-         * Unselect a photo.
-         */
-        public void unselect() {
-            getStyleClass().add("image-tile-non-selected");
-            getStyleClass().remove("image-tile-selected");
-
-            this.selected.set(false);
-        }
-
-        /**
-         * Property which represents if this tile is currently selected or not.
-         * @return The selected property.
-         */
-        public BooleanProperty getSelectedProperty() {
-            return selected;
-        }
-
-        private void handleSelected(MouseEvent event) {
-            select();
-        }
+        grid.clear();
+        this.loadingTask = photoService.loadPhotos(filter,
+                this::handleLoadedPhoto,
+                this::handleLoadError);
     }
 }

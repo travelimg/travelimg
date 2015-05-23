@@ -350,15 +350,23 @@
     -glyph-name: "CHECK";
 }
 
-.image-grid {
-    -fx-background-color: #e7e7e7;
+.photo-grid {
+    -fx-background-color: #dddddd;
 }
-
-.image-tile-non-selected {
+.photo-grid > * {
+    -fx-background-color: transparent;
+}
+.photo-grid > * > * {
+    -fx-background-color: transparent;
+}
+.photo-grid .tile-pane {
+    -fx-background-color: black;
+}
+.photo-grid .photo-tile {
     -fx-padding: 5px;
+    -fx-background-color: #bbbbbb;
 }
-
-.image-tile-selected {
+.photo-grid .photo-tile.selected {
     -fx-padding: 5px;
     -fx-background-color: #1E88E5;
 }

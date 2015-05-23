@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * Controller for organizer view which is used for browsing photos by month.
@@ -51,11 +52,9 @@ public class Organizer {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired private ImportService importService;
     @Autowired private PhotoService photoService;
     @Autowired private PhotographerService photographerService;
     @Autowired private TagService tagService;
-    @Autowired private MainController mainController;
 
     @FXML private BorderPane root;
     @FXML private Button importButton;
@@ -77,11 +76,25 @@ public class Organizer {
     private final DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy MMM");
 
     private final PhotoFilter filter = new PhotoFilter();
+    private Consumer<PhotoFilter> filterChangeCallback;
 
-    private Cancelable loadingTask;
+    public void setPresentAction(Runnable callback) {
+        LOGGER.debug("setting present action");
+        presentButton.setOnAction(event -> callback.run());
+    }
 
-    public Organizer() {
+    public void setImportAction(Runnable callback) {
+        LOGGER.debug("setting import action");
+        importButton.setOnAction(event -> callback.run());
+    }
 
+    public void setFilterChangeAction(Consumer<PhotoFilter> callback) {
+        LOGGER.debug("setting filter change action");
+        filterChangeCallback = callback;
+    }
+
+    public PhotoFilter getFilter() {
+        return new PhotoFilter(filter);
     }
 
     @FXML
@@ -91,9 +104,6 @@ public class Organizer {
         categoryPane.setContent(categoryListView);
         photographerPane.setContent(photographerListView);
         monthPane.setContent(monthListView);
-
-        importButton.setOnAction(this::handleImport);
-        presentButton.setOnAction(this::handlePresent);
 
         ratingListView.setItems(ratingList);
         ratingListView.getCheckModel().getCheckedItems().addListener(this::handleRatingsChange);
@@ -119,13 +129,12 @@ public class Organizer {
         categoryListView.setItems(sortedCategoryList);
         categoryListView.getCheckModel().getCheckedItems().addListener(this::handleCategoriesChange);
         categoryListView.setCellFactory(list -> new CheckBoxListCell<>(
-                        item -> categoryListView.getItemBooleanProperty(item),
-                        new StringConverter<Tag>() {
-                            @Override public Tag fromString(String string) {
-                                return null;
-                            }
-
-                            @Override public String toString(Tag item) {
+            item -> categoryListView.getItemBooleanProperty(item),
+            new StringConverter<Tag>() {
+                @Override public Tag fromString(String string) {
+                    return null;
+                }
+                @Override public String toString(Tag item) {
                     return item.getName();
                 }
             })
@@ -164,26 +173,12 @@ public class Organizer {
         );
 
         refreshLists();
-        reloadPhotos();
-    }
-
-    public void reloadPhotos() {
-
-        // Cancel an older ongoing loading task.
-        if (loadingTask != null) {
-            loadingTask.cancel();
-        }
-
-        // Remove currently active photos.
-        mainController.clearPhotos();
-
-        // Load photos with current filter.
-        this.loadingTask = photoService.loadPhotos(filter, this::handleLoadedPhoto,
-                this::handleLoadError);
     }
 
     private void handleFilterChange() {
-        reloadPhotos();
+        LOGGER.debug("filter changed");
+        if (filterChangeCallback == null) return;
+        filterChangeCallback.accept(getFilter());
     }
     private void handleRatingsChange(ListChangeListener.Change<? extends Rating> change) {
         LOGGER.debug("rating filter changed");
@@ -212,7 +207,7 @@ public class Organizer {
     }
 
     private void refreshLists() {
-        LOGGER.debug("refreshFilter");
+        LOGGER.debug("refreshing filter");
         ratingList.clear();
         categoryList.clear();
         photographerList.clear();
@@ -224,23 +219,23 @@ public class Organizer {
         monthList.addAll(getAllMonths());
     }
     private List<Rating> getAllRatings() {
-        LOGGER.debug("getAllRatings");
+        LOGGER.debug("fetching ratings");
         List<Rating> list = new LinkedList<Rating>();
         list.add(Rating.GOOD);
         list.add(Rating.NEUTRAL);
         list.add(Rating.BAD);
         list.add(Rating.NONE);
-        LOGGER.debug("getAllCategories succeeded with {} items", list.size());
+        LOGGER.debug("fetching ratings succeeded with {} items", list.size());
         return list;
     }
     private List<Tag> getAllCategories() {
-        LOGGER.debug("getAllCategories");
+        LOGGER.debug("fetching categories");
         try {
             List<Tag> list = tagService.getAllTags();
-            LOGGER.debug("getAllCategories succeeded with {} items", list.size());
+            LOGGER.debug("fetching categories succeeded with {} items", list.size());
             return list;
         } catch (ServiceException ex) {
-            LOGGER.error("getAllCategories failed", ex);
+            LOGGER.error("fetching categories failed", ex);
             InfoDialog dialog = new InfoDialog(root, "Fehler");
             dialog.setError(true);
             dialog.setHeaderText("Fehler beim Laden");
@@ -250,13 +245,13 @@ public class Organizer {
         }
     }
     private List<Photographer> getAllPhotographers() {
-        LOGGER.debug("getAllPhotographers");
+        LOGGER.debug("fetching photographers");
         try {
             List<Photographer> list = photographerService.readAll();
-            LOGGER.debug("getAllPhotographers succeeded with {} items", list.size());
+            LOGGER.debug("fetching photographers succeeded with {} items", list.size());
             return list;
         } catch (ServiceException ex) {
-            LOGGER.error("getAllPhotographers failed", ex);
+            LOGGER.error("fetching photographers failed", ex);
             InfoDialog dialog = new InfoDialog(root, "Fehler");
             dialog.setError(true);
             dialog.setHeaderText("Fehler beim Laden");
@@ -266,13 +261,13 @@ public class Organizer {
         }
     }
     private List<YearMonth> getAllMonths() {
-        LOGGER.debug("getAllMonths");
+        LOGGER.debug("fetching months");
         try {
             List<YearMonth> list = photoService.getMonthsWithPhotos();
-            LOGGER.debug("getAllMonths succeeded with {} items", list.size());
+            LOGGER.debug("fetching months\" succeeded with {} items", list.size());
             return list;
         } catch (ServiceException ex) {
-            LOGGER.error("getAllMonths failed", ex);
+            LOGGER.error("fetching months\" failed", ex);
             InfoDialog dialog = new InfoDialog(root, "Fehler");
             dialog.setError(true);
             dialog.setHeaderText("Fehler beim Laden");
@@ -280,99 +275,5 @@ public class Organizer {
             dialog.showAndWait();
             return new ArrayList<>();
         }
-    }
-
-    private void handleImport(Event event) {
-        ImportDialog dialog = new ImportDialog(root, photographerService);
-
-        Optional<List<Photo>> photos = dialog.showForResult();
-        if (!photos.isPresent()) return;
-
-        importService.importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
-    }
-
-    private void handleImportError(Throwable error) {
-        LOGGER.error("Import error", error);
-
-        // queue an update in the main gui
-        Platform.runLater(() -> {
-            InfoDialog dialog = new InfoDialog(root, "Import Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Import fehlgeschlagen");
-            dialog.setContentText("Fehlermeldung: " + error.getMessage());
-            dialog.showAndWait();
-        });
-    }
-
-    private void handleLoadError(Throwable error) {
-        LOGGER.error("Load error", error);
-
-        // queue an update in the main gui
-        Platform.runLater(() -> {
-            InfoDialog dialog = new InfoDialog(root, "Lade Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Laden von Fotos fehlgeschlagen");
-            dialog.setContentText("Fehlermeldung: " + error.getMessage());
-            dialog.showAndWait();
-        });
-    }
-
-    /**
-     * Called whenever a new photo is imported
-     * @param photo The newly imported    photo
-     */
-    private void handleImportedPhoto(Photo photo) {
-        // queue an update in the main gui
-        Platform.runLater(() -> {
-
-
-
-            // Ignore photos that are not part of the current filter.
-            if (!filter.matches(photo)) {
-                return;
-            }
-
-            mainController.addPhoto(photo);
-        });
-    }
-
-    /**
-     * Called whenever a new photo is loaded from the service layer
-     * @param photo The newly loaded photo
-     */
-    private void handleLoadedPhoto(Photo photo) {
-        // queue an update in the main gui
-        Platform.runLater(() -> {
-                // Ignore photos that are not part of the current filter.
-                if(!filter.matches(photo))
-                    return;
-
-                mainController.addPhoto(photo);
-            }
-        );
-    }
-
-    /**
-     * Show the current photo selection in fullscreen.
-     * @param event The event triggering the request.
-     */
-    private void handlePresent(Event event) {
-        FullscreenWindow fullscreen = new FullscreenWindow();
-        fullscreen.present(mainController.getActivePhotos());
-    }
-
-    /**
-     * Get a list of months for which we currently possess photos.
-     * @return A list of months for which photos are available
-     */
-    private List<YearMonth> getAvailableMonths() {
-        List<YearMonth> months = new ArrayList<>();
-        try {
-            months = photoService.getMonthsWithPhotos();
-        } catch (ServiceException ex) {
-            // TODO: show error dialog
-        }
-
-        return months;
     }
 }

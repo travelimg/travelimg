@@ -98,7 +98,6 @@ public class Inspector {
         }
         List<Photo> photos = new ArrayList<>();
         photos.add(photo);
-        organizer.reloadPhotos();
         try {
             photoservice.deletePhotos(photos);
         } catch (ServiceException e) {
