@@ -91,10 +91,12 @@ public class Inspector {
     }
 
     private void handleDelete(Event event) {
+
         if (photo == null) return;
         DeleteDialog dialog = new DeleteDialog(root, photoservice, photo);
         dialog.showAndWait();
         organizer.reloadPhotos();
+        photo=null;
     }
 
     private void handleCancel(Event event) {
