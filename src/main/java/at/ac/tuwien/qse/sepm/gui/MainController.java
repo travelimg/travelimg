@@ -11,6 +11,8 @@ import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -66,6 +68,13 @@ public class MainController {
             if (selection.size() == 0) return;
             for (Photo photo : selection) {
                 inspector.addActivePhoto(photo);
+            }
+        });
+
+        // NOTE: Select all photos when user presses CTRL+A.
+        root.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.isControlDown() && event.getCode() == KeyCode.A) {
+                grid.selectAll();
             }
         });
 

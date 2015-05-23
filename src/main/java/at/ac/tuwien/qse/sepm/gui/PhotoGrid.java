@@ -38,14 +38,6 @@ public class PhotoGrid extends TilePane {
 
         setMaxWidth(Double.MAX_VALUE);
         setMaxHeight(Double.MAX_VALUE);
-
-        // FIXME: ctrl-A not working
-        addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.isControlDown() && event.getCode() == KeyCode.A) {
-                LOGGER.debug("selecting all photos");
-                setSelectedPhotos(getPhotos());
-            }
-        });
     }
 
     public List<Photo> getPhotos() {
@@ -80,16 +72,16 @@ public class PhotoGrid extends TilePane {
     public void removePhoto(Photo photo) {
         if (photo == null) throw new IllegalArgumentException();
         if (!tiles.containsKey(photo)) return;
-        // FIXME: cancel loading operation of tile
-        getChildren().remove(tiles.get(photo));
+        PhotoTile tile = tiles.get(photo);
+        tile.cancel();
         tiles.remove(photo);
+        getChildren().remove(tile);
     }
 
     public void clear() {
-        // FIXME: cancel loading operations of all tiles
-        // Otherwise tile loading threads can stack up.
-        getChildren().clear();
+        tiles.values().forEach(tile -> tile.cancel());
         tiles.clear();
+        getChildren().clear();
     }
 
     public Set<Photo> getSelectedPhotos() {
@@ -105,36 +97,32 @@ public class PhotoGrid extends TilePane {
         return photos;
     }
 
-    public void setSelectedPhotos(List<Photo> newSelection) {
-        if (newSelection == null) throw new IllegalArgumentException();
-        deselectAll();
-        newSelection.forEach(this::select);
-    }
-
     public void select(Photo photo) {
         if (photo == null) throw new IllegalArgumentException();
         if (!tiles.containsKey(photo)) return;
-
         PhotoTile tile = tiles.get(photo);
-        if (!tile.isSelected()) {
-            tile.select();
-            onSelectionChange();
-        }
+        tile.select();
+        onSelectionChange();
+    }
+
+    public void selectAll() {
+        LOGGER.debug("selecting all photos");
+        tiles.values().forEach(tile -> tile.select());
+        onSelectionChange();
     }
 
     public void deselect(Photo photo) {
         if (photo == null) throw new IllegalArgumentException();
         if (!tiles.containsKey(photo)) return;
-
         PhotoTile tile = tiles.get(photo);
-        if (tile.isSelected()) {
-            tile.deselect();
-            onSelectionChange();
-        }
+        tile.deselect();
+        onSelectionChange();
     }
 
     public void deselectAll() {
+        LOGGER.debug("deselecting all photos");
         tiles.values().forEach(tile -> tile.deselect());
+        onSelectionChange();
     }
 
     public void setSelectionChangeAction(Consumer<Set<Photo>> selectionChangeAction) {
@@ -157,6 +145,7 @@ public class PhotoGrid extends TilePane {
         private final int padding = 4;
 
         private final Photo photo;
+        private Image image;
         private boolean selected;
         private final ProgressIndicator progress = new ProgressIndicator();
 
@@ -187,7 +176,7 @@ public class PhotoGrid extends TilePane {
                 // TODO: handle exception
             }
 
-            Image image = new Image(url, width, height, false, true, true);
+            image = new Image(url, width, height, false, true, true);
             ImageView imageView = new ImageView(image);
             imageView.setFitWidth(width);
             imageView.setFitHeight(height);
@@ -214,6 +203,10 @@ public class PhotoGrid extends TilePane {
 
         public boolean isSelected() {
             return selected;
+        }
+
+        public void cancel() {
+            image.cancel();
         }
     }
 }
