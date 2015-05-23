@@ -21,15 +21,6 @@ public interface PhotoService {
     List<YearMonth> getMonthsWithPhotos() throws ServiceException;
 
     /**
-     * Loads photos in an asynchronous operation.
-     *
-     * @param callback called for each photo
-     * @param errorHandler handler for occurring exceptions
-     * @return cancelable task that loads photos
-     */
-    Cancelable loadPhotos(PhotoSelector filter, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler);
-
-    /**
      * delete the delivered List of Photos
      *
      * @param photos the list of photos

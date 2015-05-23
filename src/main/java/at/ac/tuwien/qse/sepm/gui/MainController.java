@@ -6,13 +6,11 @@ import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
+import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import javafx.application.Platform;
-import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
@@ -21,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Controller for the main view.
@@ -92,37 +89,11 @@ public class MainController {
         });
     }
 
-    private void handleLoadError(Throwable error) {
-        LOGGER.error("load error", error);
-
-        // queue an update in the main gui
-        Platform.runLater(() -> {
-            InfoDialog dialog = new InfoDialog(root, "Lade Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Laden von Fotos fehlgeschlagen");
-            dialog.setContentText("Fehlermeldung: " + error.getMessage());
-            dialog.showAndWait();
-        });
-    }
-
     /**
      * Called whenever a new photo is imported
      * @param photo The newly imported    photo
      */
     private void handleImportedPhoto(Photo photo) {
-        // queue an update in the main gui
-        Platform.runLater(() -> {
-            // Ignore photos that are not part of the current filter.
-            if (!filter.matches(photo)) return;
-            grid.addPhoto(photo);
-        });
-    }
-
-    /**
-     * Called whenever a new photo is loaded from the service layer
-     * @param photo The newly loaded photo
-     */
-    private void handleLoadedPhoto(Photo photo) {
         // queue an update in the main gui
         Platform.runLater(() -> {
             // Ignore photos that are not part of the current filter.
@@ -137,12 +108,15 @@ public class MainController {
     }
 
     private void reloadImages() {
-        if (loadingTask != null) {
-            loadingTask.cancel();
+        try {
+            grid.setPhotos(photoService.getAllPhotos(filter));
+        } catch (ServiceException ex) {
+            LOGGER.error("failed loading fotos", ex);
+            InfoDialog dialog = new InfoDialog(root, "Lade Fehler");
+            dialog.setError(true);
+            dialog.setHeaderText("Laden von Fotos fehlgeschlagen");
+            dialog.setContentText("Fehlermeldung: " + ex.getMessage());
+            dialog.showAndWait();
         }
-        grid.clear();
-        this.loadingTask = photoService.loadPhotos(filter,
-                this::handleLoadedPhoto,
-                this::handleLoadError);
     }
 }

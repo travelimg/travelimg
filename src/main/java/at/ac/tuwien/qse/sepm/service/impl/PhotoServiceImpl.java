@@ -7,12 +7,8 @@ import at.ac.tuwien.qse.sepm.dao.TagDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
-import at.ac.tuwien.qse.sepm.gui.PhotoSelector;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.util.Cancelable;
-import at.ac.tuwien.qse.sepm.util.CancelableTask;
-import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +17,7 @@ import java.time.YearMonth;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class PhotoServiceImpl implements PhotoService {
 
@@ -39,14 +35,6 @@ public class PhotoServiceImpl implements PhotoService {
         } catch (DAOException ex) {
             throw new ServiceException(ex);
         }
-    }
-
-    @Override
-    public Cancelable loadPhotos(PhotoSelector filter, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
-        LOGGER.debug("Loading photos with filter {}", filter);
-        AsyncLoader loader = new AsyncLoader(filter, callback, errorHandler);
-        executorService.submit(loader);
-        return loader;
     }
 
     @Override
@@ -84,11 +72,10 @@ public class PhotoServiceImpl implements PhotoService {
     @Override
     public List<Photo> getAllPhotos(PhotoFilter filter) throws ServiceException {
         LOGGER.debug("Entering getAllPhotos with {}", filter);
-        try {
-            throw new UnsupportedOperationException(); // TODO
-        } catch (Exception e) { // TODO
-            throw new ServiceException(e);
-        }
+        return getAllPhotos()
+                .stream()
+                .filter(filter::matches)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -165,47 +152,5 @@ public class PhotoServiceImpl implements PhotoService {
             throw new ServiceException("Could not store rating of photo.", ex);
         }
         LOGGER.debug("Leaving savePhotoRating with {}", photo);
-    }
-
-
-    private class AsyncLoader extends CancelableTask {
-        private PhotoSelector filter;
-        private Consumer<Photo> callback;
-        private ErrorHandler<ServiceException> errorHandler;
-
-        public AsyncLoader(PhotoSelector filter, Consumer<Photo> callback,
-                ErrorHandler<ServiceException> errorHandler) {
-            super();
-            this.filter = filter;
-            this.callback = callback;
-            this.errorHandler = errorHandler;
-        }
-
-        @Override protected void execute() {
-            List<Photo> photos;
-            try {
-                photos = photoDAO.readAll();
-            } catch (DAOException e) {
-                errorHandler.propagate(new ServiceException("Failed to load photos", e));
-                return;
-            }
-
-            for (Photo p : photos) {
-                if (!filter.matches(p)) continue;
-                if (!getIsRunning())
-                    return;
-                try {
-                    Thread.sleep(20);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                callback.accept(p);
-            }
-        }
-    }
-
-
-    public void close() {
-        executorService.shutdown();
     }
 }
