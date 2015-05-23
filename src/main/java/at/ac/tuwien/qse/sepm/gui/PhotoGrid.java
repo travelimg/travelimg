@@ -4,11 +4,15 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import com.sun.javaws.exceptions.InvalidArgumentException;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
@@ -34,6 +38,14 @@ public class PhotoGrid extends TilePane {
 
         setMaxWidth(Double.MAX_VALUE);
         setMaxHeight(Double.MAX_VALUE);
+
+        // FIXME: ctrl-A not working
+        addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.isControlDown() && event.getCode() == KeyCode.A) {
+                LOGGER.debug("selecting all photos");
+                setSelectedPhotos(getPhotos());
+            }
+        });
     }
 
     public List<Photo> getPhotos() {
@@ -51,8 +63,16 @@ public class PhotoGrid extends TilePane {
         PhotoTile tile = new PhotoTile(photo);
         tiles.put(photo, tile);
         tile.setOnMouseClicked(event -> {
-            deselectAll();
-            select(photo);
+            if (event.isControlDown()) {
+                if (tile.isSelected()) {
+                    deselect(photo);
+                } else {
+                    select(photo);
+                }
+            } else {
+                deselectAll();
+                select(photo);
+            }
         });
         getChildren().add(tile);
     }

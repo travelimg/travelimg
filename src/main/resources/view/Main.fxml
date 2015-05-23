@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
-
 <BorderPane fx:id="root" stylesheets="@/view/style.css"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.MainController">
 
@@ -12,6 +11,7 @@
     <left>
         <fx:include source="/view/Organizer.fxml"></fx:include>
     </left>
+
     <right>
         <fx:include source="/view/Inspector.fxml"></fx:include>
     </right>

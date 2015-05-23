@@ -16,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +38,7 @@ public class MainController {
 
     private final PhotoGrid grid = new PhotoGrid();
     private PhotoFilter filter = new PhotoFilter();
+    private final List<Photo> selection = new ArrayList<Photo>();
 
     @FXML
     private void initialize() {
@@ -62,7 +64,9 @@ public class MainController {
 
         grid.setSelectionChangeAction((selection) -> {
             if (selection.size() == 0) return;
-            inspector.setActivePhoto(selection.iterator().next());
+            for (Photo photo : selection) {
+                inspector.addActivePhoto(photo);
+            }
         });
 
         // Apply the initial filter.
@@ -80,6 +84,13 @@ public class MainController {
             dialog.setContentText("Fehlermeldung: " + error.getMessage());
             dialog.showAndWait();
         });
+    }
+
+    public void deletePhotos(){
+        for(Photo photo : selection){
+            grid.removePhoto(photo);
+        }
+        selection.clear();
     }
 
     /**
