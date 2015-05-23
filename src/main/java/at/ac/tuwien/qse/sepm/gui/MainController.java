@@ -8,7 +8,6 @@ import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
-import at.ac.tuwien.qse.sepm.util.Cancelable;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
@@ -38,12 +37,6 @@ public class MainController {
 
     private final PhotoGrid grid = new PhotoGrid();
     private PhotoFilter filter = new PhotoFilter();
-
-    private Cancelable loadingTask;
-
-    public void close() {
-        grid.close();
-    }
 
     @FXML
     private void initialize() {

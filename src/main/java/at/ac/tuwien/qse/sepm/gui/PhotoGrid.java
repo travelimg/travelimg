@@ -1,20 +1,22 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Rating;
 import com.sun.javaws.exceptions.InvalidArgumentException;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.net.MalformedURLException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,19 +26,12 @@ public class PhotoGrid extends TilePane {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(1);
-    private final TilePane tilePane = new TilePane();
     private final Map<Photo, PhotoTile> tiles = new HashMap<>();
     private Consumer<Set<Photo>> selectionChangeAction;
 
     public PhotoGrid() {
         getStyleClass().add("photo-grid");
 
-        setPrefTileWidth(150);
-        setPrefTileHeight(150);
-        setHgap(15);
-        setVgap(15);
-        setPadding(new Insets(15));
         setMaxWidth(Double.MAX_VALUE);
         setMaxHeight(Double.MAX_VALUE);
     }
@@ -60,16 +55,13 @@ public class PhotoGrid extends TilePane {
             select(photo);
         });
         getChildren().add(tile);
-
-        // Load the image in a separate thread, so the GUI is not blocked.
-        executor.execute(tile::load);
     }
 
     public void removePhoto(Photo photo) {
         if (photo == null) throw new IllegalArgumentException();
         if (!tiles.containsKey(photo)) return;
         // FIXME: cancel loading operation of tile
-        tilePane.getChildren().remove(tiles.get(photo));
+        getChildren().remove(tiles.get(photo));
         tiles.remove(photo);
     }
 
@@ -126,11 +118,6 @@ public class PhotoGrid extends TilePane {
     public void setSelectionChangeAction(Consumer<Set<Photo>> selectionChangeAction) {
         this.selectionChangeAction = selectionChangeAction;
     }
-
-    public void close() {
-        executor.shutdown();
-    }
-
     private void onSelectionChange() {
         if (selectionChangeAction == null) return;
         selectionChangeAction.accept(getSelectedPhotos());
@@ -143,10 +130,13 @@ public class PhotoGrid extends TilePane {
 
         private static final Logger LOGGER = LogManager.getLogger();
 
+        private final int width = 150;
+        private final int height = 150;
+        private final int padding = 4;
+
         private final Photo photo;
-        private Image image;
-        private ImageView imageView;
         private boolean selected;
+        private final ProgressIndicator progress = new ProgressIndicator();
 
         public PhotoTile(Photo photo) {
             if (photo == null) throw new IllegalArgumentException();
@@ -156,25 +146,38 @@ public class PhotoGrid extends TilePane {
             getStyleClass().add("photo-tile");
             getStyleClass().add("loading");
 
-            // Show a loading indicator.
-            ProgressIndicator progress = new ProgressIndicator();
             getChildren().add(progress);
+            setAlignment(Pos.CENTER);
+            setPrefWidth(width + padding * 2);
+            setPrefHeight(height + padding * 2);
+            setPadding(new Insets(padding));
+
+            load();
         }
 
-        public void load() {
+        private void load() {
+            File file = new File(photo.getPath());
+            String url = null;
             try {
-                image = new Image(new FileInputStream(new File(photo.getPath())), 150, 0, true, true);
-                imageView = new ImageView(image);
+                url = file.toURI().toURL().toString();
+            } catch (MalformedURLException ex) {
+                LOGGER.error("photo URL is malformed", ex);
+                // TODO: handle exception
+            }
 
-                // Once the image is loaded, add it during the next GUI update.
-                Platform.runLater(() -> {
+            Image image = new Image(url, width, height, false, true, true);
+            ImageView imageView = new ImageView(image);
+            imageView.setFitWidth(width);
+            imageView.setFitHeight(height);
+
+            image.progressProperty().addListener((observable, oldValue, newValue) -> {
+                // Image is fully loaded.
+                if (newValue.doubleValue() == 1.0) {
+                    getChildren().clear();
                     getChildren().add(imageView);
                     getStyleClass().remove("loading");
-                });
-            } catch (FileNotFoundException ex) {
-                LOGGER.error("could not find photo", ex);
-                return;
-            }
+                }
+            });
         }
 
         public void select() {
