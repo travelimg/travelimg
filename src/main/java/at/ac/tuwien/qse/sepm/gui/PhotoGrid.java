@@ -75,6 +75,8 @@ public class PhotoGrid extends TilePane {
     public Set<Photo> getSelectedPhotos() {
         Set<Photo> photos = new HashSet<>();
         for (Photo photo : tiles.keySet()) {
+            // FIXME: tile is null
+            // When changing selection after doing something in the inspector the tile here becomes null.
             PhotoTile tile = tiles.get(photo);
             if (tile.isSelected()) {
                 photos.add(photo);
