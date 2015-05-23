@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.gui.dialogs.DeleteDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Controller for the inspector view which is used for modifying meta-data of a photo.
@@ -103,18 +105,22 @@ public class Inspector {
     }
 
     private void handleDelete(Event event) {
-        if (activePhotos.get(0) == null) {
+        if (activePhotos.isEmpty()) {
             return;
         }
+        DeleteDialog deleteDialog = new DeleteDialog(root,activePhotos);
+        Optional<List<Photo>> photos = deleteDialog.showForResult();
+        if (!photos.isPresent()) return;
 
         try {
             photoservice.deletePhotos(activePhotos);
+            mainController.deletePhotos();
             activePhotos.clear();
+            mapsScene.clearMarkers();
         } catch (ServiceException e) {
-
+            //TODO Exception handling
         }
-        mainController.deletePhotos();
-        mapsScene.clearMarkers();
+
     }
 
     private void handleCancel(Event event) {
