@@ -97,7 +97,7 @@ public class MainController {
         // queue an update in the main gui
         Platform.runLater(() -> {
             // Ignore photos that are not part of the current filter.
-            if (!filter.matches(photo)) return;
+            if (!filter.test(photo)) return;
             grid.addPhoto(photo);
         });
     }

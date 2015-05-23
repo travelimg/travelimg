@@ -4,13 +4,13 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.Tag;
-import at.ac.tuwien.qse.sepm.gui.PhotoSelector;
 
 import java.time.YearMonth;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 
-public class PhotoFilter implements PhotoSelector {
+public class PhotoFilter implements Predicate<Photo> {
 
     private final Set<Tag> includedCategories = new HashSet<>();
     private final Set<Photographer> includedPhotographers = new HashSet<>();
@@ -124,7 +124,7 @@ public class PhotoFilter implements PhotoSelector {
     }
 
     @Override
-    public boolean matches(Photo photo) {
+    public boolean test(Photo photo) {
         return true;
     }
 }

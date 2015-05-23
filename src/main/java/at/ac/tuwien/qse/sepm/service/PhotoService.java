@@ -1,15 +1,11 @@
 package at.ac.tuwien.qse.sepm.service;
 
-import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
-import at.ac.tuwien.qse.sepm.gui.PhotoSelector;
-import at.ac.tuwien.qse.sepm.util.Cancelable;
-import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 
 import java.time.YearMonth;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public interface PhotoService {
 
@@ -48,7 +44,7 @@ public interface PhotoService {
      * @param filter filter the photos are tested against
      * @return list of all available photos that match the filter
      */
-    List<Photo> getAllPhotos(PhotoFilter filter) throws ServiceException;
+    List<Photo> getAllPhotos(Predicate<Photo> filter) throws ServiceException;
 
     //TODO comment the method
     void requestFullscreenMode(List<Photo> photos) throws ServiceException;

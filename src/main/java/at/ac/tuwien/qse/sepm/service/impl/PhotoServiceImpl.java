@@ -17,6 +17,7 @@ import java.time.YearMonth;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class PhotoServiceImpl implements PhotoService {
@@ -70,11 +71,11 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public List<Photo> getAllPhotos(PhotoFilter filter) throws ServiceException {
+    public List<Photo> getAllPhotos(Predicate<Photo> filter) throws ServiceException {
         LOGGER.debug("Entering getAllPhotos with {}", filter);
         return getAllPhotos()
                 .stream()
-                .filter(filter::matches)
+                .filter(filter)
                 .collect(Collectors.toList());
     }
 
