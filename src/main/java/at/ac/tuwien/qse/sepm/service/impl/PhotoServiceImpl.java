@@ -160,16 +160,6 @@ public class PhotoServiceImpl implements PhotoService {
         LOGGER.debug("Leaving savePhotoRating with {}", photo);
     }
 
-    @Override
-    public List<Tag> getAllTags() throws ServiceException {
-        LOGGER.debug("Retrieving all tags...");
-        try {
-            return tagDAO.readAll();
-        } catch (DAOException e) {
-            throw new ServiceException(e);
-        }
-    }
-
 
     private class AsyncLoader extends CancelableTask {
         private YearMonth month;

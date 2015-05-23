@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.dao.TagDAO;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.TagValidator;
@@ -25,18 +26,14 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
 
     private static final String readStatement = "SELECT ID,name FROM TAG WHERE ID=?;";
     private static final String readAllStatement = "SELECT ID,name FROM TAG;";
-    private static final String deleteStatement ="DELETE FROM TAG WHERE ID=?;";
-
+    private static final String deleteStatement = "DELETE FROM TAG WHERE ID=?;";
 
     private SimpleJdbcInsert insertTag;
+    @Autowired private PhotoTagDAO photoTagDao;
 
-
-    @Override
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
+    @Override @Autowired public void setDataSource(DataSource dataSource) {
         super.setDataSource(dataSource);
-        this.insertTag = new SimpleJdbcInsert(dataSource)
-                .withTableName("Tag")
+        this.insertTag = new SimpleJdbcInsert(dataSource).withTableName("Tag")
                 .usingGeneratedKeyColumns("id");
     }
 
@@ -48,7 +45,7 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
      * @throws DAOException If the Tag can not be created or the data store fails to create a record.
      */
     public Tag create(Tag t) throws DAOException, ValidationException {
-        logger.debug("Creating Tag {}",t);
+        logger.debug("Creating Tag {}", t);
         TagValidator.validate(t);
         try {
             Map<String, Object> parameters = new HashMap<String, Object>(1);
@@ -69,22 +66,18 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
      * @throws DAOException If the Tag can not be retrieved or the data store fails to select the record.
      */
     public Tag read(Tag t) throws DAOException {
-        logger.debug("reading Tag {}",t);
+        logger.debug("reading Tag {}", t);
         try {
-            return this.jdbcTemplate.queryForObject(
-                    readStatement,
-                    new Object[]{t.getId()},
+            return this.jdbcTemplate.queryForObject(readStatement, new Object[] { t.getId() },
                     new RowMapper<Tag>() {
-                        @Override
-                        public Tag mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        @Override public Tag mapRow(ResultSet rs, int rowNum) throws SQLException {
                             Tag t = new Tag();
                             t.setId(rs.getInt(1));
                             t.setName(rs.getString(2));
                             return t;
                         }
                     });
-        }
-        catch(DataAccessException e){
+        } catch (DataAccessException e) {
             throw new DAOException("Failed to read a Tag", e);
         }
     }
@@ -96,33 +89,32 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
      * @throws DAOException
      */
     public void delete(Tag t) throws DAOException {
-        logger.debug("Delete Tag {}",t);
+        logger.debug("Delete Tag {}", t);
         try {
-        jdbcTemplate.update(deleteStatement,t.getId());
-        }catch (DataAccessException e){
+            photoTagDao.deleteAllEntriesOfSpecificTag(t);
+            jdbcTemplate.update(deleteStatement, t.getId());
+        } catch (DataAccessException e) {
             throw new DAOException("Failed to delete Tag ", e);
+        } catch (ValidationException e) {
+            throw new DAOException("Failed to validate entity", e);
         }
     }
 
     /**
-     *
      * Retrieve a list of all existing Tags
      *
      * @return the list of Tags
      * @throws DAOException If the Tag can not be retrieved or the data store fails to select the record.
-     *
      */
     public List<Tag> readAll() throws DAOException {
         logger.debug("reading all Tag's {}");
         try {
             return jdbcTemplate.query(readAllStatement, new RowMapper<Tag>() {
-                @Override
-                public Tag mapRow(ResultSet rs, int rowNum) throws SQLException {
+                @Override public Tag mapRow(ResultSet rs, int rowNum) throws SQLException {
                     return new Tag(rs.getInt(1), rs.getString(2));
                 }
             });
-        }
-        catch(DataAccessException e){
+        } catch (DataAccessException e) {
             throw new DAOException("Failed to read all Tag's", e);
         }
     }

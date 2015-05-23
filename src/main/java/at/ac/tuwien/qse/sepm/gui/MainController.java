@@ -4,7 +4,6 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.geometry.*;
@@ -24,6 +23,8 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controller for the main view.
@@ -38,32 +39,17 @@ public class MainController {
     @FXML private ScrollPane scrollPane;
 
     @FXML private TilePane tilePane;
-    @FXML private Insets in;
-    @FXML private BorderPane root;
-    private GoogleMapsScene worldMap;
     private ImageTile selectedTile = null;
 
+    private List<Photo> activePhotos = new ArrayList<>();
+
+
     public MainController() {
-        scrollPane = new ScrollPane();
-        in = new Insets(15,15,15,15);
-        tilePane = new TilePane();
-        scrollPane.setPrefWidth(500);
-        scrollPane.setPrefHeight(400);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setFitToHeight(true);
-        scrollPane.setFitToWidth(true);
-        tilePane.setHgap(15);
-        tilePane.setVgap(15);
-        tilePane.setPadding(in);
-        scrollPane.setContent(tilePane);
-       // worldMap = new GoogleMapsScene();
+
     }
 
     @FXML
     private void initialize() {
-        worldMap = new GoogleMapsScene();
-        root.setCenter(worldMap.getMapView());
     }
 
     /**
@@ -72,8 +58,9 @@ public class MainController {
      * @param photo The photo to be added.
      */
     public void addPhoto(Photo photo) {
-        root.setCenter(scrollPane);
         ImageTile imageTile = new ImageTile(photo);
+
+        activePhotos.add(photo);
 
         imageTile.getSelectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
@@ -91,9 +78,19 @@ public class MainController {
     }
 
     /**
+     * Return the List of active photos.
+     *
+     * @return the currently active photos
+     */
+    public List<Photo> getActivePhotos()
+    {
+        return activePhotos;
+    }
+    /**
      * Clear the image grid and don't show any photos.
      */
     public void clearPhotos() {
+        activePhotos.clear();
         tilePane.getChildren().clear();
     }
 
@@ -124,6 +121,7 @@ public class MainController {
             imageView.setOnMouseClicked(this::handleSelected);
 
             getStyleClass().add("image-tile-non-selected");
+
 
             this.getChildren().add(imageView);
         }
