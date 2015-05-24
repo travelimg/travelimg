@@ -45,8 +45,7 @@ public class Inspector {
     @FXML private Label placeholder;
     @FXML private Node details;
     @FXML private Button deleteButton;
-    @FXML private Button cancelButton;
-    @FXML private Button confirmButton;
+    @FXML private Button dropboxButton;
     @FXML private VBox tagSelectionContainer;
     @FXML private VBox mapContainer;
     @FXML private HBox ratingPickerContainer;
@@ -117,8 +116,7 @@ public class Inspector {
         placeholder.visibleProperty().bind(Bindings.not(details.visibleProperty()));
 
         deleteButton.setOnAction(this::handleDelete);
-        cancelButton.setOnAction(this::handleCancel);
-        confirmButton.setOnAction(this::handleConfirm);
+        dropboxButton.setOnAction(this::handleDropbox);
         ratingPickerContainer.getChildren().add(ratingPicker);
         ratingPicker.ratingProperty().addListener(this::handleRatingChanged);
         mapContainer.getChildren().add(mapsScene.getMapView());
@@ -148,11 +146,7 @@ public class Inspector {
         }
     }
 
-    private void handleCancel(Event event) {
-        // TODO
-    }
-
-    private void handleConfirm(Event event) {
+    private void handleDropbox(Event event) {
         // TODO
     }
 

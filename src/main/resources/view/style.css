@@ -316,16 +316,6 @@
     -fx-opacity: 0.3;
 }
 
-.inspector .delete .glyph-icon {
-    -glyph-name: "TRASH";
-}
-.inspector .cancel .glyph-icon {
-    -glyph-name: "TIMES";
-}
-.inspector .confirm .glyph-icon {
-    -glyph-name: "CHECK";
-}
-
 .photo-grid {
     -fx-padding: 16px;
     -fx-background-color: #dddddd;
@@ -468,13 +458,6 @@
 }
 .tab-content-area {
     -fx-background-color: -fx-background;
-}
-
-.organizer .import .glyph-icon {
-    -glyph-name: "PLUS";
-}
-.organizer .present .glyph-icon {
-    -glyph-name: "PLAY";
 }
 
 .filter-list {

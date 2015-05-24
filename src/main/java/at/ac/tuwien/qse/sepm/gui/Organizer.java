@@ -50,6 +50,7 @@ public class Organizer {
 
     @FXML private BorderPane root;
     @FXML private Button importButton;
+    @FXML private Button flickrButton;
     @FXML private Button presentButton;
 
     @FXML private VBox filterContainer;
@@ -72,6 +73,11 @@ public class Organizer {
     public void setImportAction(Runnable callback) {
         LOGGER.debug("setting import action");
         importButton.setOnAction(event -> callback.run());
+    }
+
+    public void setFlickrAction(Runnable callback) {
+        LOGGER.debug("setting flickr action");
+        flickrButton.setOnAction(event -> callback.run());
     }
 
     public void setFilterChangeAction(Consumer<PhotoFilter> callback) {

@@ -17,17 +17,29 @@
     <bottom>
         <HBox prefHeight="40.0" styleClass="navbar">
             <children>
-                <Button fx:id="importButton" maxHeight="Infinity" maxWidth="Infinity"
-                        styleClass="import" HBox.hgrow="ALWAYS">
+                <Button fx:id="importButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                     <graphic>
-                        <FontAwesomeIconView/>
+                        <FontAwesomeIconView glyphName="FOLDER"/>
                     </graphic>
+                    <tooltip>
+                        <Tooltip text="Vollbild-Modus"/>
+                    </tooltip>
                 </Button>
-                <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity"
-                        styleClass="present" HBox.hgrow="ALWAYS">
+                <Button fx:id="flickrButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                     <graphic>
-                        <FontAwesomeIconView/>
+                        <FontAwesomeIconView glyphName="FLICKR"/>
                     </graphic>
+                    <tooltip>
+                        <Tooltip text="Von Flickr importieren"/>
+                    </tooltip>
+                </Button>
+                <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                    <graphic>
+                        <FontAwesomeIconView glyphName="EXPAND"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Von Speichermedium importieren"/>
+                    </tooltip>
                 </Button>
             </children>
         </HBox>

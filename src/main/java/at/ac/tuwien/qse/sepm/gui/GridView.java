@@ -54,6 +54,9 @@ public class GridView {
             importService
                     .importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
         });
+        organizer.setFlickrAction(() -> {
+            // TODO
+        });
 
         organizer.setPresentAction(() -> {
             FullscreenWindow fullscreen = new FullscreenWindow();
