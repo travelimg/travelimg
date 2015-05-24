@@ -19,6 +19,7 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -41,7 +42,7 @@ public class Inspector {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @FXML private BorderPane root;
-    @FXML private Node placeholder;
+    @FXML private Label placeholder;
     @FXML private Node details;
     @FXML private Button deleteButton;
     @FXML private Button cancelButton;
@@ -158,46 +159,58 @@ public class Inspector {
     private void handleRatingChanged(ObservableValue<? extends Rating> observable, Rating oldValue, Rating newValue) {
         LOGGER.debug("handleRatingChanged(~, {}, {})", oldValue, newValue);
 
-        if (activePhotos.get(0) == null) {
+        if (activePhotos.size() == 0) {
             LOGGER.debug("No photo selected.");
             return;
         }
 
-        if (activePhotos.get(0).getRating() == newValue) {
-            LOGGER.debug("Photo already has rating of {}.", newValue);
-            return;
-        }
+        for (Photo photo : activePhotos) {
 
-        LOGGER.debug("Setting photo rating from {} to {}.", activePhotos.get(0).getRating(), newValue);
-        activePhotos.get(0).setRating(newValue);
+            if (photo.getRating() == newValue) {
+                LOGGER.debug("Photo already has rating of {}.", newValue);
+                return;
+            }
 
-        try {
-            photoservice.savePhotoRating(activePhotos.get(0));
-            onUpdate();
+            LOGGER.debug("Setting photo rating from {} to {}.", photo.getRating(),
+                    newValue);
+            activePhotos.get(0).setRating(newValue);
 
-        } catch (ServiceException ex) {
-            LOGGER.error("Failed saving photo rating.", ex);
-            LOGGER.debug("Resetting rating from {} to {}.", activePhotos.get(0).getRating(), oldValue);
+            try {
+                photoservice.savePhotoRating(photo);
+                onUpdate();
 
-            // Undo changes.
-            activePhotos.get(0).setRating(oldValue);
-            // FIXME: Reset the RatingPicker.
-            // This is not as simple as expected. Calling ratingPicker.setRating(oldValue) here
-            // will complete and finish. But once the below dialog is closed ANOTHER selection-
-            // change will occur in RatingPicker that is the same as the once that caused the error.
-            // That causes an infinite loop of error dialogs.
+            } catch (ServiceException ex) {
+                LOGGER.error("Failed saving photo rating.", ex);
+                LOGGER.debug("Resetting rating from {} to {}.", activePhotos.get(0).getRating(),
+                        oldValue);
 
-            InfoDialog dialog = new InfoDialog(root, "Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Bewertung fehlgeschlagen");
-            dialog.setContentText("Die Bewertung für das Foto konnte nicht gespeichert werden.");
-            dialog.showAndWait();
+                // Undo changes.
+                photo.setRating(oldValue);
+                // FIXME: Reset the RatingPicker.
+                // This is not as simple as expected. Calling ratingPicker.setRating(oldValue) here
+                // will complete and finish. But once the below dialog is closed ANOTHER selection-
+                // change will occur in RatingPicker that is the same as the once that caused the error.
+                // That causes an infinite loop of error dialogs.
+
+                InfoDialog dialog = new InfoDialog(root, "Fehler");
+                dialog.setError(true);
+                dialog.setHeaderText("Bewertung fehlgeschlagen");
+                dialog.setContentText("Die Bewertung für das Foto konnte nicht gespeichert werden.");
+                dialog.showAndWait();
+            }
         }
     }
 
     private void showDetails(List<Photo> photos) {
         if (photos.size() == 0) {
             details.setVisible(false);
+            placeholder.setText("Kein Foto ausgewählt.");
+            return;
+        }
+
+        if (photos.size() > 1) {
+            details.setVisible(false);
+            placeholder.setText("Mehrere Foto ausgewählt.");
             return;
         }
 
@@ -244,15 +257,11 @@ public class Inspector {
     private class TagListChangeListener implements ListChangeListener<Tag> {
         public void onChanged(ListChangeListener.Change<? extends Tag> change) {
             while(change.next()) {
-                List<Photo> photoList = new ArrayList<>();
-                if (activePhotos.get(0) != null) {
-                    photoList.add(activePhotos.get(0));
-                }
 
                 if (change.wasAdded()) {
                     Tag added = change.getAddedSubList().get(0);
                     try {
-                        photoservice.addTagToPhotos(photoList, added);
+                        photoservice.addTagToPhotos(activePhotos, added);
                         onUpdate();
                     } catch (ServiceException ex) {
                         LOGGER.error("failed adding tag", ex);
@@ -266,7 +275,7 @@ public class Inspector {
                 if (change.wasRemoved()) {
                     Tag removed = change.getRemoved().get(0);
                     try {
-                        photoservice.removeTagFromPhotos(photoList, removed);
+                        photoservice.removeTagFromPhotos(activePhotos, removed);
                         onUpdate();
                     } catch (ServiceException ex) {
                         LOGGER.error("failed removing tag", ex);
