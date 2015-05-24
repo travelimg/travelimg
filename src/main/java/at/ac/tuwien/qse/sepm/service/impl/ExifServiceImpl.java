@@ -93,8 +93,8 @@ public class ExifServiceImpl implements ExifService {
     public void attachDateAndGeoData(Photo photo) throws ServiceException {
         File file = new File(photo.getPath());
         LocalDateTime datetime;
-        double latitude = 0.0;
-        double longitude = 0.0;
+        double latitude = photo.getLatitude();
+        double longitude = photo.getLongitude();
         final TiffImageMetadata exifMetadata;
         try {
             final ImageMetadata metadata = Imaging.getMetadata(file);

@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
+import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.service.FlickrService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
@@ -8,6 +9,7 @@ import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import com.flickr4java.flickr.Flickr;
 import com.flickr4java.flickr.FlickrException;
 import com.flickr4java.flickr.REST;
+import com.flickr4java.flickr.photos.GeoData;
 import com.flickr4java.flickr.photos.Photo;
 import com.flickr4java.flickr.photos.PhotoList;
 import com.flickr4java.flickr.photos.SearchParameters;
@@ -136,7 +138,11 @@ public class FlickrServiceImpl implements FlickrService {
                                 progressCallback.accept((nrOfDownloadedPhotos/(double)nrOfPhotosToDownload)+((((double)downloadedFileSize) / ((double)completeFileSize))/100.0));
                             }
                             at.ac.tuwien.qse.sepm.entities.Photo downloaded = new at.ac.tuwien.qse.sepm.entities.Photo();
+                            GeoData geoData = flickr.getPhotosInterface().getGeoInterface().getLocation(id);
                             downloaded.setPath("src/main/resources/tmp/"+id+"."+format);
+                            downloaded.setLatitude(geoData.getLatitude());
+                            downloaded.setLongitude(geoData.getLongitude());
+                            downloaded.setRating(Rating.NONE);
                             callback.accept(downloaded);
                             nrOfDownloadedPhotos++;
                         } finally {
