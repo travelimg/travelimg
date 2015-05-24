@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import com.lynden.gmapsfx.javascript.object.MapOptions;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -69,6 +70,7 @@ public class Inspector {
         mapContainer.getChildren().add(this.mapsScene.getMapView());
 
         this.mapsScene.removeAktiveMarker();
+
     }
     @FXML private void initialize() {
 
