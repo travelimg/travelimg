@@ -55,6 +55,7 @@ public class Organizer {
     @FXML private CheckListView<Photographer> photographerListView;
     @FXML private CheckListView<YearMonth> monthListView;
     @FXML private CheckBox untaggedCheckBox;
+    @FXML private Button resetButton;
 
     private final ObservableList<Rating> ratingList = FXCollections.observableArrayList();
     private final ObservableList<Tag> categoryList = FXCollections.observableArrayList();
@@ -86,6 +87,8 @@ public class Organizer {
 
     @FXML
     private void initialize() {
+
+        resetButton.setOnAction(event -> resetFilter());
 
         ratingListView.setItems(ratingList);
         ratingListView.getCheckModel().getCheckedItems().addListener(this::handleRatingsChange);
@@ -268,6 +271,7 @@ public class Organizer {
     }
 
     private void resetFilter() {
+        refreshLists();
         categoryListView.getCheckModel().checkAll();
         ratingListView.getCheckModel().checkAll();
         photographerListView.getCheckModel().checkAll();

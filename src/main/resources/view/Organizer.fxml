@@ -9,6 +9,7 @@
             fx:controller="at.ac.tuwien.qse.sepm.gui.Organizer">
     <center>
         <VBox>
+            <Button fx:id="resetButton" text="Zurücksetzen"/>
             <Label text="Bewertung"/>
             <CheckListView fx:id="ratingListView"/>
             <Label text="Kategorien"/>
