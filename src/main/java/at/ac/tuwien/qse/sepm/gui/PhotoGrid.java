@@ -16,6 +16,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
+import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,12 +26,13 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class PhotoGrid extends TilePane {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final Map<Photo, PhotoTile> tiles = new HashMap<>();
+    private final Map<Photo, PhotoTile> tiles = new IdentityHashMap<>();
     private Consumer<Set<Photo>> selectionChangeAction;
 
     public PhotoGrid() {
@@ -85,16 +87,10 @@ public class PhotoGrid extends TilePane {
     }
 
     public Set<Photo> getSelectedPhotos() {
-        Set<Photo> photos = new HashSet<>();
-        for (Photo photo : tiles.keySet()) {
-            // FIXME: tile is null
-            // When changing selection after doing something in the inspector the tile here becomes null.
-            PhotoTile tile = tiles.get(photo);
-            if (tile.isSelected()) {
-                photos.add(photo);
-            }
-        }
-        return photos;
+        return tiles.entrySet().stream()
+                .filter(entry -> entry.getValue().isSelected())
+                .map(entry -> entry.getKey())
+                .collect(Collectors.toSet());
     }
 
     public void select(Photo photo) {
@@ -107,7 +103,7 @@ public class PhotoGrid extends TilePane {
 
     public void selectAll() {
         LOGGER.debug("selecting all photos");
-        tiles.values().forEach(tile -> tile.select());
+        tiles.values().forEach(PhotoTile::select);
         onSelectionChange();
     }
 
@@ -121,7 +117,7 @@ public class PhotoGrid extends TilePane {
 
     public void deselectAll() {
         LOGGER.debug("deselecting all photos");
-        tiles.values().forEach(tile -> tile.deselect());
+        tiles.values().forEach(PhotoTile::deselect);
         onSelectionChange();
     }
 
@@ -192,11 +188,13 @@ public class PhotoGrid extends TilePane {
         }
 
         public void select() {
+            if (selected) return;
             getStyleClass().add("selected");
             this.selected = true;
         }
 
         public void deselect() {
+            if (!selected) return;
             getStyleClass().remove("selected");
             this.selected = false;
         }
