@@ -356,12 +356,10 @@
     -fx-hgap: 16px;
     -fx-vgap: 16px;
 }
-.photo-grid .photo-tile {
+
+.photo-tile {
     -fx-background-color: #eeeeee;
     -fx-effect: -fx-dropshadow-2;
-}
-.photo-tile:hover {
-    -fx-background-color: #eeeeee;
 }
 .photo-tile.selected {
     -fx-effect: -fx-dropshadow-3;

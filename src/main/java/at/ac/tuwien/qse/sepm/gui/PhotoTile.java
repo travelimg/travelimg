@@ -5,11 +5,14 @@ import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,25 +28,64 @@ public class PhotoTile extends StackPane {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @FXML private ProgressIndicator progress;
-    @FXML private Label rating;
-    @FXML private FontAwesomeIconView ratingIcon;
-    @FXML private Tooltip ratingTooltip;
-    @FXML private Label tag;
-    @FXML private Tooltip tagTooltip;
-    @FXML private ImageView imageView;
-    @FXML private Label dateLabel;
+    private ProgressIndicator progress;
+    private Label ratingIndicator;
+    private FontAwesomeIconView ratingIndicatorIcon;
+    private Tooltip ratingIndicatorTooltip;
+    private Label taggingIndicator;
+    private Tooltip taggingIndicatorTooltip;
+    private ImageView imageView;
+    private Label dateLabel;
 
     private Image image = null;
     private boolean selected = false;
 
     public PhotoTile() {
-        FXMLLoadHelper.load(this, this, getClass(), "view/PhotoTile.fxml");
+        getStyleClass().add("photo-tile");
+
+        progress = new ProgressIndicator();
+        progress.setMaxWidth(50);
+        progress.setMaxHeight(50);
+        getChildren().add(progress);
+        setMargin(progress, new Insets(16));
+        setPadding(new Insets(4));
+
+        imageView = new ImageView();
+        imageView.setFitWidth(142);
+        imageView.setFitHeight(142);
+        imageView.setPreserveRatio(true);
+        getChildren().add(imageView);
+
+        BorderPane overlay = new BorderPane();
+        overlay.getStyleClass().add("overlay");
+        setAlignment(overlay, Pos.BOTTOM_CENTER);
+        getChildren().add(overlay);
+
+        ratingIndicator = new Label();
+        ratingIndicator.getStyleClass().add("rating");
+        ratingIndicatorIcon = new FontAwesomeIconView();
+        ratingIndicator.setGraphic(ratingIndicatorIcon);
+        ratingIndicatorTooltip = new Tooltip();
+        ratingIndicator.setTooltip(ratingIndicatorTooltip);
+        overlay.setRight(ratingIndicator);
+
+        taggingIndicator = new Label();
+        taggingIndicator.getStyleClass().add("tagging");
+        FontAwesomeIconView taggingIndicatorIcon = new FontAwesomeIconView();
+        taggingIndicatorIcon.setGlyphName("TAGS");
+        taggingIndicator.setGraphic(taggingIndicatorIcon);
+        taggingIndicatorTooltip = new Tooltip();
+        taggingIndicator.setTooltip(taggingIndicatorTooltip);
+        overlay.setLeft(taggingIndicator);
+
+        dateLabel = new Label();
+        dateLabel.getStyleClass().add("date");
+        overlay.setCenter(dateLabel);
+
         getStyleClass().add("loading");
     }
 
     public void setPhoto(Photo photo) {
-        FXMLLoadHelper.load(this, this, getClass(), "view/PhotoTile.fxml");
         showImage(photo.getPath());
         showRating(photo.getRating());
         showTags(photo.getTags());
@@ -95,36 +137,40 @@ public class PhotoTile extends StackPane {
 
     private void showRating(Rating rating) {
         if (rating == Rating.NONE) {
-            this.rating.setVisible(false);
+            ratingIndicator.setVisible(false);
             return;
         }
-        this.rating.setVisible(true);
+        ratingIndicator.setVisible(true);
+        String text = "";
+        String glyph = "";
         switch (rating) {
             case GOOD:
-                ratingIcon.setGlyphName("HEART");
-                ratingTooltip.setText("Gutes Foto");
+                glyph = "HEART";
+                text = "Gutes Foto";
                 break;
             case NEUTRAL:
-                ratingIcon.setGlyphName("CHECK");
-                ratingTooltip.setText("Neutrales Foto");
+                glyph = "CHECK";
+                text = "Neutrales Foto";
                 break;
             case BAD:
-                ratingIcon.setGlyphName("THUMBS_DOWN");
-                ratingTooltip.setText("Schlechtes Foto");
+                glyph = "THUMBS_DOWN";
+                text = "Schlechtes Foto";
                 break;
         }
+        ratingIndicatorIcon.setGlyphName(glyph);
+        ratingIndicatorTooltip.setText(text);
     }
 
     private void showTags(List<Tag> tags) {
         if (tags.isEmpty()) {
-            tag.setVisible(false);
+            taggingIndicator.setVisible(false);
             return;
         }
-        tag.setVisible(true);
+        taggingIndicator.setVisible(true);
         List<String> stringTags = tags.stream()
                 .map(Tag::getName).collect(Collectors.toList());
         String tagString = String.join(", ", stringTags);
-        tagTooltip.setText(tagString);
+        taggingIndicatorTooltip.setText(tagString);
     }
 
     private void showDate(LocalDateTime date) {
