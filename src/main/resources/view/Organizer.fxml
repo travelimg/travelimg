@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import org.controlsfx.control.CheckListView?>
-<BorderPane fx:id="root" prefWidth="160.0" styleClass="organizer" stylesheets="@style.css"
+<BorderPane fx:id="root" prefWidth="240.0" styleClass="organizer" stylesheets="@style.css"
             xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="at.ac.tuwien.qse.sepm.gui.Organizer">
     <center>

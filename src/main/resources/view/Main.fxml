@@ -3,20 +3,30 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <TabPane fx:id="root" stylesheets="@/view/style.css"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.MainController">
 
     <Tab text="Kachelansicht" closable="false">
+        <graphic>
+            <FontAwesomeIconView glyphName="TH"/>
+        </graphic>
         <content>
             <fx:include source="/view/GridView.fxml"></fx:include>
         </content>
     </Tab>
     <Tab text="Weltkarte" closable="false">
+        <graphic>
+            <FontAwesomeIconView glyphName="GLOBE"/>
+        </graphic>
         <content>
             <fx:include source="/view/WorldmapView.fxml"></fx:include>
         </content>
     </Tab>
     <Tab text="Diashow" closable="false">
+        <graphic>
+            <FontAwesomeIconView glyphName="SLIDESHARE"/>
+        </graphic>
         <content>
             <fx:include source="/view/SlideshowView.fxml"></fx:include>
         </content>
