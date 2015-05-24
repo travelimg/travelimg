@@ -4,29 +4,39 @@
 <?import javafx.scene.control.TabPane?>
 
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.Tooltip?>
 <TabPane fx:id="root" stylesheets="@/view/style.css"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.MainController">
 
-    <Tab text="Kachelansicht" closable="false">
+    <Tab text="" closable="false">
         <graphic>
             <FontAwesomeIconView glyphName="TH"/>
         </graphic>
+        <tooltip>
+            <Tooltip text="Kachelansicht"/>
+        </tooltip>
         <content>
             <fx:include source="/view/GridView.fxml"></fx:include>
         </content>
     </Tab>
-    <Tab text="Weltkarte" closable="false">
+    <Tab text="" closable="false">
         <graphic>
             <FontAwesomeIconView glyphName="GLOBE"/>
         </graphic>
+        <tooltip>
+            <Tooltip text="Weltkarte"/>
+        </tooltip>
         <content>
             <fx:include source="/view/WorldmapView.fxml"></fx:include>
         </content>
     </Tab>
-    <Tab text="Diashow" closable="false">
+    <Tab text="" closable="false">
         <graphic>
             <FontAwesomeIconView glyphName="SLIDESHARE"/>
         </graphic>
+        <tooltip>
+            <Tooltip text="Diashow anlegen"/>
+        </tooltip>
         <content>
             <fx:include source="/view/SlideshowView.fxml"></fx:include>
         </content>
