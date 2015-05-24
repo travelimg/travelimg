@@ -98,7 +98,10 @@ public class Organizer {
         });
         ratingListView.setTitle("Bewertungen");
         ratingListView.setChangeHandler(this::handleRatingsChange);
-        categoryListView = new FilterList<>(value -> value.getName());
+        categoryListView = new FilterList<>(value -> {
+            if (value == null) return "Nicht kategorisiert";
+            return value.getName();
+        });
         categoryListView.setTitle("Kategorien");
         categoryListView.setChangeHandler(this::handleCategoriesChange);
         photographerListView = new FilterList<>(value -> value.getName());
@@ -127,6 +130,8 @@ public class Organizer {
     }
     private void handleCategoriesChange(List<Tag> values) {
         LOGGER.debug("category filter changed");
+        filter.setUntaggedIncluded(values.contains(null));
+        values.remove(null);
         filter.getIncludedCategories().clear();
         filter.getIncludedCategories().addAll(values);
         handleFilterChange();
@@ -167,6 +172,7 @@ public class Organizer {
         try {
             List<Tag> list = tagService.getAllTags();
             LOGGER.debug("fetching categories succeeded with {} items", list.size());
+            list.add(null);
             return list;
         } catch (ServiceException ex) {
             LOGGER.error("fetching categories failed", ex);

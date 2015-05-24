@@ -83,13 +83,11 @@ public class FilterList<E> extends VBox {
     }
 
     public void check(E value) {
-        if (value == null) throw new IllegalArgumentException();
         if (!items.containsKey(value)) return;
         items.get(value).setState(CheckState.CHECKED);
     }
 
     public void uncheck(E value) {
-        if (value == null) throw new IllegalArgumentException();
         if (!items.containsKey(value)) return;
         items.get(value).setState(CheckState.UNCHECKED);
     }
