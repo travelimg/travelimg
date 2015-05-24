@@ -73,19 +73,6 @@ public class MainController {
 
     public MainController() {
 
-        scrollPane = new ScrollPane();
-        in = new Insets(15,15,15,15);
-        tilePane = new TilePane();
-        scrollPane.setPrefWidth(500);
-        scrollPane.setPrefHeight(400);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setFitToHeight(true);
-        scrollPane.setFitToWidth(true);
-        tilePane.setHgap(15);
-        tilePane.setVgap(15);
-        tilePane.setPadding(in);
-        scrollPane.setContent(tilePane);
         tabs = new TabPane();
 
     }
@@ -159,7 +146,6 @@ public class MainController {
     public void addPhoto(Photo photo) {
         ImageTile imageTile = new ImageTile(photo);
         activePhotos.add(photo);
-
         imageTile.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent event) {
                 if (event.isControlDown()) {
@@ -192,6 +178,13 @@ public class MainController {
 
                         flowPane.getChildren().add(imageTile);
                     }
+                }
+            }
+        });
+
+    }
+
+
 
                     /**
                      * Return the List of active photos.
@@ -203,7 +196,11 @@ public class MainController {
                     }
                     /**
                      * Clear the image grid and don't show any photos.
-                     */ public void clearPhotos () {
+                     * /
+                     *
+                     **/
+
+                public void clearPhotos () {
                     activePhotos.clear();
                     flowPane.getChildren().clear();
                 }
@@ -254,8 +251,6 @@ public class MainController {
                         getStyleClass().remove("image-tile-non-selected");
                         getStyleClass().add("image-tile-selected");
                         inspector.setMap(worldMap);
-                        inspector.setActivePhoto(photo);
-
                         inspector.addActivePhoto(photo);
                         this.selected.set(true);
                     }
@@ -273,6 +268,7 @@ public class MainController {
 
                     /**
                      * Property which represents if this tile is currently selected or not.
+                     *
                      * @return The selected property.
                      */
                     public BooleanProperty getSelectedProperty() {
@@ -283,4 +279,8 @@ public class MainController {
                         select();
                     }
                 }
+
             }
+
+
+
