@@ -316,32 +316,6 @@
     -fx-opacity: 0.3;
 }
 
-.organizer .import .glyph-icon {
-    -glyph-name: "PLUS";
-}
-.organizer .present .glyph-icon {
-    -glyph-name: "PLAY";
-}
-.organizer .list-view {
-    -fx-padding: 5px 10px;
-}
-.organizer .list-cell {
-    -fx-padding: 5px 0;
-}
-.organizer .list-cell:focused {
-    -fx-background-color: transparent;
-}
-.organizer .list-cell:hover {
-    -fx-background-color: transparent;
-}
-.organizer .list-cell:pressed {
-    -fx-background-color: transparent;
-}
-.organizer .list-cell:selected {
-    -fx-background-color: transparent;
-    -fx-text-fill: black;
-}
-
 .inspector .delete .glyph-icon {
     -glyph-name: "TRASH";
 }
@@ -496,11 +470,20 @@
     -fx-background-color: -fx-background;
 }
 
+.organizer .import .glyph-icon {
+    -glyph-name: "PLUS";
+}
+.organizer .present .glyph-icon {
+    -glyph-name: "PLAY";
+}
 
+.filter-list {
+    -fx-padding: 8px 0 16px 0;
+}
 .filter-list .check-item {
     -fx-padding: 8px 14px;
     -fx-font-size: 14;
-    -fx-background-color: -fx-default;
+    -fx-background-color: transparent;
 }
 .filter-list .check-item:hover {
     -fx-background-color: -fx-default-hover;
