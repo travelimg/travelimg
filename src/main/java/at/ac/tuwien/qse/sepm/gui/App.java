@@ -2,8 +2,8 @@ package at.ac.tuwien.qse.sepm.gui;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
@@ -44,7 +44,7 @@ public class App extends Application {
         // set base location so that resources can be loaded using relative paths
         loader.setLocation(getClass().getClassLoader().getResource("view"));
 
-        Pane root;
+        Parent root;
         try {
             root = loader.load(getClass().getClassLoader().getResourceAsStream("view/Main.fxml"));
         } catch (IOException exception) {

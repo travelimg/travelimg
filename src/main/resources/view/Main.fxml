@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.BorderPane?>
-<BorderPane fx:id="root" stylesheets="@/view/style.css"
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+
+<TabPane fx:id="root" stylesheets="@/view/style.css"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.MainController">
 
-    <center>
-        <ScrollPane fx:id="gridContainer" prefWidth="500" prefHeight="400" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true"/>
-    </center>
-    <left>
-        <fx:include source="/view/Organizer.fxml"></fx:include>
-    </left>
-
-    <right>
-        <fx:include source="/view/Inspector.fxml"></fx:include>
-    </right>
-</BorderPane>
+    <Tab text="Kachelansicht" closable="false">
+        <content>
+            <fx:include source="/view/GridView.fxml"></fx:include>
+        </content>
+    </Tab>
+    <Tab text="Weltkarte" closable="false">
+        <content>
+            <fx:include source="/view/WorldmapView.fxml"></fx:include>
+        </content>
+    </Tab>
+    <Tab text="Diashow" closable="false">
+        <content>
+            <fx:include source="/view/SlideshowView.fxml"></fx:include>
+        </content>
+    </Tab>
+</TabPane>
