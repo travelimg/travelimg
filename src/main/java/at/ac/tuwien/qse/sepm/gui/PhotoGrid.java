@@ -78,6 +78,9 @@ public class PhotoGrid extends TilePane {
         tile.cancel();
         tiles.remove(photo);
         getChildren().remove(tile);
+        if (tile.isSelected()) {
+            onSelectionChange();
+        }
     }
 
     public void clear() {
