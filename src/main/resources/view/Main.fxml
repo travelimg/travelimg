@@ -7,6 +7,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.Node?>
+<?import javafx.scene.layout.FlowPane?>
 <BorderPane fx:id="root" stylesheets="@/view/style.css"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.MainController">
 
@@ -28,7 +29,13 @@
                </Tab>
                <Tab fx:id="gitter" text="Gitter" closable="false">
                    <content>
-
+                       <ScrollPane fx:id="scrollPane" prefWidth="500" prefHeight="400" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
+                           <FlowPane fx:id="flowPane" hgap="15" vgap="15" styleClass="image-grid">
+                               <padding>
+                                   <Insets bottom="15.0" left="15.0" right ="15.0" top="15.0"/>
+                               </padding>
+                           </FlowPane>
+                       </ScrollPane>
                    </content>
                </Tab>
            </tabs>
