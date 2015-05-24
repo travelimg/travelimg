@@ -253,16 +253,28 @@ public class Inspector {
                     Tag added = change.getAddedSubList().get(0);
                     try {
                         photoservice.addTagToPhotos(photoList, added);
+                        onUpdate();
                     } catch (ServiceException ex) {
-                        //TODO Dialog
+                        LOGGER.error("failed adding tag", ex);
+                        InfoDialog dialog = new InfoDialog(root, "Fehler");
+                        dialog.setError(true);
+                        dialog.setHeaderText("Speichern fehlgeschlagen");
+                        dialog.setContentText("Die Kategorien für das Foto konnten nicht gespeichert werden.");
+                        dialog.showAndWait();
                     }
                 }
                 if (change.wasRemoved()) {
                     Tag removed = change.getRemoved().get(0);
                     try {
                         photoservice.removeTagFromPhotos(photoList, removed);
+                        onUpdate();
                     } catch (ServiceException ex) {
-                        //TODO Dialog
+                        LOGGER.error("failed removing tag", ex);
+                        InfoDialog dialog = new InfoDialog(root, "Fehler");
+                        dialog.setError(true);
+                        dialog.setHeaderText("Speichern fehlgeschlagen");
+                        dialog.setContentText("Die Kategorien für das Foto konnten nicht gespeichert werden.");
+                        dialog.showAndWait();
                     }
                 }
             }
