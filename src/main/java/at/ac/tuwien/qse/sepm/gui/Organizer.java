@@ -1,46 +1,37 @@
 package at.ac.tuwien.qse.sepm.gui;
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.Tag;
-import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
-import at.ac.tuwien.qse.sepm.service.*;
+import at.ac.tuwien.qse.sepm.service.PhotoService;
+import at.ac.tuwien.qse.sepm.service.PhotographerService;
+import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.TagService;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
-import at.ac.tuwien.qse.sepm.util.Cancelable;
-import javafx.application.Platform;
-import javafx.beans.Observable;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
-import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.CheckListView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
-
-import java.time.LocalDateTime;
 
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Observable;
 import java.util.function.Consumer;
 
 /**
@@ -59,15 +50,11 @@ public class Organizer {
     @FXML private BorderPane root;
     @FXML private Button importButton;
     @FXML private Button presentButton;
-    @FXML private TitledPane ratingPane;
-    @FXML private TitledPane categoryPane;
-    @FXML private TitledPane photographerPane;
-    @FXML private TitledPane monthPane;
-
-    private final CheckListView<Rating> ratingListView = new CheckListView<>();
-    private final CheckListView<Tag> categoryListView = new CheckListView<>();
-    private final CheckListView<Photographer> photographerListView = new CheckListView<>();
-    private final CheckListView<YearMonth> monthListView = new CheckListView<>();
+    @FXML private CheckListView<Rating> ratingListView;
+    @FXML private CheckListView<Tag> categoryListView;
+    @FXML private CheckListView<Photographer> photographerListView;
+    @FXML private CheckListView<YearMonth> monthListView;
+    @FXML private CheckBox untaggedCheckBox;
 
     private final ObservableList<Rating> ratingList = FXCollections.observableArrayList();
     private final ObservableList<Tag> categoryList = FXCollections.observableArrayList();
@@ -99,11 +86,6 @@ public class Organizer {
 
     @FXML
     private void initialize() {
-
-        ratingPane.setContent(ratingListView);
-        categoryPane.setContent(categoryListView);
-        photographerPane.setContent(photographerListView);
-        monthPane.setContent(monthListView);
 
         ratingListView.setItems(ratingList);
         ratingListView.getCheckModel().getCheckedItems().addListener(this::handleRatingsChange);
@@ -172,6 +154,8 @@ public class Organizer {
             })
         );
 
+        untaggedCheckBox.selectedProperty().addListener(this::handleUntaggedChange);
+
         refreshLists();
         resetFilter();
     }
@@ -204,6 +188,11 @@ public class Organizer {
         LOGGER.debug("month filter changed");
         filter.getIncludedMonths().clear();
         filter.getIncludedMonths().addAll(monthListView.getCheckModel().getCheckedItems());
+        handleFilterChange();
+    }
+    private void handleUntaggedChange(ObservableValue<? extends Boolean> observable, boolean oldValue, boolean newValue) {
+        LOGGER.debug("untagged filter changed");
+        filter.setUntaggedIncluded(newValue);
         handleFilterChange();
     }
 
@@ -283,10 +272,6 @@ public class Organizer {
         ratingListView.getCheckModel().checkAll();
         photographerListView.getCheckModel().checkAll();
         monthListView.getCheckModel().checkAll();
-
-        filter.getIncludedCategories().addAll(getAllCategories());
-        filter.getIncludedRatings().addAll(getAllRatings());
-        filter.getIncludedPhotographers().addAll(getAllPhotographers());
-        filter.getIncludedMonths().addAll(getAllMonths());
+        untaggedCheckBox.setSelected(true);
     }
 }

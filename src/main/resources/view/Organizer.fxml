@@ -3,19 +3,22 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
+<?import org.controlsfx.control.CheckListView?>
 <BorderPane fx:id="root" prefWidth="160.0" styleClass="organizer" stylesheets="@style.css"
             xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="at.ac.tuwien.qse.sepm.gui.Organizer">
     <center>
-        <Accordion BorderPane.alignment="CENTER">
-            <panes>
-                <TitledPane fx:id="ratingPane" animated="false" text="Bewertung"/>
-                <TitledPane fx:id="categoryPane" animated="false" text="Kategorien"/>
-                <TitledPane fx:id="photographerPane" animated="false" text="Fotografen"/>
-                <TitledPane fx:id="monthPane" animated="false" text="Monate"/>
-            </panes>
-        </Accordion>
+        <VBox>
+            <Label text="Bewertung"/>
+            <CheckListView fx:id="ratingListView"/>
+            <Label text="Kategorien"/>
+            <CheckBox fx:id="untaggedCheckBox" text="Ohne Kategorie"/>
+            <CheckListView fx:id="categoryListView"/>
+            <Label text="Fotografen"/>
+            <CheckListView fx:id="photographerListView"/>
+            <Label text="Monate"/>
+            <CheckListView fx:id="monthListView"/>
+        </VBox>
     </center>
     <bottom>
         <HBox prefHeight="40.0" styleClass="navbar">
