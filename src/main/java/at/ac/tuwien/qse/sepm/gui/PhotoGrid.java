@@ -50,6 +50,7 @@ public class PhotoGrid extends TilePane {
         if (newPhotos == null) throw new IllegalArgumentException();
         clear();
         newPhotos.forEach(this::addPhoto);
+        onSelectionChange();
     }
 
     public void addPhoto(Photo photo) {
@@ -78,15 +79,14 @@ public class PhotoGrid extends TilePane {
         tile.cancel();
         tiles.remove(photo);
         getChildren().remove(tile);
-        if (tile.isSelected()) {
-            onSelectionChange();
-        }
+        onSelectionChange();
     }
 
     public void clear() {
         tiles.values().forEach(tile -> tile.cancel());
         tiles.clear();
         getChildren().clear();
+        onSelectionChange();
     }
 
     public Set<Photo> getSelectedPhotos() {
