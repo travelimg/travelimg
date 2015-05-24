@@ -22,7 +22,7 @@
                         <FontAwesomeIconView glyphName="FOLDER"/>
                     </graphic>
                     <tooltip>
-                        <Tooltip text="Vollbild-Modus"/>
+                        <Tooltip text="Von Speichermedium importieren"/>
                     </tooltip>
                 </Button>
                 <Button fx:id="flickrButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
@@ -38,7 +38,7 @@
                         <FontAwesomeIconView glyphName="EXPAND"/>
                     </graphic>
                     <tooltip>
-                        <Tooltip text="Von Speichermedium importieren"/>
+                        <Tooltip text="Vollbild-Modus"/>
                     </tooltip>
                 </Button>
             </children>
