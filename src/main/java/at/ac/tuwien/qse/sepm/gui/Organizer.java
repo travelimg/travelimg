@@ -20,6 +20,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,19 +51,16 @@ public class Organizer {
     @FXML private BorderPane root;
     @FXML private Button importButton;
     @FXML private Button presentButton;
-    @FXML private CheckListView<Rating> ratingListView;
-    @FXML private CheckListView<Tag> categoryListView;
-    @FXML private CheckListView<Photographer> photographerListView;
-    @FXML private CheckListView<YearMonth> monthListView;
-    @FXML private CheckBox untaggedCheckBox;
+
+    @FXML private VBox filterContainer;
+    @FXML private FilterList<Rating> ratingListView;
+    @FXML private FilterList<Tag> categoryListView;
+    @FXML private FilterList<Photographer> photographerListView;
+    @FXML private FilterList<YearMonth> monthListView;
+
     @FXML private Button resetButton;
 
-    private final ObservableList<Rating> ratingList = FXCollections.observableArrayList();
-    private final ObservableList<Tag> categoryList = FXCollections.observableArrayList();
-    private final ObservableList<Photographer> photographerList = FXCollections.observableArrayList();
-    private final ObservableList<YearMonth> monthList = FXCollections.observableArrayList();
     private final DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy MMM");
-
     private final PhotoFilter filter = new PhotoFilter();
     private Consumer<PhotoFilter> filterChangeCallback;
 
@@ -90,74 +88,27 @@ public class Organizer {
 
         resetButton.setOnAction(event -> resetFilter());
 
-        ratingListView.setItems(ratingList);
-        ratingListView.getCheckModel().getCheckedItems().addListener(this::handleRatingsChange);
-        ratingListView.setCellFactory(list -> new CheckBoxListCell<>(
-            item -> ratingListView.getItemBooleanProperty(item),
-            new StringConverter<Rating>() {
-                @Override public Rating fromString(String string) {
-                    return null;
-                }
-                @Override public String toString(Rating item) {
-                    switch (item) {
-                        case GOOD: return "Gut";
-                        case NEUTRAL: return "Neutral";
-                        case BAD: return "Schlecht";
-                        default: return "Unbewertet";
-                    }
-                }
-            })
-        );
-
-        SortedList<Tag> sortedCategoryList = new SortedList<>(categoryList);
-        sortedCategoryList.setComparator((a, b) -> a.getName().compareTo(b.getName()));
-        categoryListView.setItems(sortedCategoryList);
-        categoryListView.getCheckModel().getCheckedItems().addListener(this::handleCategoriesChange);
-        categoryListView.setCellFactory(list -> new CheckBoxListCell<>(
-            item -> categoryListView.getItemBooleanProperty(item),
-            new StringConverter<Tag>() {
-                @Override public Tag fromString(String string) {
-                    return null;
-                }
-                @Override public String toString(Tag item) {
-                    return item.getName();
-                }
-            })
-        );
-
-        SortedList<Photographer> sortedPhotographerList = new SortedList<>(photographerList);
-        sortedPhotographerList.setComparator((a, b) -> a.getName().compareTo(b.getName()));
-        photographerListView.setItems(sortedPhotographerList);
-        photographerListView.getCheckModel().getCheckedItems().addListener(this::handlePhotographersChange);
-        photographerListView.setCellFactory(list -> new CheckBoxListCell<>(
-            item -> photographerListView.getItemBooleanProperty(item),
-            new StringConverter<Photographer>() {
-                @Override public Photographer fromString(String string) {
-                    return null;
-                }
-                @Override public String toString(Photographer item) {
-                    return item.getName();
-                }
-            })
-        );
-
-        SortedList<YearMonth> sortedMonthList = new SortedList<>(monthList);
-        sortedMonthList.setComparator((a, b) -> b.compareTo(a));
-        monthListView.setItems(sortedMonthList);
-        monthListView.getCheckModel().getCheckedItems().addListener(this::handleMonthsChange);
-        monthListView.setCellFactory(list -> new CheckBoxListCell<>(
-            item -> monthListView.getItemBooleanProperty(item),
-            new StringConverter<YearMonth>() {
-                @Override public YearMonth fromString(String string) {
-                    return null;
-                }
-                @Override public String toString(YearMonth item) {
-                    return monthFormatter.format(item);
-                }
-            })
-        );
-
-        untaggedCheckBox.selectedProperty().addListener(this::handleUntaggedChange);
+        ratingListView = new FilterList<>(value -> {
+            switch (value) {
+                case GOOD: return "Gut";
+                case NEUTRAL: return "Neutral";
+                case BAD: return "Schlecht";
+                default: return "Unbewertet";
+            }
+        });
+        ratingListView.setTitle("Bewertungen");
+        ratingListView.setChangeHandler(this::handleRatingsChange);
+        categoryListView = new FilterList<>(value -> value.getName());
+        categoryListView.setTitle("Kategorien");
+        categoryListView.setChangeHandler(this::handleCategoriesChange);
+        photographerListView = new FilterList<>(value -> value.getName());
+        photographerListView.setTitle("Fotografen");
+        photographerListView.setChangeHandler(this::handlePhotographersChange);
+        monthListView = new FilterList<>(value -> monthFormatter.format(value));
+        monthListView.setTitle("Monate");
+        monthListView.setChangeHandler(this::handleMonthsChange);
+        filterContainer.getChildren().addAll(ratingListView, categoryListView, photographerListView,
+                monthListView);
 
         refreshLists();
         resetFilter();
@@ -168,48 +119,38 @@ public class Organizer {
         if (filterChangeCallback == null) return;
         filterChangeCallback.accept(getFilter());
     }
-    private void handleRatingsChange(ListChangeListener.Change<? extends Rating> change) {
+    private void handleRatingsChange(List<Rating> values) {
         LOGGER.debug("rating filter changed");
         filter.getIncludedRatings().clear();
-        filter.getIncludedRatings().addAll(ratingListView.getCheckModel().getCheckedItems());
+        filter.getIncludedRatings().addAll(values);
         handleFilterChange();
     }
-    private void handleCategoriesChange(ListChangeListener.Change<? extends Tag> change) {
+    private void handleCategoriesChange(List<Tag> values) {
         LOGGER.debug("category filter changed");
         filter.getIncludedCategories().clear();
-        filter.getIncludedCategories().addAll(categoryListView.getCheckModel().getCheckedItems());
+        filter.getIncludedCategories().addAll(values);
         handleFilterChange();
     }
-    private void handlePhotographersChange(ListChangeListener.Change<? extends Photographer> change) {
+    private void handlePhotographersChange(List<Photographer> values) {
         LOGGER.debug("photographer filter changed");
         filter.getIncludedPhotographers().clear();
-        filter.getIncludedPhotographers().addAll(
-                photographerListView.getCheckModel().getCheckedItems());
+        filter.getIncludedPhotographers().addAll(values);
         handleFilterChange();
     }
-    private void handleMonthsChange(ListChangeListener.Change<? extends YearMonth> change) {
+    private void handleMonthsChange(List<YearMonth> values) {
         LOGGER.debug("month filter changed");
         filter.getIncludedMonths().clear();
-        filter.getIncludedMonths().addAll(monthListView.getCheckModel().getCheckedItems());
-        handleFilterChange();
-    }
-    private void handleUntaggedChange(ObservableValue<? extends Boolean> observable, boolean oldValue, boolean newValue) {
-        LOGGER.debug("untagged filter changed");
-        filter.setUntaggedIncluded(newValue);
+        filter.getIncludedMonths().addAll(values);
         handleFilterChange();
     }
 
     private void refreshLists() {
         LOGGER.debug("refreshing filter");
-        ratingList.clear();
-        categoryList.clear();
-        photographerList.clear();
-        monthList.clear();
 
-        ratingList.addAll(getAllRatings());
-        categoryList.addAll(getAllCategories());
-        photographerList.addAll(getAllPhotographers());
-        monthList.addAll(getAllMonths());
+        ratingListView.setValues(getAllRatings());
+        categoryListView.setValues(getAllCategories());
+        photographerListView.setValues(getAllPhotographers());
+        monthListView.setValues(getAllMonths());
     }
     private List<Rating> getAllRatings() {
         LOGGER.debug("fetching ratings");
@@ -272,10 +213,9 @@ public class Organizer {
 
     private void resetFilter() {
         refreshLists();
-        categoryListView.getCheckModel().checkAll();
-        ratingListView.getCheckModel().checkAll();
-        photographerListView.getCheckModel().checkAll();
-        monthListView.getCheckModel().checkAll();
-        untaggedCheckBox.setSelected(true);
+        categoryListView.checkAll();
+        ratingListView.checkAll();
+        photographerListView.checkAll();
+        monthListView.checkAll();
     }
 }

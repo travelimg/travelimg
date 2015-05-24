@@ -495,3 +495,45 @@
 .tab-content-area {
     -fx-background-color: -fx-background;
 }
+
+
+.filter-list .check-item {
+    -fx-padding: 8px 14px;
+    -fx-font-size: 14;
+    -fx-background-color: -fx-default;
+}
+.filter-list .check-item:hover {
+    -fx-background-color: -fx-default-hover;
+}
+.filter-list .check-item:pressed {
+    -fx-background-color: -fx-default-press;
+}
+.filter-list .check-item .label {
+    -fx-padding: 0 0 0 12px;
+}
+.filter-list .check-item .glyph-icon {
+    -glyph-size: 16;
+    -fx-fill: -fx-primary;
+}
+.filter-list .check-item.checked .glyph-icon {
+    -fx-fill: -fx-accent;
+}
+.filter-list .header {
+    -fx-background-color: -fx-primary;
+    -fx-font-size: 16;
+    -fx-padding: 8px 12px;
+}
+.filter-list .header .label {
+    -fx-text-fill: white;
+    -fx-padding: 0 0 0 10px;
+}
+.filter-list .header .glyph-icon {
+    -glyph-size: 20;
+    -fx-fill: white;
+}
+.filter-list .header:hover {
+    -fx-background-color: -fx-primary-hover;
+}
+.filter-list .header:pressed {
+    -fx-background-color: -fx-primary-press;
+}

@@ -3,23 +3,16 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import org.controlsfx.control.CheckListView?>
+
 <BorderPane fx:id="root" prefWidth="240.0" styleClass="organizer" stylesheets="@style.css"
             xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="at.ac.tuwien.qse.sepm.gui.Organizer">
     <center>
-        <VBox>
-            <Button fx:id="resetButton" text="Zurücksetzen"/>
-            <Label text="Bewertung"/>
-            <CheckListView fx:id="ratingListView"/>
-            <Label text="Kategorien"/>
-            <CheckBox fx:id="untaggedCheckBox" text="Ohne Kategorie"/>
-            <CheckListView fx:id="categoryListView"/>
-            <Label text="Fotografen"/>
-            <CheckListView fx:id="photographerListView"/>
-            <Label text="Monate"/>
-            <CheckListView fx:id="monthListView"/>
-        </VBox>
+        <ScrollPane hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
+            <VBox fx:id="filterContainer">
+                <Button fx:id="resetButton" text="Zurücksetzen"/>
+            </VBox>
+        </ScrollPane>
     </center>
     <bottom>
         <HBox prefHeight="40.0" styleClass="navbar">
