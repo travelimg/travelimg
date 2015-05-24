@@ -173,6 +173,7 @@ public class Organizer {
         );
 
         refreshLists();
+        resetFilter();
     }
 
     private void handleFilterChange() {
@@ -275,5 +276,17 @@ public class Organizer {
             dialog.showAndWait();
             return new ArrayList<>();
         }
+    }
+
+    private void resetFilter() {
+        categoryListView.getCheckModel().checkAll();
+        ratingListView.getCheckModel().checkAll();
+        photographerListView.getCheckModel().checkAll();
+        monthListView.getCheckModel().checkAll();
+
+        filter.getIncludedCategories().addAll(getAllCategories());
+        filter.getIncludedRatings().addAll(getAllRatings());
+        filter.getIncludedPhotographers().addAll(getAllPhotographers());
+        filter.getIncludedMonths().addAll(getAllMonths());
     }
 }
