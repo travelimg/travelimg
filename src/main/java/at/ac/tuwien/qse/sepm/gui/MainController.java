@@ -76,9 +76,14 @@ public class MainController {
         });
 
         // Updated photos that no longer match the filter are removed from the grid.
-        inspector.setUpdateHandler(photos -> photos.stream()
-                .filter(filter.negate())
-                .forEach(grid::removePhoto));
+        inspector.setUpdateHandler(photos -> {
+            photos.stream()
+                    .filter(filter.negate())
+                    .forEach(grid::removePhoto);
+            photos.stream()
+                    .filter(filter)
+                    .forEach(grid::updatePhoto);
+        });
 
         // Deleted photos are removed from the grid.
         inspector.setDeleteHandler(photos -> photos.forEach(grid::removePhoto));
