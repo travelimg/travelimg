@@ -6,9 +6,12 @@ import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 
 import java.time.YearMonth;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.logging.LogManager;
 
 public class PhotoFilter implements Predicate<Photo> {
 
@@ -125,6 +128,35 @@ public class PhotoFilter implements Predicate<Photo> {
 
     @Override
     public boolean test(Photo photo) {
-        return true;
+        return  testRating(photo) &&
+                testCategories(photo) &&
+                testPhotographer(photo) &&
+                testMonth(photo);
+    }
+
+    private boolean testRating(Photo photo) {
+        return getIncludedRatings().contains(photo.getRating());
+    }
+
+    private boolean testPhotographer(Photo photo) {
+        return getIncludedPhotographers().contains(photo.getPhotographer());
+    }
+
+    private boolean testCategories(Photo photo) {
+        if (photo.getTags().isEmpty()) {
+            return isUntaggedIncluded();
+        }
+        return hasCategory(photo);
+    }
+
+    private boolean testMonth(Photo photo) {
+        return getIncludedMonths().contains(YearMonth.from(photo.getDatetime()));
+    }
+
+    private boolean hasCategory(Photo photo) {
+        for (Tag category : getIncludedCategories()) {
+            if (photo.getTags().contains(category)) return true;
+        }
+        return false;
     }
 }
