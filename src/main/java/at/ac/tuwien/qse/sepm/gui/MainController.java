@@ -174,9 +174,9 @@ public class MainController {
                             }
                         });
 
-                        tilePane.getChildren().add(imageTile);
 
                         flowPane.getChildren().add(imageTile);
+                        System.out.println("test");
                     }
                 }
             }
