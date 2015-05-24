@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * Controller for the main view.
@@ -39,8 +40,8 @@ public class MainController {
     @FXML private ScrollPane gridContainer;
 
     private final PhotoGrid grid = new PhotoGrid();
-    private PhotoFilter filter = new PhotoFilter();
     private final List<Photo> selection = new ArrayList<Photo>();
+    private Predicate<Photo> filter = new PhotoFilter();
 
     @FXML
     private void initialize() {
@@ -64,22 +65,26 @@ public class MainController {
 
         organizer.setFilterChangeAction(this::handleFilterChange);
 
-        grid.setSelectionChangeAction((selection) -> {
-            if (selection.size() == 0) return;
-            for (Photo photo : selection) {
-                inspector.addActivePhoto(photo);
-            }
-        });
+        // Selected photos are shown in the inspector.
+        grid.setSelectionChangeAction(inspector::setActivePhotos);
 
-        // NOTE: Select all photos when user presses CTRL+A.
+        // CTRL+A select all photos.
         root.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.isControlDown() && event.getCode() == KeyCode.A) {
                 grid.selectAll();
             }
         });
 
+        // Updated photos that no longer match the filter are removed from the grid.
+        inspector.setUpdateHandler(photos -> photos.stream()
+                .filter(filter.negate())
+                .forEach(grid::removePhoto));
+
+        // Deleted photos are removed from the grid.
+        inspector.setDeleteHandler(photos -> photos.forEach(grid::removePhoto));
+
         // Apply the initial filter.
-        reloadImages();
+        handleFilterChange(organizer.getFilter());
     }
 
     private void handleImportError(Throwable error) {

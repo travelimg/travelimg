@@ -30,9 +30,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Controller for the inspector view which is used for modifying meta-data of a photo.
@@ -58,32 +57,54 @@ public class Inspector {
     private TagSelector tagSelector;
     private GoogleMapsScene mapsScene;
 
-    private ArrayList<Photo> activePhotos = new ArrayList<Photo>();
+    private final List<Photo> activePhotos = new ArrayList<>();
 
-    @Autowired private Organizer organizer;
+    private Consumer<Collection<Photo>>  updateHandler;
+    private Consumer<Collection<Photo>>  deleteHandler;
+
     @Autowired private PhotoService photoservice;
     @Autowired private ExifService exifService;
     @Autowired private TagService tagService;
-    @Autowired private MainController mainController;
 
     /**
-     * Adds a new photo to the selected ones.
-     * <p/>
-     * The photos metadata will be displayed in the inspector widget.
+     * Get the photos the inspector currently operates on.
      *
-     * @param photo The new added photo.
+     * @return collection of photos
      */
-    public void addActivePhoto(Photo photo) {
-        LOGGER.debug("addActivePhoto({})", photo);
-        activePhotos.add(photo);
-        mapsScene.addMarker(photo);
-        showDetails(activePhotos.get(0));
+    public Collection<Photo> getActivePhotos() {
+        return new ArrayList<>(activePhotos);
     }
 
-    public void removeActivePhoto(Photo photo){
-        LOGGER.debug("removeActivePhoto({})", photo);
-        activePhotos.remove(photo);
-        mapsScene.removeMarker(photo);
+    /**
+     * Get the photos the inspector currently operates on.
+     *
+     * @return collection of photos
+     */
+    public void setActivePhotos(Collection<Photo> photos) {
+        if (photos == null) photos = new LinkedList<>();
+        activePhotos.clear();
+        mapsScene.clearMarkers();
+        activePhotos.addAll(photos);
+        activePhotos.forEach(photo -> mapsScene.addMarker(photo));
+        showDetails(activePhotos);
+    }
+
+    /**
+     * Set a function that is invoked when the active photos are modified.
+     *
+     * @param updateHandler
+     */
+    public void setUpdateHandler(Consumer<Collection<Photo>>  updateHandler) {
+        this.updateHandler = updateHandler;
+    }
+
+    /**
+     * Set a function that is invoked when the active photos are deleted.
+     *
+     * @param deleteHandler
+     */
+    public void setDeleteHandler(Consumer<Collection<Photo>> deleteHandler) {
+        this.deleteHandler = deleteHandler;
     }
 
     @FXML private void initialize() {
@@ -115,13 +136,15 @@ public class Inspector {
 
         try {
             photoservice.deletePhotos(activePhotos);
-            mainController.deletePhotos();
-            activePhotos.clear();
-            mapsScene.clearMarkers();
-        } catch (ServiceException e) {
-            //TODO Exception handling
+            onDelete();
+        } catch (ServiceException ex) {
+            LOGGER.error("failed deleting photos", ex);
+            InfoDialog dialog = new InfoDialog(root, "Fehler");
+            dialog.setError(true);
+            dialog.setHeaderText("Fehler beim Löschen");
+            dialog.setContentText("Die ausgewählten Fotos konnten nicht gelöscht werden.");
+            dialog.showAndWait();
         }
-
     }
 
     private void handleCancel(Event event) {
@@ -150,6 +173,8 @@ public class Inspector {
 
         try {
             photoservice.savePhotoRating(activePhotos.get(0));
+            onUpdate();
+
         } catch (ServiceException ex) {
             LOGGER.error("Failed saving photo rating.", ex);
             LOGGER.debug("Resetting rating from {} to {}.", activePhotos.get(0).getRating(), oldValue);
@@ -170,13 +195,16 @@ public class Inspector {
         }
     }
 
-    private void showDetails(Photo photo) {
-        if (photo == null) {
+    private void showDetails(List<Photo> photos) {
+        if (photos.size() == 0) {
             details.setVisible(false);
             return;
         }
 
         details.setVisible(true);
+
+        // TODO: show details for all photos
+        Photo photo = photos.get(0);
         tagSelector.showCurrentlySetTags(photo);
         ratingPicker.setRating(photo.getRating());
 
@@ -196,8 +224,21 @@ public class Inspector {
             exifValue.setCellValueFactory(new PropertyValueFactory<>("Value"));
             exifTable.setItems(exifData);
         } catch (ServiceException e) {
-            //TODO Dialog
+            // TODO Dialog
         }
+    }
+
+    private void onUpdate() {
+        if (updateHandler != null) {
+            updateHandler.accept(getActivePhotos());
+        }
+    }
+
+    private void onDelete() {
+        if (deleteHandler != null) {
+            deleteHandler.accept(getActivePhotos());
+        }
+        setActivePhotos(null);
     }
 
     private class TagListChangeListener implements ListChangeListener<Tag> {
