@@ -15,15 +15,18 @@
     -fx-dropshadow-3: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 9, 0, 0, 3);
     -fx-dropshadow-4: dropshadow(gaussian, rgba(0, 0, 0, 0.50), 11, 0, 0, 4);
 
-    /* blue theme */
-    -fx-primary: #8BC34A;
-    -fx-primary-focus: #9CCC65;
-    -fx-primary-hover: #9CCC65;
-    -fx-primary-press: #7CB342;
+    -fx-primary: #333333;
+    -fx-primary-focus: #444444;
+    -fx-primary-hover: #444444;
+    -fx-primary-press: #222222;
     -fx-primary-light-focus: #F1F8E9;
     -fx-primary-light-hover: #F1F8E9;
     -fx-primary-light-press: #DCEDC8;
     -fx-danger: #FFA726;
+
+    -fx-accent: #E91E63;
+    -fx-accent-light: #EC407A;
+    -fx-accent-dark: #D81B60;
 }
 
 * {
@@ -148,7 +151,7 @@
     -fx-padding: 11px 0 4px 0;
 }
 .text-field:focused {
-    -fx-border-color: -fx-primary;
+    -fx-border-color: -fx-accent;
 }
 
 .combo-box {
@@ -161,7 +164,7 @@
     -fx-padding: 11px 0 0 0;
 }
 .combo-box:focused {
-    -fx-border-color: -fx-primary;
+    -fx-border-color: -fx-accent;
 }
 .combo-box .text-input {
     -fx-padding: 0 0 4px 0;
@@ -282,7 +285,6 @@
 .dialog .note .glyph-icon {
     -glyph-size: 50;
     -fx-fill: white;
-    -fx-opacity: 0.5;
 }
 
 .navbar {
@@ -363,7 +365,7 @@
 }
 .photo-tile.selected {
     -fx-effect: -fx-dropshadow-3;
-    -fx-background-color: black;
+    -fx-background-color: -fx-primary;
 }
 .photo-tile .overlay {
     -fx-max-height: 20px;
@@ -396,7 +398,8 @@
     -fx-text-fill: white;
     -fx-font-size: 10px;
 }
-.photo-tile .tooltip {
+
+.tooltip {
     -fx-effect: -fx-dropshadow-3;
     -fx-background-color: white;
     -fx-text-fill: black;
@@ -443,4 +446,52 @@
 }
 .import-dialog .note .glyph-icon {
     -glyph-name: "INFO_CIRCLE";
+}
+
+.tab-pane {
+    -fx-padding: 0;
+}
+.tab-pane .tab-header-area {
+    -fx-padding: 0;
+}
+.tab-pane .tab-header-background {
+    -fx-background-color: -fx-primary;
+    -fx-padding: 0;
+}
+.tab {
+    -fx-background-insets: 0;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-padding: 24px 20px 24px 20px;
+}
+.tab:hover {
+    -fx-background-color: -fx-primary-hover;
+}
+.tab:pressed {
+    -fx-background-color: -fx-primary-press;
+}
+.tab * {
+    -fx-border-width: 0;
+}
+.tab .tab-label {
+    -fx-text-fill: rgba(255, 255, 255, 0.5);
+    -fx-font-size: 14px;
+    -fx-background-color: transparent;
+}
+.tab .glyph-icon {
+    -fx-fill: rgba(255, 255, 255, 0.5);
+    -glyph-size: 30;
+}
+.tab:selected {
+    -fx-background-color: -fx-accent;
+}
+.tab:selected .tab-label {
+    -fx-text-fill: white;
+    -fx-background-color: transparent;
+}
+.tab:selected .glyph-icon {
+    -fx-fill: white;
+}
+.tab-content-area {
+    -fx-background-color: -fx-background;
 }
