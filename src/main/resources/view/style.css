@@ -388,3 +388,11 @@
 .import-dialog .note .glyph-icon {
     -glyph-name: "INFO_CIRCLE";
 }
+
+.stop .glyph-icon {
+    -glyph-name: "STOP";
+}
+
+.progress-bar > .bar {
+    -fx-padding: 6px;
+}

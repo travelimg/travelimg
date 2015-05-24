@@ -8,6 +8,7 @@ import at.ac.tuwien.qse.sepm.service.FlickrService;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl;
+import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
@@ -28,10 +29,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -52,6 +50,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class FlickrDialog extends ResultDialog<List<Photo>> {
@@ -59,7 +58,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     @FXML private HBox progress;
     @FXML private ProgressBar progressBar;
     @FXML private FlowPane photosFlowPane;
-    @FXML private Button downloadButton, importButton;
+    @FXML private Button downloadButton, importButton, stopButton;
     @FXML private Pane mapContainer;
     @FXML private ScrollPane scrollPane;
     @FXML private FlowPane keywordsFlowPane;
@@ -72,6 +71,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     private Marker actualMarker;
     private LatLong actualLatLong;
     private ArrayList<ImageTile> selectedImages = new ArrayList<ImageTile>();
+    private Cancelable downloadTask;
     private static final Logger logger = LogManager.getLogger();
 
     public FlickrDialog(Node origin, String title) {
@@ -126,7 +126,12 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
                 }
             }
         });
+        progressBar.getStyleClass().add("progress-bar");
+        progressBar.setTooltip(new Tooltip("Fotos werden heruntergeladen..."));
+        stopButton.setTooltip(new Tooltip("Abbrechen"));
     }
+
+
 
     public void addKeyword(String keyword){
         HBox hbox = new HBox();
@@ -181,10 +186,25 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
         for(ImageTile i: selectedImages){
             photos.add(i.getPhoto());
         }
-        //TODO at this point, photos are ready to import
         setResult(photos);
         selectedImages.clear();
         close();
+    }
+
+    @FXML
+    public void handleOnStopButtonClicked(){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Download abbrechen");
+        alert.setHeaderText("Download abbrechen?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            if(downloadTask!=null)
+                downloadTask.cancel();
+            progress.setVisible(false);
+            progressBar.setProgress(0.0);
+            downloadButton.setDisable(false);
+        }
     }
 
     private void downloadPhotos(){
@@ -205,7 +225,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
                 longitude = actualLatLong.getLongitude();
                 useGeoData = true;
             }
-            flickrService.downloadPhotos(tags,latitude, longitude,true,useGeoData,new Consumer<Photo>() {
+            downloadTask = flickrService.downloadPhotos(tags,latitude, longitude,true,useGeoData,new Consumer<Photo>() {
 
                 public void accept(Photo photo) {
 

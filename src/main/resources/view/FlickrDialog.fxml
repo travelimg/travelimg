@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.ProgressBar?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.TilePane?>
-
+<?import javafx.scene.text.Font?>
 <fx:root fx:id="root" prefHeight="495.0" prefWidth="593.0" styleClass="dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
 <AnchorPane prefHeight="495.0" prefWidth="593.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox fx:id="progress" alignment="CENTER" layoutX="310.0" layoutY="424.0" spacing="5.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
-                  <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="17.0" stroke="BLACK" strokeType="INSIDE" width="19.0" />
+             <Button fx:id="stopButton" onAction="#handleOnStopButtonClicked" styleClass="stop" >
+                 <graphic>
+                     <FontAwesomeIconView/>
+                 </graphic>
+             </Button>
               <ProgressBar fx:id="progressBar" layoutX="381.0" layoutY="424.0" progress="0.0" />
          </children>
       </HBox>
