@@ -111,7 +111,6 @@ public class MainController {
            if(weltkarte.isSelected() && gitterSelect){
                gitterSelect=false;
                inspector.disableDetails();
-
                worldMap = new GoogleMapsScene(getAllPhotos());
                weltkarte.setContent(worldMap.getMapView());
            }
@@ -175,12 +174,12 @@ public class MainController {
                         });
 
 
-                        flowPane.getChildren().add(imageTile);
-                        System.out.println("test");
+
                     }
                 }
             }
         });
+        flowPane.getChildren().add(imageTile);
 
     }
 

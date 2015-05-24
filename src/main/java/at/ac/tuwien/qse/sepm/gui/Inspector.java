@@ -81,7 +81,7 @@ public class Inspector {
     public void addActivePhoto(Photo photo) {
         LOGGER.debug("addActivePhoto({})", photo);
         activePhotos.add(photo);
-        mapsScene.addMarkerList(activePhotos);
+        mapsScene.addMarker(activePhotos.get(0));
         showDetails(activePhotos.get(0));
     }
 
