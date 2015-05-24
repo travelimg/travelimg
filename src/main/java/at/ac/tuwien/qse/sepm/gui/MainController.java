@@ -73,7 +73,6 @@ public class MainController {
 
     public MainController() {
 
-        tabs = new TabPane();
 
     }
 
@@ -112,7 +111,7 @@ public class MainController {
            if(weltkarte.isSelected() && gitterSelect){
                gitterSelect=false;
                inspector.disableDetails();
-               System.out.println("test");
+
                worldMap = new GoogleMapsScene(getAllPhotos());
                weltkarte.setContent(worldMap.getMapView());
            }
@@ -146,6 +145,7 @@ public class MainController {
     public void addPhoto(Photo photo) {
         ImageTile imageTile = new ImageTile(photo);
         activePhotos.add(photo);
+
         imageTile.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent event) {
                 if (event.isControlDown()) {

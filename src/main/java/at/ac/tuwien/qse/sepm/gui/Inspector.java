@@ -105,7 +105,7 @@ public class Inspector {
 
     }
     @FXML private void initialize() {
-        mapsScene = new GoogleMapsScene();
+       // mapsScene = new GoogleMapsScene();
         tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService);
 
 
@@ -119,7 +119,7 @@ public class Inspector {
         confirmButton.setOnAction(this::handleConfirm);
         ratingPickerContainer.getChildren().add(ratingPicker);
         ratingPicker.ratingProperty().addListener(this::handleRatingChanged);
-        mapContainer.getChildren().add(mapsScene.getMapView());
+//        mapContainer.getChildren().add(mapsScene.getMapView());
         //addActivePhoto(null);
         tagSelectionContainer.getChildren().add(tagSelector);
     }
@@ -132,8 +132,8 @@ public class Inspector {
         Optional<List<Photo>> photos = deleteDialog.showForResult();
         if (!photos.isPresent()) return;
 
-        List<Photo> photos = new ArrayList<>();
-        photos.add(photo);
+        List<Photo> photoss = new ArrayList<>();
+        photoss.add(photo);
         organizer.reloadPhotos();
         try {
             photoservice.deletePhotos(activePhotos);
@@ -198,6 +198,8 @@ public class Inspector {
         return this.mapsScene;
 
     }
+
+
     private void showDetails(Photo photo) {
         if (photo == null) {
             details.setVisible(false);
@@ -208,13 +210,10 @@ public class Inspector {
         tagSelector.showCurrentlySetTags(photo);
         ratingPicker.setRating(photo.getRating());
 
-        mapsScene.addMarker(photo);
-
-        Exif exif = null;
         try {
             Exif exif = exifService.getExif(photo);
             ObservableList<Pair<String, String>> exifData = FXCollections.observableArrayList(
-                    new Pair<>("Aufnahmedatum", photo.getDate().toString()),
+                    new Pair<>("Aufnahmedatum", photo.getDatetime().toString()),
                     new Pair<>("Kamerahersteller", exif.getMake()),
                     new Pair<>("Kameramodell", exif.getModel()),
                     new Pair<>("Belichtungszeit", exif.getExposure() + " Sek."),
@@ -229,6 +228,33 @@ public class Inspector {
         } catch (ServiceException e) {
             //TODO Dialog
         }
+    }
 
+    private class TagListChangeListener implements ListChangeListener<Tag> {
+        public void onChanged(ListChangeListener.Change<? extends Tag> change) {
+            while(change.next()) {
+                List<Photo> photoList = new ArrayList<>();
+                if (activePhotos.get(0) != null) {
+                    photoList.add(activePhotos.get(0));
+                }
+
+                if (change.wasAdded()) {
+                    Tag added = change.getAddedSubList().get(0);
+                    try {
+                        photoservice.addTagToPhotos(photoList, added);
+                    } catch (ServiceException ex) {
+                        //TODO Dialog
+                    }
+                }
+                if (change.wasRemoved()) {
+                    Tag removed = change.getRemoved().get(0);
+                    try {
+                        photoservice.removeTagFromPhotos(photoList, removed);
+                    } catch (ServiceException ex) {
+                        //TODO Dialog
+                    }
+                }
+            }
+        }
     }
 }

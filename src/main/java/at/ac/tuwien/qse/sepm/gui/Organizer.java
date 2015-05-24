@@ -167,6 +167,7 @@ public class Organizer {
                     return;
 
                 mainController.addPhoto(photo);
+
             }
         );
     }
