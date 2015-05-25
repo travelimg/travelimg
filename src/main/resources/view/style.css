@@ -316,21 +316,30 @@
     -fx-opacity: 0.3;
 }
 
-.photo-grid {
+.image-grid {
     -fx-padding: 16px;
     -fx-background-color: #dddddd;
     -fx-hgap: 16px;
     -fx-vgap: 16px;
 }
-
-.photo-tile {
+.image-tile {
     -fx-background-color: #eeeeee;
     -fx-effect: -fx-dropshadow-2;
 }
-.photo-tile.selected {
+.image-tile.selected {
     -fx-effect: -fx-dropshadow-3;
     -fx-background-color: -fx-primary;
 }
+.image-tile .progress-indicator {
+    -fx-progress-color: rgba(0, 0, 0, 0.3);
+}
+.image-tile:hover .progress-indicator {
+    -fx-progress-color: rgba(0, 0, 0, 0.6);
+}
+.image-tile:selected .progress-indicator {
+    -fx-progress-color: rgba(0, 0, 0, 0.6);
+}
+
 .photo-tile .overlay {
     -fx-max-height: 20px;
     -fx-padding: 8px;
@@ -349,16 +358,7 @@
 .photo-tile .overlay .glyph-icon:hover {
     -fx-fill: white;
 }
-.photo-tile .progress-indicator {
-    -fx-progress-color: rgba(0, 0, 0, 0.3);
-}
-.photo-tile:hover .progress-indicator {
-    -fx-progress-color: rgba(0, 0, 0, 0.6);
-}
-.photo-tile:selected .progress-indicator {
-    -fx-progress-color: rgba(0, 0, 0, 0.6);
-}
-.photo-tile .date {
+.photo-tile .overlay .date {
     -fx-text-fill: white;
     -fx-font-size: 10px;
 }
