@@ -7,6 +7,9 @@ import com.lynden.gmapsfx.javascript.object.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by christoph on 08.05.15.
  */
@@ -17,7 +20,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     private GoogleMapView mapView;
     private GoogleMap map;
     //new LatLong(40.7033127, -73.979681); // the default Location
-    private Marker actualMarker;
+    private HashMap<Photo,Marker> actualMarkers = new HashMap<Photo,Marker>();
 
     /**
      * Default Constructor
@@ -62,16 +65,27 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     }
 
     public void addMarker(Photo photo){
-        if(actualMarker!=null)
-            map.removeMarker(actualMarker);
-        actualMarker = new Marker(new MarkerOptions().position(new LatLong(photo.getLatitude(),
-                photo.getLongitude())).visible(Boolean.TRUE));
+        Marker marker = new Marker(new MarkerOptions().position(new LatLong(photo.getLatitude(), photo.getLongitude())));
+        actualMarkers.put(photo,marker);
         mapView.setCenter(photo.getLatitude(), photo.getLongitude());
-        mapView.setZoom(1);//workaround to remove the old marker from the view
-        mapView.setZoom(12);
         //actualMarker.setTitle(photo.getPhotographer().getName());
-        map.addMarker(actualMarker);
+        map.addMarker(marker);
 
+    }
+
+    public void removeMarker(Photo photo){
+        Marker marker = actualMarkers.get(photo);
+        map.removeMarker(marker);
+        actualMarkers.remove(photo);
+        //mapView.setZoom(1);//workaround to remove the old marker from the view
+        //mapView.setZoom(12);
+    }
+
+    public void clearMarkers(){
+        for (Map.Entry<Photo, Marker> entry : actualMarkers.entrySet()) {
+            map.removeMarker(entry.getValue());
+        }
+        actualMarkers.clear();
     }
 
 }

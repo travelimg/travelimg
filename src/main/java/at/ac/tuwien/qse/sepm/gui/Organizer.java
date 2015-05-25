@@ -1,34 +1,39 @@
 package at.ac.tuwien.qse.sepm.gui;
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
+import at.ac.tuwien.qse.sepm.entities.Photographer;
+import at.ac.tuwien.qse.sepm.entities.Rating;
+import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
-import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.util.Cancelable;
-import javafx.application.Platform;
+import at.ac.tuwien.qse.sepm.service.TagService;
+import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.TitledPane;
+import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.control.CheckListView;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Observable;
+import java.util.function.Consumer;
 
 /**
  * Controller for organizer view which is used for browsing photos by month.
@@ -39,202 +44,190 @@ public class Organizer {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired private ImportService importService;
     @Autowired private PhotoService photoService;
     @Autowired private PhotographerService photographerService;
-
-    @Autowired private MainController mainController;
+    @Autowired private TagService tagService;
 
     @FXML private BorderPane root;
     @FXML private Button importButton;
+    @FXML private Button flickrButton;
     @FXML private Button presentButton;
-    @FXML private ListView<YearMonth> monthList;
 
-    private final ObservableList<YearMonth> months = FXCollections.observableArrayList();
+    @FXML private VBox filterContainer;
+    @FXML private FilterList<Rating> ratingListView;
+    @FXML private FilterList<Tag> categoryListView;
+    @FXML private FilterList<Photographer> photographerListView;
+    @FXML private FilterList<YearMonth> monthListView;
+
+    @FXML private Button resetButton;
+
     private final DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy MMM");
-    private final MonthSelector monthSelector = new MonthSelector(null);
-    private Cancelable loadingTask;
+    private final PhotoFilter filter = new PhotoFilter();
+    private Consumer<PhotoFilter> filterChangeCallback;
 
-    public Organizer() {
+    public void setPresentAction(Runnable callback) {
+        LOGGER.debug("setting present action");
+        presentButton.setOnAction(event -> callback.run());
+    }
 
+    public void setImportAction(Runnable callback) {
+        LOGGER.debug("setting import action");
+        importButton.setOnAction(event -> callback.run());
+    }
+
+    public void setFlickrAction(Runnable callback) {
+        LOGGER.debug("setting flickr action");
+        flickrButton.setOnAction(event -> callback.run());
+    }
+
+    public void setFilterChangeAction(Consumer<PhotoFilter> callback) {
+        LOGGER.debug("setting filter change action");
+        filterChangeCallback = callback;
+    }
+
+    public PhotoFilter getFilter() {
+        return new PhotoFilter(filter);
     }
 
     @FXML
     private void initialize() {
-        importButton.setOnAction(this::handleImport);
-        presentButton.setOnAction(this::handlePresent);
 
-        SortedList<YearMonth> monthsSorted = new SortedList<>(months);
-        monthsSorted.setComparator((a, b) -> b.compareTo(a));
-        monthList.setItems(monthsSorted);
+        resetButton.setOnAction(event -> resetFilter());
 
-        monthList.setCellFactory(list -> new ListCell<YearMonth>() {
-            @Override protected void updateItem(YearMonth item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) return;
-                String monthString = monthFormatter.format(item);
-                setText(monthString);
+        ratingListView = new FilterList<>(value -> {
+            switch (value) {
+                case GOOD: return "Gut";
+                case NEUTRAL: return "Neutral";
+                case BAD: return "Schlecht";
+                default: return "Unbewertet";
             }
         });
-
-        monthList.getSelectionModel().selectedItemProperty().addListener(this::handleMonthChange);
-
-        months.addAll(getAvailableMonths());
-    }
-
-    public void reloadPhotos() {
-        YearMonth selected = monthList.getSelectionModel().getSelectedItem();
-        handleMonthChange(null, null, selected);
-    }
-
-    private void handleImport(Event event) {
-        ImportDialog dialog = new ImportDialog(root, photographerService);
-
-        Optional<List<Photo>> photos = dialog.showForResult();
-        if (!photos.isPresent()) return;
-
-        importService.importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
-    }
-
-    private void handleImportError(Throwable error) {
-        LOGGER.error("Import error", error);
-
-        // queue an update in the main gui
-        Platform.runLater(() -> {
-                InfoDialog dialog = new InfoDialog(root, "Import Fehler");
-                dialog.setError(true);
-                dialog.setHeaderText("Import fehlgeschlagen");
-                dialog.setContentText("Fehlermeldung: " + error.getMessage());
-                dialog.showAndWait();
-            }
-        );
-    }
-
-    private void handleLoadError(Throwable error) {
-        LOGGER.error("Load error", error);
-
-        // queue an update in the main gui
-        Platform.runLater(() -> {
-                    InfoDialog dialog = new InfoDialog(root, "Lade Fehler");
-                    dialog.setError(true);
-                    dialog.setHeaderText("Laden von Fotos fehlgeschlagen");
-                    dialog.setContentText("Fehlermeldung: " + error.getMessage());
-                    dialog.showAndWait();
-                });
-    }
-
-    /**
-     * Called whenever a new photo is imported
-     * @param photo The newly imported    photo
-     */
-    private void handleImportedPhoto(Photo photo) {
-        // queue an update in the main gui
-        Platform.runLater(() -> {
-            updateMonthListWithDate(photo.getDatetime());
-
-            // Ignore photos that are not part of the current filter.
-            if (!monthSelector.matches(photo)) {
-                return;
-            }
-
-            mainController.addPhoto(photo);
+        ratingListView.setTitle("Bewertungen");
+        ratingListView.setChangeHandler(this::handleRatingsChange);
+        categoryListView = new FilterList<>(value -> {
+            if (value == null) return "Nicht kategorisiert";
+            return value.getName();
         });
+        categoryListView.setTitle("Kategorien");
+        categoryListView.setChangeHandler(this::handleCategoriesChange);
+        photographerListView = new FilterList<>(value -> value.getName());
+        photographerListView.setTitle("Fotografen");
+        photographerListView.setChangeHandler(this::handlePhotographersChange);
+        monthListView = new FilterList<>(value -> monthFormatter.format(value));
+        monthListView.setTitle("Monate");
+        monthListView.setChangeHandler(this::handleMonthsChange);
+        filterContainer.getChildren().addAll(ratingListView, categoryListView, photographerListView,
+                monthListView);
+
+        refreshLists();
+        resetFilter();
     }
 
-    /**
-     * Called whenever a new photo is loaded from the service layer
-     * @param photo The newly loaded photo
-     */
-    private void handleLoadedPhoto(Photo photo) {
-        // queue an update in the main gui
-        Platform.runLater(() -> {
-                // Ignore photos that are not part of the current filter.
-                if(!monthSelector.matches(photo))
-                    return;
-
-                mainController.addPhoto(photo);
-            }
-        );
+    private void handleFilterChange() {
+        LOGGER.debug("filter changed");
+        if (filterChangeCallback == null) return;
+        filterChangeCallback.accept(getFilter());
+    }
+    private void handleRatingsChange(List<Rating> values) {
+        LOGGER.debug("rating filter changed");
+        filter.getIncludedRatings().clear();
+        filter.getIncludedRatings().addAll(values);
+        handleFilterChange();
+    }
+    private void handleCategoriesChange(List<Tag> values) {
+        LOGGER.debug("category filter changed");
+        filter.setUntaggedIncluded(values.contains(null));
+        values.remove(null);
+        filter.getIncludedCategories().clear();
+        filter.getIncludedCategories().addAll(values);
+        handleFilterChange();
+    }
+    private void handlePhotographersChange(List<Photographer> values) {
+        LOGGER.debug("photographer filter changed");
+        filter.getIncludedPhotographers().clear();
+        filter.getIncludedPhotographers().addAll(values);
+        handleFilterChange();
+    }
+    private void handleMonthsChange(List<YearMonth> values) {
+        LOGGER.debug("month filter changed");
+        filter.getIncludedMonths().clear();
+        filter.getIncludedMonths().addAll(values);
+        handleFilterChange();
     }
 
-    /**
-     * Show the current photo selection in fullscreen.
-     * @param event The event triggering the request.
-     */
-    private void handlePresent(Event event) {
-        // TODO
+    private void refreshLists() {
+        LOGGER.debug("refreshing filter");
+
+        ratingListView.setValues(getAllRatings());
+        categoryListView.setValues(getAllCategories());
+        photographerListView.setValues(getAllPhotographers());
+        monthListView.setValues(getAllMonths());
     }
-
-    /**
-     * Display photos for a newly selected month
-     *
-     * @param observable The observable value which changed
-     * @param oldValue The previously selected month
-     * @param newValue The newly selected month
-     */
-    private void handleMonthChange(ObservableValue<? extends YearMonth> observable, YearMonth oldValue, YearMonth newValue) {
-        // cancel an older ongoing loading task
-        if(loadingTask != null) {
-            loadingTask.cancel();
-        }
-
-        monthSelector.setMonth(newValue);
-
-        // remove currently active photos
-        mainController.clearPhotos();
-
-        // load photos from current month
-        this.loadingTask = photoService.loadPhotosByMonth(newValue, this::handleLoadedPhoto, this::handleLoadError);
+    private List<Rating> getAllRatings() {
+        LOGGER.debug("fetching ratings");
+        List<Rating> list = new LinkedList<Rating>();
+        list.add(Rating.GOOD);
+        list.add(Rating.NEUTRAL);
+        list.add(Rating.BAD);
+        list.add(Rating.NONE);
+        LOGGER.debug("fetching ratings succeeded with {} items", list.size());
+        return list;
     }
-
-    /**
-     * Add a new month to the list if it is not already included.
-     * @param date represents the month to add
-     */
-    private void updateMonthListWithDate(LocalDateTime date) {
-        YearMonth month = YearMonth.from(date);
-
-        if(!months.contains(month)) {
-            months.add(month);
-        }
-    }
-
-    /**
-     * Get a list of months for which we currently possess photos.
-     * @return A list of months for which photos are available
-     */
-    private List<YearMonth> getAvailableMonths() {
-        List<YearMonth> months = new ArrayList<>();
+    private List<Tag> getAllCategories() {
+        LOGGER.debug("fetching categories");
         try {
-            months = photoService.getMonthsWithPhotos();
+            List<Tag> list = tagService.getAllTags();
+            LOGGER.debug("fetching categories succeeded with {} items", list.size());
+            list.add(null);
+            return list;
         } catch (ServiceException ex) {
-            // TODO: show error dialog
+            LOGGER.error("fetching categories failed", ex);
+            InfoDialog dialog = new InfoDialog(root, "Fehler");
+            dialog.setError(true);
+            dialog.setHeaderText("Fehler beim Laden");
+            dialog.setContentText("Foto-Kategorien konnten nicht geladen werden.");
+            dialog.showAndWait();
+            return new ArrayList<>();
         }
-
-        return months;
+    }
+    private List<Photographer> getAllPhotographers() {
+        LOGGER.debug("fetching photographers");
+        try {
+            List<Photographer> list = photographerService.readAll();
+            LOGGER.debug("fetching photographers succeeded with {} items", list.size());
+            return list;
+        } catch (ServiceException ex) {
+            LOGGER.error("fetching photographers failed", ex);
+            InfoDialog dialog = new InfoDialog(root, "Fehler");
+            dialog.setError(true);
+            dialog.setHeaderText("Fehler beim Laden");
+            dialog.setContentText("Fotografen konnten nicht geladen werden.");
+            dialog.showAndWait();
+            return new ArrayList<>();
+        }
+    }
+    private List<YearMonth> getAllMonths() {
+        LOGGER.debug("fetching months");
+        try {
+            List<YearMonth> list = photoService.getMonthsWithPhotos();
+            LOGGER.debug("fetching months\" succeeded with {} items", list.size());
+            return list;
+        } catch (ServiceException ex) {
+            LOGGER.error("fetching months\" failed", ex);
+            InfoDialog dialog = new InfoDialog(root, "Fehler");
+            dialog.setError(true);
+            dialog.setHeaderText("Fehler beim Laden");
+            dialog.setContentText("Monate konnten nicht geladen werden.");
+            dialog.showAndWait();
+            return new ArrayList<>();
+        }
     }
 
-    /**
-     * Matches all photos that where taken in the same month as the current active month
-     */
-    private class MonthSelector implements PhotoSelector {
-        private YearMonth month;
-
-        public MonthSelector(YearMonth month) {
-            this.month = month;
-        }
-
-        public void setMonth(YearMonth month) {
-            this.month = month;
-        }
-
-        @Override
-        public boolean matches(Photo photo) {
-            if(month == null) {
-                return false;
-            }
-
-            return month.equals(YearMonth.from(photo.getDatetime()));
-        }
+    private void resetFilter() {
+        refreshLists();
+        categoryListView.checkAll();
+        ratingListView.checkAll();
+        photographerListView.checkAll();
+        monthListView.checkAll();
     }
 }

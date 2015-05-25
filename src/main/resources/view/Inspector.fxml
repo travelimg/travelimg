@@ -4,47 +4,52 @@
 <?import javafx.scene.layout.*?>
 
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<?import javafx.geometry.Insets?>
 <BorderPane fx:id="root" prefWidth="240.0" styleClass="inspector" stylesheets="@style.css"
             xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="at.ac.tuwien.qse.sepm.gui.Inspector">
     <center>
         <VBox>
-            <children>
-                <Label fx:id="placeholder" text="Kein Foto ausgewählt." VBox.vgrow="ALWAYS" alignment="CENTER" maxWidth="Infinity" maxHeight="Infinity"/>
-                <VBox fx:id="details" visible="false">
-                    <children>
-                    <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0" prefHeight="Infinity"/>
-                        <Pane fx:id="ratingPickerContainer"/>
-                        <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="200">
-                            <columns>
-                                <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
-                                <TableColumn fx:id="exifValue" prefWidth="100.0" text="Wert"/>
-                            </columns>
-                        </TableView>
-                    </children>
+            <Label fx:id="placeholder" text="Kein Foto ausgewählt." VBox.vgrow="ALWAYS"
+                   alignment="CENTER" maxWidth="Infinity" maxHeight="Infinity"/>
+            <VBox fx:id="details" visible="false">
+                <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0"
+                      prefHeight="Infinity"/>
+                <HBox fx:id="ratingPickerContainer"/>
+                <VBox fx:id="tagSelectionContainer">
+                    <VBox.margin>
+                        <Insets bottom="5"/>
+                    </VBox.margin>
                 </VBox>
-            </children>
+                <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="260">
+                    <columns>
+                        <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
+                        <TableColumn fx:id="exifValue" prefWidth="100.0" text="Wert"/>
+                    </columns>
+                </TableView>
+            </VBox>
         </VBox>
     </center>
     <bottom>
         <HBox prefHeight="40.0" styleClass="navbar">
-            <children>
-                <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity" styleClass="delete" HBox.hgrow="ALWAYS">
-                    <graphic>
-                        <FontAwesomeIconView/>
-                    </graphic>
-                </Button>
-                <Button fx:id="cancelButton" maxHeight="Infinity" maxWidth="Infinity" styleClass="cancel" HBox.hgrow="ALWAYS">
-                    <graphic>
-                        <FontAwesomeIconView/>
-                    </graphic>
-                </Button>
-                <Button fx:id="confirmButton" maxHeight="Infinity" maxWidth="Infinity" styleClass="confirm" HBox.hgrow="ALWAYS">
-                    <graphic>
-                        <FontAwesomeIconView/>
-                    </graphic>
-                </Button>
-            </children>
+            <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity"
+                    styleClass="delete" HBox.hgrow="ALWAYS">
+                <graphic>
+                    <FontAwesomeIconView glyphName="TRASH"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Ausgewählte löschen"/>
+                </tooltip>
+            </Button>
+            <Button fx:id="dropboxButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                <graphic>
+                    <FontAwesomeIconView glyphName="DROPBOX"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Dropbox-Export"/>
+                </tooltip>
+            </Button>
         </HBox>
     </bottom>
 </BorderPane>
