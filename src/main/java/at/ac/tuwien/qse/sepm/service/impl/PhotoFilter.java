@@ -6,12 +6,9 @@ import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 
 import java.time.YearMonth;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.logging.LogManager;
 
 public class PhotoFilter implements Predicate<Photo> {
 
@@ -20,8 +17,6 @@ public class PhotoFilter implements Predicate<Photo> {
     private final Set<Rating> includedRatings = new HashSet<>();
     private final Set<YearMonth> includedMonths = new HashSet<>();
     private boolean untaggedIncluded = false;
-    private boolean unassignedIncluded = false;
-    private boolean unratedIncluded = false;
 
     public PhotoFilter() { }
 
@@ -30,8 +25,6 @@ public class PhotoFilter implements Predicate<Photo> {
         getIncludedPhotographers().addAll(from.getIncludedPhotographers());
         getIncludedRatings().addAll(from.getIncludedRatings());
         getIncludedMonths().addAll(from.getIncludedMonths());
-        setUnassignedIncluded(from.isUnassignedIncluded());
-        setUnratedIncluded(from.isUnratedIncluded());
         setUntaggedIncluded(from.isUntaggedIncluded());
     }
 
@@ -88,42 +81,6 @@ public class PhotoFilter implements Predicate<Photo> {
      */
     public void setUntaggedIncluded(boolean untaggedIncluded) {
         this.untaggedIncluded = untaggedIncluded;
-    }
-
-    /**
-     * Get a value indicating that photos without photographer are included.
-     *
-     * @return true if photos without photographer are included, else false
-     */
-    public boolean isUnassignedIncluded() {
-        return unassignedIncluded;
-    }
-
-    /**
-     * Set a value indicating that photos without photographer are included.
-     *
-     * @param unassignedIncluded true if photos without photographer should be included, else false
-     */
-    public void setUnassignedIncluded(boolean unassignedIncluded) {
-        this.unassignedIncluded = unassignedIncluded;
-    }
-
-    /**
-     * Get a value indicating that photos without tags are included.
-     *
-     * @return true if untagged photos are included, else false
-     */
-    public boolean isUnratedIncluded() {
-        return unratedIncluded;
-    }
-
-    /**
-     * Set a value indicating that photos without photographer are included.
-     *
-     * @param unratedIncluded true if photos without rating should be included, else false
-     */
-    public void setUnratedIncluded(boolean unratedIncluded) {
-        this.unratedIncluded = unratedIncluded;
     }
 
     @Override
