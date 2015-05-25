@@ -503,3 +503,11 @@
 .filter-list .header:pressed {
     -fx-background-color: -fx-primary-press;
 }
+
+.stop .glyph-icon {
+    -glyph-name: "STOP";
+}
+
+.progress-bar > .bar {
+    -fx-padding: 6px;
+}

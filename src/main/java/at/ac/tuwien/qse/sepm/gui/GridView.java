@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.gui.dialogs.FlickrDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.ImportService;
@@ -55,7 +56,10 @@ public class GridView {
                     .importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
         });
         organizer.setFlickrAction(() -> {
-            // TODO
+            FlickrDialog flickrDialog = new FlickrDialog(root,"Flickr Import");
+            Optional<List<Photo>> photos = flickrDialog.showForResult();
+            if (!photos.isPresent()) return;
+            importService.importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
         });
 
         organizer.setPresentAction(() -> {

@@ -135,7 +135,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
 
     public void addKeyword(String keyword){
         HBox hbox = new HBox();
-        hbox.setStyle("-fx-background-radius: 5; -fx-background-color: #8BC34A; ");
+        hbox.setStyle("-fx-background-radius: 5; -fx-background-color: #E91E63; ");
         Text text = new Text(keyword);
         text.setFill(Color.WHITE);
         hbox.setAlignment(Pos.CENTER);
@@ -340,8 +340,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
          * Select this photo. Triggers an update of the inspector widget.
          */
         public void select() {
-            getStyleClass().remove("image-tile-non-selected");
-            getStyleClass().add("image-tile-selected");
+            setStyle("-fx-effect: dropshadow(three-pass-box, black, 5, 5, 0, 0);");
             this.selected.set(true);
         }
 
@@ -349,8 +348,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
          * Unselect a photo.
          */
         public void unselect() {
-            getStyleClass().remove("image-tile-selected");
-            getStyleClass().add("image-tile-non-selected");
+            setStyle("-fx-effect: null");
             this.selected.set(false);
         }
 
