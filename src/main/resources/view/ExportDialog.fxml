@@ -33,7 +33,7 @@
             <bottom>
                 <BorderPane maxWidth="Infinity" styleClass="footer">
                     <left>
-                        <Label fx:id="statusText" text="X Fotos ausgewählt"/>
+                        <Label fx:id="statusText" text="X Fotos ausgewählt" BorderPane.alignment="CENTER_LEFT"/>
                     </left>
                     <right>
                         <HBox spacing="8.0">
