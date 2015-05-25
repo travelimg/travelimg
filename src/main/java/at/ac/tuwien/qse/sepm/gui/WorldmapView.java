@@ -32,7 +32,7 @@ public class WorldmapView {
         } catch (ServiceException e) {
             //TODO
         }
-
+        worldMap.setCenter(70.7385, -90.9871);
         worldMap.setZoom(2);
         border.setCenter(worldMap.getMapView());
     }

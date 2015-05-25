@@ -128,7 +128,9 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
 
     }
-
+    public void setCenter(double x, double y){
+        this.mapView.setCenter(x,y);
+    }
 
     /**
      *
@@ -223,7 +225,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         }
         double [] center = calculateCenter(centerPoint);
         //mapView.setCenter(center[0],center[1]);
-        mapView.setCenter(39.7385, -104.9871);
+
         mapView.setZoom(10);
         System.out.println(displayedMarker.size());
 
