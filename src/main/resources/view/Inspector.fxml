@@ -36,20 +36,19 @@
             <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity"
                     styleClass="delete" HBox.hgrow="ALWAYS">
                 <graphic>
-                    <FontAwesomeIconView/>
+                    <FontAwesomeIconView glyphName="TRASH"/>
                 </graphic>
+                <tooltip>
+                    <Tooltip text="Ausgewählte löschen"/>
+                </tooltip>
             </Button>
-            <Button fx:id="cancelButton" maxHeight="Infinity" maxWidth="Infinity"
-                    styleClass="cancel" HBox.hgrow="ALWAYS">
+            <Button fx:id="dropboxButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                 <graphic>
-                    <FontAwesomeIconView/>
+                    <FontAwesomeIconView glyphName="DROPBOX"/>
                 </graphic>
-            </Button>
-            <Button fx:id="confirmButton" maxHeight="Infinity" maxWidth="Infinity"
-                    styleClass="confirm" HBox.hgrow="ALWAYS">
-                <graphic>
-                    <FontAwesomeIconView/>
-                </graphic>
+                <tooltip>
+                    <Tooltip text="Dropbox-Export"/>
+                </tooltip>
             </Button>
         </HBox>
     </bottom>

@@ -61,7 +61,8 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
         this.mapView = new GoogleMapView();
         this.mapView.addMapInializedListener(this);
-
+        aktivMarker = new ArrayList<Marker>();
+        displayedMarker = new HashMap<>();
     }
     public int sizeOfActiveMarker(){
         if(aktivMarker ==null){
@@ -81,7 +82,9 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         displayedMarker = new HashMap<>();
         this.mapView.addMapInializedListener(this);
     }
-
+    public void setZoom(int zoom){
+        this.map.setZoom(zoom);
+    }
     @Override
     public void mapInitialized() {
         //Set the initial properties of the map.
@@ -112,15 +115,10 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
                 m.setTitle("Marker");
                 m.setAnimation(Animation.BOUNCE);
                aktivMarker.add(m);
-                displayedMarker.put(m.getVariableName(),new LatLong(photo.getLatitude(),
-                        photo.getLongitude()));
+                displayedMarker.put(m.getVariableName(),
+                        new LatLong(photo.getLatitude(), photo.getLongitude()));
                 map.addMarker(m);
-                map.addUIEventHandler(m,UIEventType.click,(JSObject obj) ->{System.out.println(m.getVariableName());
-                    System.out.println("AKTIVE MARKER");
 
-                    System.out.println(displayedMarker.get(m.getVariableName()));
-
-                });
 
             }
 
@@ -157,7 +155,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
       for(Marker m : aktivMarker){
            map.removeMarker(m);
         }
-        displayedMarker = new HashMap<>();
+        displayedMarker.clear();
     }
    /* public void addMarker(Photo photo){
         if(actualMarker!=null)
@@ -185,11 +183,19 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         aktivMarker.add(m);
         displayedMarker.put(m.getVariableName(),
                 new LatLong(photo.getLatitude(), photo.getLongitude()));
+
+        map.addUIEventHandler(m, UIEventType.click, (JSObject obj) -> {
+            System.out.println(m.getVariableName());
+            System.out.println("AKTIVE MARKER");
+
+            System.out.println(displayedMarker.get(m.getVariableName()));
+
+        });
         mapView.setCenter(photo.getLatitude(), photo.getLongitude());
         mapView.setZoom(12);
         map.addMarker(m);
     }
-    public void addMarkerList(ArrayList<Photo> list){
+    public void addMarkerList(List<Photo> list){
             if(aktivMarker.size()!=0){
                 aktivMarker = new ArrayList<>();
             }
@@ -204,14 +210,22 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
             aktivMarker.add(m);
             displayedMarker.put(m.getVariableName(),
                     new LatLong(photo.getLatitude(), photo.getLongitude()));
+            map.addUIEventHandler(m, UIEventType.click, (JSObject obj) -> {
+                System.out.println(m.getVariableName());
+                System.out.println("AKTIVE MARKER");
+
+                System.out.println(displayedMarker.get(m.getVariableName()));
+
+            });
             centerPoint.add(new LatLong(photo.getLatitude(),
                     photo.getLongitude()));
             map.addMarker(m);
         }
         double [] center = calculateCenter(centerPoint);
-        mapView.setCenter(center[0],center[1]);
+        //mapView.setCenter(center[0],center[1]);
+        mapView.setCenter(39.7385, -104.9871);
         mapView.setZoom(10);
-
+        System.out.println(displayedMarker.size());
 
     }
     public double[] calculateCenter(ArrayList<LatLong> centerPoint){
