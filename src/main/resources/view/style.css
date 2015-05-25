@@ -406,6 +406,9 @@
 .import-dialog .search .glyph-icon {
     -glyph-name: "FOLDER";
 }
+.import-dialog .note .glyph-icon {
+    -glyph-name: "INFO_CIRCLE";
+}
 
 .tab-pane {
     -fx-padding: 0;
