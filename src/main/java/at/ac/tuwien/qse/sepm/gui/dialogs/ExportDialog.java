@@ -100,6 +100,10 @@ public class ExportDialog extends ResultDialog<String> {
 
         // Export directory is valid.
         exportButton.setDisable(false);
-        statusText.setText(String.format("%d Fotos ausgewählt", photoCount));
+        String format = "%d Fotos ausgewählt";
+        if (photoCount == 1) {
+            format = "%d Foto ausgewählt";
+        }
+        statusText.setText(String.format(format, photoCount));
     }
 }
