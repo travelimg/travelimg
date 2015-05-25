@@ -1,13 +1,10 @@
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.geometry.Insets?>
+<?xml version="1.0" encoding="UTF-8"?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <fx:root styleClass="dialog,export-dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane"
-         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" minHeight="400">
+         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <BorderPane prefWidth="560.0" maxHeight="Infinity">
             <top>
@@ -19,7 +16,7 @@
                         <Label text="Dropbox Ordner auswählen"/>
                         <HBox prefHeight="0.0" prefWidth="0.0" VBox.vgrow="ALWAYS">
                             <children>
-                                <Button fx:id="browseButton" styleClass="search,raised" HBox.hgrow="ALWAYS" onAction="#handleBrowse">
+                                <Button fx:id="browseButton" styleClass="search,raised" HBox.hgrow="ALWAYS">
                                     <graphic>
                                         <FontAwesomeIconView glyphName="FOLDER"/>
                                     </graphic>
@@ -41,10 +38,8 @@
                     <right>
                         <HBox spacing="8.0">
                             <children>
-                                <Button fx:id="cancelButton" alignment="CENTER_RIGHT"
-                                        text="ABBRECHEN" onAction="#handleCancel"/>
-                                <Button fx:id="importButton" alignment="CENTER_RIGHT"
-                                        styleClass="primary" text="EXPORTIEREN" onAction="#handleExport"/>
+                                <Button fx:id="cancelButton" alignment="CENTER_RIGHT" text="ABBRECHEN"/>
+                                <Button fx:id="exportButton" alignment="CENTER_RIGHT" styleClass="primary" text="EXPORTIEREN"/>
                             </children>
                         </HBox>
                     </right>

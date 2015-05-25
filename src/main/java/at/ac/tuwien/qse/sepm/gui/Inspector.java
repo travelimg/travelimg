@@ -154,7 +154,7 @@ public class Inspector {
             // TODO: handle error
         }
 
-        ExportDialog dialog = new ExportDialog(root, dropboxFolder);
+        ExportDialog dialog = new ExportDialog(root, dropboxFolder, activePhotos.size());
 
         Optional<String> destinationPath = dialog.showForResult();
         if(!destinationPath.isPresent()) return;
