@@ -34,7 +34,7 @@ public class App extends Application {
         logger.info("Application started.");
 
         FXMLLoader loader = new FXMLLoader();
-        loader.setControllerFactory(new Callback<Class<?>, Object>() {
+        loader.setControllerFactory(new Callback<Classs<?>, Object>() {
             @Override
             public Object call(Class<?> param) {
                 return context.getBean(param);
