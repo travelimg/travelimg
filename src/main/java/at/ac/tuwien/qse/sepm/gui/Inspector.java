@@ -129,9 +129,9 @@ public class Inspector {
             return;
         }
 
-        DeleteDialog deleteDialog = new DeleteDialog(root,activePhotos);
-        Optional<List<Photo>> photos = deleteDialog.showForResult();
-        if (!photos.isPresent()) return;
+        DeleteDialog deleteDialog = new DeleteDialog(root, activePhotos.size());
+        Optional<Boolean> confirmed = deleteDialog.showForResult();
+        if (!confirmed.isPresent() || !confirmed.get()) return;
 
         try {
             photoservice.deletePhotos(activePhotos);
