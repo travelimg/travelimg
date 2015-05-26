@@ -8,16 +8,25 @@
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" maxWidth="Infinity">
     <children>
         <ToggleButton fx:id="badButton" styleClass="bad" HBox.hgrow="SOMETIMES" maxWidth="Infinity">
+            <tooltip>
+                <Tooltip text="Schlechtes Foto"/>
+            </tooltip>
             <graphic>
                 <FontAwesomeIconView glyphName="THUMBS_DOWN"/>
             </graphic>
         </ToggleButton>
         <ToggleButton fx:id="neutralButton" styleClass="neutral" HBox.hgrow="SOMETIMES" maxWidth="Infinity">
+            <tooltip>
+                <Tooltip text="Neutrales Foto"/>
+            </tooltip>
             <graphic>
                 <FontAwesomeIconView glyphName="CHECK"/>
             </graphic>
         </ToggleButton>
         <ToggleButton fx:id="goodButton" styleClass="good" HBox.hgrow="SOMETIMES" maxWidth="Infinity">
+            <tooltip>
+                <Tooltip text="Gutes Foto"/>
+            </tooltip>
             <graphic>
                 <FontAwesomeIconView glyphName="HEART"/>
             </graphic>
