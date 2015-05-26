@@ -247,14 +247,12 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
                 return true;
 
             }
-            double latrpos = displayedMarker.get(key).getLatitude()+0.1;
-            double latrneg = displayedMarker.get(key).getLatitude()-0.1;
-            double lonrneg = displayedMarker.get(key).getLongitude()-0.1;
-            double lonrpos = displayedMarker.get(key).getLongitude()+0.1;
-            if(latrpos-p.getLatitude()>0 || p.getLatitude()-latrneg>0 && lonrpos-p.getLongitude()<0 || p.getLongitude()-lonrneg<0){
-                logger.debug("Marker with the coordinates +- 0.1 already exists");
+
+            if(Math.abs(p.getLatitude()-displayedMarker.get(key).getLatitude())<1 && Math.abs(p.getLongitude()-displayedMarker.get(key).getLongitude())<1){
+                logger.debug("Marker with similar coordinates already exists");
                 return true;
             }
+
         }
         logger.debug("set Marker ");
         return false;
