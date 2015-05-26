@@ -160,11 +160,15 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
             @Override
             public void handle(MouseEvent event) {
                 keywordsFlowPane.getChildren().remove(hbox);
+                flickrService.reset();
+                downloadButton.setText("Fotos herunterladen");
             }
         });
         hbox.getChildren().add(new Text("  "));
         hbox.getChildren().add(x);
         keywordsFlowPane.getChildren().add(hbox);
+        flickrService.reset();
+        downloadButton.setText("Fotos herunterladen");
     }
 
     private void dropMarker(LatLong ll){
@@ -173,13 +177,12 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
         }
         this.actualLatLong = ll;
         googleMap.addMarker(actualMarker = new Marker(new MarkerOptions().position(ll)));
+        flickrService.reset();
+        downloadButton.setText("Fotos herunterladen");
     }
 
     @FXML
     public void handleOnDownloadButtonClicked(){
-        mapContainer.setDisable(true);
-        keywordsFlowPane.setDisable(true);
-        keywordTextField.setDisable(true);
         downloadButton.setDisable(true);
         progress.setVisible(true);
         downloadPhotos();
