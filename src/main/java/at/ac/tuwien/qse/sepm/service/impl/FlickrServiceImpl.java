@@ -13,6 +13,8 @@ import com.flickr4java.flickr.photos.GeoData;
 import com.flickr4java.flickr.photos.Photo;
 import com.flickr4java.flickr.photos.PhotoList;
 import com.flickr4java.flickr.photos.SearchParameters;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
@@ -32,6 +34,7 @@ public class FlickrServiceImpl implements FlickrService {
     private AsyncDownloader downloader;
     private Flickr flickr;
     private int i = 0;
+    private static final Logger logger = LogManager.getLogger();
 
     public FlickrServiceImpl(){
         this.flickr = new Flickr(API_KEY, SECRET, new REST());
@@ -86,19 +89,24 @@ public class FlickrServiceImpl implements FlickrService {
                 if(i==0){
                     SearchParameters searchParameters = new SearchParameters();
                     searchParameters.setTags(tags);
+                    logger.debug("Using for search tags {}",tags);
                     if(useGeoData){
+                        logger.debug("Using for search latitude {} and longitude {}",latitude,longitude);
                         searchParameters.setLatitude(String.valueOf(latitude));
                         searchParameters.setLongitude(String.valueOf(longitude));
                         searchParameters.setRadius(2);
                     }
                     searchParameters.setHasGeo(true);
+                    logger.debug("Searching photos using the flickr api...");
                     list = flickr.getPhotosInterface().search(searchParameters, 250, 1);
+                    logger.debug("Found {} photos.",list.size());
                 }
                 int nrOfDownloadedPhotos = 0;
                 int nrOfPhotosToDownload = 10;
-                if(list.size()<10){
-                    nrOfPhotosToDownload = list.size();
+                if(list.size()-i<10){
+                    nrOfPhotosToDownload = list.size()-i;
                 }
+                logger.debug("Start downloading {} photos", nrOfPhotosToDownload);
                 for (;i<list.size();i++) {
 
                     Photo p = list.get(i);
@@ -107,7 +115,7 @@ public class FlickrServiceImpl implements FlickrService {
                     }
                     if(!isRunning())
                         return;
-
+                    logger.debug("Downloading photo nr {} ...",i+1);
                     String farmId = p.getFarm();
                     String serverId = p.getServer();
                     String id = p.getId();
@@ -137,6 +145,7 @@ public class FlickrServiceImpl implements FlickrService {
                             downloaded.setLatitude(geoData.getLatitude());
                             downloaded.setLongitude(geoData.getLongitude());
                             downloaded.setRating(Rating.NONE);
+                            logger.debug("Downloaded photo {}",downloaded);
                             callback.accept(downloaded);
                             nrOfDownloadedPhotos++;
                         } finally {
@@ -147,6 +156,9 @@ public class FlickrServiceImpl implements FlickrService {
                                 fout.close();
                             }
                         }
+                    }
+                    else{
+                        logger.debug("Can't get original secret for photo.");
                     }
                 }
                 progressCallback.accept(1.0);
