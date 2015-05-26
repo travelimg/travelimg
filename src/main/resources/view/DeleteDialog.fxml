@@ -1,32 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.*?>
-
 <fx:root fx:id="root" styleClass="dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <BorderPane prefWidth="320.0">
+        <BorderPane prefWidth="560.0">
             <top>
-                <Label fx:id="headerText" maxWidth="Infinity" styleClass="header" text="Fotos löschen" BorderPane.alignment="CENTER" />
+                <Label maxWidth="Infinity" styleClass="header" text="Fotos permanent löschen?"/>
             </top>
             <center>
-                <HBox maxHeight="Infinity" maxWidth="Infinity" styleClass="body">
+                <VBox maxHeight="Infinity" maxWidth="Infinity" styleClass="body">
                     <children>
-                        <Label fx:id="contentText" text="Möchten sie die ausgewählten Fotos wirklich löschen?" wrapText="true" BorderPane.alignment="CENTER" />
+                        <Label wrapText="true" BorderPane.alignment="CENTER"
+                               text="Die ausgewählten Fotos und die damit verbundenen Metadaten werden unwideruflich aus Ihrem travelimg-Fotoverzeichnis gelöscht."/>
+
+                        <HBox alignment="CENTER" spacing="16.0" styleClass="note">
+                            <children>
+                                <FontAwesomeIconView glyphName="INFO_CIRCLE"/>
+                                <Label text="Wenn Sie die Fotos noch an einem anderen Ort gespeichert haben, können Sie diese jedezeit wieder importieren."
+                                       textFill="WHITE" wrapText="true" HBox.hgrow="ALWAYS"/>
+                            </children>
+                            <VBox.margin>
+                                <Insets top="16.0"/>
+                            </VBox.margin>
+                        </HBox>
                     </children>
-                </HBox>
+                </VBox>
             </center>
             <bottom>
-                <HBox fx:id="actionBar" alignment="CENTER_RIGHT" maxWidth="Infinity" styleClass="footer">
-                    <children>
-                        <Button fx:id="cancelButton" cancelButton="true" text="Abbrechen"/>
-                        <Button fx:id="deleteP" cancelButton="true" text="Entfernen" />
-
-                    </children>
-                </HBox>
+                <BorderPane maxWidth="Infinity" styleClass="footer">
+                    <left>
+                        <Label fx:id="statusText" text="X Fotos ausgewählt" BorderPane.alignment="CENTER_LEFT"/>
+                    </left>
+                    <right>
+                        <HBox spacing="8.0">
+                            <children>
+                                <Button fx:id="cancelButton" alignment="CENTER_RIGHT" text="BEHALTEN"/>
+                                <Button fx:id="confirmButton" alignment="CENTER_RIGHT" styleClass="primary" text="LÖSCHEN"/>
+                            </children>
+                        </HBox>
+                    </right>
+                </BorderPane>
             </bottom>
         </BorderPane>
     </children>

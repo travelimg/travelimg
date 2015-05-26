@@ -11,10 +11,6 @@ import com.lynden.gmapsfx.javascript.event.StateEventHandler;
 import com.lynden.gmapsfx.javascript.event.UIEventHandler;
 import com.lynden.gmapsfx.javascript.event.UIEventType;
 import com.lynden.gmapsfx.javascript.object.*;
-import com.sun.media.jfxmedia.events.MarkerEvent;
-import javafx.event.*;
-
-import netscape.javascript.JSObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +28,7 @@ import java.util.Set;
 import org.springframework.beans.BeanInstantiationException;
 
 import javafx.scene.Node;
+import netscape.javascript.JSObject;
 
 import static java.awt.event.MouseEvent.MOUSE_CLICKED;
 
@@ -47,9 +44,6 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     private ArrayList<Photo> markers =null;
     private ArrayList<Marker> aktivMarker;
     private HashMap<String,LatLong> displayedMarker;
-
-
-
 
     /**
      * Default Constructor
@@ -96,12 +90,12 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
                 .zoom(2)
                 .mapMarker(true);
         map = mapView.createMap(mapOptions);
-
-        map.addUIEventHandler(UIEventType.dblclick, (JSObject obj) -> {
+        map.addUIEventHandler(UIEventType.dblclick,(netscape.javascript.JSObject obj)->{
             LatLong ll = new LatLong((JSObject) obj.getMember("latLng"));
             // the Coordinate on the Map
             //TODO Markerhandling
         });
+
 
 
         if(markers!=null){
@@ -115,10 +109,10 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
                     aktivMarker.add(m);
                     displayedMarker.put(m.getVariableName(),
                             new LatLong(photo.getLatitude(), photo.getLongitude()));
-                    map.addUIEventHandler(m, UIEventType.click, (JSObject obj) -> {
-                        //TODO Markerhandling
-
+                    map.addUIEventHandler(m, UIEventType.dblclick, (JSObject obj) -> {
+                        //TODO //TODO Markerhandling
                     });
+
                     map.addMarker(m);
 
                 }
@@ -154,7 +148,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      * @param y height
      */
     public void setMaxSize(double x, double y){
-        mapView.setMaxSize(x, y);
+        mapView.setMaxSize(x,y);
     }
 
     /**

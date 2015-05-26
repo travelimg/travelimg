@@ -36,7 +36,7 @@ public class GridView {
     @FXML private BorderPane root;
     @FXML private ScrollPane gridContainer;
 
-    private final PhotoGrid grid = new PhotoGrid();
+    private final ImageGrid<Photo> grid = new ImageGrid<>(PhotoGridTile::new);
     private final List<Photo> selection = new ArrayList<Photo>();
     private Predicate<Photo> filter = new PhotoFilter();
 
@@ -60,7 +60,7 @@ public class GridView {
 
         organizer.setPresentAction(() -> {
             FullscreenWindow fullscreen = new FullscreenWindow();
-            fullscreen.present(grid.getPhotos());
+            fullscreen.present(grid.getItems());
         });
 
         organizer.setFilterChangeAction(this::handleFilterChange);
@@ -79,14 +79,14 @@ public class GridView {
         inspector.setUpdateHandler(photos -> {
             photos.stream()
                     .filter(filter.negate())
-                    .forEach(grid::removePhoto);
+                    .forEach(grid::removeItem);
             photos.stream()
                     .filter(filter)
-                    .forEach(grid::updatePhoto);
+                    .forEach(grid::updateItem);
         });
 
         // Deleted photos are removed from the grid.
-        inspector.setDeleteHandler(photos -> photos.forEach(grid::removePhoto));
+        inspector.setDeleteHandler(photos -> photos.forEach(grid::removeItem));
 
         // Apply the initial filter.
         handleFilterChange(organizer.getFilter());
@@ -107,7 +107,7 @@ public class GridView {
 
     public void deletePhotos(){
         for(Photo photo : selection){
-            grid.removePhoto(photo);
+            grid.removeItem(photo);
         }
         selection.clear();
     }
@@ -121,7 +121,7 @@ public class GridView {
         Platform.runLater(() -> {
             // Ignore photos that are not part of the current filter.
             if (!filter.test(photo)) return;
-            grid.addPhoto(photo);
+            grid.addItem(photo);
         });
     }
 
@@ -132,7 +132,7 @@ public class GridView {
 
     private void reloadImages() {
         try {
-            grid.setPhotos(photoService.getAllPhotos(filter));
+            grid.setItems(photoService.getAllPhotos(filter));
         } catch (ServiceException ex) {
             LOGGER.error("failed loading fotos", ex);
             InfoDialog dialog = new InfoDialog(root, "Lade Fehler");
