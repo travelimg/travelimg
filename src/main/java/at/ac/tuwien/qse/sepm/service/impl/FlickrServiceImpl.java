@@ -111,7 +111,7 @@ public class FlickrServiceImpl implements FlickrService {
                     if(nrOfDownloadedPhotos==10){
                         break;
                     }
-                    if(!getIsRunning())
+                    if(!isRunning())
                         return;
 
                     String farmId = p.getFarm();

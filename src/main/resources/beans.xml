@@ -24,12 +24,18 @@
         <jdbc:script location="classpath:db/create.sql" />
         <jdbc:script location="classpath:db/insert.sql" />
     </jdbc:initialize-database>
+
+	<bean id="ioHandler" class="at.ac.tuwien.qse.sepm.util.DefaultIOHandler"></bean>
 	
 	<bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"
 			destroy-method="close">
 	</bean>
 
 	<bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl"></bean>
+
+	<bean id="dropboxService" class="at.ac.tuwien.qse.sepm.service.impl.DropboxServiceImpl"
+			destroy-method="close">
+	</bean>
 
     <bean id="photographerService" class="at.ac.tuwien.qse.sepm.service.impl.PhotographerServiceImpl"></bean>
 

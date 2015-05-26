@@ -5,8 +5,10 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+import at.ac.tuwien.qse.sepm.util.TestIOHandler;
 import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,18 +28,21 @@ import java.util.Locale;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 
 @UsingTable("Photo")
 public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
     @Autowired
     PhotoDAO photoDAO;
+    @Autowired
+    TestIOHandler ioHandler;
 
     private static final Photographer defaultPhotographer = new Photographer(1, "Test Photographer");
-    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.ENGLISH);
 
     private static final String dataDir = Paths.get(System.getProperty("java.io.tmpdir"), "travelimg").toString();
     private static final String sourceDir = Paths.get(System.getProperty( "os.name" ).contains( "indow" ) ?
@@ -51,34 +56,21 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     };
 
     private Photo expectedPhotos[] = new Photo[] {
-            new Photo(1, defaultPhotographer, dataDir + "/2015/03/06/1.jpg", Rating.NONE, LocalDateTime.of(2015, 3, 6, 0, 0, 0), 41.5, 19.5),
-            new Photo(2, defaultPhotographer, dataDir + "/2005/09/11/2.jpg", Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9),
-            new Photo(3, defaultPhotographer, dataDir + "/2005/09/11/3.jpg", Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9),
-            new Photo(4, defaultPhotographer, dataDir + "/2005/09/11/4.jpg", Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9),
-            new Photo(5, defaultPhotographer, dataDir + "/2015/03/04/5.jpg", Rating.NONE, LocalDateTime.of(2015, 3, 4, 0, 0, 0), 12.0, 12.0),
-            new Photo(6, defaultPhotographer, dataDir + "/2015/05/17/6.jpg", Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
-            new Photo(7, defaultPhotographer, dataDir + "/2015/05/17/7.jpg", Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
-            new Photo(8, defaultPhotographer, dataDir + "/2015/05/17/8.jpg", Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
+            new Photo(1, defaultPhotographer, Paths.get(dataDir, "2015", "03", "06", "1.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 3, 6, 0, 0, 0), 41.5, 19.5),
+            new Photo(2, defaultPhotographer, Paths.get(dataDir, "2005", "09", "11", "2.jpg").toString(), Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9),
+            new Photo(3, defaultPhotographer, Paths.get(dataDir, "2005", "09", "11", "3.jpg").toString(), Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9),
+            new Photo(4, defaultPhotographer, Paths.get(dataDir, "2005", "09", "11", "4.jpg").toString(), Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9),
+            new Photo(5, defaultPhotographer, Paths.get(dataDir, "2015", "03", "04", "5.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 3, 4, 0, 0, 0), 12.0, 12.0),
+            new Photo(6, defaultPhotographer, Paths.get(dataDir, "2015", "05", "17", "6.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
+            new Photo(7, defaultPhotographer, Paths.get(dataDir, "2015", "05", "17", "7.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
+            new Photo(8, defaultPhotographer, Paths.get(dataDir, "2015", "05", "17", "8.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
     };
 
     private Photo inputPhotos[] = new Photo[] {
-            new Photo(6, defaultPhotographer, sourceDir + "/6.jpg", Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
-            new Photo(7, defaultPhotographer, sourceDir + "/7.jpg", Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
-            new Photo(8, defaultPhotographer, sourceDir + "/8.jpg", Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
+            new Photo(6, defaultPhotographer, Paths.get(sourceDir, "6.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
+            new Photo(7, defaultPhotographer, Paths.get(sourceDir, "7.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
+            new Photo(8, defaultPhotographer, Paths.get(sourceDir, "8.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
     };
-
-    public JDBCPhotoDAOTest() {
-        for(Photo photo : Arrays.asList(expectedPhotos)) {
-            String path = photo.getPath().replace("/", File.separator);
-            photo.setPath(path);;
-        }
-
-        for(Photo photo : Arrays.asList(inputPhotos)) {
-            String path = photo.getPath().replace("/", File.separator);
-            photo.setPath(path);;
-        }
-
-    }
 
     private Photo getInputPhoto(int seq) {
         return new Photo(inputPhotos[seq]);
@@ -103,6 +95,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
     @Before
     public void setUp() throws Exception {
+        ioHandler.reset();
         FileUtils.deleteDirectory(new File(dataDir));
         FileUtils.copyDirectory(new File(Paths.get(sourceDir, "prepared").toString()), new File(dataDir));
     }
@@ -145,10 +138,16 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
         Photo value = photoDAO.create(photo);
 
         assertEquals(expected.getPath(), value.getPath());
-        assertTrue(Files.exists(Paths.get(expected.getPath())));
+
+        Pair<Path, Path> copyOperation = ioHandler.copiedFiles.get(0);
+
+        // ensure that the files are copied correctly
+        assertThat(copyOperation.getKey().toString(), equalTo(getInputPhoto(1).getPath()));
+        assertThat(copyOperation.getValue().toString(), equalTo(expected.getPath()));
+
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = DAOException.class)
     @WithData
     public void testCreateWithNonexistingPathThrows() throws DAOException, ValidationException {
         Photo photo = getInputPhoto(2);
@@ -270,14 +269,28 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
         Photo photo = getExpectedPhoto(1);
         photo.setId(1337);
-        photoDAO.delete(photo);
 
+        boolean didThrow = false;
+        try {
+            photoDAO.delete(photo);
+        } catch (DAOException ex) {
+            didThrow = true;
+        }
+
+        if(!didThrow) {
+            throw new AssertionError("Expected DAOException");
+        }
+
+        // ensure that no files were deleted
+        assertThat(ioHandler.deletedFiles, empty());
+
+        // ensure that the number of photos did not change
         assertEquals(initial, countRows());
     }
 
     @Test(expected = ValidationException.class)
     @WithData
-    public void testDeleteWithINvalidIdThrows() throws DAOException, ValidationException {
+    public void testDeleteWithInvalidIdThrows() throws DAOException, ValidationException {
         Photo photo = getExpectedPhoto(5);
         photo.setId(-2);
 
@@ -294,8 +307,11 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
         photoDAO.delete(photo);
 
+        // ensure that entry was deleted
         assertEquals(initial - 1, countRows());
         assertThat(setPrefix(photoDAO.readAll()), not(hasItem(photo)));
-    }
 
+        // ensure that file was deleted
+        assertThat(ioHandler.deletedFiles, hasItem(Paths.get(getExpectedPhoto(3).getPath())));
+    }
 }
