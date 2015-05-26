@@ -19,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -37,9 +38,9 @@ public class FlickrServiceImpl implements FlickrService {
     }
 
     @Override
-    public Cancelable downloadPhotos(String tags[], double latitude, double longitude, boolean useTags, boolean useGeoData, Consumer<at.ac.tuwien.qse.sepm.entities.Photo> callback,  Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler) throws ServiceException{
+    public Cancelable downloadPhotos(String tags[], double latitude, double longitude, boolean useGeoData, Consumer<at.ac.tuwien.qse.sepm.entities.Photo> callback,  Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler) throws ServiceException{
         if(i==0){
-            downloader = new AsyncDownloader(tags, latitude, longitude, useTags, useGeoData, callback, progressCallback, errorHandler);
+            downloader = new AsyncDownloader(tags, latitude, longitude, useGeoData, callback, progressCallback, errorHandler);
         }
         executorService.submit(downloader);
         return downloader;
@@ -60,19 +61,17 @@ public class FlickrServiceImpl implements FlickrService {
         private String[] tags;
         private double latitude;
         private double longitude;
-        private boolean useTags;
         private boolean useGeoData;
         private Consumer<at.ac.tuwien.qse.sepm.entities.Photo> callback;
         private Consumer<Double> progressCallback;
         private ErrorHandler<ServiceException> errorHandler;
         private PhotoList<Photo> list;
 
-        public AsyncDownloader(String tags[], double latitude, double longitude, boolean useTags, boolean useGeoData, Consumer<at.ac.tuwien.qse.sepm.entities.Photo> callback,  Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler) {
+        public AsyncDownloader(String tags[], double latitude, double longitude, boolean useGeoData, Consumer<at.ac.tuwien.qse.sepm.entities.Photo> callback,  Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler) {
             super();
             this.tags = tags;
             this.latitude = latitude;
             this.longitude = longitude;
-            this.useTags = useTags;
             this.useGeoData = useGeoData;
             this.callback = callback;
             this.progressCallback = progressCallback;
@@ -82,23 +81,18 @@ public class FlickrServiceImpl implements FlickrService {
 
         @Override
         protected void execute() {
+            Paths.get("src/main/resources/tmp").toFile().mkdirs();
             try {
-
-
                 if(i==0){
                     SearchParameters searchParameters = new SearchParameters();
-                    if(useTags){
-                        searchParameters.setTags(tags);
-                    }
+                    searchParameters.setTags(tags);
                     if(useGeoData){
                         searchParameters.setLatitude(String.valueOf(latitude));
                         searchParameters.setLongitude(String.valueOf(longitude));
                         searchParameters.setRadius(2);
                     }
-
                     searchParameters.setHasGeo(true);
                     list = flickr.getPhotosInterface().search(searchParameters, 250, 1);
-                    //System.out.println(list.size());
                 }
                 int nrOfDownloadedPhotos = 0;
                 int nrOfPhotosToDownload = 10;

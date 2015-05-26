@@ -228,7 +228,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
                 longitude = actualLatLong.getLongitude();
                 useGeoData = true;
             }
-            downloadTask = flickrService.downloadPhotos(tags,latitude, longitude,true,useGeoData,new Consumer<Photo>() {
+            downloadTask = flickrService.downloadPhotos(tags,latitude, longitude,useGeoData,new Consumer<Photo>() {
 
                 public void accept(Photo photo) {
 
