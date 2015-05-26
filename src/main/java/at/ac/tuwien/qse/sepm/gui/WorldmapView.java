@@ -5,7 +5,9 @@ import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import com.lynden.gmapsfx.javascript.object.LatLong;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import netscape.javascript.JSException;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,7 +30,9 @@ public class WorldmapView {
     }
     public void setMap(GoogleMapsScene map){
         logger.debug("Worldmap wird erstellt");
-        this.worldMap = map;
+
+
+               this.worldMap = map;
 
         worldMap.removeAktiveMarker();
         try {

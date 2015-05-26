@@ -130,7 +130,6 @@ public class Inspector {
         this.mapsScene = new GoogleMapsScene();
         this.mapsScene.removeAktiveMarker();
         mapContainer.getChildren().add(mapsScene.getMapView());
-        this.mapsScene.addMarkerList(activePhotos);
         details.setVisible(false);
     }
     private void handleDelete(Event event) {
