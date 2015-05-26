@@ -5,11 +5,9 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.gui.dialogs.DeleteDialog;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ExportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
-import at.ac.tuwien.qse.sepm.service.ExifService;
-import at.ac.tuwien.qse.sepm.service.PhotoService;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.service.TagService;
+import at.ac.tuwien.qse.sepm.service.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -33,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.function.Consumer;
+
 
 /**
  * Controller for the inspector view which is used for modifying meta-data of a photo.
@@ -62,6 +61,7 @@ public class Inspector {
     private Consumer<Collection<Photo>>  updateHandler;
     private Consumer<Collection<Photo>>  deleteHandler;
 
+    @Autowired private DropboxService dropboxService;
     @Autowired private PhotoService photoservice;
     @Autowired private ExifService exifService;
     @Autowired private TagService tagService;
@@ -129,9 +129,9 @@ public class Inspector {
             return;
         }
 
-        DeleteDialog deleteDialog = new DeleteDialog(root,activePhotos);
-        Optional<List<Photo>> photos = deleteDialog.showForResult();
-        if (!photos.isPresent()) return;
+        DeleteDialog deleteDialog = new DeleteDialog(root, activePhotos.size());
+        Optional<Boolean> confirmed = deleteDialog.showForResult();
+        if (!confirmed.isPresent() || !confirmed.get()) return;
 
         try {
             photoservice.deletePhotos(activePhotos);
@@ -147,7 +147,26 @@ public class Inspector {
     }
 
     private void handleDropbox(Event event) {
-        // TODO
+        String dropboxFolder = "";
+        try {
+            dropboxFolder = dropboxService.getDropboxFolder();
+        } catch (ServiceException ex) {
+            // TODO: handle error
+        }
+
+        ExportDialog dialog = new ExportDialog(root, dropboxFolder, activePhotos.size());
+
+        Optional<String> destinationPath = dialog.showForResult();
+        if(!destinationPath.isPresent()) return;
+
+        dropboxService.uploadPhotos(activePhotos, destinationPath.get(),
+                photo -> {
+                    // TODO: progressbar
+                },
+                exception -> {
+                    // TODO: handle error
+                }
+        );
     }
 
     private void handleRatingChanged(ObservableValue<? extends Rating> observable, Rating oldValue, Rating newValue) {

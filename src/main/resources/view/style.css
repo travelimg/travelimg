@@ -19,9 +19,9 @@
     -fx-primary-focus: #444444;
     -fx-primary-hover: #444444;
     -fx-primary-press: #222222;
-    -fx-primary-light-focus: #F1F8E9;
-    -fx-primary-light-hover: #F1F8E9;
-    -fx-primary-light-press: #DCEDC8;
+    -fx-primary-light-focus: #FFEBEE;
+    -fx-primary-light-hover: #FFEBEE;
+    -fx-primary-light-press: #FFCDD2;
     -fx-danger: #FFA726;
 
     -fx-accent: #E91E63;
@@ -355,6 +355,7 @@
     -fx-fill: #eeeeee;
     -glypy-size: 12;
 }
+
 .photo-tile .overlay .glyph-icon:hover {
     -fx-fill: white;
 }
@@ -393,9 +394,6 @@
 }
 .rating-picker .toggle-button:selected .glyph-icon {
     -fx-fill: white;
-}
-
-.add-category-Btn .toggle-button {
 }
 
 .add-category {
@@ -503,3 +501,4 @@
 .filter-list .header:pressed {
     -fx-background-color: -fx-primary-press;
 }
+

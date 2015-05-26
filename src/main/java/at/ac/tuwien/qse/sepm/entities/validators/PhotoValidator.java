@@ -15,10 +15,6 @@ public class PhotoValidator {
 
         if (entity.getPath() == null)
             throw new ValidationException("Photo path can not be null");
-
-        File file = new File(entity.getPath());
-        if (!file.exists())
-            throw new ValidationException("Photo does not exist");
     }
 
     /**
