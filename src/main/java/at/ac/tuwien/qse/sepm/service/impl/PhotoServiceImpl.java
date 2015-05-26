@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 public class PhotoServiceImpl implements PhotoService {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private ExecutorService executorService = Executors.newFixedThreadPool(1);
     @Autowired private PhotoDAO photoDAO;
     @Autowired private TagDAO tagDAO;
     @Autowired private PhotoTagDAO photoTagDAO;
