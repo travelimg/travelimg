@@ -41,8 +41,10 @@ public class Inspector {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @FXML private BorderPane root;
-    @FXML private Label placeholder;
+    @FXML private Node placeholder;
     @FXML private Node details;
+    @FXML private Node multiAlert;
+
     @FXML private Button deleteButton;
     @FXML private Button dropboxButton;
     @FXML private VBox tagSelectionContainer;
@@ -110,17 +112,12 @@ public class Inspector {
     @FXML private void initialize() {
         mapsScene = new GoogleMapsScene();
         tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService);
-        // if placeholder is hidden then it should not take up any space
-        placeholder.managedProperty().bind(placeholder.visibleProperty());
-        // hide placeholder when details are visible
-        placeholder.visibleProperty().bind(Bindings.not(details.visibleProperty()));
 
         deleteButton.setOnAction(this::handleDelete);
         dropboxButton.setOnAction(this::handleDropbox);
         ratingPickerContainer.getChildren().add(ratingPicker);
         ratingPicker.ratingProperty().addListener(this::handleRatingChanged);
         mapContainer.getChildren().add(mapsScene.getMapView());
-        //addActivePhoto(null);
         tagSelectionContainer.getChildren().add(tagSelector);
     }
 
@@ -215,19 +212,18 @@ public class Inspector {
     }
 
     private void showDetails(List<Photo> photos) {
-        if (photos.size() == 0) {
-            details.setVisible(false);
-            placeholder.setText("Kein Foto ausgewählt.");
-            return;
-        }
 
-        if (photos.size() > 1) {
-            details.setVisible(false);
-            placeholder.setText("Mehrere Foto ausgewählt.");
-            return;
-        }
+        boolean hasActive = activePhotos.size() > 0;
+        boolean multipleActive = activePhotos.size() > 1;
 
-        details.setVisible(true);
+        details.setVisible(hasActive);
+        details.setManaged(hasActive);
+        placeholder.setVisible(!hasActive);
+        placeholder.setManaged(!hasActive);
+        multiAlert.setVisible(multipleActive);
+        multiAlert.setManaged(multipleActive);
+
+        if (!hasActive) return;
 
         // TODO: show details for all photos
         Photo photo = photos.get(0);

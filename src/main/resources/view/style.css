@@ -502,3 +502,26 @@
     -fx-background-color: -fx-primary-press;
 }
 
+.inspector .placeholder {
+    -fx-spacing: 16px;
+}
+.inspector .placeholder * {
+    -fx-text-fill: -fx-primary;
+}
+.inspector .placeholder .glyph-icon {
+    -fx-fill: -fx-default-hover;
+    -glyph-size: 80;
+}
+
+.alert {
+    -fx-background-color: -fx-background-alt;
+    -fx-text-fill: white;
+    -fx-padding: 16px;
+}
+.alert.warning {
+    -fx-background-color: -fx-accent;
+}
+.alert .glyph-icon {
+    -glyph-size: 30;
+    -fx-fill: white;
+}
