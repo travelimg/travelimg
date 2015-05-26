@@ -4,16 +4,11 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,93 +19,53 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PhotoTile extends StackPane {
+public class PhotoGridTile extends ImageGridTile<Photo> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private ProgressIndicator progress;
-    private Label ratingIndicator;
-    private FontAwesomeIconView ratingIndicatorIcon;
-    private Tooltip ratingIndicatorTooltip;
-    private Label taggingIndicator;
-    private Tooltip taggingIndicatorTooltip;
-    private ImageView imageView;
-    private Label dateLabel;
+    private final BorderPane overlay = new BorderPane();
+    private final Label ratingIndicator = new Label();
+    private final FontAwesomeIconView ratingIndicatorIcon = new FontAwesomeIconView();
+    private final Tooltip ratingIndicatorTooltip = new Tooltip();
+    private final Label taggingIndicator = new Label();
+    private final Tooltip taggingIndicatorTooltip = new Tooltip();
+    private final Label dateLabel = new Label();
 
     private Image image = null;
     private boolean selected = false;
 
-    public PhotoTile() {
+    public PhotoGridTile() {
         getStyleClass().add("photo-tile");
 
-        progress = new ProgressIndicator();
-        progress.setMaxWidth(50);
-        progress.setMaxHeight(50);
-        getChildren().add(progress);
-        setMargin(progress, new Insets(16));
-        setPadding(new Insets(4));
-
-        imageView = new ImageView();
-        imageView.setFitWidth(142);
-        imageView.setFitHeight(142);
-        imageView.setPreserveRatio(true);
-        getChildren().add(imageView);
-
-        BorderPane overlay = new BorderPane();
         overlay.getStyleClass().add("overlay");
         setAlignment(overlay, Pos.BOTTOM_CENTER);
-        getChildren().add(overlay);
 
-        ratingIndicator = new Label();
         ratingIndicator.getStyleClass().add("rating");
-        ratingIndicatorIcon = new FontAwesomeIconView();
         ratingIndicator.setGraphic(ratingIndicatorIcon);
-        ratingIndicatorTooltip = new Tooltip();
         ratingIndicator.setTooltip(ratingIndicatorTooltip);
-        overlay.setRight(ratingIndicator);
 
-        taggingIndicator = new Label();
         taggingIndicator.getStyleClass().add("tagging");
         FontAwesomeIconView taggingIndicatorIcon = new FontAwesomeIconView();
         taggingIndicatorIcon.setGlyphName("TAGS");
         taggingIndicator.setGraphic(taggingIndicatorIcon);
-        taggingIndicatorTooltip = new Tooltip();
         taggingIndicator.setTooltip(taggingIndicatorTooltip);
-        overlay.setLeft(taggingIndicator);
 
-        dateLabel = new Label();
         dateLabel.getStyleClass().add("date");
-        overlay.setCenter(dateLabel);
 
-        getStyleClass().add("loading");
+        getChildren().add(overlay);
+        overlay.setLeft(taggingIndicator);
+        overlay.setCenter(dateLabel);
+        overlay.setRight(ratingIndicator);
     }
 
-    public void setPhoto(Photo photo) {
+    @Override public void setItem(Photo photo) {
+        super.setItem(photo);
+        if (photo == null) return;
+
         showImage(photo.getPath());
         showRating(photo.getRating());
         showTags(photo.getTags());
         showDate(photo.getDatetime());
-    }
-
-    public void select() {
-        if (selected) return;
-        getStyleClass().add("selected");
-        this.selected = true;
-    }
-
-    public void deselect() {
-        if (!selected) return;
-        getStyleClass().remove("selected");
-        this.selected = false;
-    }
-
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void cancel() {
-        if (image == null) return;
-        image.cancel();
     }
 
     private void showImage(String path) {
@@ -122,17 +77,7 @@ public class PhotoTile extends StackPane {
             LOGGER.error("photo URL is malformed", ex);
             // TODO: handle exception
         }
-
-        image = new Image(url, imageView.getFitWidth(), imageView.getFitHeight(), false, true, true);
-        imageView.setImage(image);
-
-        image.progressProperty().addListener((observable, oldValue, newValue) -> {
-            // Image is fully loaded.
-            if (newValue.doubleValue() == 1.0) {
-                getChildren().remove(progress);
-                getStyleClass().remove("loading");
-            }
-        });
+        loadImage(url);
     }
 
     private void showRating(Rating rating) {
