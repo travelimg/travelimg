@@ -1,71 +1,83 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Rating;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.HBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class RatingPicker extends HBox {
+import java.util.Collections;
+import java.util.function.Consumer;
+
+public class RatingPicker {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @FXML private ToggleGroup toggleGroup;
+    @FXML private Node root;
     @FXML private Toggle badButton;
     @FXML private Toggle neutralButton;
     @FXML private Toggle goodButton;
 
-    public RatingPicker() {
-        LOGGER.debug("RatingPicker()");
-        FXMLLoadHelper.load(this, this, RatingPicker.class, "view/RatingPicker.fxml");
-        toggleGroup.selectedToggleProperty().addListener(this::handleSelect);
+    private Rating rating = Rating.NONE;
+    private boolean indetermined = false;
+    private Consumer<Rating> ratingChangeHandler;
+
+    @FXML private void initialize() {
+        badButton.selectedProperty().addListener((observable, oldValue, newValue) ->
+                setRating(Rating.BAD));
+        neutralButton.selectedProperty().addListener((observable, oldValue, newValue) ->
+                setRating(Rating.NEUTRAL));
+        goodButton.selectedProperty().addListener((observable, oldValue, newValue) ->
+                setRating(Rating.GOOD));
     }
 
-    public final Rating getRating() {
-        return ratingProperty().get();
+    public void setRatingChangeHandler(Consumer<Rating> ratingChangeHandler) {
+        this.ratingChangeHandler = ratingChangeHandler;
     }
-    public final ObjectProperty<Rating> ratingProperty() {
+
+    public Rating getRating() {
         return rating;
     }
-    public final void setRating(Rating rating) {
-        LOGGER.debug("setRating({})", rating);
 
-        if (getRating() == rating) {
-            LOGGER.debug("Rating {} already set.", rating);
+    public void setRating(Rating rating) {
+        if (this.rating == rating) return;
+
+        badButton.setSelected(false);
+        neutralButton.setSelected(false);
+        goodButton.setSelected(false);
+        root.getStyleClass().remove("indetermined");
+
+        this.rating = rating;
+        this.indetermined = rating == null;
+
+        if (rating == null) {
+            root.getStyleClass().add("indetermined");
             return;
         }
 
-        ratingProperty().set(rating);
-        toggleGroup.selectToggle(null);
         switch (rating) {
             case BAD:
-                toggleGroup.selectToggle(badButton);
+                badButton.setSelected(true);
                 break;
             case NEUTRAL:
-                toggleGroup.selectToggle(neutralButton);
+                neutralButton.setSelected(true);
                 break;
             case GOOD:
-                toggleGroup.selectToggle(goodButton);
+                goodButton.setSelected(true);
                 break;
         }
+
+        onRatingChange();
     }
-    private final ObjectProperty<Rating> rating =
-            new SimpleObjectProperty<>(RatingPicker.this, "rating", Rating.NONE);
 
-    private void handleSelect(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-        LOGGER.debug("handleSelect(~)", oldValue, newValue);
+    public boolean isIndetermined() {
+        return indetermined;
+    }
 
-        if (newValue == badButton) {
-            setRating(Rating.BAD);
-        } else if (newValue == neutralButton) {
-            setRating(Rating.NEUTRAL);
-        } else if (newValue == goodButton) {
-            setRating(Rating.GOOD);
+    private void onRatingChange() {
+        if (ratingChangeHandler != null) {
+            ratingChangeHandler.accept(getRating());
         }
     }
 }

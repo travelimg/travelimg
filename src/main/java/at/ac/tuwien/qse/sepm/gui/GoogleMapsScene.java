@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
+import netscape.javascript.JSException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -65,12 +66,16 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     }
 
     public void addMarker(Photo photo){
-        Marker marker = new Marker(new MarkerOptions().position(new LatLong(photo.getLatitude(), photo.getLongitude())));
-        actualMarkers.put(photo,marker);
-        mapView.setCenter(photo.getLatitude(), photo.getLongitude());
-        //actualMarker.setTitle(photo.getPhotographer().getName());
-        map.addMarker(marker);
-
+        try {
+            Marker marker = new Marker(new MarkerOptions()
+                    .position(new LatLong(photo.getLatitude(), photo.getLongitude())));
+            actualMarkers.put(photo, marker);
+            mapView.setCenter(photo.getLatitude(), photo.getLongitude());
+            //actualMarker.setTitle(photo.getPhotographer().getName());
+            map.addMarker(marker);
+        } catch (JSException ex) {
+            // TODO
+        }
     }
 
     public void removeMarker(Photo photo){

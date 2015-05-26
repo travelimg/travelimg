@@ -16,6 +16,7 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -23,15 +24,18 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.function.Consumer;
-
+import java.util.stream.Collectors;
 
 /**
  * Controller for the inspector view which is used for modifying meta-data of a photo.
@@ -39,6 +43,8 @@ import java.util.function.Consumer;
 public class Inspector {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    @Autowired private RatingPicker ratingPicker;
 
     @FXML private BorderPane root;
     @FXML private Node placeholder;
@@ -49,12 +55,10 @@ public class Inspector {
     @FXML private Button dropboxButton;
     @FXML private VBox tagSelectionContainer;
     @FXML private VBox mapContainer;
-    @FXML private HBox ratingPickerContainer;
     @FXML private TableColumn<String, String> exifName;
     @FXML private TableColumn<String, String> exifValue;
     @FXML private TableView<Pair<String, String>> exifTable;
 
-    private final RatingPicker ratingPicker = new RatingPicker();
     private TagSelector tagSelector;
     private GoogleMapsScene mapsScene;
 
@@ -85,9 +89,7 @@ public class Inspector {
     public void setActivePhotos(Collection<Photo> photos) {
         if (photos == null) photos = new LinkedList<>();
         activePhotos.clear();
-        mapsScene.clearMarkers();
         activePhotos.addAll(photos);
-        activePhotos.forEach(photo -> mapsScene.addMarker(photo));
         showDetails(activePhotos);
     }
 
@@ -113,10 +115,9 @@ public class Inspector {
         mapsScene = new GoogleMapsScene();
         tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService);
 
+        ratingPicker.setRatingChangeHandler(this::handleRatingChange);
         deleteButton.setOnAction(this::handleDelete);
         dropboxButton.setOnAction(this::handleDropbox);
-        ratingPickerContainer.getChildren().add(ratingPicker);
-        ratingPicker.ratingProperty().addListener(this::handleRatingChanged);
         mapContainer.getChildren().add(mapsScene.getMapView());
         tagSelectionContainer.getChildren().add(tagSelector);
     }
@@ -166,8 +167,8 @@ public class Inspector {
         );
     }
 
-    private void handleRatingChanged(ObservableValue<? extends Rating> observable, Rating oldValue, Rating newValue) {
-        LOGGER.debug("handleRatingChanged(~, {}, {})", oldValue, newValue);
+    private void handleRatingChange(Rating newRating) {
+        LOGGER.debug("rating picker changed to {}", newRating);
 
         if (activePhotos.size() == 0) {
             LOGGER.debug("No photo selected.");
@@ -176,14 +177,14 @@ public class Inspector {
 
         for (Photo photo : activePhotos) {
 
-            if (photo.getRating() == newValue) {
-                LOGGER.debug("Photo already has rating of {}.", newValue);
-                return;
+            if (photo.getRating() == newRating) {
+                LOGGER.debug("photo already has rating of {}", newRating);
+                continue;
             }
 
-            LOGGER.debug("Setting photo rating from {} to {}.", photo.getRating(),
-                    newValue);
-            activePhotos.get(0).setRating(newValue);
+            Rating oldRating = photo.getRating();
+            LOGGER.debug("setting photo rating from {} to {}", oldRating, newRating);
+            photo.setRating(newRating);
 
             try {
                 photoservice.savePhotoRating(photo);
@@ -191,11 +192,10 @@ public class Inspector {
 
             } catch (ServiceException ex) {
                 LOGGER.error("Failed saving photo rating.", ex);
-                LOGGER.debug("Resetting rating from {} to {}.", activePhotos.get(0).getRating(),
-                        oldValue);
+                LOGGER.debug("Resetting rating from {} to {}.", newRating, oldRating);
 
                 // Undo changes.
-                photo.setRating(oldValue);
+                photo.setRating(oldRating);
                 // FIXME: Reset the RatingPicker.
                 // This is not as simple as expected. Calling ratingPicker.setRating(oldValue) here
                 // will complete and finish. But once the below dialog is closed ANOTHER selection-
@@ -213,40 +213,59 @@ public class Inspector {
 
     private void showDetails(List<Photo> photos) {
 
-        boolean hasActive = activePhotos.size() > 0;
-        boolean multipleActive = activePhotos.size() > 1;
-
+        // Depending on the number of photos selected show different elements.
+        boolean noneActive = photos.size() == 0;
+        boolean hasActive = !noneActive;
+        boolean singleActive = photos.size() == 1;
+        boolean multipleActive = photos.size() > 1;
+        placeholder.setVisible(noneActive);
+        placeholder.setManaged(noneActive);
         details.setVisible(hasActive);
         details.setManaged(hasActive);
-        placeholder.setVisible(!hasActive);
-        placeholder.setManaged(!hasActive);
         multiAlert.setVisible(multipleActive);
         multiAlert.setManaged(multipleActive);
+        exifTable.setVisible(singleActive);
+        exifTable.setManaged(singleActive);
+        tagSelectionContainer.setVisible(singleActive);
+        tagSelectionContainer.setManaged(singleActive);
 
-        if (!hasActive) return;
+        // Nothing to show.
+        if (noneActive) return;
 
-        // TODO: show details for all photos
-        Photo photo = photos.get(0);
-        tagSelector.showCurrentlySetTags(photo);
-        ratingPicker.setRating(photo.getRating());
+        // Only set a non-null rating if all active photos have the same rating.
+        // Otherwise the rating picker should be indetermined.
+        ratingPicker.setRating(null);
+        List<Rating> ratings = photos.stream()
+                .map(photo -> photo.getRating())
+                .distinct()
+                .collect(Collectors.toList());
+        if (ratings.size() == 1) {
+            ratingPicker.setRating(ratings.get(0));
+        }
 
-        try {
-            Exif exif = exifService.getExif(photo);
-            ObservableList<Pair<String, String>> exifData = FXCollections.observableArrayList(
-                    new Pair<>("Aufnahmedatum", photo.getDatetime().toString()),
-                    new Pair<>("Kamerahersteller", exif.getMake()),
-                    new Pair<>("Kameramodell", exif.getModel()),
-                    new Pair<>("Belichtungszeit", exif.getExposure() + " Sek."),
-                    new Pair<>("Blende", "f/" + exif.getAperture()),
-                    new Pair<>("Brennweite", "" + exif.getFocalLength()),
-                    new Pair<>("ISO", "" + exif.getIso()),
-                    new Pair<>("Blitz", exif.isFlash()? "wurde ausgelöst" : "wurde nicht ausgelöst"),
-                    new Pair<>("Höhe", "" + exif.getAltitude()));
-            exifName.setCellValueFactory(new PropertyValueFactory<>("Key"));
-            exifValue.setCellValueFactory(new PropertyValueFactory<>("Value"));
-            exifTable.setItems(exifData);
-        } catch (ServiceException e) {
-            // TODO Dialog
+        // Add the map markers for each photo.
+        mapsScene.clearMarkers();
+        activePhotos.forEach(photo -> mapsScene.addMarker(photo));
+
+        // Show additional details for a single selected photo.
+        if (singleActive) {
+            Photo photo = photos.get(0);
+            tagSelector.showCurrentlySetTags(photo);
+
+            try {
+                Exif exif = exifService.getExif(photo);
+                ObservableList<Pair<String, String>> exifData = FXCollections.observableArrayList(
+                        new Pair<>("Aufnahmedatum", photo.getDatetime().toString()), new Pair<>("Kamerahersteller", exif.getMake()),
+                        new Pair<>("Kameramodell", exif.getModel()), new Pair<>("Belichtungszeit", exif.getExposure() + " Sek."),
+                        new Pair<>("Blende", "f/" + exif.getAperture()), new Pair<>("Brennweite", "" + exif.getFocalLength()),
+                        new Pair<>("ISO", "" + exif.getIso()), new Pair<>("Blitz",
+                                exif.isFlash() ? "wurde ausgelöst" : "wurde nicht ausgelöst"), new Pair<>("Höhe", "" + exif.getAltitude()));
+                exifName.setCellValueFactory(new PropertyValueFactory<>("Key"));
+                exifValue.setCellValueFactory(new PropertyValueFactory<>("Value"));
+                exifTable.setItems(exifData);
+            } catch (ServiceException e) {
+                // TODO Dialog
+            }
         }
     }
 

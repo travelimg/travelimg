@@ -27,6 +27,10 @@
     -fx-accent: #E91E63;
     -fx-accent-light: #EC407A;
     -fx-accent-dark: #D81B60;
+
+    -fx-indetermined: #2196F3;
+    -fx-indetermined-light: #42A5F5;
+    -fx-indetermined-light: #1E88E5;
 }
 
 * {
@@ -108,36 +112,6 @@
 }
 .button.raised.primary .glyph-icon {
     -fx-fill: white;
-}
-
-/* toggle button */
-.toggle-button {
-    -fx-padding: 11px 8px;
-    -fx-background-radius: 3px;
-    -fx-font-size: 14px;
-    -fx-background-color: -fx-default;
-    -fx-effect: -fx-dropshadow-1;
-}
-.toggle-button:focused {
-    -fx-background-color: -fx-default-focus;
-    -fx-effect: -fx-dropshadow-3;
-}
-.toggle-button:hover {
-    -fx-background-color: -fx-default-hover;
-}
-.toggle-button:pressed {
-    -fx-effect: -fx-dropshadow-3;
-    -fx-background-color: -fx-default-press;
-}
-.toggle-button:disabled {
-    -fx-effect: none;
-    -fx-background-color: -fx-default-disabled;
-}
-.toggle-button:selected {
-    -fx-background-color: -fx-primary;
-}
-.toggle-button:selected * {
-    -fx-text-fill: white;
 }
 
 /* input fields */
@@ -291,23 +265,21 @@
     -fx-background-color: -fx-primary;
 }
 .navbar .button {
+    -fx-background-color: -fx-primary;
     -fx-border-radius: 0;
-    -fx-background-color: transparent;
-    -fx-text-fill: white;
+}
+.navbar .button:hover {
+    -fx-background-color: -fx-primary-hover;
 }
 .navbar .button:pressed {
     -fx-background-color: -fx-primary-press;
 }
 .navbar .button .glyph-icon {
-    -fx-opacity: 0.8;
-    -fx-fill: white;
+    -fx-fill: rgba(255, 255, 255, 0.5);
     -glyph-size: 20;
 }
-.navbar .button:focused  .glyph-icon {
-    -fx-opacity: 1.0;
-}
-.navbar .button:hover  .glyph-icon {
-    -fx-opacity: 1.0;
+.navbar .button:pressed .glyph-icon {
+    -fx-fill: white;
 }
 .navbar .button:disabled {
     -fx-background-color: #1E88E5;
@@ -333,12 +305,6 @@
 .image-tile .progress-indicator {
     -fx-progress-color: rgba(0, 0, 0, 0.3);
 }
-.image-tile:hover .progress-indicator {
-    -fx-progress-color: rgba(0, 0, 0, 0.6);
-}
-.image-tile:selected .progress-indicator {
-    -fx-progress-color: rgba(0, 0, 0, 0.6);
-}
 
 .photo-tile .overlay {
     -fx-max-height: 20px;
@@ -355,7 +321,6 @@
     -fx-fill: #eeeeee;
     -glypy-size: 12;
 }
-
 .photo-tile .overlay .glyph-icon:hover {
     -fx-fill: white;
 }
@@ -373,27 +338,35 @@
     -fx-padding: 8px 12px;
 }
 
-.rating-picker {
-    -fx-effect: -fx-dropshadow-1;
-    -fx-padding: 16px;
-}
 .rating-picker .toggle-button {
-    -fx-effect: none;
+    -fx-background-color: -fx-primary;
+    -fx-padding: 16px;
     -fx-background-radius: 0;
-    -fx-pref-width: 48px;
 }
-.rating-picker .toggle-button.bad {
-    -fx-background-radius: 3 0 0 3;
+.rating-picker .toggle-button:hover {
+    -fx-background-color: -fx-primary-hover;
 }
-.rating-picker .toggle-button.good {
-    -fx-background-radius: 0 3 3 0;
+.rating-picker .toggle-button:pressed {
+    -fx-background-color: -fx-primary-press;
 }
-.rating-picker .toggle-button .glyph-icon {
-    -glyph-size: 16;
-    -fx-fill: -fx-text;
+.rating-picker .glyph-icon {
+    -glyph-size: 20;
+    -fx-fill: rgba(255, 255, 255, 0.5);
+}
+.rating-picker .toggle-button:selected {
+    -fx-background-color: -fx-accent;
 }
 .rating-picker .toggle-button:selected .glyph-icon {
     -fx-fill: white;
+}
+.rating-picker.indetermined .toggle-button {
+    -fx-background-color: -fx-indetermined;
+}
+.rating-picker.indetermined .toggle-button:hover {
+    -fx-background-color: -fx-indetermined-light;
+}
+.rating-picker.indetermined .toggle-button:pressed {
+    -fx-background-color: -fx-indetermined-dark;
 }
 
 .add-category {
@@ -482,6 +455,9 @@
 .filter-list .check-item.checked .glyph-icon {
     -fx-fill: -fx-accent;
 }
+.filter-list .check-item.indetermined .glyph-icon {
+    -fx-fill: -fx-indetermined;
+}
 .filter-list .header {
     -fx-background-color: -fx-primary;
     -fx-font-size: 16;
@@ -513,15 +489,15 @@
     -glyph-size: 80;
 }
 
-.alert {
+.inspector .alert {
     -fx-background-color: -fx-background-alt;
     -fx-text-fill: white;
-    -fx-padding: 16px;
+    -fx-padding: 32px 16px;
 }
-.alert.warning {
-    -fx-background-color: -fx-accent;
+.inspector .alert.warning {
+    -fx-background-color: -fx-indetermined;
 }
-.alert .glyph-icon {
-    -glyph-size: 30;
+.inspector .alert .glyph-icon {
+    -glyph-size: 50;
     -fx-fill: white;
 }
