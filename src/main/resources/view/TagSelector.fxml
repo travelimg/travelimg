@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.layout.HBox?>
+<?import org.controlsfx.control.CheckListView?>
+<?import javafx.geometry.Insets?>
+<fx:root fx:id="root" stylesheets="@style.css" type="javafx.scene.layout.VBox"
+         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+
+    <HBox prefWidth="200.0" styleClass="add-category">
+        <TextField fx:id="newCatName" promptText="Kategorie hinzufügen"/>
+        <ToggleButton fx:id="addCategoryBtn" styleClass="add-category-Btn">
+            <graphic>
+                <FontAwesomeIconView glyphName="PLUS"/>
+            </graphic>
+        </ToggleButton>
+        <Button fx:id="deleteTagBtn">
+            <graphic>
+                <FontAwesomeIconView glyphName="MINUS"/>
+            </graphic>
+        </Button>
+    </HBox>
+    <CheckListView fx:id="tagList" prefWidth="240.0"/>
+</fx:root>

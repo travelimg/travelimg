@@ -1,45 +1,36 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
-
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotographerDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
-import at.ac.tuwien.qse.sepm.entities.Tag;
-
 import at.ac.tuwien.qse.sepm.entities.Rating;
-
+import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+import at.ac.tuwien.qse.sepm.util.IOHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.sql.Date;
 import java.sql.ResultSet;
-
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-
-import java.util.stream.Collectors;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
@@ -50,13 +41,13 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private static final String GET_BY_ID_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude FROM Photo where id=?";
     private static final String UPDATE_STATEMENT = "UPDATE Photo SET path = ?, rating = ? WHERE id = ?";
 
-
     private final String photoDirectory;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.ENGLISH);
     private SimpleJdbcInsert insertPhoto;
 
     @Autowired private PhotoTagDAO photoTagDAO;
     @Autowired private PhotographerDAO photographerDAO;
+    @Autowired private IOHandler ioHandler;
 
     public JDBCPhotoDAO(String photoDirectory) {
         this.photoDirectory = photoDirectory;
@@ -133,18 +124,23 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
         int id = photo.getId();
 
-        List<Tag> taglist = photoTagDAO.readTagsByPhoto(photo);
-        if (taglist != null) {
-            for (Tag t : taglist) {
-                photoTagDAO.removeTagFromPhoto(photo, t);
+        try {
+            int affected = jdbcTemplate.update(DELETE_STATEMENT, id);
+            photoTagDAO.deleteAllEntriesOfSpecificPhoto(photo);
+            jdbcTemplate.update(DELETE_STATEMENT, id);
+
+            if (affected != 1) {
+                throw new DAOException("Could not delete photo");
             }
+        } catch (DataAccessException e) {
+            throw new DAOException("Failed to delete photo", e);
         }
 
         try {
-            jdbcTemplate.update(DELETE_STATEMENT, id);
-
-        } catch (DataAccessException e) {
-            throw new DAOException("Failed to delete photo", e);
+            ioHandler.delete(Paths.get(photo.getPath()));
+        } catch (IOException ex) {
+            logger.error("Failed to delete photo", ex);
+            throw new DAOException("Failed to delete photo", ex);
         }
     }
 
@@ -163,7 +159,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     @Override
-    public List<Photo> readAll() throws DAOException, ValidationException {
+    public List<Photo> readAll() throws DAOException {
         logger.debug("retrieving all photos");
 
         try {
@@ -221,6 +217,11 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
      */
     private String copyToPhotoDirectory(Photo photo) throws IOException {
         File source = new File(photo.getPath());
+
+        if(!source.exists()) {
+            throw new IOException("File " + source.getPath() + " does not exist");
+        }
+
         String filename = source.getName();
         String date = dateFormatter.format(photo.getDatetime());
 
@@ -233,9 +234,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         if(source.getPath().equals(dest.getPath()))
             return photo.getPath();
 
-        logger.debug("Copying {} to {}", source.getPath(), dest.getPath());
-
-        Files.copy(source.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        ioHandler.copyFromTo(source.toPath(), dest.toPath());
 
         return dest.getPath();
     }
@@ -243,23 +242,33 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private class PhotoRowMapper implements RowMapper<Photo> {
         @Override
         public Photo mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Photographer photographer;
+
+            Photo photo = new Photo();
+            photo.setId(rs.getInt(1));
+            photo.setPath(rs.getString(3));
+            photo.setRating(Rating.from(rs.getInt(4)));
+            photo.setDatetime(rs.getTimestamp(5).toLocalDateTime());
+            photo.setLatitude(rs.getDouble(6));
+            photo.setLongitude(rs.getDouble(7));
+
             try {
-                photographer = photographerDAO.getById(rs.getInt(2));
+                int photographerId = rs.getInt(2);
+                Photographer photographer = photographerDAO.getById(photographerId);
+                photo.setPhotographer(photographer);
             } catch (DAOException ex) {
                 throw new RuntimeException(ex);
             }
 
-            Rating rating = Rating.from(rs.getInt(4));
+            try {
+                List<Tag> tags = photoTagDAO.readTagsByPhoto(photo);
+                photo.getTags().addAll(tags);
+            } catch (DAOException ex) {
+                throw new RuntimeException(ex);
+            } catch (ValidationException ex) {
+                throw new RuntimeException(ex);
+            }
 
-            return new Photo(rs.getInt(1),
-                    photographer,
-                    rs.getString(3),
-                    rating,
-                    rs.getTimestamp(5).toLocalDateTime(),
-                    rs.getDouble(6),
-                    rs.getDouble(7)
-            );
+            return photo;
         }
     }
 }

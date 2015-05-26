@@ -5,15 +5,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class CancelableTask implements Runnable, Cancelable {
 
-    private AtomicBoolean isRunning = new AtomicBoolean(false);
+    private AtomicBoolean finished = new AtomicBoolean(false);
+    private AtomicBoolean running = new AtomicBoolean(false);
 
     /**
      * Return the current execution status of the task.
      *
      * @return true if the task is currently executing else false.
      * */
-    protected boolean getIsRunning() {
-        return isRunning.get();
+    protected boolean isRunning() {
+        return running.get();
     }
 
     /**
@@ -21,9 +22,10 @@ public abstract class CancelableTask implements Runnable, Cancelable {
      */
     @Override
     public void run() {
-        isRunning.set(true);
+        running.set(true);
         execute();
-        isRunning.set(false);
+        running.set(false);
+        finished.set(true);
     }
 
     /**
@@ -33,9 +35,13 @@ public abstract class CancelableTask implements Runnable, Cancelable {
      */
     @Override
     public void cancel() {
-        isRunning.set(false);
+        running.set(false);
     }
 
+    @Override
+    public boolean isFinished() {
+        return finished.get();
+    }
 
     /**
      * Perform the work the task is intended for.

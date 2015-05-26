@@ -30,6 +30,24 @@ public interface PhotoTagDAO {
     void removeTagFromPhoto(Photo photo, Tag tag) throws DAOException, ValidationException;
 
     /**
+     * Delete if existent all photo-tag entries where Tag = <tt>tag</tt>
+     *
+     * @param tag must not be null; tag.id must not be null;
+     * @throws DAOException: if an exception occurs on persistence layer
+     * @throws ValidationException: if parameter validation fails
+     */
+    void deleteAllEntriesOfSpecificTag(Tag tag) throws DAOException, ValidationException;
+
+    /**
+     * Delete if existent all photo-tag entries where Photo = <tt>photo</tt>
+     *
+     * @param photo must not be null; photo.id must not be null;
+     * @throws DAOException: if an exception occurs on persistence layer
+     * @throws ValidationException: if parameter validation fails
+     */
+    void deleteAllEntriesOfSpecificPhoto(Photo photo) throws DAOException, ValidationException;
+
+    /**
      * Return list of all tags which are currently set for <tt>photo</tt>.
      *
      * @param photo must not be null; photo.id must not be null;

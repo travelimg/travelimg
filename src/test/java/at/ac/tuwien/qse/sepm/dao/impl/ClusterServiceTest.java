@@ -40,8 +40,6 @@ public class ClusterServiceTest {
             clusterService.cluster(photoDAO.readAll());
         } catch (DAOException e) {
             e.printStackTrace();
-        } catch (ValidationException e) {
-            e.printStackTrace();
         } catch (ServiceException e) {
             e.printStackTrace();
         }

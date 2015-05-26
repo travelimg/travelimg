@@ -1,6 +1,8 @@
 package at.ac.tuwien.qse.sepm.entities;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Photo {
 
@@ -13,6 +15,7 @@ public class Photo {
     private double longitude;
     private Journey journey;
     private Place place;
+    private final List<Tag> tags = new ArrayList<>();
 
     public Photo() {
     }
@@ -109,6 +112,10 @@ public class Photo {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
     }
 
     @Override

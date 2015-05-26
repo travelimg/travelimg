@@ -8,11 +8,7 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
-import at.ac.tuwien.qse.sepm.service.Service;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.util.Cancelable;
-import at.ac.tuwien.qse.sepm.util.CancelableTask;
-import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +17,8 @@ import java.time.YearMonth;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class PhotoServiceImpl implements PhotoService {
 
@@ -39,15 +36,6 @@ public class PhotoServiceImpl implements PhotoService {
         } catch (DAOException ex) {
             throw new ServiceException(ex);
         }
-    }
-
-    @Override
-    public Cancelable loadPhotosByMonth(YearMonth month, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
-        LOGGER.debug("Loading photos for month {}",month);
-        AsyncLoader loader = new AsyncLoader(month, callback, errorHandler);
-        executorService.submit(loader);
-
-        return loader;
     }
 
     @Override
@@ -79,9 +67,16 @@ public class PhotoServiceImpl implements PhotoService {
             return photoDAO.readAll();
         } catch (DAOException e) {
             throw new ServiceException(e);
-        } catch (ValidationException e) {
-            throw new ServiceException("Failed to validate entity", e);
         }
+    }
+
+    @Override
+    public List<Photo> getAllPhotos(Predicate<Photo> filter) throws ServiceException {
+        LOGGER.debug("Entering getAllPhotos with {}", filter);
+        return getAllPhotos()
+                .stream()
+                .filter(filter)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -98,6 +93,7 @@ public class PhotoServiceImpl implements PhotoService {
         for (Photo photo : photos) {
             try {
                 photoTagDAO.createPhotoTag(photo, tag);
+                photo.getTags().add(tag);
             } catch (DAOException ex) {
                 LOGGER.error("Photo-Tag-creation with {}, {} failed.", photo, tag);
                 throw new ServiceException("Creation of Photo-Tag failed.", ex);
@@ -117,6 +113,7 @@ public class PhotoServiceImpl implements PhotoService {
         for (Photo photo : photos) {
             try {
                 photoTagDAO.removeTagFromPhoto(photo, tag);
+                photo.getTags().remove(tag);
             } catch (DAOException ex) {
                 LOGGER.error("Removal of Photo-Tag with {}, {} failed.", photo, tag);
                 throw new ServiceException("Photo-Tag removal failed.", ex);
@@ -158,56 +155,5 @@ public class PhotoServiceImpl implements PhotoService {
             throw new ServiceException("Could not store rating of photo.", ex);
         }
         LOGGER.debug("Leaving savePhotoRating with {}", photo);
-    }
-
-    @Override
-    public List<Tag> getAllTags() throws ServiceException {
-        LOGGER.debug("Retrieving all tags...");
-        try {
-            return tagDAO.readAll();
-        } catch (DAOException e) {
-            throw new ServiceException(e);
-        }
-    }
-
-
-    private class AsyncLoader extends CancelableTask {
-        private YearMonth month;
-        private Consumer<Photo> callback;
-        private ErrorHandler<ServiceException> errorHandler;
-
-        public AsyncLoader(YearMonth month, Consumer<Photo> callback,
-                ErrorHandler<ServiceException> errorHandler) {
-            super();
-            this.month = month;
-            this.callback = callback;
-            this.errorHandler = errorHandler;
-        }
-
-        @Override protected void execute() {
-            List<Photo> photos;
-            try {
-                photos = photoDAO.readPhotosByMonth(month);
-            } catch (DAOException e) {
-                errorHandler.propagate(new ServiceException("Failed to load photos", e));
-                return;
-            }
-
-            for (Photo p : photos) {
-                if (!getIsRunning())
-                    return;
-                try {
-                    Thread.sleep(20);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                callback.accept(p);
-            }
-        }
-    }
-
-
-    public void close() {
-        executorService.shutdown();
     }
 }
