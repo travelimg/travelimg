@@ -17,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -30,6 +31,7 @@ public class FlickrServiceImpl implements FlickrService {
 
     private static final String API_KEY ="206f4ffa559e5e48301f84f046bf208b";
     private static final String SECRET ="f58343bd30c130b6";
+    private static final String tmpDir ="src/main/resources/tmp/";
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
     private AsyncDownloader downloader;
     private Flickr flickr;
@@ -56,8 +58,16 @@ public class FlickrServiceImpl implements FlickrService {
 
     @Override
     public void close() {
+        logger.debug("Shutting down executor...");
         executorService.shutdown();
-        //TODO delete photos from the tmp folder
+        File directory = new File(tmpDir);
+        if(directory.exists()){
+            File[] files = directory.listFiles();
+            logger.debug("Deleting photos from tmp folder...");
+            for(int i=0; i<files.length; i++) {
+                files[i].delete();
+            }
+        }
     }
 
     private class AsyncDownloader extends CancelableTask {
@@ -84,7 +94,7 @@ public class FlickrServiceImpl implements FlickrService {
 
         @Override
         protected void execute() {
-            Paths.get("src/main/resources/tmp").toFile().mkdirs();
+            Paths.get(tmpDir).toFile().mkdirs();
             try {
                 if(i==0){
                     SearchParameters searchParameters = new SearchParameters();
@@ -129,7 +139,7 @@ public class FlickrServiceImpl implements FlickrService {
                             HttpURLConnection httpConnection = (HttpURLConnection) (new URL(url).openConnection());
                             long completeFileSize = httpConnection.getContentLength();
                             in = new BufferedInputStream((httpConnection.getInputStream()));
-                            fout = new FileOutputStream("src/main/resources/tmp/"+id+"."+format);
+                            fout = new FileOutputStream(tmpDir+id+"."+format);
 
                             final byte data[] = new byte[64];
                             int count;
@@ -141,7 +151,7 @@ public class FlickrServiceImpl implements FlickrService {
                             }
                             at.ac.tuwien.qse.sepm.entities.Photo downloaded = new at.ac.tuwien.qse.sepm.entities.Photo();
                             GeoData geoData = flickr.getPhotosInterface().getGeoInterface().getLocation(id);
-                            downloaded.setPath("src/main/resources/tmp/"+id+"."+format);
+                            downloaded.setPath(tmpDir+id+"."+format);
                             downloaded.setLatitude(geoData.getLatitude());
                             downloaded.setLongitude(geoData.getLongitude());
                             downloaded.setRating(Rating.NONE);
