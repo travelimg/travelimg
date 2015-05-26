@@ -187,7 +187,10 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     public void handleOnImportButtonClicked(){
         ArrayList<Photo> photos = new ArrayList<Photo>();
         for(ImageTile i: selectedImages){
-            photos.add(i.getPhoto());
+            Photo p = i.getPhoto();
+            p.setDatetime(datePicker.getValue().atStartOfDay());
+            photos.add(p);
+            logger.debug("Added photo for import {}",p);
         }
         setResult(photos);
         selectedImages.clear();
@@ -202,6 +205,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK) {
+            logger.debug("Canceling the download...");
             if(downloadTask!=null)
                 downloadTask.cancel();
             progress.setVisible(false);
