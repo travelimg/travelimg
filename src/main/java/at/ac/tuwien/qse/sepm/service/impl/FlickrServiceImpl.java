@@ -32,6 +32,7 @@ public class FlickrServiceImpl implements FlickrService {
     private static final String API_KEY ="206f4ffa559e5e48301f84f046bf208b";
     private static final String SECRET ="f58343bd30c130b6";
     private static final String tmpDir ="src/main/resources/tmp/";
+    private static int nrOfPhotosToDownload = 10;
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
     private AsyncDownloader downloader;
     private Flickr flickr;
@@ -54,6 +55,7 @@ public class FlickrServiceImpl implements FlickrService {
     @Override
     public void reset() {
         i = 0;
+        nrOfPhotosToDownload = 10;
     }
 
     @Override
@@ -68,6 +70,69 @@ public class FlickrServiceImpl implements FlickrService {
                 files[i].delete();
             }
         }
+    }
+
+    /**
+     * Downloads a photo from flickr
+     * @param url the url of the photo
+     * @param id the id of the photo
+     * @param format the format of the photo
+     * @param nrOfDownloadedPhotos the number of downloaded photos (used to indicate the overall download progress)
+     * @param progressCallback callback object for the progress of the download
+     * @throws ServiceException
+     */
+    private void downloadPhotoFromFlickr(String url, String id, String format, int nrOfDownloadedPhotos, Consumer<Double> progressCallback) throws ServiceException {
+        BufferedInputStream in = null;
+        FileOutputStream fout = null;
+        try {
+            HttpURLConnection httpConnection = (HttpURLConnection) (new URL(url).openConnection());
+            long completeFileSize = httpConnection.getContentLength();
+            in = new BufferedInputStream((httpConnection.getInputStream()));
+            fout = new FileOutputStream(tmpDir + id + "." + format);
+
+            final byte data[] = new byte[64];
+            int count;
+            long downloadedFileSize = 0;
+            while ((count = in.read(data, 0, 64)) != -1) {
+                fout.write(data, 0, count);
+                downloadedFileSize = downloadedFileSize + count;
+                progressCallback.accept((nrOfDownloadedPhotos / (double) nrOfPhotosToDownload) + ((((double) downloadedFileSize) / ((double) completeFileSize)) / 100.0));
+            }
+        } catch (IOException e) {
+            throw new ServiceException(e.getMessage(),e);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {}
+            }
+            if (fout != null) {
+                try {
+                    fout.close();
+                } catch (IOException e) {}
+            }
+        }
+    }
+
+    /**
+     * Creates photo with geo data. This photo is available at flickr.
+     * @param id the id of the photo at flickr
+     * @param format the format of the photo
+     * @return the photo
+     * @throws ServiceException
+     */
+    private at.ac.tuwien.qse.sepm.entities.Photo createPhotoWithGeoData(String id, String format) throws ServiceException {
+        at.ac.tuwien.qse.sepm.entities.Photo downloaded = new at.ac.tuwien.qse.sepm.entities.Photo();
+        try {
+            GeoData geoData = flickr.getPhotosInterface().getGeoInterface().getLocation(id);
+            downloaded.setPath(tmpDir+id+"."+format);
+            downloaded.setLatitude(geoData.getLatitude());
+            downloaded.setLongitude(geoData.getLongitude());
+            downloaded.setRating(Rating.NONE);
+        } catch (FlickrException e) {
+            throw new ServiceException(e.getMessage(),e);
+        }
+        return downloaded;
     }
 
     private class AsyncDownloader extends CancelableTask {
@@ -89,9 +154,11 @@ public class FlickrServiceImpl implements FlickrService {
             this.callback = callback;
             this.progressCallback = progressCallback;
             this.errorHandler = errorHandler;
-
         }
 
+        /**
+         * Downloads 10 photos( beginning at index i ) from flickr using tags and/or geo data.
+         */
         @Override
         protected void execute() {
             Paths.get(tmpDir).toFile().mkdirs();
@@ -112,15 +179,14 @@ public class FlickrServiceImpl implements FlickrService {
                     logger.debug("Found {} photos.",list.size());
                 }
                 int nrOfDownloadedPhotos = 0;
-                int nrOfPhotosToDownload = 10;
-                if(list.size()-i<10){
+                if(list.size()-i<nrOfPhotosToDownload){
                     nrOfPhotosToDownload = list.size()-i;
                 }
                 logger.debug("Start downloading {} photos", nrOfPhotosToDownload);
                 for (;i<list.size();i++) {
 
                     Photo p = list.get(i);
-                    if(nrOfDownloadedPhotos==10){
+                    if(nrOfDownloadedPhotos==nrOfPhotosToDownload){
                         break;
                     }
                     if(!isRunning())
@@ -133,39 +199,11 @@ public class FlickrServiceImpl implements FlickrService {
                     String format = p.getOriginalFormat();
                     String url = "https://farm"+farmId+".staticflickr.com/"+serverId+"/"+id+"_"+originalSecret+"_o."+format;
                     if(!originalSecret.isEmpty()){
-                        BufferedInputStream in = null;
-                        FileOutputStream fout = null;
-                        try {
-                            HttpURLConnection httpConnection = (HttpURLConnection) (new URL(url).openConnection());
-                            long completeFileSize = httpConnection.getContentLength();
-                            in = new BufferedInputStream((httpConnection.getInputStream()));
-                            fout = new FileOutputStream(tmpDir+id+"."+format);
-
-                            final byte data[] = new byte[64];
-                            int count;
-                            long downloadedFileSize = 0;
-                            while ((count = in.read(data, 0, 64)) != -1) {
-                                fout.write(data, 0, count);
-                                downloadedFileSize = downloadedFileSize + count;
-                                progressCallback.accept((nrOfDownloadedPhotos/(double)nrOfPhotosToDownload)+((((double)downloadedFileSize) / ((double)completeFileSize))/100.0));
-                            }
-                            at.ac.tuwien.qse.sepm.entities.Photo downloaded = new at.ac.tuwien.qse.sepm.entities.Photo();
-                            GeoData geoData = flickr.getPhotosInterface().getGeoInterface().getLocation(id);
-                            downloaded.setPath(tmpDir+id+"."+format);
-                            downloaded.setLatitude(geoData.getLatitude());
-                            downloaded.setLongitude(geoData.getLongitude());
-                            downloaded.setRating(Rating.NONE);
-                            logger.debug("Downloaded photo {}",downloaded);
-                            callback.accept(downloaded);
-                            nrOfDownloadedPhotos++;
-                        } finally {
-                            if (in != null) {
-                                in.close();
-                            }
-                            if (fout != null) {
-                                fout.close();
-                            }
-                        }
+                        downloadPhotoFromFlickr(url,id,format,nrOfDownloadedPhotos,progressCallback);
+                        at.ac.tuwien.qse.sepm.entities.Photo downloaded = createPhotoWithGeoData(id,format);
+                        logger.debug("Downloaded photo {}",downloaded);
+                        callback.accept(downloaded);
+                        nrOfDownloadedPhotos++;
                     }
                     else{
                         logger.debug("Can't get original secret for photo.");
@@ -176,9 +214,8 @@ public class FlickrServiceImpl implements FlickrService {
             } catch (FlickrException e) {
                 errorHandler.propagate(new ServiceException("Failed to download photo", e));
                 return;
-            } catch (IOException e) {
+            } catch (ServiceException e) {
                 errorHandler.propagate(new ServiceException("Failed to download photo", e));
-                return;
             }
         }
     }
