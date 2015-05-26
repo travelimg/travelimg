@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Controller for organizer view which is used for browsing photos by month.
@@ -76,6 +77,20 @@ public class Organizer {
 
     public PhotoFilter getFilter() {
         return new PhotoFilter(filter);
+    }
+
+    /**
+     * Add a month to the month list view and check it
+     * @param month the month to be added.
+     */
+    public void addMonth(YearMonth month) {
+        List<YearMonth> months = monthListView.getValues();
+        months.add(month);
+
+        months = months.stream().distinct().collect(Collectors.toList());
+
+        monthListView.setValues(months);
+        monthListView.check(month);
     }
 
     @FXML

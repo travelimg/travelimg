@@ -18,6 +18,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.Year;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -119,6 +121,10 @@ public class GridView {
     private void handleImportedPhoto(Photo photo) {
         // queue an update in the main gui
         Platform.runLater(() -> {
+            // update filter to show the new month
+            YearMonth month = YearMonth.from(photo.getDatetime());
+            organizer.addMonth(month);
+
             // Ignore photos that are not part of the current filter.
             if (!filter.test(photo)) return;
             grid.addItem(photo);
