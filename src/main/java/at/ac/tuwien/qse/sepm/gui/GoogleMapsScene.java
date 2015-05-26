@@ -47,10 +47,9 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     private ArrayList<Photo> markers =null;
     private ArrayList<Marker> aktivMarker;
     private HashMap<String,LatLong> displayedMarker;
-    //new LatLong(40.7033127, -73.979681); // the default Location
-    private Marker actualMarker;
-    private Marker m;
-    private StateEventHandler h;
+
+
+
 
     /**
      * Default Constructor
@@ -58,33 +57,31 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      *
      */
     public GoogleMapsScene(){
-
+        logger.debug("GoogleMapsScene wird erzeugt ");
         this.mapView = new GoogleMapView();
         this.mapView.addMapInializedListener(this);
         aktivMarker = new ArrayList<Marker>();
         displayedMarker = new HashMap<>();
     }
-    public int sizeOfActiveMarker(){
-        if(aktivMarker ==null){
-            return 0;
-        }else {
-            return this.aktivMarker.size();
-        }
-    }
+
+
     /**
      * WorldMap Constructor
      * @param l
      */
     public GoogleMapsScene(ArrayList<Photo> l){
+        logger.debug("GoogleMapsScene wird erzeugt");
         this.mapView = new GoogleMapView();
         markers = l;
         aktivMarker = new ArrayList<Marker>();
         displayedMarker = new HashMap<>();
         this.mapView.addMapInializedListener(this);
     }
-    public void setZoom(int zoom){
+    public void setZoom(int zoom) {
         this.map.setZoom(zoom);
     }
+
+
     @Override
     public void mapInitialized() {
         //Set the initial properties of the map.
@@ -100,36 +97,46 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
                 .mapMarker(true);
         map = mapView.createMap(mapOptions);
 
-
         map.addUIEventHandler(UIEventType.dblclick, (JSObject obj) -> {
             LatLong ll = new LatLong((JSObject) obj.getMember("latLng"));
-            //System.out.println("LatLong: lat: " + ll.getLatitude() + " lng: " + ll.getLongitude());
-            System.out.println(ll.toString());
+            // the Coordinate on the Map
+            //TODO Markerhandling
         });
 
 
         if(markers!=null){
-            for(Photo photo : markers){
-                Marker m = new Marker(new MarkerOptions().position(new LatLong(photo.getLatitude(),
-                        photo.getLongitude())).visible(Boolean.TRUE).animation(Animation.BOUNCE));
-                m.setTitle("Marker");
-                m.setAnimation(Animation.BOUNCE);
-               aktivMarker.add(m);
-                displayedMarker.put(m.getVariableName(),
-                        new LatLong(photo.getLatitude(), photo.getLongitude()));
-                map.addMarker(m);
+            for(Photo photo : markers) {
+                if (!checkDouble(photo)) {
+                    Marker m = new Marker(new MarkerOptions()
+                            .position(new LatLong(photo.getLatitude(), photo.getLongitude()))
+                            .visible(Boolean.TRUE).animation(Animation.BOUNCE));
+                    m.setTitle("Marker");
 
+                    aktivMarker.add(m);
+                    displayedMarker.put(m.getVariableName(),
+                            new LatLong(photo.getLatitude(), photo.getLongitude()));
+                    map.addUIEventHandler(m, UIEventType.click, (JSObject obj) -> {
+                        //TODO Markerhandling
+
+                    });
+                    map.addMarker(m);
+
+                }
 
             }
-
-
         }
 
 
 
     }
+
+    /**
+     * set the Center of the MapView
+     * @param x the latitude
+     * @param y the longitude
+     */
     public void setCenter(double x, double y){
-        this.mapView.setCenter(x,y);
+        this.mapView.setCenter(x, y);
     }
 
     /**
@@ -159,24 +166,18 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         }
         displayedMarker.clear();
     }
-   /* public void addMarker(Photo photo){
-        if(actualMarker!=null)
-            map.removeMarker(actualMarker);
-        actualMarker = new Marker(new MarkerOptions().position(new LatLong(photo.getLatitude(),
-                photo.getLongitude())).visible(Boolean.TRUE).animation(Animation.BOUNCE));
-        mapView.setCenter(photo.getLatitude(), photo.getLongitude());
-        mapView.setZoom(1);//workaround to remove the old marker from the view
-        mapView.setZoom(12);
-        //actualMarker.setTitle(photo.getPhotographer().getName());
-        map.addMarker(actualMarker);
 
-    }*/
-
+    /**
+     *  add one marker, which represents the foto, to the map
+     * @param photo the photo
+     */
     public void addMarker(Photo photo){
         if(aktivMarker.size()!=0){
+            removeAktiveMarker();
             aktivMarker = new ArrayList<>();
         }
         if(displayedMarker.size()!=0){
+
             displayedMarker = new HashMap<>();
         }
         Marker m =new Marker(new MarkerOptions().position(new LatLong(photo.getLatitude(),
@@ -187,72 +188,78 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
                 new LatLong(photo.getLatitude(), photo.getLongitude()));
 
         map.addUIEventHandler(m, UIEventType.click, (JSObject obj) -> {
-            System.out.println(m.getVariableName());
-            System.out.println("AKTIVE MARKER");
-
-            System.out.println(displayedMarker.get(m.getVariableName()));
+            //TODO Markerhandler
 
         });
         mapView.setCenter(photo.getLatitude(), photo.getLongitude());
         mapView.setZoom(12);
         map.addMarker(m);
     }
+
+    /**
+     *  try to add some marker
+     * @param list list of photos to be displayed on the map
+     */
     public void addMarkerList(List<Photo> list){
             if(aktivMarker.size()!=0){
+                removeAktiveMarker();
                 aktivMarker = new ArrayList<>();
             }
             if(displayedMarker.size()!=0){
                 displayedMarker = new HashMap<>();
             }
-        ArrayList<LatLong> centerPoint = new ArrayList<>();
+
+
         for(Photo photo:list){
-            Marker m = new Marker(new MarkerOptions().position(new LatLong(photo.getLatitude(),
-                    photo.getLongitude())).visible(Boolean.TRUE).animation(Animation.BOUNCE));
-            m.setTitle("Marker");
-            aktivMarker.add(m);
-            displayedMarker.put(m.getVariableName(),
-                    new LatLong(photo.getLatitude(), photo.getLongitude()));
-            map.addUIEventHandler(m, UIEventType.click, (JSObject obj) -> {
-                System.out.println(m.getVariableName());
-                System.out.println("AKTIVE MARKER");
+            if(!checkDouble(photo)){
+                Marker m = new Marker(new MarkerOptions().position(new LatLong(photo.getLatitude(),
+                        photo.getLongitude())).visible(Boolean.TRUE).animation(Animation.BOUNCE));
+                m.setTitle("Marker");
+                aktivMarker.add(m);
+                displayedMarker.put(m.getVariableName(),
+                        new LatLong(photo.getLatitude(), photo.getLongitude()));
+                map.addUIEventHandler(m, UIEventType.click, (JSObject obj) -> {
+                   //TODO Markerhandler
 
-                System.out.println(displayedMarker.get(m.getVariableName()));
+                });
 
-            });
-            centerPoint.add(new LatLong(photo.getLatitude(),
-                    photo.getLongitude()));
-            map.addMarker(m);
+                map.addMarker(m);
+            }else{
+                logger.debug("Marker wird nicht gesetzt");
+            }
+
         }
-        double [] center = calculateCenter(centerPoint);
-        //mapView.setCenter(center[0],center[1]);
+
 
         mapView.setZoom(10);
-        System.out.println(displayedMarker.size());
+
 
     }
-    public double[] calculateCenter(ArrayList<LatLong> centerPoint){
-        double x=0;
-        double y=0;
-        double area=0;
-        double[] erg = new double[2];
-        for(int i =0; i<centerPoint.size()-1;i++){
-            LatLong point = centerPoint.get(i);
-            LatLong pointN = centerPoint.get(i+1);
-            double help = point.getLatitude() * pointN.getLongitude() + pointN.getLatitude()*point.getLongitude();
 
-            x += (point.getLatitude() + pointN.getLatitude())*help;
-            y += (point.getLongitude() + pointN.getLongitude())*help;
+    /**
+     * checks whether a marker representing a photo and is already available
+     * @param p the photo
+     * @return true if a marker representing the photo , false if there ist no marker representing the photo
+     */
+    public boolean checkDouble(Photo p){
 
-            area += help;
+        for(String key:displayedMarker.keySet()){
+            if(p.getLatitude()==displayedMarker.get(key).getLatitude() && p.getLongitude() ==displayedMarker.get(key).getLongitude()){
+                logger.debug("Marker schon vorhanden");
+                return true;
+
+            }
+            double latrpos = displayedMarker.get(key).getLatitude()+0.1;
+            double latrneg = displayedMarker.get(key).getLatitude()-0.1;
+            double lonrneg = displayedMarker.get(key).getLongitude()-0.1;
+            double lonrpos = displayedMarker.get(key).getLongitude()+0.1;
+            if(latrpos-p.getLatitude()>0 || p.getLatitude()-latrneg>0 && lonrpos-p.getLongitude()<0 || p.getLongitude()-lonrneg<0){
+                logger.debug("Marker im Raduis +- 0.1 schon vorhanden");
+                return true;
+            }
         }
-        area /= 2.0;
-        x *= 1/6.0 *area;
-        y *= 1/6.0 *area;
-
-        erg[0]=x;
-        erg[1]=y;
-        return erg;
-
+        logger.debug("Marker wird gesetzt");
+        return false;
     }
 
 

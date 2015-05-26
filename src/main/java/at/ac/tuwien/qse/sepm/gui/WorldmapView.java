@@ -6,15 +6,19 @@ import at.ac.tuwien.qse.sepm.service.ServiceException;
 import com.lynden.gmapsfx.javascript.object.LatLong;
 import javafx.fxml.FXML;
 import javafx.scene.layout.BorderPane;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class WorldmapView {
     @FXML private BorderPane border;
     private GoogleMapsScene worldMap;
     @Autowired private PhotoService photoService;
+    private static final org.apache.logging.log4j.Logger logger = LogManager
+            .getLogger(WorldmapView.class);
 
     public WorldmapView(){
 
@@ -23,14 +27,15 @@ public class WorldmapView {
 
     }
     public void setMap(GoogleMapsScene map){
+        logger.debug("Worldmap wird erstellt");
         this.worldMap = map;
 
         worldMap.removeAktiveMarker();
         try {
             worldMap.addMarkerList(photoService.getAllPhotos());
-//            border.getChildren().add(worldMap.getMapView());
+
         } catch (ServiceException e) {
-            //TODO
+            logger.debug(e);
         }
         worldMap.setCenter(70.7385, -90.9871);
         worldMap.setZoom(2);
