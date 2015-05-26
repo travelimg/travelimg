@@ -47,7 +47,7 @@ public class Inspector {
 
 
     @FXML private BorderPane root;
-    @FXML private Label placeholder;
+    //@FXML private Label placeholder;
     @FXML private Node details;
     @FXML private Node multiAlert;
 
@@ -55,6 +55,7 @@ public class Inspector {
     @FXML private Button dropboxButton;
     @FXML private VBox tagSelectionContainer;
     @FXML private VBox mapContainer;
+    @FXML private VBox placeholder;
     @FXML private HBox ratingPickerContainer;
     @FXML private TableColumn<String, String> exifName;
     @FXML private TableColumn<String, String> exifValue;
@@ -119,21 +120,16 @@ public class Inspector {
         return this.mapsScene;
     }
     @FXML private void initialize() {
+
+
+
         mapsScene = new GoogleMapsScene();
         tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService);
-        // if placeholder is hidden then it should not take up any space
-        placeholder.managedProperty().bind(placeholder.visibleProperty());
-        // hide placeholder when details are visible
-        placeholder.visibleProperty().bind(Bindings.not(details.visibleProperty()));
 
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
         deleteButton.setOnAction(this::handleDelete);
         dropboxButton.setOnAction(this::handleDropbox);
-        //ratingPickerContainer.getChildren().add(ratingPicker);
-
-        //ratingPicker.ratingProperty().addListener(this::handleRatingChanged);
         mapContainer.getChildren().add(mapsScene.getMapView());
-        //addActivePhoto(null);
         tagSelectionContainer.getChildren().add(tagSelector);
     }
     public void setMap(GoogleMapsScene map){
