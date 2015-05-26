@@ -7,7 +7,7 @@
 <?import javafx.scene.text.Font?>
 <fx:root fx:id="root" prefHeight="495.0" prefWidth="593.0" styleClass="dialog,import-dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-<AnchorPane prefHeight="495.0" prefWidth="593.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="anchorPane" prefHeight="495.0" prefWidth="593.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox fx:id="progress" alignment="CENTER" layoutX="310.0" layoutY="424.0" spacing="5.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>

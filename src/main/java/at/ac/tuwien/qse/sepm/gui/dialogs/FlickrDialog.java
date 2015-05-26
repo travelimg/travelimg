@@ -33,6 +33,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -53,6 +54,7 @@ import java.util.function.Consumer;
 
 public class FlickrDialog extends ResultDialog<List<Photo>> {
 
+    @FXML private AnchorPane anchorPane;
     @FXML private HBox progress;
     @FXML private ProgressBar progressBar;
     @FXML private FlowPane photosFlowPane;
@@ -199,19 +201,16 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
 
     @FXML
     public void handleOnStopButtonClicked(){
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Download abbrechen");
-        alert.setHeaderText("Download abbrechen?");
+        ConfirmationDialog confirmationDialog = new ConfirmationDialog(anchorPane, "Download abbrechen","Download abbrechen?");
+        Optional<Boolean> confirmed = confirmationDialog.showForResult();
+        if (!confirmed.isPresent() || !confirmed.get()) return;
+        logger.debug("Canceling the download...");
+        if(downloadTask!=null)
+            downloadTask.cancel();
+        progress.setVisible(false);
+        progressBar.setProgress(0.0);
+        downloadButton.setDisable(false);
 
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
-            logger.debug("Canceling the download...");
-            if(downloadTask!=null)
-                downloadTask.cancel();
-            progress.setVisible(false);
-            progressBar.setProgress(0.0);
-            downloadButton.setDisable(false);
-        }
     }
 
     private void downloadPhotos(){
