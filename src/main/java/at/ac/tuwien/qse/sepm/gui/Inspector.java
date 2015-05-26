@@ -121,16 +121,14 @@ public class Inspector {
     }
     @FXML private void initialize() {
 
+            mapsScene = new GoogleMapsScene();
+            tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService);
+            ratingPicker.setRatingChangeHandler(this::handleRatingChange);
+            deleteButton.setOnAction(this::handleDelete);
+            dropboxButton.setOnAction(this::handleDropbox);
+            mapContainer.getChildren().add(mapsScene.getMapView());
+            tagSelectionContainer.getChildren().add(tagSelector);
 
-
-        mapsScene = new GoogleMapsScene();
-        tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService);
-
-        ratingPicker.setRatingChangeHandler(this::handleRatingChange);
-        deleteButton.setOnAction(this::handleDelete);
-        dropboxButton.setOnAction(this::handleDropbox);
-        mapContainer.getChildren().add(mapsScene.getMapView());
-        tagSelectionContainer.getChildren().add(tagSelector);
     }
     public void setMap(GoogleMapsScene map){
         this.mapsScene = map;
