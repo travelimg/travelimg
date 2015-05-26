@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.gui;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Toggle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,21 +16,18 @@ public class RatingPicker {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @FXML private Node root;
-    @FXML private Toggle badButton;
-    @FXML private Toggle neutralButton;
-    @FXML private Toggle goodButton;
+    @FXML private Button badButton;
+    @FXML private Button neutralButton;
+    @FXML private Button goodButton;
 
-    private Rating rating = Rating.NONE;
+    private Rating rating = null;
     private boolean indetermined = false;
     private Consumer<Rating> ratingChangeHandler;
 
     @FXML private void initialize() {
-        badButton.selectedProperty().addListener((observable, oldValue, newValue) ->
-                setRating(Rating.BAD));
-        neutralButton.selectedProperty().addListener((observable, oldValue, newValue) ->
-                setRating(Rating.NEUTRAL));
-        goodButton.selectedProperty().addListener((observable, oldValue, newValue) ->
-                setRating(Rating.GOOD));
+        badButton.setOnMouseClicked((event) -> handleToggle(badButton, Rating.BAD));
+        neutralButton.setOnMouseClicked((event) -> handleToggle(neutralButton, Rating.NEUTRAL));
+        goodButton.setOnMouseClicked((event) -> handleToggle(goodButton, Rating.GOOD));
     }
 
     public void setRatingChangeHandler(Consumer<Rating> ratingChangeHandler) {
@@ -43,9 +41,9 @@ public class RatingPicker {
     public void setRating(Rating rating) {
         if (this.rating == rating) return;
 
-        badButton.setSelected(false);
-        neutralButton.setSelected(false);
-        goodButton.setSelected(false);
+        badButton.getStyleClass().remove("selected");
+        neutralButton.getStyleClass().remove("selected");
+        goodButton.getStyleClass().remove("selected");
         root.getStyleClass().remove("indetermined");
 
         this.rating = rating;
@@ -58,26 +56,32 @@ public class RatingPicker {
 
         switch (rating) {
             case BAD:
-                badButton.setSelected(true);
+                badButton.getStyleClass().add("selected");
                 break;
             case NEUTRAL:
-                neutralButton.setSelected(true);
+                neutralButton.getStyleClass().add("selected");
                 break;
             case GOOD:
-                goodButton.setSelected(true);
+                goodButton.getStyleClass().add("selected");
                 break;
+            case NONE:
+
         }
 
         onRatingChange();
     }
 
-    public boolean isIndetermined() {
-        return indetermined;
-    }
-
     private void onRatingChange() {
         if (ratingChangeHandler != null) {
             ratingChangeHandler.accept(getRating());
+        }
+    }
+
+    private void handleToggle(Button button, Rating rating) {
+        if (button.getStyleClass().contains("selected")) {
+            setRating(Rating.NONE);
+        } else {
+            setRating(rating);
         }
     }
 }

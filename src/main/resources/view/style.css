@@ -338,34 +338,34 @@
     -fx-padding: 8px 12px;
 }
 
-.rating-picker .toggle-button {
+.rating-picker .button {
     -fx-background-color: -fx-primary;
     -fx-padding: 16px;
     -fx-background-radius: 0;
 }
-.rating-picker .toggle-button:hover {
+.rating-picker .button:hover {
     -fx-background-color: -fx-primary-hover;
 }
-.rating-picker .toggle-button:pressed {
+.rating-picker .button:pressed {
     -fx-background-color: -fx-primary-press;
 }
 .rating-picker .glyph-icon {
     -glyph-size: 20;
     -fx-fill: rgba(255, 255, 255, 0.5);
 }
-.rating-picker .toggle-button:selected {
+.rating-picker .button.selected {
     -fx-background-color: -fx-accent;
 }
-.rating-picker .toggle-button:selected .glyph-icon {
+.rating-picker .button.selected .glyph-icon {
     -fx-fill: white;
 }
-.rating-picker.indetermined .toggle-button {
+.rating-picker.indetermined .button {
     -fx-background-color: -fx-indetermined;
 }
-.rating-picker.indetermined .toggle-button:hover {
+.rating-picker.indetermined .button:hover {
     -fx-background-color: -fx-indetermined-light;
 }
-.rating-picker.indetermined .toggle-button:pressed {
+.rating-picker.indetermined .button:pressed {
     -fx-background-color: -fx-indetermined-dark;
 }
 
