@@ -4,10 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.dialogs.FlickrDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
-import at.ac.tuwien.qse.sepm.service.ImportService;
-import at.ac.tuwien.qse.sepm.service.PhotoService;
-import at.ac.tuwien.qse.sepm.service.PhotographerService;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -30,6 +27,7 @@ public class GridView {
 
     @Autowired private PhotoService photoService;
     @Autowired private ImportService importService;
+    @Autowired private FlickrService flickrService;
     @Autowired private PhotographerService photographerService;
     @Autowired private Organizer organizer;
     @Autowired private Inspector inspector;
@@ -56,7 +54,7 @@ public class GridView {
                     .importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
         });
         organizer.setFlickrAction(() -> {
-            FlickrDialog flickrDialog = new FlickrDialog(root,"Flickr Import");
+            FlickrDialog flickrDialog = new FlickrDialog(root,"Flickr Import",flickrService);
             Optional<List<Photo>> photos = flickrDialog.showForResult();
             if (!photos.isPresent()) return;
             importService.importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);

@@ -5,9 +5,7 @@ import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.gui.GoogleMapsScene;
 import at.ac.tuwien.qse.sepm.service.FlickrService;
-import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import com.lynden.gmapsfx.GoogleMapView;
@@ -43,11 +41,11 @@ import javafx.scene.text.Text;
 import netscape.javascript.JSObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -63,9 +61,9 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     @FXML private ScrollPane scrollPane;
     @FXML private FlowPane keywordsFlowPane;
     @FXML private TextField keywordTextField;
-    @Autowired private FlickrService flickrService;
-    @Autowired private ImportService importService;
+    @FXML private DatePicker datePicker;
 
+    private FlickrService flickrService;
     private GoogleMapView mapView;
     private GoogleMap googleMap;
     private Marker actualMarker;
@@ -74,13 +72,13 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     private Cancelable downloadTask;
     private static final Logger logger = LogManager.getLogger();
 
-    public FlickrDialog(Node origin, String title) {
+    public FlickrDialog(Node origin, String title, FlickrService flickrService) {
         super(origin, title);
         FXMLLoadHelper.load(this, this, FlickrDialog.class, "view/FlickrDialog.fxml");
         GoogleMapsScene mapsScene = new GoogleMapsScene();
         this.mapView = mapsScene.getMapView();
         this.mapContainer.getChildren().add(mapsScene.getMapView());
-        this.flickrService = new FlickrServiceImpl(); //TODO should be removed as we are using spring
+        this.flickrService = flickrService;
         keywordTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -129,6 +127,8 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
         progressBar.getStyleClass().add("progress-bar");
         progressBar.setTooltip(new Tooltip("Fotos werden heruntergeladen..."));
         stopButton.setTooltip(new Tooltip("Abbrechen"));
+        datePicker.setValue(LocalDate.now());
+        datePicker.setTooltip(new Tooltip("Wählen Sie ein Datum für die Fotos aus"));
     }
 
 
@@ -175,6 +175,9 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
 
     @FXML
     public void handleOnDownloadButtonClicked(){
+        mapContainer.setDisable(true);
+        keywordsFlowPane.setDisable(true);
+        keywordTextField.setDisable(true);
         downloadButton.setDisable(true);
         progress.setVisible(true);
         downloadPhotos();
