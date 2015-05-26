@@ -47,7 +47,7 @@ public class Inspector {
 
 
     @FXML private BorderPane root;
-    //@FXML private Label placeholder;
+
     @FXML private Node details;
     @FXML private Node multiAlert;
 
