@@ -176,7 +176,7 @@ public class FilterList<E> extends VBox {
             switch (getState()) {
                 case UNCHECKED:
                     icon.setGlyphName("SQUARE");
-                    getStyleClass().add("indetermined");
+                    getStyleClass().add("unchecked");
                     break;
                 case CHECKED:
                     icon.setGlyphName("CHECK_SQUARE");
@@ -184,7 +184,7 @@ public class FilterList<E> extends VBox {
                     break;
                 case INDETERMINED:
                     icon.setGlyphName("MINUS_SQUARE");
-                    getStyleClass().add("unchecked");
+                    getStyleClass().add("indetermined");
                     break;
             }
         }
