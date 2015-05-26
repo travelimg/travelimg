@@ -1,50 +1,41 @@
 package at.ac.tuwien.qse.sepm.gui.dialogs;
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 
-import java.util.List;
-
-/**
- * Created by christoph on 20.05.15.
- */
-public class DeleteDialog extends ResultDialog<List<Photo>> {
+public class DeleteDialog extends ResultDialog<Boolean> {
 
     @FXML private Button cancelButton;
-    @FXML private Button deleteP;
-    private List<Photo> photos;
+    @FXML private Button confirmButton;
+    @FXML private Label statusText;
 
     /**
-     *
-     * @param origin node that provides the stage that serves as the owner of this dialog
-     * @param photos the photos to delete
+     * {@inheritDoc}
      */
-    public DeleteDialog(Node origin, List<Photo> photos) {
-        super(origin, "Delete photos");
-        this.photos = photos;
+    public DeleteDialog(Node origin, int photoCount) {
+        super(origin, "Fotos Löschen");
         FXMLLoadHelper.load(this, this, InfoDialog.class, "view/DeleteDialog.fxml");
-        deleteP.setOnAction(this::handleDeleteP);
+        confirmButton.setOnAction(this::handleConfirm);
         cancelButton.setOnAction(this::handleCancel);
+
+        String status = "%d Fotos ausgewählt";
+        if (photoCount == 1) {
+            status = "%d Foto ausgewählt";
+        }
+        statusText.setText(String.format(status, photoCount));
     }
 
-    /**
-     * close the DeleteDialog
-     * @param event
-     */
     private void handleCancel(Event event){
+        setResult(false);
         close();
     }
 
-    /**
-     *  Delete the photos
-     * @param event
-     */
-    private void handleDeleteP(Event event) {
-        setResult(photos);
+    private void handleConfirm(Event event) {
+        setResult(true);
         close();
     }
 }
