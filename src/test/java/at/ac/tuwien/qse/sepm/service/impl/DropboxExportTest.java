@@ -89,7 +89,7 @@ public class DropboxExportTest {
         List<Photo> photos = photoService.getAllPhotos();
 
         // some path which exists on the system, but is definitely not inside the dropbox folder
-        String target = Paths.get(dropboxService.getDropboxFolder(), "travelimg", "doesnotexist").toString();
+        String target = Paths.get("travelimg", "doesnotexist").toString();
 
         TestPhotoAcceptor acceptor = new TestPhotoAcceptor();
         TestErrorHandler errorHandler = new TestErrorHandler();
