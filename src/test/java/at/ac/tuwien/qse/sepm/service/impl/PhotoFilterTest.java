@@ -1,4 +1,4 @@
-package at.ac.tuwien.qse.sepm.sevice.impl;
+package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
