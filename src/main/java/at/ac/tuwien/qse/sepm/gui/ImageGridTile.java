@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 public abstract class ImageGridTile<E> extends StackPane {
 
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final int IMG_SIZE = 300;
 
     private final ProgressIndicator progress = new ProgressIndicator();
     private final ImageView imageView = new ImageView();
@@ -30,8 +31,8 @@ public abstract class ImageGridTile<E> extends StackPane {
         setMargin(progress, new Insets(16));
         setPadding(new Insets(4));
 
-        imageView.setFitWidth(142);
-        imageView.setFitHeight(142);
+        imageView.setFitWidth(IMG_SIZE);
+        imageView.setFitHeight(IMG_SIZE);
         imageView.setPreserveRatio(true);
 
         super.getChildren().add(progress);

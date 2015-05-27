@@ -51,7 +51,8 @@ public class App extends Application {
             throw new RuntimeException(exception);
         }
 
-        stage.setScene(new Scene(root, 800, 600));
+        stage.setScene(new Scene(root));
+        stage.setMaximized(true);
         stage.setTitle("travelimg");
         stage.show();
     }
