@@ -119,7 +119,10 @@ public class ClusterServiceImpl implements ClusterService {
 
     @Override public List<Place> clusterJourney(Journey journey) throws ServiceException {
         List<Photo> photos;
-        Place place = new Place(-1, "", "");
+        List<Place> places = new ArrayList<Place>();
+        Place place = new Place(1, "Unknown place", "Unknown place");
+        double latitude = 1000;
+        double longitude = 1000;
 
         try {
             photos = photoDAO.readPhotosByJourney(journey);
@@ -130,22 +133,26 @@ public class ClusterServiceImpl implements ClusterService {
 
         for (Photo element : photos) {
             try {
-                Place tempPlace = geoService
-                        .getPlaceByGeoData(element.getLatitude(), element.getLongitude());
-                if (!place.getCity().equals(tempPlace.getCity())) {
-                    place = tempPlace;
-                    placeDAO.create(place);
+                if (Math.abs(element.getLatitude() - latitude) > 1
+                        && Math.abs(element.getLongitude() - longitude) > 1) {
+                    place = geoService
+                            .getPlaceByGeoData(element.getLatitude(), element.getLongitude());
+                    latitude = element.getLatitude();
+                    longitude = element.getLongitude();
                 }
+
+                latitude = element.getLatitude();
+                longitude = element.getLongitude();
+                placeDAO.create(place);
                 element.setPlace(place);
                 photoDAO.update(element);
+                places.add(place);
             } catch (DAOException e) {
                 e.printStackTrace();
             } catch (ValidationException e) {
                 e.printStackTrace();
             }
-
         }
-
-        return null;
+        return places;
     }
 }
