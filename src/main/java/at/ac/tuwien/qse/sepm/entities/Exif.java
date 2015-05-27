@@ -1,10 +1,7 @@
 package at.ac.tuwien.qse.sepm.entities;
 
-import java.sql.Timestamp;
-
 public class Exif {
     private int id;
-    private Timestamp date;
     private String exposure;
     private double aperture;
     private double focalLength;
@@ -12,13 +9,10 @@ public class Exif {
     private boolean flash;
     private String make;
     private String model;
-    private double latitude;
-    private double longitude;
     private double altitude;
 
-    public Exif(int id, Timestamp date, String exposure, double aperture, double focalLength, int iso, boolean flash, String make, String model, double latitude, double longitude, double altitude) {
+    public Exif(int id, String exposure, double aperture, double focalLength, int iso, boolean flash, String make, String model, double altitude) {
         this.id = id;
-        this.date = date;
         this.exposure = exposure;
         this.aperture = aperture;
         this.focalLength = focalLength;
@@ -26,8 +20,6 @@ public class Exif {
         this.flash = flash;
         this.make = make;
         this.model = model;
-        this.latitude = latitude;
-        this.longitude = longitude;
         this.altitude = altitude;
     }
 
@@ -37,14 +29,6 @@ public class Exif {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public Timestamp getDate() {
-        return date;
-    }
-
-    public void setDate(Timestamp date) {
-        this.date = date;
     }
 
     public String getExposure() {
@@ -87,23 +71,6 @@ public class Exif {
         this.flash = flash;
     }
 
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
-
     public double getAltitude() {
         return altitude;
     }
@@ -132,7 +99,6 @@ public class Exif {
     public String toString() {
         return "Exif{" +
                 "id=" + id +
-                ", date=" + date +
                 ", exposure='" + exposure + '\'' +
                 ", aperture=" + aperture +
                 ", focalLength=" + focalLength +
@@ -140,8 +106,6 @@ public class Exif {
                 ", flash=" + flash +
                 ", make='" + make + '\'' +
                 ", model='" + model + '\'' +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
                 ", altitude=" + altitude +
                 '}';
     }

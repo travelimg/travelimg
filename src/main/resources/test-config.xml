@@ -21,6 +21,8 @@
         <jdbc:script location="classpath:db/create.sql"/>
     </jdbc:embedded-database>
 
+    <bean id="ioHandler" class="at.ac.tuwien.qse.sepm.util.TestIOHandler"></bean>
+
     <bean id="transactionManager"
           class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
           scope="singleton">
@@ -31,7 +33,11 @@
           destroy-method="close">
     </bean>
 
-    <bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl"
+    <bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl"></bean>
+
+    <bean id="tagService" class="at.ac.tuwien.qse.sepm.service.impl.TagServiceImpl"></bean>
+
+    <bean id="dropboxService" class="at.ac.tuwien.qse.sepm.service.impl.DropboxServiceImpl"
           destroy-method="close">
     </bean>
 
@@ -42,7 +48,6 @@
     </bean>
 
     <bean id="tagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTagDAO"></bean>
-    <bean id="exifDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCExifDAO"></bean>
     <bean id="photoTagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoTagDAO"></bean>
     <bean id="photographerDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotographerDAO"></bean>
 </beans>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.layout.HBox?>
+<HBox fx:id="root" styleClass="rating-picker" stylesheets="@style.css" fx:controller="at.ac.tuwien.qse.sepm.gui.RatingPicker"
+         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" maxWidth="Infinity">
+    <children>
+        <Button fx:id="badButton" styleClass="bad" HBox.hgrow="SOMETIMES" maxWidth="Infinity">
+            <tooltip>
+                <Tooltip text="Schlechtes Foto"/>
+            </tooltip>
+            <graphic>
+                <FontAwesomeIconView glyphName="THUMBS_DOWN"/>
+            </graphic>
+        </Button>
+        <Button fx:id="neutralButton" styleClass="neutral" HBox.hgrow="SOMETIMES" maxWidth="Infinity">
+            <tooltip>
+                <Tooltip text="Neutrales Foto"/>
+            </tooltip>
+            <graphic>
+                <FontAwesomeIconView glyphName="CHECK"/>
+            </graphic>
+        </Button>
+        <Button fx:id="goodButton" styleClass="good" HBox.hgrow="SOMETIMES" maxWidth="Infinity">
+            <tooltip>
+                <Tooltip text="Gutes Foto"/>
+            </tooltip>
+            <graphic>
+                <FontAwesomeIconView glyphName="HEART"/>
+            </graphic>
+        </Button>
+    </children>
+</HBox>

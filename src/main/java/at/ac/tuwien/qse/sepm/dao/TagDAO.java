@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao;
 
 import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public interface TagDAO {
      * @return the created Tag
      * @throws DAOException If the Tag can not be created or the data store fails to create a record.
      */
-    public Tag create(Tag t) throws DAOException;
+    Tag create(Tag t) throws DAOException, ValidationException;
 
     /**
      * Retrieve an existing Tag
@@ -22,7 +23,7 @@ public interface TagDAO {
      * @return the Tag-Objekt
      * @throws DAOException If the Tag can not be retrieved or the data store fails to select the record.
      */
-    public Tag read(Tag t) throws DAOException;
+    Tag read(Tag t) throws DAOException;
 
 
     /**
@@ -31,7 +32,7 @@ public interface TagDAO {
      * @param t Specifies which Tag to delete by providing the id.
      * @throws DAOException If the Tag can not be deleted or the data store fails to delete the record.
      */
-    public void delete(Tag t) throws DAOException;
+    void delete(Tag t) throws DAOException;
 
     /**
      * Retrieve a list of all existing Tags
@@ -39,6 +40,6 @@ public interface TagDAO {
      * @return the list of Tags
      * @throws DAOException If the Tag can not be retrieved or the data store fails to select the record.
      */
-    public List<Tag> readAll() throws DAOException;
+    List<Tag> readAll() throws DAOException;
 
 }

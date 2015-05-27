@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @UsingTable("Photographer")
@@ -25,33 +24,48 @@ public class JDBCPhotographerDAOTest extends AbstractJDBCDAOTest {
     @Test
     @WithData
     public void testWithData() throws DAOException {
-        // fails because test_data_insert.sql is incomplete
-        assertEquals(1, countRows());
+        assertEquals(photographerDAO.readAll().size(), countRows());
     }
 
     @Test(expected = ValidationException.class)
+    @WithData
     public void createWithNullShouldThrow() throws ValidationException, DAOException {
         photographerDAO.create(null);
     }
 
     @Test
+    @WithData
     public void createWithValidParameterShouldPersist() throws ValidationException, DAOException {
+        int nrOfRows = countRows();
         Photographer p = photographerDAO.create(new Photographer(null, "Enri"));
-        assertFalse(p.getId() == null);
-        assertEquals(1, countRows());
+        assertEquals(nrOfRows+1, countRows());
+    }
+
+    @Test(expected = ValidationException.class)
+    @WithData
+    public void updateWithInvalidNameShouldThrow() throws DAOException, ValidationException {
+        photographerDAO.update(new Photographer(1,""));
+    }
+
+    @Test
+    @WithData
+    public void updateWithValidNameShouldUpdate() throws DAOException, ValidationException {
+        photographerDAO.update(new Photographer(1,"Enri"));
+        assertEquals("Enri",photographerDAO.getById(1).getName());
     }
 
     @Test(expected = DAOException.class)
+    @WithData
     public void readWithNonExistingIdShouldThrow() throws DAOException {
-        photographerDAO.read(new Photographer(1337, null));
+        photographerDAO.getById(-1);
     }
 
     @Test
     @WithData
     public void readWithValidIdShouldReturnPhotographer() throws DAOException {
-        Photographer p = photographerDAO.read(new Photographer(1,null));
-        assertTrue(p.getName().equals("Alex Kinara"));
-        assertEquals(1, countRowsWhere("name = 'Alex Kinara'"));
+        Photographer p = photographerDAO.getById(1);
+        assertTrue(p.getName().equals("Test Photographer"));
+        assertEquals(1, countRowsWhere("name = 'Test Photographer'"));
     }
 
     @Test

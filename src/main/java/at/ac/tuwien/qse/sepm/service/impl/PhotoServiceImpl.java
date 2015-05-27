@@ -1,66 +1,50 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
-import at.ac.tuwien.qse.sepm.dao.ExifDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
+import at.ac.tuwien.qse.sepm.dao.TagDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.util.Cancelable;
-import at.ac.tuwien.qse.sepm.util.CancelableTask;
-import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Date;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class PhotoServiceImpl implements PhotoService {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    @Autowired private ExifDAO exifDAO;
+    private ExecutorService executorService = Executors.newFixedThreadPool(1);
     @Autowired private PhotoDAO photoDAO;
+    @Autowired private TagDAO tagDAO;
     @Autowired private PhotoTagDAO photoTagDAO;
 
-    private ExecutorService executorService = Executors.newFixedThreadPool(1);
-
-    public List<Photo> getAllPhotos() throws ServiceException {
+    @Override
+    public List<YearMonth> getMonthsWithPhotos() throws ServiceException {
+        LOGGER.debug("Retrieving list of months...");
         try {
-            return photoDAO.readAll();
-        } catch (DAOException e) {
-            throw new ServiceException(e);
-        } catch (ValidationException e) {
-            throw new ServiceException("Failed to validate entity", e);
+            return photoDAO.getMonthsWithPhotos();
+        } catch (DAOException ex) {
+            throw new ServiceException(ex);
         }
     }
 
-    public List<Tag> getAllTags() throws ServiceException {
-        return null;
-    }
-
-    public void requestFullscreenMode(List<Photo> photos) throws ServiceException {
-
-    }
-
-    /**
-     * delete the delivered List of Photos
-     *
-     * @param photos the list of photos
-     * @throws ServiceException
-     */
+    @Override
     public void deletePhotos(List<Photo> photos) throws ServiceException {
         if (photos == null) {
             throw new ServiceException("List<Photo> photos is null");
         }
         for (Photo p : photos) {
+            LOGGER.debug("Deleting photo {}",p);
             try {
                 photoDAO.delete(p);
             } catch (DAOException e) {
@@ -71,15 +55,36 @@ public class PhotoServiceImpl implements PhotoService {
         }
     }
 
-    /**
-     * Add Tag <tt>tag</tt> to every photo in list <tt>photos</tt>. If a photo already has this tag,
-     * then it will keep it.
-     *
-     * @param photos must not be null; all elements must not be null; no element.id must be null
-     * @param tag    must not be null; tag.id must not be null
-     * @throws ServiceException         if an Exception in this or an underlying
-     *                                  layer occurs
-     */
+    @Override
+    public void editPhotos(List<Photo> photos, Photo photo) throws ServiceException {
+        //TODO
+    }
+
+    @Override
+    public List<Photo> getAllPhotos() throws ServiceException {
+        LOGGER.debug("Retrieving all photos...");
+        try {
+            return photoDAO.readAll();
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
+    }
+
+    @Override
+    public List<Photo> getAllPhotos(Predicate<Photo> filter) throws ServiceException {
+        LOGGER.debug("Entering getAllPhotos with {}", filter);
+        return getAllPhotos()
+                .stream()
+                .filter(filter)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void requestFullscreenMode(List<Photo> photos) throws ServiceException {
+        //TODO
+    }
+
+    @Override
     public void addTagToPhotos(List<Photo> photos, Tag tag) throws ServiceException {
         LOGGER.debug("Entering addTagToPhotos with {}, {}", photos, tag);
         if (photos == null) {
@@ -88,6 +93,7 @@ public class PhotoServiceImpl implements PhotoService {
         for (Photo photo : photos) {
             try {
                 photoTagDAO.createPhotoTag(photo, tag);
+                photo.getTags().add(tag);
             } catch (DAOException ex) {
                 LOGGER.error("Photo-Tag-creation with {}, {} failed.", photo, tag);
                 throw new ServiceException("Creation of Photo-Tag failed.", ex);
@@ -98,15 +104,7 @@ public class PhotoServiceImpl implements PhotoService {
         LOGGER.debug("Leaving addTagToPhotos");
     }
 
-    /**
-     * Remove Tag <tt>tag</tt> from all photos in list <tt>photos</tt>. If a photo in the list
-     * does not have this tag, then no action will be taken for this photo.
-     *
-     * @param photos must not be null; all elements must not be null; no element.id must be null
-     * @param tag    must not be null; tag.id must not be null
-     * @throws ServiceException         if an Exception in this or an underlying
-     *                                  layer occurs
-     */
+    @Override
     public void removeTagFromPhotos(List<Photo> photos, Tag tag) throws ServiceException {
         LOGGER.debug("Entering removeTagFromPhotos with {}, {}", photos, tag);
         if (photos == null) {
@@ -115,6 +113,7 @@ public class PhotoServiceImpl implements PhotoService {
         for (Photo photo : photos) {
             try {
                 photoTagDAO.removeTagFromPhoto(photo, tag);
+                photo.getTags().remove(tag);
             } catch (DAOException ex) {
                 LOGGER.error("Removal of Photo-Tag with {}, {} failed.", photo, tag);
                 throw new ServiceException("Photo-Tag removal failed.", ex);
@@ -125,14 +124,7 @@ public class PhotoServiceImpl implements PhotoService {
         LOGGER.debug("Leaving removeTagFromPhotos");
     }
 
-    /**
-     * Return list of all tags which are currently set for <tt>photo</tt>.
-     *
-     * @param photo must not be null; photo.id must not be null;
-     * @return List with all tags which are linked to <tt>photo</tt> as a PhotoTag;
-     * If no tag exists, return an empty List.
-     * @throws ServiceException         if an exception occurs on this or an underlying layer
-     */
+    @Override
     public List<Tag> getTagsForPhoto(Photo photo) throws ServiceException {
         LOGGER.debug("Entering getTagsForPhoto with {}", photo);
         List<Tag> tagList;
@@ -149,63 +141,19 @@ public class PhotoServiceImpl implements PhotoService {
         return tagList;
     }
 
-    public void editPhotos(List<Photo> photos, Photo photo) throws ServiceException {
-
-    }
-
-    public Cancelable loadPhotosByDate(Date date, Consumer<Photo> callback,
-            ErrorHandler<ServiceException> errorHandler) {
-        LOGGER.debug("Loading photos");
-        AsyncLoader loader = new AsyncLoader(date, callback, errorHandler);
-        executorService.submit(loader);
-
-        return loader;
-    }
-
-    private class AsyncLoader extends CancelableTask {
-        private Date date;
-        private Consumer<Photo> callback;
-        private ErrorHandler<ServiceException> errorHandler;
-
-        public AsyncLoader(Date date, Consumer<Photo> callback,
-                ErrorHandler<ServiceException> errorHandler) {
-            super();
-            this.date = date;
-            this.callback = callback;
-            this.errorHandler = errorHandler;
-        }
-
-        @Override protected void execute() {
-            List<Photo> photos;
-            try {
-                photos = photoDAO.readPhotosByDate(date);
-            } catch (DAOException e) {
-                errorHandler.propagate(new ServiceException("Failed to load photos", e));
-                return;
-            }
-
-            for (Photo p : photos) {
-                if (!getIsRunning())
-                    return;
-                try {
-                    Thread.sleep(20);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                callback.accept(p);
-            }
-        }
-    }
-
-    @Override public List<Date> getMonthsWithPhotos() throws ServiceException {
+    @Override public void savePhotoRating(Photo photo) throws ServiceException {
+        if (photo == null) throw new IllegalArgumentException();
+        LOGGER.debug("Entering savePhotoRating with {}", photo);
         try {
-            return exifDAO.getMonthsWithPhotos();
+            photoDAO.update(photo);
+            LOGGER.info("Successfully saved rating for {}", photo);
         } catch (DAOException ex) {
-            throw new ServiceException(ex);
+            LOGGER.error("Saving rating for {} failed to to DAOException", photo);
+            throw new ServiceException("Could not store rating of photo.", ex);
+        } catch (ValidationException ex) {
+            LOGGER.error("Saving rating for {} failed to to ValidationException", photo);
+            throw new ServiceException("Could not store rating of photo.", ex);
         }
-    }
-
-    public void close() {
-        executorService.shutdown();
+        LOGGER.debug("Leaving savePhotoRating with {}", photo);
     }
 }

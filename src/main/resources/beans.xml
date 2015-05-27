@@ -24,14 +24,22 @@
         <jdbc:script location="classpath:db/create.sql" />
         <jdbc:script location="classpath:db/insert.sql" />
     </jdbc:initialize-database>
-	
+
+	<bean id="ioHandler" class="at.ac.tuwien.qse.sepm.util.DefaultIOHandler"></bean>
+
 	<bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"
 			destroy-method="close">
 	</bean>
 
-	<bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl"
+	<bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl"></bean>
+
+	<bean id="dropboxService" class="at.ac.tuwien.qse.sepm.service.impl.DropboxServiceImpl"
 			destroy-method="close">
 	</bean>
+
+    <bean id="photographerService" class="at.ac.tuwien.qse.sepm.service.impl.PhotographerServiceImpl"></bean>
+
+	<bean id="tagService" class="at.ac.tuwien.qse.sepm.service.impl.TagServiceImpl"></bean>
 
 	<bean id="exifService" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
 
@@ -39,11 +47,15 @@
 		<constructor-arg value="${user.home}/travelimg"></constructor-arg>
 	</bean>
 
-	<bean id="exifDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCExifDAO"></bean>
 	<bean id="photoTagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoTagDAO"></bean>
 	<bean id="photographerDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotographerDAO"></bean>
+	<bean id="tagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTagDAO"></bean>
 
 	<bean id="mainController" class="at.ac.tuwien.qse.sepm.gui.MainController"></bean>
+    <bean id="gridViewController" class="at.ac.tuwien.qse.sepm.gui.GridView"></bean>
+    <bean id="slideshowViewController" class="at.ac.tuwien.qse.sepm.gui.SlideshowView"></bean>
+    <bean id="worldmapViewController" class="at.ac.tuwien.qse.sepm.gui.WorldmapView"></bean>
 	<bean id="organizerController" class="at.ac.tuwien.qse.sepm.gui.Organizer"></bean>
 	<bean id="inspectorController" class="at.ac.tuwien.qse.sepm.gui.Inspector"></bean>
+    <bean id="ratingPicker" class="at.ac.tuwien.qse.sepm.gui.RatingPicker"></bean>
 </beans>
