@@ -213,7 +213,10 @@ public class Organizer {
     private List<YearMonth> getAllMonths() {
         LOGGER.debug("fetching months");
         try {
-            List<YearMonth> list = photoService.getMonthsWithPhotos();
+            List<YearMonth> list = photoService.getMonthsWithPhotos()
+                    .stream()
+                    .sorted()
+                    .collect(Collectors.toList());
             LOGGER.debug("fetching months\" succeeded with {} items", list.size());
             return list;
         } catch (ServiceException ex) {
