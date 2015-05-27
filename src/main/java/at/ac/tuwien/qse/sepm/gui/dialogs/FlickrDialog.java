@@ -33,10 +33,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import netscape.javascript.JSObject;
@@ -54,7 +51,7 @@ import java.util.function.Consumer;
 
 public class FlickrDialog extends ResultDialog<List<Photo>> {
 
-    @FXML private AnchorPane anchorPane;
+    @FXML private BorderPane borderPane;
     @FXML private HBox progress;
     @FXML private ProgressBar progressBar;
     @FXML private FlowPane photosFlowPane;
@@ -204,7 +201,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
 
     @FXML
     public void handleOnStopButtonClicked(){
-        ConfirmationDialog confirmationDialog = new ConfirmationDialog(anchorPane, "Download abbrechen","Download abbrechen?");
+        ConfirmationDialog confirmationDialog = new ConfirmationDialog(borderPane, "Download abbrechen","Download abbrechen?");
         Optional<Boolean> confirmed = confirmationDialog.showForResult();
         if (!confirmed.isPresent() || !confirmed.get()) return;
         logger.debug("Canceling the download...");

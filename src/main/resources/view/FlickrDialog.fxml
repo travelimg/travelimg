@@ -5,51 +5,64 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<fx:root fx:id="root" prefHeight="495.0" prefWidth="593.0" styleClass="dialog,import-dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root fx:id="root" prefHeight="600" prefWidth="800" styleClass="dialog,import-dialog"
+         stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-<AnchorPane fx:id="anchorPane" prefHeight="495.0" prefWidth="593.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <HBox fx:id="progress" alignment="CENTER" layoutX="310.0" layoutY="424.0" spacing="5.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
-         <children>
-             <Button fx:id="stopButton" onAction="#handleOnStopButtonClicked" styleClass="stop" >
-                 <graphic>
-                     <FontAwesomeIconView/>
-                 </graphic>
-             </Button>
-              <ProgressBar fx:id="progressBar" layoutX="381.0" layoutY="424.0" progress="0.0" />
-         </children>
-      </HBox>
-      <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefHeight="447.0" prefWidth="402.0" style="-fx-border-width: 1px; -fx-border-color: black;" vbarPolicy="AS_NEEDED" AnchorPane.bottomAnchor="48.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="191.0" AnchorPane.topAnchor="0.0">
-         <content>
-             <FlowPane fx:id="photosFlowPane" hgap="15" prefHeight="447.0" prefWidth="402.0" styleClass="image-grid" vgap="15">
-                 <padding>
-                     <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                 </padding>
+<BorderPane fx:id="borderPane">
+    <center>
+        <ScrollPane fx:id="scrollPane" maxHeight="500" fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+            <content>
+                <FlowPane fx:id="photosFlowPane" maxHeight="500" hgap="15" styleClass="image-grid" vgap="15">
+                    <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                    </padding>
 
-             </FlowPane>
-         </content>
-      </ScrollPane>
-       <Button fx:id="downloadButton" alignment="CENTER_RIGHT" layoutX="414.0" layoutY="426.0" onAction="#handleOnDownloadButtonClicked" prefHeight="42.0" prefWidth="142.0" styleClass="primary" text="Fotos herunterladen" />
-            <VBox fx:id="mapContainer" layoutX="322.0" layoutY="47.0" prefHeight="173.0" prefWidth="194.0" AnchorPane.rightAnchor="-3.0" AnchorPane.topAnchor="47.0" />
-            <ScrollPane layoutX="404.0" layoutY="267.0" prefHeight="94.0" prefViewportHeight="138.0" prefViewportWidth="159.0" prefWidth="186.0">
-               <content>
-                  <FlowPane fx:id="keywordsFlowPane" hgap="10" layoutX="293.0" layoutY="252.0" prefHeight="92.0" prefWidth="183.0" vgap="10" AnchorPane.bottomAnchor="67.0" AnchorPane.rightAnchor="7.0">
+                </FlowPane>
+            </content>
+        </ScrollPane>
+    </center>
 
-                  </FlowPane>
-               </content>
-            </ScrollPane>
-            <TextField fx:id="keywordTextField" layoutX="405.0" layoutY="380.0" prefHeight="37.0" prefWidth="159.0" promptText="Neuer Suchbegriff" />
-            <Separator layoutX="406.0" layoutY="28.0" prefHeight="2.0" prefWidth="186.0" />
-            <Label layoutX="406.0" layoutY="-1.0" text="Doppelklick um Ort zu wählen">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font></Label>
-            <Separator layoutX="406.0" layoutY="262.0" prefHeight="2.0" prefWidth="186.0" />
-            <Label layoutX="406.0" layoutY="233.0" text="Suchbegriffe" />
-            <Button fx:id="importButton" alignment="CENTER_RIGHT" disable="true" layoutX="14.0" layoutY="447.0" onAction="#handleOnImportButtonClicked" prefHeight="42.0" prefWidth="142.0" styleClass="primary" text="Fotos importieren" />
-            <DatePicker fx:id="datePicker" editable="false" layoutX="197.0" layoutY="450.0" prefHeight="37.0" prefWidth="150.0" style="-fx-background-color: transparent;" />
+    <right>
+        <VBox>
+            <children>
+                <Label text="Doppelklick um Ort zu wählen"/>
+                <VBox fx:id="mapContainer" maxHeight="200"/>
+                <Label text="Suchbegriffe" />
+                <ScrollPane prefHeight="150" hbarPolicy="NEVER">
+                    <content>
+                        <FlowPane fx:id="keywordsFlowPane" prefWidth="200" hgap="10" vgap="10">
 
-   </children>
-</AnchorPane>
+                        </FlowPane>
+                    </content>
+                </ScrollPane>
+                <TextField fx:id="keywordTextField" promptText="Neuer Suchbegriff" />
+                <Button fx:id="downloadButton" onAction="#handleOnDownloadButtonClicked"
+                        styleClass="primary" text="Fotos herunterladen" />
+                <HBox fx:id="progress" spacing="5.0" visible="false">
+                    <children>
+                        <Button fx:id="stopButton" onAction="#handleOnStopButtonClicked" styleClass="stop" >
+                            <graphic>
+                                <FontAwesomeIconView/>
+                            </graphic>
+                        </Button>
+                        <ProgressBar fx:id="progressBar" progress="0.0" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+    </right>
+
+    <bottom>
+        <HBox alignment="BOTTOM_LEFT">
+            <children>
+                <Button fx:id="importButton" disable="true" onAction="#handleOnImportButtonClicked"
+                        styleClass="primary" text="Fotos importieren" />
+                <DatePicker fx:id="datePicker" editable="false" style="-fx-background-color: transparent;" />
+            </children>
+        </HBox>
+
+    </bottom>
+</BorderPane>
     </children>
 </fx:root>
