@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class GridView {
 
@@ -150,7 +151,12 @@ public class GridView {
 
     private void reloadImages() {
         try {
-            grid.setItems(photoService.getAllPhotos(filter));
+            grid.setItems(
+                    photoService.getAllPhotos(filter)
+                    .stream()
+                    .sorted((p1, p2) -> p1.getDatetime().compareTo(p2.getDatetime()))
+                    .collect(Collectors.toList())
+            );
         } catch (ServiceException ex) {
             LOGGER.error("failed loading fotos", ex);
             InfoDialog dialog = new InfoDialog(root, "Lade Fehler");
