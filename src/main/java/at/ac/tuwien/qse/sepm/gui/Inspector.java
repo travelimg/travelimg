@@ -75,15 +75,18 @@ public class Inspector {
         proofOfConceptLabel.setText("Selected photo is: " + photo.getPath());
 
         Exif exif = photo.getExif();
+
+        String date = exif.getDate().toString().replace("T", " ");
         ObservableList<Pair<String, String>> exifData = FXCollections.observableArrayList(
-                new Pair<String, String>("Aufnahmedatum", exif.getDate().toString()),
+                new Pair<String, String>("Aufnahmedatum", date),
                 new Pair<String, String>("Kamerahersteller", exif.getMake()),
                 new Pair<String, String>("Kameramodell", exif.getModel()),
                 new Pair<String, String>("Belichtungszeit", exif.getExposure() + " Sek."),
                 new Pair<String, String>("Blende", "f/" + exif.getAperture()),
                 new Pair<String, String>("Brennweite", "" + exif.getFocalLength()),
                 new Pair<String, String>("ISO", "" + exif.getIso()),
-                new Pair<String, String>("Blitz", exif.isFlash()? "wurde ausgelöst" : "wurde nicht ausgelöst"),
+                new Pair<String, String>("Blitz",
+                        exif.isFlash() ? "wurde ausgelöst" : "wurde nicht ausgelöst"),
                 new Pair<String, String>("Höhe", "" + exif.getAltitude()));
 
         exifTable.setEditable(true);
