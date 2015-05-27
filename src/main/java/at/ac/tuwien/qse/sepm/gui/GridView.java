@@ -154,7 +154,7 @@ public class GridView {
             grid.setItems(
                     photoService.getAllPhotos(filter)
                     .stream()
-                    .sorted((p1, p2) -> p1.getDatetime().compareTo(p2.getDatetime()))
+                    .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
                     .collect(Collectors.toList())
             );
         } catch (ServiceException ex) {
