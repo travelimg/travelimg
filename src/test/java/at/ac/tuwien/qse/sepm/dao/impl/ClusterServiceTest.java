@@ -1,12 +1,12 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
-import at.ac.tuwien.qse.sepm.dao.DAOException;
-import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
-import at.ac.tuwien.qse.sepm.dao.UsingTable;
-import at.ac.tuwien.qse.sepm.dao.WithData;
+import at.ac.tuwien.qse.sepm.dao.*;
+import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +15,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 /**
  * Created by David on 17.05.2015.
@@ -27,20 +29,38 @@ import org.springframework.transaction.annotation.Transactional;
 @UsingTable("Photo")
 public class ClusterServiceTest {
 
-    @Autowired
-    ClusterServiceImpl clusterService;
+    private static final Logger logger = LogManager.getLogger(ClusterServiceTest.class);
 
     @Autowired
+    ClusterServiceImpl clusterService;
+    @Autowired
     PhotoDAO photoDAO;
+    @Autowired
+    PlaceDAO placeDAO;
+
+    private Journey inputJourneys[] = new Journey[] {
+            new Journey(1, "Asien", LocalDateTime.of(2015, 3, 3, 0, 0, 0), LocalDateTime.of(2015, 3, 7, 0, 0, 0)),
+            new Journey(2, "Amerika", LocalDateTime.of(2005, 11, 8, 0, 0, 0), LocalDateTime.of(2005, 11, 10, 0, 0, 0)),
+            new Journey(3, "Leere Reise", LocalDateTime.of(2000, 3, 6, 0, 0, 0), LocalDateTime.of(2000, 3, 6, 0, 0, 0))
+    };
+
 
     @WithData
     @Test
     public void testClusteringService() {
         try {
-            clusterService.cluster(photoDAO.readAll());
-        } catch (DAOException e) {
-            e.printStackTrace();
+//            clusterService.cluster(photoDAO.readAll());
+            clusterService.addJourney(inputJourneys[0]);
+            clusterService.addJourney(inputJourneys[1]);
+            clusterService.addJourney(inputJourneys[2]);
+            clusterService.clusterJourney(inputJourneys[0]);
+            clusterService.clusterJourney(inputJourneys[1]);
+            clusterService.clusterJourney(inputJourneys[2]);
+            logger.debug(placeDAO.readAll());
+
         } catch (ServiceException e) {
+            e.printStackTrace();
+        } catch (DAOException e) {
             e.printStackTrace();
         }
     }

@@ -209,7 +209,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
         try {
             List<Photo> photos = jdbcTemplate.query(READ_JOURNEY_STATEMENT,
-                    new PhotoRowMapper(), journey.getStartDate(), journey.getEndDate());
+                    new PhotoRowMapper(), Timestamp.valueOf(journey.getStartDate()), Timestamp.valueOf(journey.getEndDate()));
 
             logger.debug("Successfully retrieved photos");
             return photos;

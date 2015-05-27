@@ -139,6 +139,7 @@ public class ClusterServiceImpl implements ClusterService {
                             .getPlaceByGeoData(element.getLatitude(), element.getLongitude());
                     latitude = element.getLatitude();
                     longitude = element.getLongitude();
+                    logger.debug("New place-cluster: " + place.getId() + " " + place.getCity());
                 }
 
                 latitude = element.getLatitude();

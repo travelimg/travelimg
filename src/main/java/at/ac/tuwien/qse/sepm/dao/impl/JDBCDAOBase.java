@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 
 public class JDBCDAOBase {
 
-    protected static final Logger logger = LogManager.getLogger();
+    protected final Logger logger = LogManager.getLogger(getClass());
 
     protected JdbcTemplate jdbcTemplate;
 
