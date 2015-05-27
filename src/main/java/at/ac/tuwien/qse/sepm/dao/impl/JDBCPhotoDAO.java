@@ -4,10 +4,7 @@ import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotographerDAO;
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Photographer;
-import at.ac.tuwien.qse.sepm.entities.Rating;
-import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.util.IOHandler;
@@ -40,6 +37,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private static final String READ_MONTH_STATEMENT = "SELECT YEAR(datetime), MONTH(datetime) from Photo;";
     private static final String GET_BY_ID_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude FROM Photo where id=?";
     private static final String UPDATE_STATEMENT = "UPDATE Photo SET path = ?, rating = ? WHERE id = ?";
+    private static final String READ_JOURNEY_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude FROM PHOTO WHERE (datetime)>? AND (datetime)<?";
 
     private final String photoDirectory;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.ENGLISH);
@@ -205,6 +203,24 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
                     .collect(Collectors.toList());
         } catch (DataAccessException ex) {
             throw new DAOException("Failed to retrieve all months", ex);
+        }
+    }
+
+    @Override public List<Photo> readPhotosByJourney(Journey journey) throws DAOException {
+        logger.debug("retrieving photos for monthh {}", journey);
+
+        try {
+            List<Photo> photos = jdbcTemplate.query(READ_BY_YEAR_AND_MONTH_STATEMENT,
+                    new PhotoRowMapper(), journey.getStartDate(), journey.getEndDate());
+
+            logger.debug("Successfully retrieved photos");
+            return photos;
+        } catch (DataAccessException ex) {
+            logger.error("Failed to read photos from given journey", ex);
+            throw new DAOException("Failed to read photos from given journey", ex);
+        } catch (RuntimeException ex) {
+            logger.error("Failed to read photos from given journey", ex);
+            throw new DAOException("Failed to read photos from given journey", ex.getCause());
         }
     }
 

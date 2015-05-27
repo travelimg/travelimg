@@ -2,6 +2,8 @@ package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.JourneyDAO;
+import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
+import at.ac.tuwien.qse.sepm.dao.PlaceDAO;
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
@@ -17,7 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by David on 15.05.2015.
@@ -32,6 +36,8 @@ public class ClusterServiceImpl implements ClusterService {
 
     @Autowired private GeoService geoService;
     @Autowired private JourneyDAO journeyDAO;
+    @Autowired private PhotoDAO photoDAO;
+    @Autowired private PlaceDAO placeDAO;
 
     @Override public void cluster(List<Photo> photos) throws ServiceException {
         logger.debug("photoList-size: " + photos.size());
@@ -109,5 +115,25 @@ public class ClusterServiceImpl implements ClusterService {
             e.printStackTrace();
             throw new ServiceException("Failed to create new Journey", e);
         }
+    }
+
+    @Override public List<Place> clusterJourney(Journey journey) throws ServiceException {
+        List<Photo> photos;
+        Map<Photo, Place> placeMap = new HashMap<Photo, Place>();
+
+        try {
+            photos = photoDAO.readPhotosByJourney(journey);
+        } catch (DAOException e) {
+            logger.error("Failed to read photos of journey", e);
+            throw new ServiceException("Failed to read photos of journey", e);
+        }
+
+        for (Photo element : photos) {
+            placeMap.put(element,
+                    geoService.getPlaceByGeoData(element.getLatitude(), element.getLongitude()));
+        }
+
+
+        return null;
     }
 }
