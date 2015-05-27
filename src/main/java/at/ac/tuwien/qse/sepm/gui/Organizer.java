@@ -182,6 +182,7 @@ public class Organizer {
         try {
             List<Tag> list = tagService.getAllTags();
             LOGGER.debug("fetching categories succeeded with {} items", list.size());
+            list.sort((a, b) -> a.getName().compareTo(b.getName()));
             list.add(null);
             return list;
         } catch (ServiceException ex) {
