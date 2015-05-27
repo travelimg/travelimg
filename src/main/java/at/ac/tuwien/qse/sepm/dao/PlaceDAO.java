@@ -17,5 +17,5 @@ public interface PlaceDAO {
 
     List<Place> readAll() throws DAOException;
 
-    Place getByCityName(String name) throws DAOException;
+    Place getById(int id) throws DAOException;
 }

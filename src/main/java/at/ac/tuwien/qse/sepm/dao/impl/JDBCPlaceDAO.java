@@ -21,14 +21,14 @@ import java.util.Map;
  */
 public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
     private static final String readStatement = "SELECT city, country FROM PLACE WHERE id=?;";
-    private static final String readAllStatement = "SELECT city, country, FROM PLACE;";
+    private static final String readAllStatement = "SELECT id, city, country, FROM PLACE;";
     private static final String deleteStatement = "DELETE FROM PLACE WHERE id=?;";
     private static final String updateStatement = "UPDATE PLACE SET city = ?, country = ? WHERE id = ?";
-    private SimpleJdbcInsert insertJourney;
+    private SimpleJdbcInsert insertPlace;
 
     @Override @Autowired public void setDataSource(DataSource dataSource) {
         super.setDataSource(dataSource);
-        this.insertJourney = new SimpleJdbcInsert(dataSource).withTableName("Place")
+        this.insertPlace = new SimpleJdbcInsert(dataSource).withTableName("Place")
                 .usingGeneratedKeyColumns("id");
     }
 
@@ -39,12 +39,12 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
 
         // TODO: Validator
         Map<String, Object> parameters = new HashMap<String, Object>(1);
-        parameters.put("id", place.getId());
         parameters.put("city", place.getCity());
         parameters.put("country", place.getCountry());
 
         try {
-            insertJourney.execute(parameters);
+            Number newId = insertPlace.executeAndReturnKey(parameters);
+            place.setId((int) newId.longValue());
             return place;
         } catch (DataAccessException ex) {
             logger.error("Failed to create place", ex);
@@ -82,7 +82,7 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
     @Override public List<Place> readAll() throws DAOException {
         logger.debug("readAll");
         try {
-            List<Place> journeys = jdbcTemplate.query(readAllStatement, new RowMapper<Place>() {
+            List<Place> places = jdbcTemplate.query(readAllStatement, new RowMapper<Place>() {
 
                 @Override public Place mapRow(ResultSet resultSet, int i) throws SQLException {
                     return new Place(resultSet.getInt(1), resultSet.getString(2),
@@ -91,7 +91,7 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
             });
 
             logger.debug("Successfully read all Places");
-            return journeys;
+            return places;
         } catch (DataAccessException e) {
             throw new DAOException("Failed to read all Places", e);
         } catch (RuntimeException ex) {
@@ -99,19 +99,19 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
         }
     }
 
-    @Override public Place getByCityName(String name) throws DAOException {
-        logger.debug("getByName ", name);
-        if (name == null)
+    @Override public Place getById(int id) throws DAOException {
+        logger.debug("getByName ", id);
+        if (id < 0)
             throw new IllegalArgumentException();
 
         try {
             return this.jdbcTemplate
-                    .queryForObject(readStatement, new Object[] { name }, new RowMapper<Place>() {
+                    .queryForObject(readStatement, new Object[] { id }, new RowMapper<Place>() {
 
                         @Override public Place mapRow(ResultSet resultSet, int i)
                                 throws SQLException {
-                            return new Place(resultSet.getInt(1), resultSet.getString(2),
-                                    resultSet.getString(3));
+                            return new Place(id, resultSet.getString(1),
+                                    resultSet.getString(2));
                         }
                     });
         } catch (DataAccessException ex) {
