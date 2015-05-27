@@ -238,8 +238,6 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
                     Platform.runLater(new Runnable() {
 
                         public void run() {
-                            Photographer photographer = new Photographer(1,null);
-                            photo.setPhotographer(photographer);
                             ImageTile imageTile = new ImageTile(photo);
                             imageTile.setOnMouseClicked(new EventHandler<MouseEvent>() {
                                 @Override

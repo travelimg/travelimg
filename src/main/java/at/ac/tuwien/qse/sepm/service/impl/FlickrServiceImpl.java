@@ -1,7 +1,9 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
+import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.service.FlickrService;
+import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.CancelableTask;
@@ -15,6 +17,7 @@ import com.flickr4java.flickr.photos.PhotoList;
 import com.flickr4java.flickr.photos.SearchParameters;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -38,6 +41,8 @@ public class FlickrServiceImpl implements FlickrService {
     private Flickr flickr;
     private int i = 0;
     private static final Logger logger = LogManager.getLogger();
+
+    @Autowired private PhotographerService photographerService;
 
     public FlickrServiceImpl(){
         this.flickr = new Flickr(API_KEY, SECRET, new REST());
@@ -132,6 +137,15 @@ public class FlickrServiceImpl implements FlickrService {
         } catch (FlickrException e) {
             throw new ServiceException(e.getMessage(),e);
         }
+
+        // attach flickr photographer
+        Photographer photographer = photographerService.readAll()
+                .stream()
+                .filter(p -> p.getId() == 2)
+                .findFirst()
+                .orElse(new Photographer(1, null)); // default photographer
+        downloaded.setPhotographer(photographer);
+
         return downloaded;
     }
 
