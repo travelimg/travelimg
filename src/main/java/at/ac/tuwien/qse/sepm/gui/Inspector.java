@@ -134,6 +134,7 @@ public class Inspector {
         this.mapsScene = map;
         this.mapsScene = new GoogleMapsScene();
         this.mapsScene.removeAktiveMarker();
+        mapContainer.getChildren().clear();
         mapContainer.getChildren().add(mapsScene.getMapView());
         details.setVisible(false);
     }
