@@ -171,7 +171,7 @@ public class FlickrServiceImpl implements FlickrService {
                         logger.debug("Using for search latitude {} and longitude {}",latitude,longitude);
                         searchParameters.setLatitude(String.valueOf(latitude));
                         searchParameters.setLongitude(String.valueOf(longitude));
-                        searchParameters.setRadius(25);
+                        searchParameters.setRadius(5);
                     }
                     searchParameters.setHasGeo(true);
                     logger.debug("Searching photos using the flickr api...");
