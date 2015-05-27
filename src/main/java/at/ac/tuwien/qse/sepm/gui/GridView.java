@@ -16,6 +16,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.Year;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +40,8 @@ public class GridView {
     private final ImageGrid<Photo> grid = new ImageGrid<>(PhotoGridTile::new);
     private final List<Photo> selection = new ArrayList<Photo>();
     private Predicate<Photo> filter = new PhotoFilter();
+
+    private boolean disableReload = false;
 
     @FXML
     private void initialize() {
@@ -121,15 +125,27 @@ public class GridView {
     private void handleImportedPhoto(Photo photo) {
         // queue an update in the main gui
         Platform.runLater(() -> {
+            disableReload = true;
+            // update filter to show the new month
+            YearMonth month = YearMonth.from(photo.getDatetime());
+            organizer.addMonth(month);
+
             // Ignore photos that are not part of the current filter.
-            if (!filter.test(photo)) return;
+            if (!filter.test(photo)){
+                disableReload = false;
+                return;
+            }
             grid.addItem(photo);
+
+            disableReload = false;
         });
     }
 
     private void handleFilterChange(PhotoFilter filter) {
         this.filter = filter;
-        reloadImages();
+
+        if(!disableReload)
+            reloadImages();
     }
 
     private void reloadImages() {

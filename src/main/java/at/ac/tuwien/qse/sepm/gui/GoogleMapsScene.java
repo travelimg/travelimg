@@ -82,7 +82,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
         if(markers!=null){
             for(Photo photo : markers) {
-                if (!checkDouble(photo)) {
+
                     Marker m = new Marker(new MarkerOptions()
                             .position(new LatLong(photo.getLatitude(), photo.getLongitude()))
                             .visible(Boolean.TRUE).animation(Animation.BOUNCE));
@@ -99,7 +99,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
                 }
 
-            }
+
         }
 
 
@@ -205,28 +205,28 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
             if (displayedMarker.size() != 0) {
                 displayedMarker = new HashMap<>();
             }
-
+            map.setZoom(13);
             for (Photo photo : list) {
-                if (!checkDouble(photo)) {
+
                     Marker m = new Marker(new MarkerOptions()
                             .position(new LatLong(photo.getLatitude(), photo.getLongitude()))
                             .visible(Boolean.TRUE).animation(Animation.BOUNCE));
                     m.setTitle("Marker");
                     aktivMarker.add(m);
-                    displayedMarker.put(m.getVariableName(), new LatLong(photo.getLatitude(), photo.getLongitude()));
+                    displayedMarker.put(m.getVariableName(),
+                            new LatLong(photo.getLatitude(), photo.getLongitude()));
                     map.addUIEventHandler(m, UIEventType.click, (JSObject obj) -> {
                         //TODO Markerhandler
 
                     });
 
                     map.addMarker(m);
-                } else {
-                    logger.debug("Marker is not set");
-                }
+
+
 
             }
 
-            mapView.setZoom(10);
+
         }catch (JSException ex) {
             logger.debug("Error by initializing Map");
         }
@@ -234,29 +234,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
     }
 
-    /**
-     * checks whether a marker representing a photo and is already available
-     * @param p the photo
-     * @return true if a marker representing the photo , false if there ist no marker representing the photo
-     */
-    public boolean checkDouble(Photo p){
 
-        for(String key:displayedMarker.keySet()){
-            if(p.getLatitude()==displayedMarker.get(key).getLatitude() && p.getLongitude() ==displayedMarker.get(key).getLongitude()){
-                logger.debug("Marker already exists");
-                return true;
-
-            }
-
-            if(Math.abs(p.getLatitude()-displayedMarker.get(key).getLatitude())<1 && Math.abs(p.getLongitude()-displayedMarker.get(key).getLongitude())<1){
-                logger.debug("Marker with similar coordinates already exists");
-                return true;
-            }
-
-        }
-        logger.debug("set Marker ");
-        return false;
-    }
 
 
 }

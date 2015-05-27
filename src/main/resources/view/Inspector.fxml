@@ -4,7 +4,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane fx:id="root" prefWidth="240.0" styleClass="inspector" stylesheets="@style.css"
+<BorderPane fx:id="root" prefWidth="280.0" styleClass="inspector" stylesheets="@style.css"
             xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="at.ac.tuwien.qse.sepm.gui.Inspector">
     <center>
@@ -34,7 +34,7 @@
                         <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="260">
                             <columns>
                                 <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
-                                <TableColumn fx:id="exifValue" prefWidth="100.0" text="Wert"/>
+                                <TableColumn fx:id="exifValue" prefWidth="135.0" text="Wert"/>
                             </columns>
                         </TableView>
                     </children>

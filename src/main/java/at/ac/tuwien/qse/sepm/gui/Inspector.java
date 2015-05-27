@@ -134,6 +134,7 @@ public class Inspector {
         this.mapsScene = map;
         this.mapsScene = new GoogleMapsScene();
         this.mapsScene.removeAktiveMarker();
+        mapContainer.getChildren().clear();
         mapContainer.getChildren().add(mapsScene.getMapView());
         details.setVisible(false);
     }
@@ -260,7 +261,8 @@ public class Inspector {
 
         // Add the map markers for each photo.
         mapsScene.removeAktiveMarker();
-        activePhotos.forEach(photo -> mapsScene.addMarker(photo));
+        mapsScene.addMarkerList(activePhotos);
+
 
         // Show additional details for a single selected photo.
         if (singleActive) {
@@ -270,7 +272,7 @@ public class Inspector {
             try {
                 Exif exif = exifService.getExif(photo);
                 ObservableList<Pair<String, String>> exifData = FXCollections.observableArrayList(
-                        new Pair<>("Aufnahmedatum", photo.getDatetime().toString()), new Pair<>("Kamerahersteller", exif.getMake()),
+                        new Pair<>("Aufnahmedatum", photo.getDatetime().toString().replace("T", " ")), new Pair<>("Kamerahersteller", exif.getMake()),
                         new Pair<>("Kameramodell", exif.getModel()), new Pair<>("Belichtungszeit", exif.getExposure() + " Sek."),
                         new Pair<>("Blende", "f/" + exif.getAperture()), new Pair<>("Brennweite", "" + exif.getFocalLength()),
                         new Pair<>("ISO", "" + exif.getIso()), new Pair<>("Blitz",

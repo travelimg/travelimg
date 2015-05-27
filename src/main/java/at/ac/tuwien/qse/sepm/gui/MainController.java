@@ -24,6 +24,7 @@ public class MainController {
     @FXML private TabPane root;
     @Autowired private WorldmapView worldMapView;
     @Autowired private Inspector inspector;
+    @Autowired private SlideshowView slideshowView;
     private EventHandler<javafx.scene.input.MouseEvent> ehandl;
     private GoogleMapsScene map;
     @FXML private void initialize() {
@@ -36,6 +37,18 @@ public class MainController {
                         }
                         if (t.equals(world) && t1.equals(grid)) {
                             inspector.setMap(worldMapView.getMap());
+                        }
+                        if (t.equals(world) && t1.equals(slide)) {
+                            slideshowView.setMap(worldMapView.getMap());
+                        }
+                        if (t.equals(grid) && t1.equals(slide)) {
+                            slideshowView.setMap(inspector.getMap());
+                        }
+                        if (t.equals(slide) && t1.equals(world)) {
+                            worldMapView.setMap(slideshowView.getMap());
+                        }
+                        if (t.equals(slide) && t1.equals(grid)) {
+                            inspector.setMap(slideshowView.getMap());
                         }
                     }
                 }
