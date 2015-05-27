@@ -42,6 +42,8 @@ public class GridView {
     private final List<Photo> selection = new ArrayList<Photo>();
     private Predicate<Photo> filter = new PhotoFilter();
 
+    private boolean disableReload = false;
+
     @FXML
     private void initialize() {
         LOGGER.debug("initializing");
@@ -121,19 +123,27 @@ public class GridView {
     private void handleImportedPhoto(Photo photo) {
         // queue an update in the main gui
         Platform.runLater(() -> {
+            disableReload = true;
             // update filter to show the new month
             YearMonth month = YearMonth.from(photo.getDatetime());
             organizer.addMonth(month);
 
             // Ignore photos that are not part of the current filter.
-            if (!filter.test(photo)) return;
+            if (!filter.test(photo)){
+                disableReload = false;
+                return;
+            }
             grid.addItem(photo);
+
+            disableReload = false;
         });
     }
 
     private void handleFilterChange(PhotoFilter filter) {
         this.filter = filter;
-        reloadImages();
+
+        if(!disableReload)
+            reloadImages();
     }
 
     private void reloadImages() {

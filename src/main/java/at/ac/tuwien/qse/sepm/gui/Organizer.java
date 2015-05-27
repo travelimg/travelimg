@@ -90,7 +90,7 @@ public class Organizer {
         months = months.stream().distinct().collect(Collectors.toList());
 
         monthListView.setValues(months);
-        monthListView.check(month);
+        monthListView.checkAll();
     }
 
     @FXML
