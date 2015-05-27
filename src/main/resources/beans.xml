@@ -26,7 +26,7 @@
     </jdbc:initialize-database>
 
 	<bean id="ioHandler" class="at.ac.tuwien.qse.sepm.util.DefaultIOHandler"></bean>
-	
+
 	<bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"
 			destroy-method="close">
 	</bean>
@@ -57,4 +57,5 @@
     <bean id="worldmapViewController" class="at.ac.tuwien.qse.sepm.gui.WorldmapView"></bean>
 	<bean id="organizerController" class="at.ac.tuwien.qse.sepm.gui.Organizer"></bean>
 	<bean id="inspectorController" class="at.ac.tuwien.qse.sepm.gui.Inspector"></bean>
+    <bean id="ratingPicker" class="at.ac.tuwien.qse.sepm.gui.RatingPicker"></bean>
 </beans>

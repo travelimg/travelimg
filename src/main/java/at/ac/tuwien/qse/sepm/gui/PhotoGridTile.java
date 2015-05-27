@@ -59,10 +59,14 @@ public class PhotoGridTile extends ImageGridTile<Photo> {
     }
 
     @Override public void setItem(Photo photo) {
+        Photo oldPhoto = getItem();
         super.setItem(photo);
         if (photo == null) return;
 
-        showImage(photo.getPath());
+        // Only reload image if necessary.
+        if (oldPhoto == null || !photo.getPath().equals(oldPhoto.getPath())) {
+            showImage(photo.getPath());
+        }
         showRating(photo.getRating());
         showTags(photo.getTags());
         showDate(photo.getDatetime());

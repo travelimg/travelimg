@@ -8,7 +8,7 @@
 <TabPane fx:id="root" stylesheets="@/view/style.css"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.MainController">
 
-    <Tab text="" closable="false">
+    <Tab fx:id="grid" text="" closable="false">
         <graphic>
             <FontAwesomeIconView glyphName="TH"/>
         </graphic>
@@ -19,7 +19,7 @@
             <fx:include source="/view/GridView.fxml"></fx:include>
         </content>
     </Tab>
-    <Tab text="" closable="false">
+    <Tab fx:id="world" text="" closable="false">
         <graphic>
             <FontAwesomeIconView glyphName="GLOBE"/>
         </graphic>
@@ -30,7 +30,7 @@
             <fx:include source="/view/WorldmapView.fxml"></fx:include>
         </content>
     </Tab>
-    <Tab text="" closable="false">
+    <Tab fx:id="slide" text="" closable="false">
         <graphic>
             <FontAwesomeIconView glyphName="SLIDESHARE"/>
         </graphic>
