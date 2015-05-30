@@ -27,7 +27,7 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
     private static final Logger logger = LogManager.getLogger(JDBCJourneyDAO.class);
 
     private static final String readStatement = "SELECT name, start, end FROM JOURNEY WHERE id=?;";
-    private static final String readAllStatement = "SELECT name, start, end FROM JOURNEY;";
+    private static final String readAllStatement = "SELECT id, name, start, end FROM JOURNEY;";
     private static final String deleteStatement = "DELETE FROM JOURNEY WHERE id=?;";
     private static final String updateStatement = "UPDATE Journey SET name = ?, start = ?, end = ? WHERE id = ?";
     private SimpleJdbcInsert insertJourney;
