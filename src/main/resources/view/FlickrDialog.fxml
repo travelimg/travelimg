@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<fx:root fx:id="root" prefHeight="600" prefWidth="800" styleClass="dialog,import-dialog"
+         stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+<BorderPane fx:id="borderPane">
+    <center>
+        <ScrollPane fx:id="scrollPane" maxHeight="500" fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+            <content>
+                <FlowPane fx:id="photosFlowPane" maxHeight="500" hgap="15" styleClass="image-grid" vgap="15">
+                    <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                    </padding>
+
+                </FlowPane>
+            </content>
+        </ScrollPane>
+    </center>
+
+    <right>
+        <VBox>
+            <children>
+                <Label text="Doppelklick um Ort zu wählen"/>
+                <VBox fx:id="mapContainer" maxHeight="200"/>
+                <Label text="Suchbegriffe" />
+                <ScrollPane prefHeight="150" hbarPolicy="NEVER">
+                    <content>
+                        <FlowPane fx:id="keywordsFlowPane" prefWidth="200" hgap="10" vgap="10">
+
+                        </FlowPane>
+                    </content>
+                </ScrollPane>
+                <TextField fx:id="keywordTextField" promptText="Neuer Suchbegriff" />
+                <Button fx:id="downloadButton" onAction="#handleOnDownloadButtonClicked"
+                        styleClass="primary" text="Fotos herunterladen" />
+                <HBox fx:id="progress" spacing="5.0" visible="false">
+                    <children>
+                        <Button fx:id="stopButton" onAction="#handleOnStopButtonClicked" styleClass="stop" >
+                            <graphic>
+                                <FontAwesomeIconView/>
+                            </graphic>
+                        </Button>
+                        <ProgressBar fx:id="progressBar" progress="0.0" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+    </right>
+
+    <bottom>
+        <HBox alignment="BOTTOM_LEFT">
+            <children>
+                <Button fx:id="importButton" disable="true" onAction="#handleOnImportButtonClicked"
+                        styleClass="primary" text="Fotos importieren" />
+                <DatePicker fx:id="datePicker" editable="false" style="-fx-background-color: transparent;" />
+            </children>
+        </HBox>
+
+    </bottom>
+</BorderPane>
+    </children>
+</fx:root>

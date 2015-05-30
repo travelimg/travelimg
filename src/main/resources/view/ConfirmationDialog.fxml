@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<fx:root fx:id="root" styleClass="dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <BorderPane prefWidth="460.0">
+            <top>
+                <Label fx:id="descriptionLabel" maxWidth="Infinity" wrapText="true" styleClass="header"/>
+            </top>
+            <bottom>
+                <BorderPane maxWidth="Infinity" styleClass="footer">
+                    <right>
+                        <HBox spacing="8.0">
+                            <children>
+                                <Button fx:id="cancelButton" alignment="CENTER_RIGHT" text="Nein"/>
+                                <Button fx:id="confirmButton" alignment="CENTER_RIGHT" styleClass="primary" text="Ja"/>
+                            </children>
+                        </HBox>
+                    </right>
+                </BorderPane>
+            </bottom>
+        </BorderPane>
+    </children>
+</fx:root>
