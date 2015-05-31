@@ -1,12 +1,10 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.gui.dialogs.FlickrDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
-import at.ac.tuwien.qse.sepm.service.ImportService;
-import at.ac.tuwien.qse.sepm.service.PhotoService;
-import at.ac.tuwien.qse.sepm.service.PhotographerService;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -18,10 +16,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.Year;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class GridView {
 
@@ -29,6 +30,7 @@ public class GridView {
 
     @Autowired private PhotoService photoService;
     @Autowired private ImportService importService;
+    @Autowired private FlickrService flickrService;
     @Autowired private PhotographerService photographerService;
     @Autowired private Organizer organizer;
     @Autowired private Inspector inspector;
@@ -39,6 +41,8 @@ public class GridView {
     private final ImageGrid<Photo> grid = new ImageGrid<>(PhotoGridTile::new);
     private final List<Photo> selection = new ArrayList<Photo>();
     private Predicate<Photo> filter = new PhotoFilter();
+
+    private boolean disableReload = false;
 
     @FXML
     private void initialize() {
@@ -55,7 +59,10 @@ public class GridView {
                     .importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
         });
         organizer.setFlickrAction(() -> {
-            // TODO
+            FlickrDialog flickrDialog = new FlickrDialog(root,"Flickr Import",flickrService);
+            Optional<List<Photo>> photos = flickrDialog.showForResult();
+            if (!photos.isPresent()) return;
+            importService.importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
         });
 
         organizer.setPresentAction(() -> {
@@ -119,20 +126,37 @@ public class GridView {
     private void handleImportedPhoto(Photo photo) {
         // queue an update in the main gui
         Platform.runLater(() -> {
+            disableReload = true;
+            // update filter to show the new month
+            YearMonth month = YearMonth.from(photo.getDatetime());
+            organizer.addMonth(month);
+
             // Ignore photos that are not part of the current filter.
-            if (!filter.test(photo)) return;
+            if (!filter.test(photo)){
+                disableReload = false;
+                return;
+            }
             grid.addItem(photo);
+
+            disableReload = false;
         });
     }
 
     private void handleFilterChange(PhotoFilter filter) {
         this.filter = filter;
-        reloadImages();
+
+        if(!disableReload)
+            reloadImages();
     }
 
     private void reloadImages() {
         try {
-            grid.setItems(photoService.getAllPhotos(filter));
+            grid.setItems(
+                    photoService.getAllPhotos(filter)
+                    .stream()
+                    .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
+                    .collect(Collectors.toList())
+            );
         } catch (ServiceException ex) {
             LOGGER.error("failed loading fotos", ex);
             InfoDialog dialog = new InfoDialog(root, "Lade Fehler");

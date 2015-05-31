@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Controller for organizer view which is used for browsing photos by month.
@@ -87,6 +88,20 @@ public class Organizer {
 
     public PhotoFilter getFilter() {
         return new PhotoFilter(filter);
+    }
+
+    /**
+     * Add a month to the month list view and check it
+     * @param month the month to be added.
+     */
+    public void addMonth(YearMonth month) {
+        List<YearMonth> months = monthListView.getValues();
+        months.add(month);
+
+        months = months.stream().distinct().collect(Collectors.toList());
+
+        monthListView.setValues(months);
+        monthListView.checkAll();
     }
 
     @FXML
@@ -178,6 +193,7 @@ public class Organizer {
         try {
             List<Tag> list = tagService.getAllTags();
             LOGGER.debug("fetching categories succeeded with {} items", list.size());
+            list.sort((a, b) -> a.getName().compareTo(b.getName()));
             list.add(null);
             return list;
         } catch (ServiceException ex) {
@@ -209,7 +225,10 @@ public class Organizer {
     private List<YearMonth> getAllMonths() {
         LOGGER.debug("fetching months");
         try {
-            List<YearMonth> list = photoService.getMonthsWithPhotos();
+            List<YearMonth> list = photoService.getMonthsWithPhotos()
+                    .stream()
+                    .sorted()
+                    .collect(Collectors.toList());
             LOGGER.debug("fetching months\" succeeded with {} items", list.size());
             return list;
         } catch (ServiceException ex) {

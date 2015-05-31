@@ -46,6 +46,10 @@
 
 	<bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
 
+    <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl"
+			destroy-method="close">
+	</bean>
+
 	<bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
 		<constructor-arg value="${user.home}/travelimg"></constructor-arg>
 	</bean>

@@ -261,7 +261,8 @@ public class Inspector {
 
         // Add the map markers for each photo.
         mapsScene.removeAktiveMarker();
-        activePhotos.forEach(photo -> mapsScene.addMarker(photo));
+        mapsScene.addMarkerList(activePhotos);
+
 
         // Show additional details for a single selected photo.
         if (singleActive) {
