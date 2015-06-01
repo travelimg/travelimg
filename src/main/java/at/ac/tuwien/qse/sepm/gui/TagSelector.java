@@ -54,7 +54,7 @@ public class TagSelector extends VBox {
         newCatName.setOnKeyReleased(this::highlightAddCategoryBtn);
     }
 
-    private void initializeTagList() {
+    public void initializeTagList() {
         ObservableList<Tag> tagNames = FXCollections.observableArrayList();
         try {
             for (Tag tag : tagService.getAllTags()) {

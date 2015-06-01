@@ -299,6 +299,12 @@ public class Inspector {
         setActivePhotos(null);
     }
 
+    public void refreshTags() {
+        if(tagSelector != null) {
+            tagSelector.initializeTagList();
+        }
+    }
+
     private class TagListChangeListener implements ListChangeListener<Tag> {
         public void onChanged(ListChangeListener.Change<? extends Tag> change) {
             while(change.next()) {

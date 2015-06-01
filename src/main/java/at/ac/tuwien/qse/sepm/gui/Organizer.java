@@ -37,6 +37,7 @@ public class Organizer {
     @Autowired private PhotoService photoService;
     @Autowired private PhotographerService photographerService;
     @Autowired private ClusterService clusterService;
+    @Autowired private Inspector inspectorController;
 
     @Autowired private TagService tagService;
 
@@ -134,6 +135,7 @@ public class Organizer {
         monthListView.setChangeHandler(this::handleMonthsChange);
         filterContainer.getChildren().addAll(ratingListView, categoryListView, photographerListView,
                 monthListView);
+
 
         refreshLists();
         resetFilter();
@@ -245,6 +247,7 @@ public class Organizer {
 
     private void resetFilter() {
         refreshLists();
+        inspectorController.refreshTags();
         categoryListView.checkAll();
         ratingListView.checkAll();
         photographerListView.checkAll();
