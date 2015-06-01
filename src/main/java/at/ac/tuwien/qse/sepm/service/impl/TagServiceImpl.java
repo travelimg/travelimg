@@ -56,6 +56,15 @@ public class TagServiceImpl implements TagService {
         }
     }
 
+    @Override public Tag readName(Tag tag) throws ServiceException {
+        try {
+            return tagDAO.readName(tag);
+        } catch (DAOException e) {
+            e.printStackTrace();
+            throw new ServiceException(e);
+        }
+    }
+
     /**
      * Return a list of all existing tags.
      *

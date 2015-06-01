@@ -8,6 +8,7 @@ import java.util.List;
 /**
  * Created by David on 21.05.2015.
  */
+@Deprecated
 public interface JourneyDAO {
     // TODO: handle ID in JourneyDAO
     Journey create(Journey journey) throws DAOException, ValidationException;

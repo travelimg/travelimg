@@ -23,6 +23,8 @@ import java.util.Map;
 /**
  * Created by David on 21.05.2015.
  */
+
+@Deprecated
 public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
     private static final Logger logger = LogManager.getLogger(JDBCJourneyDAO.class);
 

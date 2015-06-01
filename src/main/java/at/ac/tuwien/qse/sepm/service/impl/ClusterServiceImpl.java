@@ -7,6 +7,7 @@ import at.ac.tuwien.qse.sepm.dao.PlaceDAO;
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
+import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.wrapper.LocationWrapper;
@@ -37,9 +38,10 @@ public class ClusterServiceImpl implements ClusterService {
     @Autowired private GeoService geoService;
     @Autowired private JourneyDAO journeyDAO;
     @Autowired private PhotoDAO photoDAO;
-    @Autowired private PlaceDAO placeDAO;
+    @Autowired private TagService tagService;
+    @Autowired private PhotoService photoService;
 
-    @Override public void cluster(List<Photo> photos) throws ServiceException {
+    @Deprecated @Override public void cluster(List<Photo> photos) throws ServiceException {
         logger.debug("photoList-size: " + photos.size());
 
         List<TimeWrapper> timeList = new ArrayList<TimeWrapper>();
@@ -118,6 +120,7 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override public List<Place> clusterJourney(Journey journey) throws ServiceException {
+        logger.debug("clusteringJourney" + journey);
         List<Photo> photos;
         List<Place> places = new ArrayList<Place>();
         Place place = new Place(1, "Unknown place", "Unknown place");
@@ -131,28 +134,30 @@ public class ClusterServiceImpl implements ClusterService {
             throw new ServiceException("Failed to read photos of journey", e);
         }
 
-        for (Photo element : photos) {
-            try {
-                if (Math.abs(element.getLatitude() - latitude) > 1
-                        && Math.abs(element.getLongitude() - longitude) > 1) {
-                    place = geoService
-                            .getPlaceByGeoData(element.getLatitude(), element.getLongitude());
-                    latitude = element.getLatitude();
-                    longitude = element.getLongitude();
-                    logger.debug("New place-cluster: " + place.getId() + " " + place.getCity());
-                }
+        Tag journeyTag = new Tag(null, "journey." + journey.getName());
+        tagService.create(journeyTag);
+        photoService.addTagToPhotos(photos, journeyTag);
 
+        for (Photo element : photos) {
+            if (Math.abs(element.getLatitude() - latitude) > 1
+                    && Math.abs(element.getLongitude() - longitude) > 1) {
+                place = geoService.getPlaceByGeoData(element.getLatitude(), element.getLongitude());
                 latitude = element.getLatitude();
                 longitude = element.getLongitude();
-                placeDAO.create(place);
-                element.setPlace(place);
-                photoDAO.update(element);
-                places.add(place);
-            } catch (DAOException e) {
-                e.printStackTrace();
-            } catch (ValidationException e) {
-                e.printStackTrace();
+                logger.debug("New place-cluster: " + place.getId() + " " + place.getCity());
             }
+
+            latitude = element.getLatitude();
+            longitude = element.getLongitude();
+
+            Tag placeTag = new Tag(null, "place." + place.getCity() + "." + place.getCountry());
+            tagService.create(placeTag);
+            photoService.addTagToPhotos(photos, placeTag);
+
+            //                placeDAO.create(place);
+            //                element.setPlace(place);
+            //                photoDAO.update(element);
+            places.add(place);
         }
         return places;
     }

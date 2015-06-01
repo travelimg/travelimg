@@ -7,6 +7,7 @@ import at.ac.tuwien.qse.sepm.dao.TagDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
@@ -24,7 +25,7 @@ public class PhotoServiceImpl implements PhotoService {
 
     private static final Logger LOGGER = LogManager.getLogger();
     @Autowired private PhotoDAO photoDAO;
-    @Autowired private TagDAO tagDAO;
+    @Autowired private ExifService exifService;
     @Autowired private PhotoTagDAO photoTagDAO;
 
     @Override
@@ -93,6 +94,7 @@ public class PhotoServiceImpl implements PhotoService {
             try {
                 photoTagDAO.createPhotoTag(photo, tag);
                 photo.getTags().add(tag);
+                exifService.exportTagsToExif(photo);
             } catch (DAOException ex) {
                 LOGGER.error("Photo-Tag-creation with {}, {} failed.", photo, tag);
                 throw new ServiceException("Creation of Photo-Tag failed.", ex);
@@ -113,6 +115,7 @@ public class PhotoServiceImpl implements PhotoService {
             try {
                 photoTagDAO.removeTagFromPhoto(photo, tag);
                 photo.getTags().remove(tag);
+                exifService.exportTagsToExif(photo);
             } catch (DAOException ex) {
                 LOGGER.error("Removal of Photo-Tag with {}, {} failed.", photo, tag);
                 throw new ServiceException("Photo-Tag removal failed.", ex);

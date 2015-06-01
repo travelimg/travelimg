@@ -33,6 +33,7 @@ public class Organizer {
 
     private static final Logger LOGGER = LogManager.getLogger(Organizer.class);
 
+
     @Autowired private PhotoService photoService;
     @Autowired private PhotographerService photographerService;
     @Autowired private ClusterService clusterService;
