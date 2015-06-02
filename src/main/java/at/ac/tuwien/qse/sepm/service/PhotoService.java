@@ -7,7 +7,7 @@ import java.time.YearMonth;
 import java.util.List;
 import java.util.function.Predicate;
 
-public interface PhotoService {
+public interface PhotoService extends Service {
 
     /**
      * Retrieve a list of those months for which there are photos.
