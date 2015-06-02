@@ -232,10 +232,18 @@ public class Organizer {
     }
 
     private void resetFilter() {
+        // don't update the filter until all list views have been reset
+        Consumer<PhotoFilter> savedCallback = filterChangeCallback;
+        filterChangeCallback = null;
+
         refreshLists();
         categoryListView.checkAll();
         ratingListView.checkAll();
         photographerListView.checkAll();
         monthListView.checkAll();
+
+        // restore the callback and handle the change
+        filterChangeCallback = savedCallback;
+        handleFilterChange();
     }
 }
