@@ -73,7 +73,7 @@ public class GridView {
         });
 
         organizer.setPresentAction(() -> {
-            FullscreenWindow fullscreen = new FullscreenWindow();
+            FullscreenWindow fullscreen = new FullscreenWindow(imageCache);
             fullscreen.present(grid.getItems());
         });
 
