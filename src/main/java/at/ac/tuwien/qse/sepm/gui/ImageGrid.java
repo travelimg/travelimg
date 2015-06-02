@@ -1,5 +1,9 @@
 package at.ac.tuwien.qse.sepm.gui;
 
+import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
+import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
+import javafx.scene.image.Image;
 import javafx.scene.layout.TilePane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,6 +23,7 @@ public class ImageGrid extends TilePane {
     private Consumer<Set<Photo>> selectionChangeAction;
 
     private final Supplier<ImageGridTile> tileSupplier;
+    private ImageCache imageCache;
 
     public ImageGrid(Supplier<ImageGridTile> tileSupplier) {
         if (tileSupplier == null) throw new IllegalArgumentException();
@@ -29,6 +34,9 @@ public class ImageGrid extends TilePane {
         setMaxHeight(Double.MAX_VALUE);
     }
 
+    public void setImageCache(ImageCache imageCache) {
+        this.imageCache = imageCache;
+    }
 
     public List<Photo> getItems() {
         return tiles.stream()
@@ -47,6 +55,8 @@ public class ImageGrid extends TilePane {
         if (item == null) throw new IllegalArgumentException();
         ImageGridTile tile = tileSupplier.get();
 
+        Image image = imageCache.get(item, ImageSize.MEDIUM);
+        tile.setPhoto(item, image);
 
         tiles.add(tile);
         tile.setOnMouseClicked(event -> {
@@ -68,7 +78,9 @@ public class ImageGrid extends TilePane {
         if (item == null) throw new IllegalArgumentException();
         ImageGridTile tile = findTile(item);
         if (tile == null) return;
-        tile.setItem(item);
+
+        Image image = imageCache.get(item, ImageSize.MEDIUM);
+        tile.setPhoto(item, image);
     }
 
     public void removeItem(Photo item) {

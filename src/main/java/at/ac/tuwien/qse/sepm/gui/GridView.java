@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.dialogs.FlickrDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
+import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import javafx.application.Platform;
@@ -34,6 +35,7 @@ public class GridView {
     @Autowired private PhotographerService photographerService;
     @Autowired private Organizer organizer;
     @Autowired private Inspector inspector;
+    @Autowired private ImageCache imageCache;
 
     @FXML private BorderPane root;
     @FXML private ScrollPane gridContainer;
@@ -43,6 +45,11 @@ public class GridView {
     private Predicate<Photo> filter = new PhotoFilter();
 
     private boolean disableReload = false;
+
+    @Autowired
+    public void setImageCache(ImageCache imageCache) {
+        this.grid.setImageCache(imageCache);
+    }
 
     @FXML
     private void initialize() {
