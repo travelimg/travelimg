@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -251,7 +252,17 @@ public class TagSelector extends VBox {
         tagList.getCheckModel().getCheckedItems().addListener(tagListChangeListener);
     }
 
+    // Validates user-tags for not allowed characters
     private boolean isValidInput(String string) {
+        if(string.contains("/")) {
+            return false;
+        }
+        if(string.contains(".")) {
+            return false;
+        }
+        if(string.contains("travelimg")) {
+            return false;
+        }
         return string != null && !string.isEmpty() && string.trim().length() > 0;
     }
 }
