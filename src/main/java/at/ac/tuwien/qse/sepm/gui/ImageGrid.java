@@ -88,13 +88,13 @@ public class ImageGrid extends TilePane {
         ImageGridTile tile = findTile(item);
         if (tile == null) return;
         tile.cancel();
-        tiles.remove(item);
+        tiles.remove(tile);
         getChildren().remove(tile);
         onSelectionChange();
     }
 
     public void clear() {
-        tiles.forEach(tile -> tile.cancel());
+        tiles.forEach(ImageGridTile::cancel);
         tiles.clear();
         getChildren().clear();
         onSelectionChange();
@@ -102,8 +102,8 @@ public class ImageGrid extends TilePane {
 
     public Set<Photo> getSelectedItems() {
         return tiles.stream()
-                .filter(tile -> tile.isSelected())
-                .map(tile -> tile.getPhoto())
+                .filter(ImageGridTile::isSelected)
+                .map(ImageGridTile::getPhoto)
                 .collect(Collectors.toSet());
     }
 
