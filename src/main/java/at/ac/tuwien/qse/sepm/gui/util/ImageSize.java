@@ -1,7 +1,14 @@
 package at.ac.tuwien.qse.sepm.gui.util;
 
-/**
- * Created by kris on 02.06.15.
- */
+
 public enum ImageSize {
+    SMALL,
+    MEDIUM,
+    ORIGINAL;
+
+    public static int inPixels(ImageSize size) {
+        if(size == SMALL) return 100;
+        else if(size == MEDIUM) return 200;
+        else return 1; // placeholder
+    }
 }
