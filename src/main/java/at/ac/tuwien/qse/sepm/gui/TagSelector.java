@@ -167,6 +167,10 @@ public class TagSelector extends VBox {
 
             alert.showAndWait();
             */
+            InfoDialog dialog = new InfoDialog(root, "Tag Fehler"); dialog.setError(true);
+            dialog.setHeaderText("Tag anlegen fehlgeschlagen");
+            dialog.setContentText("Fehlermeldung: Folgende Zeichen sind nicht erlaubt: ., /, travelimg");
+            dialog.showAndWait();
             newCatName.requestFocus();
             newCatName.selectAll();
         } highlightAddCategoryBtn(null);
