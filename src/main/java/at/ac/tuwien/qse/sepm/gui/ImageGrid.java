@@ -11,16 +11,16 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class ImageGrid<E> extends TilePane {
+public class ImageGrid extends TilePane {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final List<ImageGridTile<E>> tiles = new LinkedList<>();
-    private Consumer<Set<E>> selectionChangeAction;
+    private final List<ImageGridTile> tiles = new LinkedList<>();
+    private Consumer<Set<Photo>> selectionChangeAction;
 
-    private final Supplier<ImageGridTile<E>> tileSupplier;
+    private final Supplier<ImageGridTile> tileSupplier;
 
-    public ImageGrid(Supplier<ImageGridTile<E>> tileSupplier) {
+    public ImageGrid(Supplier<ImageGridTile> tileSupplier) {
         if (tileSupplier == null) throw new IllegalArgumentException();
         this.tileSupplier = tileSupplier;
 
@@ -29,23 +29,25 @@ public class ImageGrid<E> extends TilePane {
         setMaxHeight(Double.MAX_VALUE);
     }
 
-    public List<E> getItems() {
+
+    public List<Photo> getItems() {
         return tiles.stream()
-                .map(ImageGridTile::getItem)
+                .map(ImageGridTile::getPhoto)
                 .collect(Collectors.toList());
     }
 
-    public void setItems(List<E> newItems) {
+    public void setItems(List<Photo> newItems) {
         if (newItems == null) throw new IllegalArgumentException();
         clear();
         newItems.forEach(this::addItem);
         onSelectionChange();
     }
 
-    public void addItem(E item) {
+    public void addItem(Photo item) {
         if (item == null) throw new IllegalArgumentException();
-        ImageGridTile<E> tile = tileSupplier.get();
-        tile.setItem(item);
+        ImageGridTile tile = tileSupplier.get();
+
+
         tiles.add(tile);
         tile.setOnMouseClicked(event -> {
             if (event.isControlDown()) {
@@ -62,16 +64,16 @@ public class ImageGrid<E> extends TilePane {
         getChildren().add(tile);
     }
 
-    public void updateItem(E item) {
+    public void updateItem(Photo item) {
         if (item == null) throw new IllegalArgumentException();
-        ImageGridTile<E> tile = findTile(item);
+        ImageGridTile tile = findTile(item);
         if (tile == null) return;
         tile.setItem(item);
     }
 
-    public void removeItem(E item) {
+    public void removeItem(Photo item) {
         if (item == null) throw new IllegalArgumentException();
-        ImageGridTile<E> tile = findTile(item);
+        ImageGridTile tile = findTile(item);
         if (tile == null) return;
         tile.cancel();
         tiles.remove(item);
@@ -86,16 +88,16 @@ public class ImageGrid<E> extends TilePane {
         onSelectionChange();
     }
 
-    public Set<E> getSelectedItems() {
+    public Set<Photo> getSelectedItems() {
         return tiles.stream()
                 .filter(tile -> tile.isSelected())
-                .map(tile -> tile.getItem())
+                .map(tile -> tile.getPhoto())
                 .collect(Collectors.toSet());
     }
 
-    public void select(E item) {
+    public void select(Photo item) {
         if (item == null) throw new IllegalArgumentException();
-        ImageGridTile<E> tile = findTile(item);
+        ImageGridTile tile = findTile(item);
         if (tile == null) return;
         tile.select();
         onSelectionChange();
@@ -103,13 +105,13 @@ public class ImageGrid<E> extends TilePane {
 
     public void selectAll() {
         LOGGER.debug("selecting all items");
-        tiles.forEach(ImageGridTile<E>::select);
+        tiles.forEach(ImageGridTile::select);
         onSelectionChange();
     }
 
-    public void deselect(E item) {
+    public void deselect(Photo item) {
         if (item == null) throw new IllegalArgumentException();
-        ImageGridTile<E> tile = findTile(item);
+        ImageGridTile tile = findTile(item);
         if (tile == null) return;
         tile.deselect();
         onSelectionChange();
@@ -121,7 +123,7 @@ public class ImageGrid<E> extends TilePane {
         onSelectionChange();
     }
 
-    public void setSelectionChangeAction(Consumer<Set<E>> selectionChangeAction) {
+    public void setSelectionChangeAction(Consumer<Set<Photo>> selectionChangeAction) {
         this.selectionChangeAction = selectionChangeAction;
     }
 
@@ -130,9 +132,9 @@ public class ImageGrid<E> extends TilePane {
         selectionChangeAction.accept(getSelectedItems());
     }
 
-    private ImageGridTile<E> findTile(E item) {
-        for (ImageGridTile<E> tile : tiles) {
-            if (item == tile.getItem()) return tile;
+    private ImageGridTile findTile(Photo item) {
+        for (ImageGridTile tile : tiles) {
+            if (item == tile.getPhoto()) return tile;
         }
         return null;
     }

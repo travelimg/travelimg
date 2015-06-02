@@ -38,7 +38,7 @@ public class GridView {
     @FXML private BorderPane root;
     @FXML private ScrollPane gridContainer;
 
-    private final ImageGrid<Photo> grid = new ImageGrid<>(PhotoGridTile::new);
+    private final ImageGrid grid = new ImageGrid(PhotoGridTile::new);
     private final List<Photo> selection = new ArrayList<Photo>();
     private Predicate<Photo> filter = new PhotoFilter();
 
