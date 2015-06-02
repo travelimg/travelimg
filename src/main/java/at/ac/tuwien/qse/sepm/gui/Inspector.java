@@ -122,7 +122,7 @@ public class Inspector {
     @FXML private void initialize() {
 
             mapsScene = new GoogleMapsScene();
-            tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService);
+            tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService, root);
             ratingPicker.setRatingChangeHandler(this::handleRatingChange);
             deleteButton.setOnAction(this::handleDelete);
             dropboxButton.setOnAction(this::handleDropbox);
@@ -306,6 +306,7 @@ public class Inspector {
     }
 
     private class TagListChangeListener implements ListChangeListener<Tag> {
+
         public void onChanged(ListChangeListener.Change<? extends Tag> change) {
             while(change.next()) {
 
@@ -339,5 +340,6 @@ public class Inspector {
                 }
             }
         }
+
     }
 }
