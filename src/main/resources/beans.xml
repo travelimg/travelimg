@@ -62,4 +62,5 @@
 	<bean id="organizerController" class="at.ac.tuwien.qse.sepm.gui.Organizer"></bean>
 	<bean id="inspectorController" class="at.ac.tuwien.qse.sepm.gui.Inspector"></bean>
     <bean id="ratingPicker" class="at.ac.tuwien.qse.sepm.gui.RatingPicker"></bean>
+	<bean id="highlightsViewController" class="at.ac.tuwien.qse.sepm.gui.HighlightsViewController"></bean>
 </beans>
