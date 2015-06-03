@@ -16,10 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-/**
- * Created by David on 17.05.2015.
- */
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:test-config.xml")
 @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -48,9 +44,9 @@ public class ClusterServiceTest {
     public void testClusteringService() {
         try {
 //            clusterService.cluster(photoDAO.readAll());
-            clusterService.addJourney(inputJourneys[0]);
-            clusterService.addJourney(inputJourneys[1]);
-            clusterService.addJourney(inputJourneys[2]);
+//            clusterService.addJourney(inputJourneys[0]);
+//            clusterService.addJourney(inputJourneys[1]);
+//            clusterService.addJourney(inputJourneys[2]);
             clusterService.clusterJourney(inputJourneys[0]);
             clusterService.clusterJourney(inputJourneys[1]);
             clusterService.clusterJourney(inputJourneys[2]);

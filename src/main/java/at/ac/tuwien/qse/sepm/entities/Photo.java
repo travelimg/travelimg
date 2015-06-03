@@ -15,6 +15,7 @@ public class Photo {
     private double latitude;
     private double longitude;
     private Place place;
+    private Journey journey;
     private final List<Tag> tags = new ArrayList<>();
 
     public Photo() {
@@ -157,5 +158,13 @@ public class Photo {
                 ", longitude=" + longitude +
                 ", place=" + place +
                 '}';
+    }
+
+    public Journey getJourney() {
+        return journey;
+    }
+
+    public void setJourney(Journey journey) {
+        this.journey = journey;
     }
 }

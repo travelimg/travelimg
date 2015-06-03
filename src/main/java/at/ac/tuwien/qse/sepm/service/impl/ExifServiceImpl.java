@@ -1,12 +1,7 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
-import at.ac.tuwien.qse.sepm.entities.Exif;
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Tag;
-import at.ac.tuwien.qse.sepm.service.ExifService;
-import at.ac.tuwien.qse.sepm.service.PhotoService;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.service.TagService;
+import at.ac.tuwien.qse.sepm.entities.*;
+import at.ac.tuwien.qse.sepm.service.*;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.ImageWriteException;
 import org.apache.commons.imaging.Imaging;
@@ -23,6 +18,7 @@ import org.apache.commons.imaging.util.IoUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -39,6 +35,7 @@ public class ExifServiceImpl implements ExifService {
 
     @Autowired PhotoService photoService;
     @Autowired TagService tagService;
+    @Autowired ClusterService clusterService;
 
     @Override public Exif getExif(Photo photo) throws ServiceException {
         File file = new File(photo.getPath());
@@ -123,39 +120,70 @@ public class ExifServiceImpl implements ExifService {
                         .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_USER_COMMENT)
                         .getValueDescription();
                 // no tags from our programm
-                if(!tags.contains("travelimg")) return;
+                if (!tags.contains("travelimg"))
+                    return;
                 logger.debug("Tags in exif found: " + tags);
                 tags = tags.replace("'", "");
             }
             String[] tagArray = tags.split("/");
             for (String element : tagArray) {
-                if(element.equals("travelimg")) continue;
+                if (element.equals("travelimg"))
+                    continue;
+
+                if (element.contains("journey")) {
+                    String[] tempJourney = element.split(".");
+
+                    LocalDateTime startdate = LocalDateTime.parse(tempJourney[2], dateFormatter);
+
+                LocalDateTime enddate = LocalDateTime.parse(tempJourney[3], dateFormatter);
+
+                photoService.addJourneyToPhotos(Arrays.asList(photo),
+                        new Journey(0, tempJourney[1], startdate, enddate));
+            }
+
+            if (element.contains("place")) {
+                String[] tempPlace = element.split(".");
+                photoService.addPlaceToPhotos(Arrays.asList(photo),
+                        new Place(0, tempPlace[1], tempPlace[2]));
+            }
+
+            // tags
                 Tag tag = new Tag(null, element);
                 Tag tempTag = tagService.readName(tag);
-                if(tempTag == null) {
+                if (tempTag == null) {
                     tagService.create(tag);
                     tempTag = tag;
                 }
                 photoService.addTagToPhotos(Arrays.asList(photo), tempTag);
             }
 
-    } catch (IOException e) {
-        e.printStackTrace();
-    } catch (ImageReadException e) {
-        e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ImageReadException e) {
+            e.printStackTrace();
+        }
     }
-}
 
-    @Override public void exportTagsToExif(Photo photo) throws ServiceException {
-        logger.debug("exportTagsToExif" + photo + ":" + photo.getTags());
+    @Override public void exportMetaToExif(Photo photo) throws ServiceException {
+        logger.debug("exportMetaToExif" + photo + ":" + photo.getTags());
         File jpegImageFile = new File(photo.getPath());
         File tempFile = new File(photo.getPath() + "d");
         OutputStream os = null;
         boolean canThrow = false;
+
         String tags = "travelimg";
 
-        for(Tag element: photo.getTags()) {
+        for (Tag element : photo.getTags()) {
             tags += "/" + element.getName();
+        }
+
+        if (photo.getJourney() != null) {
+            Journey journey = photo.getJourney();
+            tags += "/journey" + journey.getName() + "." + journey.getStartDate() + "." + journey.getEndDate();
+        }
+        if (photo.getPlace() != null) {
+            Place place = photo.getPlace();
+            tags += "/place" + place.getCountry() + "." + place.getCity();
         }
 
         try {

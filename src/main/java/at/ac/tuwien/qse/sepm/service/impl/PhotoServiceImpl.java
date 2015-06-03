@@ -1,10 +1,9 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
-import at.ac.tuwien.qse.sepm.dao.DAOException;
-import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
-import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
-import at.ac.tuwien.qse.sepm.dao.TagDAO;
+import at.ac.tuwien.qse.sepm.dao.*;
+import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.ExifService;
@@ -27,6 +26,9 @@ public class PhotoServiceImpl implements PhotoService {
     @Autowired private PhotoDAO photoDAO;
     @Autowired private ExifService exifService;
     @Autowired private PhotoTagDAO photoTagDAO;
+    @Autowired private JourneyDAO journeyDAO;
+    @Autowired private PlaceDAO placeDAO;
+
     ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     @Override public List<YearMonth> getMonthsWithPhotos() throws ServiceException {
@@ -85,7 +87,7 @@ public class PhotoServiceImpl implements PhotoService {
             try {
                 photoTagDAO.createPhotoTag(photo, tag);
                 photo.getTags().add(tag);
-                exifService.exportTagsToExif(photo);
+                exifService.exportMetaToExif(photo);
             } catch (DAOException ex) {
                 LOGGER.error("Photo-Tag-creation with {}, {} failed.", photo, tag);
                 throw new ServiceException("Creation of Photo-Tag failed.", ex);
@@ -109,7 +111,7 @@ public class PhotoServiceImpl implements PhotoService {
                 executorService.execute(new Runnable() {
                     @Override public void run() {
                         try {
-                            exifService.exportTagsToExif(photo);
+                            exifService.exportMetaToExif(photo);
                         } catch (ServiceException e) {
                             e.printStackTrace();
                         }
@@ -156,6 +158,49 @@ public class PhotoServiceImpl implements PhotoService {
             throw new ServiceException("Could not store rating of photo.", ex);
         }
         LOGGER.debug("Leaving savePhotoRating with {}", photo);
+    }
+
+    @Override public void addJourneyToPhotos(List<Photo> photos, Journey journey)
+            throws ServiceException {
+        LOGGER.debug("Entering addJourneyToPhotos with {}, {}", photos, journey);
+        if (photos == null) {
+            throw new ServiceException("List<Photo> photos is null");
+        }
+        for (Photo photo : photos) {
+            try {
+                journeyDAO.create(journey);
+                photo.setJourney(journey);
+                exifService.exportMetaToExif(photo);
+            } catch (DAOException ex) {
+                LOGGER.error("Journey-creation with {}, {} failed.", photo, journey);
+                throw new ServiceException("Creation of Journey failed.", ex);
+            } catch (ValidationException e) {
+                throw new ServiceException("Failed to validate entity", e);
+            }
+        }
+        LOGGER.debug("Leaving addJourneyToPhotos");
+    }
+
+    @Override public void addPlaceToPhotos(List<Photo> photos, Place place) throws ServiceException {
+        LOGGER.debug("Entering addPlaceToPhotos with {}, {}", photos, place);
+        if (photos == null) {
+            throw new ServiceException("List<Photo> photos is null");
+        }
+
+        for (Photo photo : photos) {
+            try {
+                placeDAO.create(place);
+                photo.setPlace(place);
+                exifService.exportMetaToExif(photo);
+            } catch (DAOException ex) {
+                LOGGER.error("Place-creation with {}, {} failed.", photo, place);
+                throw new ServiceException("Creation of Place failed.", ex);
+            } catch (ValidationException e) {
+                throw new ServiceException("Failed to validate entity", e);
+            }
+        }
+
+        LOGGER.debug("Leaving addPlaceToPhotos");
     }
 
     @Override public void close() {

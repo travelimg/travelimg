@@ -51,7 +51,7 @@ public class JourneyDialog extends ResultDialog<Journey>{
     private void handleAdd(ActionEvent actionEvent) {
         Journey journey = new Journey(-1, journeyNameField.getText(), journeyBeginDate.getValue().atStartOfDay(), journeyEndDate.getValue().atStartOfDay());
         try {
-            clusterService.addJourney(journey);
+            clusterService.clusterJourney(journey);
         } catch (ServiceException e) {
             e.printStackTrace();
             // TODO: Show Error Dialog

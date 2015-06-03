@@ -5,10 +5,7 @@ import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 
 import java.util.List;
 
-/**
- * Created by David on 21.05.2015.
- */
-@Deprecated
+
 public interface PlaceDAO {
     Place create(Place place) throws DAOException, ValidationException;
 

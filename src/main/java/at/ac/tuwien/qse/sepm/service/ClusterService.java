@@ -6,11 +6,23 @@ import at.ac.tuwien.qse.sepm.entities.Place;
 
 import java.util.List;
 
-/**
- * Created by David on 15.05.2015.
- */
 public interface ClusterService {
-    void cluster(List<Photo> photos) throws ServiceException;
-    Journey addJourney(Journey journey) throws ServiceException;
+
+    /**
+     *
+     * @param journey
+     * @return
+     * @throws ServiceException
+     */
     List<Place> clusterJourney(Journey journey) throws ServiceException;
+
+//    /**
+//     *
+//     * @param journey
+//     * @return
+//     * @throws ServiceException
+//     */
+////    Journey addJourney(Journey journey) throws ServiceException;
+////
+////    Place addPlace(Place place) throws ServiceException;
 }

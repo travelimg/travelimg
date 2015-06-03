@@ -16,10 +16,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by David on 02.06.2015.
- */
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:test-config.xml")
 @TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
@@ -57,7 +53,7 @@ public class ExifServiceTest {
     public void testTagExportToPhotoFile() throws ServiceException {
         Tag testTag = new Tag(null, "Testtag");
         inputPhotos.get(0).getTags().add(testTag);
-        exifService.exportTagsToExif(inputPhotos.get(0));
+        exifService.exportMetaToExif(inputPhotos.get(0));
     }
 
     @WithData

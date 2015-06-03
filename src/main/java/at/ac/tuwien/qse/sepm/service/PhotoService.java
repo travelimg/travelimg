@@ -1,6 +1,8 @@
 package at.ac.tuwien.qse.sepm.service;
 
+import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 
 import java.time.YearMonth;
@@ -88,4 +90,8 @@ public interface PhotoService extends Service {
      * @throws ServiceException failed to perform operation
      */
     void savePhotoRating(Photo photo) throws ServiceException;
+
+    void addJourneyToPhotos(List<Photo> photos, Journey journey) throws ServiceException;
+
+    void addPlaceToPhotos(List<Photo> photos, Place place) throws ServiceException;
 }

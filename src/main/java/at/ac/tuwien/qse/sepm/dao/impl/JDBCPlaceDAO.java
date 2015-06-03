@@ -16,10 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by David on 21.05.2015.
- */
-@Deprecated
 public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
     private static final String readStatement = "SELECT city, country FROM PLACE WHERE id=?;";
     private static final String readAllStatement = "SELECT id, city, country FROM PLACE;";

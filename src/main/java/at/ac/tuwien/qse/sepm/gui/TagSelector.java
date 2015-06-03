@@ -129,16 +129,6 @@ public class TagSelector extends VBox {
         highlightAddCategoryBtn(null);
 
         if (isValidInput(newCategoryName)) {
-            //            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            //            alert.setTitle("Hinzufügen bestätigen");
-            //            alert.setHeaderText("Wollen Sie die Kategorie \"" + newCategoryName + "\" wirklich"
-            //                    + " hinzufügen?");
-            //            alert.setContentText("Die Kategorie wird dann für alle verwalteten Fotos als Auswahl"
-            //                    + " zur Verfügung stehen");
-            //
-            //            Optional<ButtonType> result = alert.showAndWait();
-            //
-            //            if (result.get() == ButtonType.OK) {
             try {
                 Tag newTag = tagService.create(new Tag(null, newCategoryName));
                 LOGGER.info("Successfully added new category: \"{}\"", newCategoryName);
@@ -146,34 +136,25 @@ public class TagSelector extends VBox {
                 newCatName.clear();
             } catch (ServiceException ex) {
                 LOGGER.error("Failed to add new category: \"{}\"", newCategoryName);
-                InfoDialog dialog = new InfoDialog(root, "Tag Fehler"); dialog.setError(true);
+                InfoDialog dialog = new InfoDialog(root, "Tag Fehler");
+                dialog.setError(true);
                 dialog.setHeaderText("Tag anlegen fehlgeschlagen");
                 dialog.setContentText("Fehlermeldung: " + ex.getMessage());
                 dialog.showAndWait();
 
             }
-            //            }
-            //        else {
-            //                LOGGER.debug("User did not confirm addition of category: \"{}\"", newCategoryName);
-            //                newCatName.requestFocus();
-            //                newCatName.selectAll();
-            //            }
-        } else {
-            /*
-            alert.setTitle("Fehlende Eingabe");
-            alert.setHeaderText("Es wurde noch kein gültiger Name für die Kategorie gewählt");
-            alert.setContentText("Bitte geben Sie den gewünschten Namen in das Textfeld links "
-                    + "des 'Plus'-Buttons ein und versuchen Sie es erneut.");
 
-            alert.showAndWait();
-            */
-            InfoDialog dialog = new InfoDialog(root, "Tag Fehler"); dialog.setError(true);
+        } else {
+            InfoDialog dialog = new InfoDialog(root, "Tag Fehler");
+            dialog.setError(true);
             dialog.setHeaderText("Tag anlegen fehlgeschlagen");
-            dialog.setContentText("Fehlermeldung: Folgende Zeichen sind nicht erlaubt: ., /, travelimg");
+            dialog.setContentText(
+                    "Fehlermeldung: Folgende Zeichen sind nicht erlaubt: ., /, travelimg");
             dialog.showAndWait();
             newCatName.requestFocus();
             newCatName.selectAll();
-        } highlightAddCategoryBtn(null);
+        }
+        highlightAddCategoryBtn(null);
     }
 
     /**
@@ -258,13 +239,13 @@ public class TagSelector extends VBox {
 
     // Validates user-tags for not allowed characters
     private boolean isValidInput(String string) {
-        if(string.contains("/")) {
+        if (string.contains("/")) {
             return false;
         }
-        if(string.contains(".")) {
+        if (string.contains(".")) {
             return false;
         }
-        if(string.contains("travelimg")) {
+        if (string.contains("travelimg")) {
             return false;
         }
         return string != null && !string.isEmpty() && string.trim().length() > 0;
