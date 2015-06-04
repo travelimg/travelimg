@@ -63,4 +63,5 @@
 	<bean id="inspectorController" class="at.ac.tuwien.qse.sepm.gui.Inspector"></bean>
     <bean id="ratingPicker" class="at.ac.tuwien.qse.sepm.gui.RatingPicker"></bean>
 	<bean id="imageCache" class="at.ac.tuwien.qse.sepm.gui.util.ImageCache"></bean>
+	<bean id="imageGridController" class="at.ac.tuwien.qse.sepm.gui.PaginatedImageGrid"></bean>
 </beans>

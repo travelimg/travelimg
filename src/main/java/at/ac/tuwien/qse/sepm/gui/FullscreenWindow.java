@@ -75,10 +75,12 @@ public class FullscreenWindow extends AnchorPane {
         });
     }
 
-    public void present(List<Photo> photos) {
+    public void present(List<Photo> photos, Photo initial) {
         this.photos = photos;
 
-        if(activeIndex >= photos.size()) {
+        activeIndex = photos.indexOf(initial);
+
+        if(activeIndex < 0) {
             activeIndex = 0;
         }
 

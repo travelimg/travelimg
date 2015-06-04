@@ -17,7 +17,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,21 +34,17 @@ public class GridView {
     @Autowired private PhotographerService photographerService;
     @Autowired private Organizer organizer;
     @Autowired private Inspector inspector;
-    @Autowired private ImageCache imageCache;
 
     @FXML private BorderPane root;
     @FXML private ScrollPane gridContainer;
 
-    private final ImageGrid grid = new ImageGrid(PhotoGridTile::new);
     private final List<Photo> selection = new ArrayList<Photo>();
     private Predicate<Photo> filter = new PhotoFilter();
 
-    private boolean disableReload = false;
+    @Autowired private ImageCache imageCache;
+    @Autowired private PaginatedImageGrid grid = new PaginatedImageGrid();
 
-    @Autowired
-    public void setImageCache(ImageCache imageCache) {
-        this.grid.setImageCache(imageCache);
-    }
+    private boolean disableReload = false;
 
     @FXML
     private void initialize() {
@@ -74,7 +69,7 @@ public class GridView {
 
         organizer.setPresentAction(() -> {
             FullscreenWindow fullscreen = new FullscreenWindow(imageCache);
-            fullscreen.present(grid.getItems());
+            fullscreen.present(grid.getPhotos(), grid.getActivePhoto());
         });
 
         organizer.setFilterChangeAction(this::handleFilterChange);
@@ -93,14 +88,14 @@ public class GridView {
         inspector.setUpdateHandler(photos -> {
             photos.stream()
                     .filter(filter.negate())
-                    .forEach(grid::removeItem);
+                    .forEach(grid::removePhoto);
             photos.stream()
                     .filter(filter)
-                    .forEach(grid::updateItem);
+                    .forEach(grid::updatePhoto);
         });
 
         // Deleted photos are removed from the grid.
-        inspector.setDeleteHandler(photos -> photos.forEach(grid::removeItem));
+        inspector.setDeleteHandler(photos -> photos.forEach(grid::removePhoto));
 
         // Apply the initial filter.
         handleFilterChange(organizer.getFilter());
@@ -121,7 +116,7 @@ public class GridView {
 
     public void deletePhotos(){
         for(Photo photo : selection){
-            grid.removeItem(photo);
+            grid.removePhoto(photo);
         }
         selection.clear();
     }
@@ -139,11 +134,11 @@ public class GridView {
             organizer.addMonth(month);
 
             // Ignore photos that are not part of the current filter.
-            if (!filter.test(photo)){
+            if (!filter.test(photo)) {
                 disableReload = false;
                 return;
             }
-            grid.addItem(photo);
+            grid.addPhoto(photo);
 
             disableReload = false;
         });
