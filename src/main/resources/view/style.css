@@ -510,6 +510,10 @@
     -fx-padding: 6px;
 }
 
+.pagination {
+    -fx-background-color: #dddddd;
+}
+
 .pagination .toggle-button {
     -fx-padding: 10px; /* TODO: does not work */
 }

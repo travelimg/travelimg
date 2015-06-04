@@ -3,7 +3,9 @@ package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
+import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import at.ac.tuwien.qse.sepm.gui.util.LRUCache;
+import javafx.fxml.FXML;
 import javafx.scene.control.Pagination;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,7 +27,7 @@ public class PaginatedImageGrid extends Pagination {
     private LRUCache<Integer, ImageGridPage> pageCache = new LRUCache<>(10);
     private Consumer<Set<Photo>> selectionChangeAction = null;
 
-    private int photosPerPage = 20;
+    private int photosPerPage = 24;
     private ImageGridPage activePage = null;
 
     public PaginatedImageGrid() {
@@ -33,8 +35,10 @@ public class PaginatedImageGrid extends Pagination {
 
         setPageFactory(this::getPage);
         getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
-    }
 
+        heightProperty().addListener(this::handleSizeChange);
+    }
+    
     public List<Photo> getPhotos() {
         return photos;
     }
@@ -168,5 +172,30 @@ public class PaginatedImageGrid extends Pagination {
 
     private int calculatePageCount() {
         return Math.max(1, (int)Math.ceil(photos.size() / (double)photosPerPage));
+    }
+
+    /**
+     * Calculate how many photos we can fit inside the page.
+     */
+    private void handleSizeChange(Object observable) {
+        // estimate tile size
+        int gap = 16;
+        int padding = 8;
+        int size = ImageSize.inPixels(ImageSize.MEDIUM);
+        int tileSize = padding + gap + size;
+
+        int photosPerRow = (int)getWidth() / tileSize;
+        int photosPerCol = (int)getHeight() / tileSize;
+
+        int totalPhotos = photosPerRow * photosPerCol;
+
+        if(totalPhotos != photosPerPage) {
+            photosPerPage = totalPhotos;
+            pageCache.clear();
+
+            // force relayout
+            setPageCount(calculatePageCount() + 1);
+            setPageCount(calculatePageCount());
+        }
     }
 }
