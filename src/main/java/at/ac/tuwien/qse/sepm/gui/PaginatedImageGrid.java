@@ -32,6 +32,7 @@ public class PaginatedImageGrid extends Pagination {
         super(0, 0);
 
         setPageFactory(this::getPage);
+        getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
     }
 
     public List<Photo> getPhotos() {
