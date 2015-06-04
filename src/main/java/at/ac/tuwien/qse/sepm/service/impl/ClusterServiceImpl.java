@@ -127,6 +127,21 @@ public class ClusterServiceImpl implements ClusterService {
 //        }
 //    }
 
+    /**
+     * Read and return all currently saved journeys.
+     *
+     * @return list of all currently saved journeys
+     * @throws ServiceException propagates DAOExceptions
+     */
+    @Override public List<Journey> getAllJourneys() throws ServiceException {
+        try {
+            return journeyDAO.readAll();
+        } catch (DAOException ex) {
+            ex.printStackTrace();
+            throw new ServiceException("Failed to get all journeys", ex);
+        }
+    }
+
     @Override public List<Place> clusterJourney(Journey journey) throws ServiceException {
         logger.debug("clusteringJourney" + journey);
         List<Photo> photos;

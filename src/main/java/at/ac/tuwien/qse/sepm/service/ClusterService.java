@@ -8,6 +8,19 @@ import java.util.List;
 
 public interface ClusterService {
 
+    void cluster(List<Photo> photos) throws ServiceException;
+
+    /**
+     * Read and return all currently saved journeys.
+     *
+     * @return list of all currently saved journeys
+     * @throws ServiceException propagates DAOExceptions
+     */
+    List<Journey> getAllJourneys() throws ServiceException;
+
+    Journey addJourney(Journey journey) throws ServiceException;
+
+
     /**
      *
      * @param journey
