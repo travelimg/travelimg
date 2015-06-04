@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PlaceDAO;
 import at.ac.tuwien.qse.sepm.entities.Place;
+import at.ac.tuwien.qse.sepm.entities.validators.PlaceValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -31,10 +32,9 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
 
     @Override public Place create(Place place) throws DAOException, ValidationException {
         logger.debug("Creating Place", place);
-        if (place == null)
-            throw new IllegalArgumentException();
 
-        // TODO: Validator
+        PlaceValidator.validate(place);
+
         Map<String, Object> parameters = new HashMap<String, Object>(1);
         parameters.put("city", place.getCity());
         parameters.put("country", place.getCountry());
@@ -51,8 +51,10 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
 
     @Override public void delete(Place place) throws DAOException, ValidationException {
         logger.debug("Deleting Place", place);
-        if (place == null)
-            throw new IllegalArgumentException();
+
+        PlaceValidator.validate(place);
+        PlaceValidator.validateID(place.getId());
+
         try {
             jdbcTemplate.update(deleteStatement, place.getId());
         } catch (DataAccessException ex) {
@@ -63,8 +65,9 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
 
     @Override public void update(Place place) throws DAOException, ValidationException {
         logger.debug("Updating Place", place);
-        if (place == null)
-            throw new IllegalArgumentException();
+
+        PlaceValidator.validate(place);
+        PlaceValidator.validateID(place.getId());
 
         try {
             jdbcTemplate
@@ -96,10 +99,10 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
         }
     }
 
-    @Override public Place getById(int id) throws DAOException {
+    @Override public Place getById(int id) throws DAOException, ValidationException {
         logger.debug("getByName ", id);
-        if (id < 0)
-            throw new IllegalArgumentException();
+
+        PlaceValidator.validateID(id);
 
         try {
             return this.jdbcTemplate

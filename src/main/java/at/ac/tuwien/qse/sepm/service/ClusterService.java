@@ -8,8 +8,6 @@ import java.util.List;
 
 public interface ClusterService {
 
-    //void cluster(List<Photo> photos) throws ServiceException;
-
     /**
      * Read and return all currently saved journeys.
      *
@@ -18,24 +16,14 @@ public interface ClusterService {
      */
     List<Journey> getAllJourneys() throws ServiceException;
 
-   // Journey addJourney(Journey journey) throws ServiceException;
-
-
     /**
+     * Creates a journey and clusters this journey in places.
      *
-     * @param journey
-     * @return
-     * @throws ServiceException
+     * A journey entry is made in the data record.
+     * This journey is then clustered into places (places are at least 1 degree apart from each other)
+     * @param journey Journey to be clustered.
+     * @return Returns a list with all the clusters(places).
+     * @throws ServiceException If cluster-service fails due to database errors.
      */
     List<Place> clusterJourney(Journey journey) throws ServiceException;
-
-//    /**
-//     *
-//     * @param journey
-//     * @return
-//     * @throws ServiceException
-//     */
-////    Journey addJourney(Journey journey) throws ServiceException;
-////
-////    Place addPlace(Place place) throws ServiceException;
 }

@@ -38,18 +38,18 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
     @Override public Journey create(Journey journey) throws DAOException, ValidationException {
         logger.debug("Creating Journey", journey);
         if (journey == null)
-            throw new IllegalArgumentException();
+            throw new ValidationException();
         // TODO: handle validator exception
         JourneyValidator.validate(journey);
 
         Map<String, Object> parameters = new HashMap<String, Object>(1);
-        parameters.put("id", journey.getId());
         parameters.put("name", journey.getName());
         parameters.put("start", Timestamp.valueOf(journey.getStartDate()));
         parameters.put("end", Timestamp.valueOf(journey.getEndDate()));
 
         try {
-            insertJourney.execute(parameters);
+            Number newId = insertJourney.executeAndReturnKey(parameters);
+            journey.setId((int) newId.longValue());
             return journey;
         } catch (DataAccessException ex) {
             logger.error("Failed to create journey", ex);
@@ -60,9 +60,11 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
 
     @Override public void delete(Journey journey) throws DAOException, ValidationException {
         logger.debug("Deleting Journey", journey);
-        if (journey == null)
-            throw new IllegalArgumentException();
-        try {
+
+        JourneyValidator.validate(journey);
+        JourneyValidator.validateID(journey.getId());
+
+         try {
             jdbcTemplate.update(deleteStatement, journey.getId());
         } catch (DataAccessException ex) {
             logger.error("Failed to delete Journey", ex);
@@ -72,14 +74,13 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
 
     @Override public void update(Journey journey) throws DAOException, ValidationException {
         logger.debug("Updating Journey", journey);
-        if (journey == null)
-            throw new IllegalArgumentException();
 
+        JourneyValidator.validateID(journey.getId());
         JourneyValidator.validate(journey);
 
         try {
-            jdbcTemplate.update(updateStatement, journey.getName(), journey.getStartDate(), journey.getEndDate(),
-                    journey.getId());
+            jdbcTemplate.update(updateStatement, journey.getName(), journey.getStartDate(),
+                    journey.getEndDate(), journey.getId());
             logger.debug("Successfully updated Journey", journey);
         } catch (DataAccessException ex) {
             logger.error("Failed updating Journey", journey);
@@ -108,10 +109,10 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         }
     }
 
-    @Override public Journey getByName(String name) throws DAOException {
+    @Override public Journey getByName(String name) throws DAOException, ValidationException {
         logger.debug("getByName ", name);
         if (name == null)
-            throw new IllegalArgumentException();
+            throw new ValidationException();
 
         try {
             return this.jdbcTemplate
@@ -124,7 +125,7 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
                                     resultSet.getTimestamp(4).toLocalDateTime());
                         }
                     });
-        }catch (DataAccessException ex) {
+        } catch (DataAccessException ex) {
             throw new DAOException("Failed to read a Journey", ex);
         }
     }

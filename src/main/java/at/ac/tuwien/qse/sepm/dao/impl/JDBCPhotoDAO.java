@@ -95,8 +95,10 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     @Override
     public void update(Photo photo) throws DAOException, ValidationException {
-        if (photo == null) throw new IllegalArgumentException();
         logger.debug("Updating photo {}", photo);
+
+        PhotoValidator.validate(photo);
+
         try {
             jdbcTemplate.update(UPDATE_STATEMENT,
                     // TODO: Also update photographer ID.
@@ -271,7 +273,9 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
                 photo.setPlace(place);
             } catch (DAOException e) {
                 e.printStackTrace();
-                throw new SQLException(e);
+                throw new RuntimeException(e);
+            } catch (ValidationException e) {
+                throw new RuntimeException(e);
             }
 
             try {
