@@ -50,6 +50,8 @@
 			destroy-method="close">
 	</bean>
 
+	<bean id="filter" class="at.ac.tuwien.qse.sepm.service.impl.PhotoFilter"></bean>
+
 	<bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
 		<constructor-arg value="${user.home}/travelimg"></constructor-arg>
 	</bean>
