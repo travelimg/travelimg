@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ClusterService {
 
-    void cluster(List<Photo> photos) throws ServiceException;
+    //void cluster(List<Photo> photos) throws ServiceException;
 
     /**
      * Read and return all currently saved journeys.
@@ -18,7 +18,7 @@ public interface ClusterService {
      */
     List<Journey> getAllJourneys() throws ServiceException;
 
-    Journey addJourney(Journey journey) throws ServiceException;
+   // Journey addJourney(Journey journey) throws ServiceException;
 
 
     /**
