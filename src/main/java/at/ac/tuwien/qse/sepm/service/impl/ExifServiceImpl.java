@@ -169,21 +169,21 @@ public class ExifServiceImpl implements ExifService {
         File jpegImageFile = new File(photo.getPath());
         File tempFile = new File(photo.getPath() + "d");
         OutputStream os = null;
-        boolean canThrow = false;
+            boolean canThrow = false;
 
-        String tags = "travelimg";
+            String tags = "travelimg";
 
-        for (Tag element : photo.getTags()) {
-            tags += "/" + element.getName();
-        }
+            for (Tag element : photo.getTags()) {
+                tags += "/" + element.getName();
+            }
 
-        if (photo.getJourney() != null) {
-            Journey journey = photo.getJourney();
-            tags += "/journey" + journey.getName() + "." + journey.getStartDate() + "." + journey.getEndDate();
-        }
-        if (photo.getPlace() != null) {
-            Place place = photo.getPlace();
-            tags += "/place" + place.getCountry() + "." + place.getCity();
+            if (photo.getJourney() != null) {
+                Journey journey = photo.getJourney();
+                tags += "/journey" + journey.getName() + "." + journey.getStartDate() + "." + journey.getEndDate();
+            }
+            if (photo.getPlace() != null) {
+                Place place = photo.getPlace();
+                tags += "/place" + place.getCountry() + "." + place.getCity();
         }
 
         try {

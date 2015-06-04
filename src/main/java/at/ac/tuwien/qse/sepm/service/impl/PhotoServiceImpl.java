@@ -166,41 +166,42 @@ public class PhotoServiceImpl implements PhotoService {
         if (photos == null) {
             throw new ServiceException("List<Photo> photos is null");
         }
-        for (Photo photo : photos) {
-            try {
-                journeyDAO.create(journey);
-                photo.setJourney(journey);
-                exifService.exportMetaToExif(photo);
-            } catch (DAOException ex) {
-                LOGGER.error("Journey-creation with {}, {} failed.", photo, journey);
-                throw new ServiceException("Creation of Journey failed.", ex);
-            } catch (ValidationException e) {
-                throw new ServiceException("Failed to validate entity", e);
-            }
+        try {
+            journeyDAO.create(journey);
+        } catch (DAOException ex) {
+            LOGGER.error("Journey-creation with {}, {} failed.", journey);
+            throw new ServiceException("Creation of Journey failed.", ex);
+        } catch (ValidationException e) {
+            throw new ServiceException("Failed to validate entity", e);
         }
-        LOGGER.debug("Leaving addJourneyToPhotos");
+
+        for (Photo photo : photos) {
+            photo.setJourney(journey);
+            exifService.exportMetaToExif(photo);
+            LOGGER.debug("Leaving addJourneyToPhotos");
+        }
     }
 
-    @Override public void addPlaceToPhotos(List<Photo> photos, Place place) throws ServiceException {
+    @Override public void addPlaceToPhotos(List<Photo> photos, Place place)
+            throws ServiceException {
         LOGGER.debug("Entering addPlaceToPhotos with {}, {}", photos, place);
         if (photos == null) {
             throw new ServiceException("List<Photo> photos is null");
         }
-
-        for (Photo photo : photos) {
-            try {
-                placeDAO.create(place);
-                photo.setPlace(place);
-                exifService.exportMetaToExif(photo);
-            } catch (DAOException ex) {
-                LOGGER.error("Place-creation with {}, {} failed.", photo, place);
-                throw new ServiceException("Creation of Place failed.", ex);
-            } catch (ValidationException e) {
-                throw new ServiceException("Failed to validate entity", e);
-            }
+        try {
+            placeDAO.create(place);
+        } catch (DAOException ex) {
+            LOGGER.error("Place-creation with {}, {} failed.", place);
+            throw new ServiceException("Creation of Place failed.", ex);
+        } catch (ValidationException e) {
+            throw new ServiceException("Failed to validate entity", e);
         }
 
-        LOGGER.debug("Leaving addPlaceToPhotos");
+        for (Photo photo : photos) {
+            photo.setPlace(place);
+            exifService.exportMetaToExif(photo);
+            LOGGER.debug("Leaving addPlaceToPhotos");
+        }
     }
 
     @Override public void close() {
