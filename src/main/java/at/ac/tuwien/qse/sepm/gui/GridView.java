@@ -153,7 +153,7 @@ public class GridView {
 
     private void reloadImages() {
         try {
-            grid.setItems(
+            grid.setPhotos(
                     photoService.getAllPhotos(filter)
                     .stream()
                     .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
