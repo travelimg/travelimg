@@ -7,22 +7,18 @@ import at.ac.tuwien.qse.sepm.dao.PlaceDAO;
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
-import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
-import at.ac.tuwien.qse.sepm.service.*;
-import at.ac.tuwien.qse.sepm.service.wrapper.LocationWrapper;
-import at.ac.tuwien.qse.sepm.service.wrapper.TimeWrapper;
-import org.apache.commons.math3.ml.clustering.Cluster;
-import org.apache.commons.math3.ml.clustering.DBSCANClusterer;
+import at.ac.tuwien.qse.sepm.service.ClusterService;
+import at.ac.tuwien.qse.sepm.service.GeoService;
+import at.ac.tuwien.qse.sepm.service.PhotoService;
+import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class ClusterServiceImpl implements ClusterService {
 
@@ -40,6 +36,17 @@ public class ClusterServiceImpl implements ClusterService {
         } catch (DAOException ex) {
             ex.printStackTrace();
             throw new ServiceException("Failed to get all journeys", ex);
+        }
+    }
+
+    @Override public void addPlace(Place place) throws ServiceException {
+        try {
+            placeDAO.create(place);
+        } catch (DAOException ex) {
+            logger.error("Place-creation with {}, {} failed.", place);
+            throw new ServiceException("Creation of Place failed.", ex);
+        } catch (ValidationException e) {
+            throw new ServiceException("Failed to validate entity", e);
         }
     }
 
@@ -64,15 +71,12 @@ public class ClusterServiceImpl implements ClusterService {
             if (Math.abs(element.getLatitude() - latitude) > 1
                     && Math.abs(element.getLongitude() - longitude) > 1) {
                 place = geoService.getPlaceByGeoData(element.getLatitude(), element.getLongitude());
-                latitude = element.getLatitude();
-                longitude = element.getLongitude();
                 logger.debug("New place-cluster: " + place.getId() + " " + place.getCity());
+                addPlace(place);
             }
-
             latitude = element.getLatitude();
             longitude = element.getLongitude();
-
-            photoService.addPlaceToPhotos(photos, place);
+            photoService.addPlaceToPhotos(Arrays.asList(element), place);
             places.add(place);
         }
         return places;
