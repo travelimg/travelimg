@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -8,5 +10,36 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane fx:id="borderPane" stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.HighlightsViewController">
+    <left>
+        <BorderPane prefWidth="240.0">
+            <top>
+                <Label prefHeight="20.0" prefWidth="259.0" style="-fx-background-color: #333333; -fx-font-size: 18; -fx-text-fill: white; -fx-padding: 5 0 5 10px;" text="Reisen" />
+            </top>
+            <center>
+                <VBox fx:id="journeys" spacing="5.0" style="-fx-font-size: 16;">
+                   <children>
+                       <Label text="Keine Reisen gefunden. Bitte fügen Sie eine neue ein." wrapText="true" />
+                   </children>
+                    <padding>
+                        <Insets left="10.0" top="5.0" />
+                    </padding>
+                </VBox>
 
+            </center>
+         <padding>
+            <Insets top="5.0" />
+         </padding>
+        </BorderPane>
+    </left>
+    <center>
+        <BorderPane>
+            <top>
+                <VBox fx:id="mapContainer" maxHeight="300.0" />
+            </top>
+            <center>
+                <Label text="Photos should show here up" />
+            </center>
+        </BorderPane>
+
+    </center>
 </BorderPane>

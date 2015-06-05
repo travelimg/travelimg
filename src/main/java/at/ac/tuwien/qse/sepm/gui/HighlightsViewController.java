@@ -1,6 +1,9 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 
+import at.ac.tuwien.qse.sepm.entities.Journey;
+import at.ac.tuwien.qse.sepm.service.ClusterService;
+import at.ac.tuwien.qse.sepm.service.ServiceException;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
@@ -9,26 +12,49 @@ import com.lynden.gmapsfx.shapes.PolylineOptions;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class HighlightsViewController {
 
     @FXML private BorderPane borderPane;
     @FXML private GoogleMapsScene mapsScene;
+    @FXML private VBox journeys, mapContainer;
+    @Autowired ClusterService clusterService;
     private GoogleMapView mapView;
     private GoogleMap googleMap;
     private ArrayList<Marker> markers = new ArrayList<Marker>();
     private ArrayList<Polyline> polylines = new ArrayList<Polyline>();
+    private HashMap<RadioButton,Journey> journeyRadioButtonsHashMap = new HashMap<>();
     private Marker actualMarker;
     private int pos = 0;
 
     public void initialize(){
-        //this is just for testing atm
+        try {
+            List<Journey> listOfJourneys = clusterService.getAllJourneys();
+            if(listOfJourneys.size()>0){
+                journeys.getChildren().clear();
+            }
+            final ToggleGroup group = new ToggleGroup();
+            for(Journey j: listOfJourneys){
+                RadioButton rb = new RadioButton(j.getName());
+                rb.setToggleGroup(group);
+                journeys.getChildren().add(rb);
+                journeyRadioButtonsHashMap.put(rb,j);
+            }
+        } catch (ServiceException e) {
 
+        }
+        //this is just for testing atm
         HBox vBox = new HBox();
         Button drawButton = new Button("draw polyline!");
         drawButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -66,7 +92,8 @@ public class HighlightsViewController {
                 googleMap = mapView.getMap();
             }
         });
-        borderPane.setTop(map.getMapView());
+        //borderPane.setCenter(map.getMapView());
+        mapContainer.getChildren().add(map.getMapView());
     }
 
     private void drawDestinationsAsPolyline(LatLong[] path){
@@ -160,8 +187,8 @@ public class HighlightsViewController {
         double latFraction = ((ne.latToRadians()) - sw.latToRadians()) / Math.PI;
         double lngDiff = ne.getLongitude() - sw.getLongitude();
         double lngFraction = ((lngDiff < 0) ? (lngDiff + 360) : lngDiff) / 360;
-        double latZoom = Math.floor(Math.log(borderPane.getHeight() / 256 / latFraction) / 0.6931472);
-        double lngZoom = Math.floor(Math.log(borderPane.getWidth() / 256 / lngFraction) / 0.6931472);
+        double latZoom = Math.floor(Math.log(300 / 256 / latFraction) / 0.6931472);
+        double lngZoom = Math.floor(Math.log((borderPane.getWidth()-240) / 256 / lngFraction) / 0.6931472);
         double min = Math.min(latZoom, lngZoom);
         min = Math.min(min,21);
         mapsScene.setZoom((int)min);
