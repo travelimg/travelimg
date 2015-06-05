@@ -1,13 +1,15 @@
 package at.ac.tuwien.qse.sepm.service;
 
+import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 
 import java.time.YearMonth;
 import java.util.List;
 import java.util.function.Predicate;
 
-public interface PhotoService {
+public interface PhotoService extends Service {
 
     /**
      * Retrieve a list of those months for which there are photos.
@@ -88,4 +90,8 @@ public interface PhotoService {
      * @throws ServiceException failed to perform operation
      */
     void savePhotoRating(Photo photo) throws ServiceException;
+
+    void addJourneyToPhotos(List<Photo> photos, Journey journey) throws ServiceException;
+
+    void addPlaceToPhotos(List<Photo> photos, Place place) throws ServiceException;
 }

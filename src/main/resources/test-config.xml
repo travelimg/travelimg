@@ -42,6 +42,9 @@
     </bean>
 
     <bean id="exifService" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
+    <bean id="geoService" class="at.ac.tuwien.qse.sepm.service.impl.GeoServiceImpl"></bean>
+
+    <bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
 
     <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
         <constructor-arg value="${java.io.tmpdir}/travelimg"></constructor-arg>
@@ -50,4 +53,6 @@
     <bean id="tagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTagDAO"></bean>
     <bean id="photoTagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoTagDAO"></bean>
     <bean id="photographerDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotographerDAO"></bean>
+    <bean id="journeyDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCJourneyDAO"></bean>
+    <bean id="placeDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPlaceDAO"></bean>
 </beans>

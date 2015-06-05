@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.gui.dialogs;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
+import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
@@ -116,12 +117,13 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
         assert (directory.exists()); // import button should be disabled otherwise
 
         Photographer photographer = photographerBox.getSelectionModel().getSelectedItem();
+        Place place = new Place(1, "Unkown place", "Unknown place");
 
         // Fetch all photos from the directory.
         ArrayList<Photo> photos = new ArrayList<>();
         for (final File file : directory.listFiles(new ImageFileFilter())) {
             if (!file.isDirectory()) {
-                photos.add(new Photo(null, photographer, file.getPath(), Rating.NONE, null, 0.0, 0.0));
+                photos.add(new Photo(null, photographer, file.getPath(), Rating.NONE, null, 0.0, 0.0, place));
             }
         }
 

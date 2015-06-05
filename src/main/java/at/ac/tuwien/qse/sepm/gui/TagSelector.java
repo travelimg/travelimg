@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.TagService;
@@ -14,9 +16,11 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
@@ -36,17 +40,20 @@ public class TagSelector extends VBox {
 
     private PhotoService photoservice;
     private TagService tagService;
+    private Node root;
 
     /**
      * create Instance and initialize tagList.
      *
      * @param listener defines how to handle the change; must not be null;
      */
-    public TagSelector(ListChangeListener<Tag> listener, PhotoService ps, TagService ts) {
+    public TagSelector(ListChangeListener<Tag> listener, PhotoService ps, TagService ts,
+            Node root) {
         LOGGER.debug("Instantiate TagSelector");
         this.tagListChangeListener = listener;
         this.photoservice = ps;
         this.tagService = ts;
+        this.root = root;
         FXMLLoadHelper.load(this, this, TagSelector.class, "view/TagSelector.fxml");
         initializeTagList();
         addCategoryBtn.setOnAction(this::addCategory);
@@ -54,7 +61,7 @@ public class TagSelector extends VBox {
         newCatName.setOnKeyReleased(this::highlightAddCategoryBtn);
     }
 
-    private void initializeTagList() {
+    public void initializeTagList() {
         ObservableList<Tag> tagNames = FXCollections.observableArrayList();
         try {
             for (Tag tag : tagService.getAllTags()) {
@@ -117,44 +124,33 @@ public class TagSelector extends VBox {
         tagList.getCheckModel().getCheckedItems().addListener(tagListChangeListener);
     }
 
-    @FXML
-    private void addCategory(ActionEvent event) {
+    @FXML private void addCategory(ActionEvent event) {
         String newCategoryName = newCatName.getText();
         highlightAddCategoryBtn(null);
 
         if (isValidInput(newCategoryName)) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Hinzufügen bestätigen");
-            alert.setHeaderText("Wollen Sie die Kategorie \"" + newCategoryName + "\" wirklich"
-                    + " hinzufügen?");
-            alert.setContentText("Die Kategorie wird dann für alle verwalteten Fotos als Auswahl"
-                    + " zur Verfügung stehen");
+            try {
+                Tag newTag = tagService.create(new Tag(null, newCategoryName));
+                LOGGER.info("Successfully added new category: \"{}\"", newCategoryName);
+                addTagToList(newTag);
+                newCatName.clear();
+            } catch (ServiceException ex) {
+                LOGGER.error("Failed to add new category: \"{}\"", newCategoryName);
+                InfoDialog dialog = new InfoDialog(root, "Tag Fehler");
+                dialog.setError(true);
+                dialog.setHeaderText("Tag anlegen fehlgeschlagen");
+                dialog.setContentText("Fehlermeldung: " + ex.getMessage());
+                dialog.showAndWait();
 
-            Optional<ButtonType> result = alert.showAndWait();
-
-            if (result.get() == ButtonType.OK) {
-                try {
-                    Tag newTag = tagService.create(new Tag(null, newCategoryName));
-                    LOGGER.info("Successfully added new category: \"{}\"", newCategoryName);
-                    addTagToList(newTag);
-                    newCatName.clear();
-                } catch (ServiceException ex) {
-                    LOGGER.error("Failed to add new category: \"{}\"", newCategoryName);
-                }
-            } else {
-                LOGGER.debug("User did not confirm addition of category: \"{}\"", newCategoryName);
-                newCatName.requestFocus();
-                newCatName.selectAll();
             }
-        } else {
-            /*
-            alert.setTitle("Fehlende Eingabe");
-            alert.setHeaderText("Es wurde noch kein gültiger Name für die Kategorie gewählt");
-            alert.setContentText("Bitte geben Sie den gewünschten Namen in das Textfeld links "
-                    + "des 'Plus'-Buttons ein und versuchen Sie es erneut.");
 
-            alert.showAndWait();
-            */
+        } else {
+            InfoDialog dialog = new InfoDialog(root, "Tag Fehler");
+            dialog.setError(true);
+            dialog.setHeaderText("Tag anlegen fehlgeschlagen");
+            dialog.setContentText(
+                    "Fehlermeldung: Folgende Zeichen sind nicht erlaubt: ., /, travelimg");
+            dialog.showAndWait();
             newCatName.requestFocus();
             newCatName.selectAll();
         }
@@ -186,8 +182,7 @@ public class TagSelector extends VBox {
         tagList.getCheckModel().getCheckedItems().addListener(tagListChangeListener);
     }
 
-    @FXML
-    private void highlightAddCategoryBtn(KeyEvent event) {
+    @FXML private void highlightAddCategoryBtn(KeyEvent event) {
         if (isValidInput(newCatName.getText())) {
             addCategoryBtn.setSelected(true);
         } else {
@@ -195,15 +190,14 @@ public class TagSelector extends VBox {
         }
     }
 
-    @FXML
-    private void deleteSelectedTag(ActionEvent event) {
+    @FXML private void deleteSelectedTag(ActionEvent event) {
         Tag oldTag = tagList.getSelectionModel().getSelectedItem();
 
         if (oldTag != null) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Löschen bestätigen");
-            alert.setHeaderText("Wollen Sie die Kategorie \"" + oldTag.getName() + "\" wirklich"
-                    + " löschen?");
+            alert.setHeaderText(
+                    "Wollen Sie die Kategorie \"" + oldTag.getName() + "\" wirklich" + " löschen?");
             alert.setContentText("Alle damit verbundenen Daten gehen unwiderruflich verloren.");
 
             Optional<ButtonType> result = alert.showAndWait();
@@ -243,9 +237,17 @@ public class TagSelector extends VBox {
         tagList.getCheckModel().getCheckedItems().addListener(tagListChangeListener);
     }
 
+    // Validates user-tags for not allowed characters
     private boolean isValidInput(String string) {
-        return string != null
-                && !string.isEmpty()
-                && string.trim().length() > 0;
+        if (string.contains("/")) {
+            return false;
+        }
+        if (string.contains(".")) {
+            return false;
+        }
+        if (string.contains("travelimg")) {
+            return false;
+        }
+        return string != null && !string.isEmpty() && string.trim().length() > 0;
     }
 }

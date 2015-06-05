@@ -33,7 +33,9 @@
                         <Tooltip text="Von Flickr importieren"/>
                     </tooltip>
                 </Button>
+
                 <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+
                     <graphic>
                         <FontAwesomeIconView glyphName="EXPAND"/>
                     </graphic>
@@ -44,4 +46,7 @@
             </children>
         </HBox>
     </bottom>
+   <top>
+      <Button fx:id="journeyButton" mnemonicParsing="false" text="Reise hinzufügen" BorderPane.alignment="CENTER" />
+   </top>
 </BorderPane>

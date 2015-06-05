@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.dao;
 
+import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 
@@ -58,7 +59,7 @@ public interface PhotoDAO {
     List<Photo> readAll() throws DAOException;
 
     /**
-     * Retrieve a list of photos from a givenn month
+     * Retrieve a list of photos from a given month
      *
      * @param month the month for which to retrieve the photos.
      * @return the list with the photos
@@ -72,5 +73,12 @@ public interface PhotoDAO {
      * @return a list of months with available photos
      */
     List<YearMonth> getMonthsWithPhotos() throws DAOException;
+
+    /**
+     * Retrieve a list of photos from a given journey
+     * @param journey this sets the start and end-date
+     * @return the list with the photos
+     */
+    List<Photo> readPhotosByJourney(Journey journey) throws DAOException;
 
 }

@@ -14,12 +14,14 @@ public class Photo {
     private LocalDateTime datetime;
     private double latitude;
     private double longitude;
+    private Place place;
+    private Journey journey;
     private final List<Tag> tags = new ArrayList<>();
 
     public Photo() {
     }
 
-    public Photo(Integer id, Photographer photographer, String path, Rating rating, LocalDateTime datetime, double latitude, double longitude) {
+    public Photo(Integer id, Photographer photographer, String path, Rating rating, LocalDateTime datetime, double latitude, double longitude, Place place) {
         this.id = id;
         this.photographer = photographer;
         this.path = path;
@@ -27,6 +29,7 @@ public class Photo {
         this.datetime = datetime;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.place = place;
     }
 
     public Photo(Photo other) {
@@ -37,6 +40,15 @@ public class Photo {
         this.datetime = other.datetime;
         this.latitude = other.latitude;
         this.longitude = other.longitude;
+        this.place = other.place;
+    }
+
+    public Place getPlace() {
+        return place;
+    }
+
+    public void setPlace(Place place) {
+        this.place = place;
     }
 
     public Integer getId() {
@@ -113,6 +125,7 @@ public class Photo {
         if (id != null ? !id.equals(photo.id) : photo.id != null) return false;
         if (photographer != null ? !photographer.equals(photo.photographer) : photo.photographer != null) return false;
         if (rating != null ? !rating.equals(photo.rating) : photo.rating != null) return false;
+        if (place.getId() != photo.getPlace().getId()) return false;
         return !(datetime != null ? !datetime.equals(photo.datetime) : photo.datetime != null);
 
     }
@@ -143,6 +156,15 @@ public class Photo {
                 ", datetime=" + datetime +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
+                ", place=" + place +
                 '}';
+    }
+
+    public Journey getJourney() {
+        return journey;
+    }
+
+    public void setJourney(Journey journey) {
+        this.journey = journey;
     }
 }

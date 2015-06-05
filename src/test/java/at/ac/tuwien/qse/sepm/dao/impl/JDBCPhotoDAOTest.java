@@ -3,28 +3,23 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 import at.ac.tuwien.qse.sepm.dao.*;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
+import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.util.TestIOHandler;
 import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -43,6 +38,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     TestIOHandler ioHandler;
 
     private static final Photographer defaultPhotographer = new Photographer(1, "Test Photographer");
+    private static final Place defaultPlace = new Place(1, "Unkown place", "Unknown place");
 
     private static final String dataDir = Paths.get(System.getProperty("java.io.tmpdir"), "travelimg").toString();
     private static final String sourceDir = Paths.get(System.getProperty( "os.name" ).contains( "indow" ) ?
@@ -56,20 +52,20 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     };
 
     private Photo expectedPhotos[] = new Photo[] {
-            new Photo(1, defaultPhotographer, Paths.get(dataDir, "2015", "03", "06", "1.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 3, 6, 0, 0, 0), 41.5, 19.5),
-            new Photo(2, defaultPhotographer, Paths.get(dataDir, "2005", "09", "11", "2.jpg").toString(), Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9),
-            new Photo(3, defaultPhotographer, Paths.get(dataDir, "2005", "09", "11", "3.jpg").toString(), Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9),
-            new Photo(4, defaultPhotographer, Paths.get(dataDir, "2005", "09", "11", "4.jpg").toString(), Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9),
-            new Photo(5, defaultPhotographer, Paths.get(dataDir, "2015", "03", "04", "5.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 3, 4, 0, 0, 0), 12.0, 12.0),
-            new Photo(6, defaultPhotographer, Paths.get(dataDir, "2015", "05", "17", "6.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
-            new Photo(7, defaultPhotographer, Paths.get(dataDir, "2015", "05", "17", "7.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
-            new Photo(8, defaultPhotographer, Paths.get(dataDir, "2015", "05", "17", "8.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
+            new Photo(1, defaultPhotographer, Paths.get(dataDir, "2015", "03", "06", "1.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 3, 6, 0, 0, 0), 41.5, 19.5, defaultPlace),
+            new Photo(2, defaultPhotographer, Paths.get(dataDir, "2005", "09", "11", "2.jpg").toString(), Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9, defaultPlace),
+            new Photo(3, defaultPhotographer, Paths.get(dataDir, "2005", "09", "11", "3.jpg").toString(), Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9, defaultPlace),
+            new Photo(4, defaultPhotographer, Paths.get(dataDir, "2005", "09", "11", "4.jpg").toString(), Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9, defaultPlace),
+            new Photo(5, defaultPhotographer, Paths.get(dataDir, "2015", "03", "04", "5.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 3, 4, 0, 0, 0), 12.0, 12.0, defaultPlace),
+            new Photo(6, defaultPhotographer, Paths.get(dataDir, "2015", "05", "17", "6.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
+            new Photo(7, defaultPhotographer, Paths.get(dataDir, "2015", "05", "17", "7.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
+            new Photo(8, defaultPhotographer, Paths.get(dataDir, "2015", "05", "17", "8.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
     };
 
     private Photo inputPhotos[] = new Photo[] {
-            new Photo(6, defaultPhotographer, Paths.get(sourceDir, "6.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
-            new Photo(7, defaultPhotographer, Paths.get(sourceDir, "7.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
-            new Photo(8, defaultPhotographer, Paths.get(sourceDir, "8.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115),
+            new Photo(6, defaultPhotographer, Paths.get(sourceDir, "6.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
+            new Photo(7, defaultPhotographer, Paths.get(sourceDir, "7.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
+            new Photo(8, defaultPhotographer, Paths.get(sourceDir, "8.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
     };
 
     private Photo getInputPhoto(int seq) {

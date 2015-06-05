@@ -42,10 +42,15 @@
 	<bean id="tagService" class="at.ac.tuwien.qse.sepm.service.impl.TagServiceImpl"></bean>
 
 	<bean id="exifService" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
+	<bean id="geoService" class="at.ac.tuwien.qse.sepm.service.impl.GeoServiceImpl"></bean>
+
+	<bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
 
     <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl"
 			destroy-method="close">
 	</bean>
+
+	<bean id="filter" class="at.ac.tuwien.qse.sepm.service.impl.PhotoFilter"></bean>
 
 	<bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
 		<constructor-arg value="${user.home}/travelimg"></constructor-arg>
@@ -54,6 +59,8 @@
 	<bean id="photoTagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoTagDAO"></bean>
 	<bean id="photographerDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotographerDAO"></bean>
 	<bean id="tagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTagDAO"></bean>
+	<bean id="journeyDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCJourneyDAO"></bean>
+	<bean id="placeDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPlaceDAO"></bean>
 
 	<bean id="mainController" class="at.ac.tuwien.qse.sepm.gui.MainController"></bean>
     <bean id="gridViewController" class="at.ac.tuwien.qse.sepm.gui.GridView"></bean>
