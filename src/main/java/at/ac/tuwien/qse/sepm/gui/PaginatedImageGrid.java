@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -103,21 +104,25 @@ public class PaginatedImageGrid extends Pagination {
             activePage.selectAll();
     }
 
+    /**
+     * Remove a photo from the grid
+     *
+     * @param photo The photo to be removed.
+     */
     public void removePhoto(Photo photo) {
-        // TODO
-        LOGGER.error("Not implemented removePhoto");
-        /*int pageIndex = getPageIndexForPhoto(photo);
-        ImageGridPage page = getPage(pageIndex);
-
-        if (pageCache.containsKey(pageIndex)) {
-            pageCache.remove(pageIndex);
-        }
-
         photos.remove(photo);
-        if (getPageCount() != calculatePageCount()) {
-            setPageCount(calculatePageCount());
-            //activePage.refresh();
-        }*/
+        pageCache.clear();
+
+        int currentPage = getCurrentPageIndex();
+
+        setPageCount(calculatePageCount() + 2);
+        setPageCount(calculatePageCount());
+
+        if (currentPage >=   getPageCount()) {
+            setCurrentPageIndex(getPageCount() - 1);
+        } else {
+            setCurrentPageIndex(currentPage);
+        }
     }
 
     /**
