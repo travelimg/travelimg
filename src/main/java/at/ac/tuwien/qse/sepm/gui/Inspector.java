@@ -204,8 +204,6 @@ public class Inspector {
 
             try {
                 photoservice.savePhotoRating(photo);
-                onUpdate();
-
             } catch (ServiceException ex) {
                 LOGGER.error("Failed saving photo rating.", ex);
                 LOGGER.debug("Resetting rating from {} to {}.", newRating, oldRating);
@@ -225,6 +223,8 @@ public class Inspector {
                 dialog.showAndWait();
             }
         }
+
+        onUpdate();
     }
 
     private void showDetails(List<Photo> photos) {
@@ -301,13 +301,15 @@ public class Inspector {
 
     private class TagListChangeListener implements ListChangeListener<Tag> {
         public void onChanged(ListChangeListener.Change<? extends Tag> change) {
+            boolean updateNeeded = false;
+
             while(change.next()) {
 
                 if (change.wasAdded()) {
                     Tag added = change.getAddedSubList().get(0);
                     try {
                         photoservice.addTagToPhotos(activePhotos, added);
-                        onUpdate();
+                        updateNeeded = true;
                     } catch (ServiceException ex) {
                         LOGGER.error("failed adding tag", ex);
                         InfoDialog dialog = new InfoDialog(root, "Fehler");
@@ -321,7 +323,7 @@ public class Inspector {
                     Tag removed = change.getRemoved().get(0);
                     try {
                         photoservice.removeTagFromPhotos(activePhotos, removed);
-                        onUpdate();
+                        updateNeeded = true;
                     } catch (ServiceException ex) {
                         LOGGER.error("failed removing tag", ex);
                         InfoDialog dialog = new InfoDialog(root, "Fehler");
@@ -332,6 +334,9 @@ public class Inspector {
                     }
                 }
             }
+
+            if (updateNeeded)
+                onUpdate();
         }
     }
 }
