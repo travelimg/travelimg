@@ -5,14 +5,14 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import at.ac.tuwien.qse.sepm.gui.util.LRUCache;
-import javafx.fxml.FXML;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Pagination;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -29,7 +29,7 @@ public class PaginatedImageGrid extends Pagination {
     private Consumer<Set<Photo>> selectionChangeAction = null;
 
     private int photosPerPage = 24;
-    private ImageGridPage activePage = null;
+    private ObjectProperty<ImageGridPage> activePageProperty = new SimpleObjectProperty<>(null);
 
     public PaginatedImageGrid() {
         super(0, 0);
@@ -38,6 +38,7 @@ public class PaginatedImageGrid extends Pagination {
         getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
 
         heightProperty().addListener(this::handleSizeChange);
+        activePageProperty.addListener(this::handlePageChange);
     }
     
     public List<Photo> getPhotos() {
@@ -89,19 +90,20 @@ public class PaginatedImageGrid extends Pagination {
      * @return The first photo of the current page or null if no page is active or the page is empty
      */
     public Photo getActivePhoto() {
-        if (activePage == null) {
+        if (activePageProperty.get() == null) {
             return null;
         }
 
-        return activePage.getActivePhoto();
+        return activePageProperty.get().getActivePhoto();
     }
 
     /**
      * Select all photos in the currently active page.
      */
     public void selectAll() {
-        if (activePage != null)
-            activePage.selectAll();
+        if (activePageProperty.get() != null) {
+            activePageProperty.get().selectAll();
+        }
     }
 
     /**
@@ -169,10 +171,13 @@ public class PaginatedImageGrid extends Pagination {
     }
 
     private ImageGridPage getPage(int pageIndex) {
-        activePage = createPage(pageIndex);
+        ImageGridPage page = createPage(pageIndex);
 
-        activePage.setSelectionChangeAction(selectionChangeAction);
-        return activePage;
+        page.setSelectionChangeAction(selectionChangeAction);
+
+        activePageProperty.set(page);
+
+        return page;
     }
 
     private int getPageIndexForPhoto(Photo photo) {
@@ -204,13 +209,29 @@ public class PaginatedImageGrid extends Pagination {
 
         int totalPhotos = photosPerRow * photosPerCol;
 
-        if(totalPhotos != photosPerPage) {
+        if (totalPhotos != photosPerPage) {
             photosPerPage = totalPhotos;
             pageCache.clear();
 
             // force relayout
             setPageCount(calculatePageCount() + 1);
             setPageCount(calculatePageCount());
+        }
+    }
+
+    private void handlePageChange(Object observable, ImageGridPage oldValue, ImageGridPage newValue) {
+        if (oldValue == null) {
+            return;
+        }
+
+        // carry the selection from the old page to the new page
+        // if more than one photo is selected then only select the first photo from the previous selection
+        int index = oldValue.getFirstSelectedIndex();
+
+        oldValue.deselectAll();
+
+        if (index != -1) {
+            newValue.selectAt(index);
         }
     }
 }

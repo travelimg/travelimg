@@ -93,6 +93,42 @@ public class ImageGridPage extends ScrollPane {
         onSelectionChange();
     }
 
+    /**
+     * Remove selection for all photos in the grid.
+     */
+    public void deselectAll() {
+        LOGGER.debug("deselecting all items");
+        tiles.forEach(ImageGridTile::deselect);
+        onSelectionChange();
+    }
+
+    /**
+     * Select the n'th photo (index) in the grid.
+     * @param index Specify which photo to select.
+     */
+    public void selectAt(int index) {
+        PhotoGridTile tile = tiles.get(Math.max(Math.min(tiles.size() - 1, index), 0));
+        tile.select();
+        onSelectionChange();
+    }
+
+    /**
+     * Return the index of the first selected tile.
+     * @return the index of the first selected tile or -1 if none is selected.
+     */
+    public int getFirstSelectedIndex() {
+        PhotoGridTile selected = tiles.stream()
+                .filter(ImageGridTile::isSelected)
+                .findFirst()
+                .orElse(null);
+
+        if (selected == null) {
+            return -1;
+        } else {
+            return tiles.indexOf(selected);
+        }
+    }
+
     private void addPhoto(Photo photo) {
         Image image = imageCache.get(photo, ImageSize.MEDIUM);
 
@@ -125,17 +161,9 @@ public class ImageGridPage extends ScrollPane {
         onSelectionChange();
     }
 
-
-
     private void deselect(PhotoGridTile tile) {
         if (tile == null) return;
         tile.deselect();
-        onSelectionChange();
-    }
-
-    private void deselectAll() {
-        LOGGER.debug("deselecting all items");
-        tiles.forEach(ImageGridTile::deselect);
         onSelectionChange();
     }
 
