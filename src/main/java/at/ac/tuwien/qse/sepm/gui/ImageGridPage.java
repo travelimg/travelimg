@@ -70,6 +70,16 @@ public class ImageGridPage extends ScrollPane {
         PhotoGridTile tile = findTile(photo);
         if (tile == null) return;
 
+        // update photo in list
+        int index = 0;
+        for (Photo p : photos) {
+            if (p.getId().equals(photo.getId()))
+                break;
+            index++;
+        }
+
+        photos.set(index, photo);
+
         Image image = imageCache.get(photo, ImageSize.MEDIUM);
         tile.setPhoto(photo, image);
     }
@@ -143,7 +153,7 @@ public class ImageGridPage extends ScrollPane {
 
     private PhotoGridTile findTile(Photo photo) {
         for (PhotoGridTile tile : tiles) {
-            if (photo.getId() == tile.getPhoto().getId()) return tile;
+            if (photo.getId().equals(tile.getPhoto().getId())) return tile;
         }
         return null;
     }

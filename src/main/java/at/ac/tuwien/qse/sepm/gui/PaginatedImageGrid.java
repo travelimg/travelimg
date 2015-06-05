@@ -128,6 +128,16 @@ public class PaginatedImageGrid extends Pagination {
     public void updatePhoto(Photo photo) {
         ImageGridPage page = getPageForPhoto(photo);
         page.updatePhoto(photo);
+
+        // update photo in list
+        int index = 0;
+        for (Photo p : photos) {
+            if (p.getId().equals(photo.getId()))
+                break;
+            index++;
+        }
+
+        photos.set(index, photo);
     }
 
     /**
