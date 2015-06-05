@@ -24,6 +24,7 @@ public class MainController {
     @Autowired private HighlightsViewController highlightsViewController;
     private EventHandler<javafx.scene.input.MouseEvent> ehandl;
     private GoogleMapsScene map;
+    private boolean mapInitialized = false;
     @FXML private void initialize() {
 
         root.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
@@ -47,8 +48,9 @@ public class MainController {
                         if (t.equals(slide) && t1.equals(grid)) {
                             inspector.setMap(slideshowView.getMap());
                         }
-                        if(t.equals(highlights)){
+                        if(t.equals(highlights) && !mapInitialized){
                             highlightsViewController.setMap(new GoogleMapsScene());
+                            mapInitialized = true;
                         }
                     }
                 }
