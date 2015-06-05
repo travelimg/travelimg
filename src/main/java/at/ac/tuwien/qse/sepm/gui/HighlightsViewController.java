@@ -39,21 +39,7 @@ public class HighlightsViewController {
     private int pos = 0;
 
     public void initialize(){
-        try {
-            List<Journey> listOfJourneys = clusterService.getAllJourneys();
-            if(listOfJourneys.size()>0){
-                journeys.getChildren().clear();
-            }
-            final ToggleGroup group = new ToggleGroup();
-            for(Journey j: listOfJourneys){
-                RadioButton rb = new RadioButton(j.getName());
-                rb.setToggleGroup(group);
-                journeys.getChildren().add(rb);
-                journeyRadioButtonsHashMap.put(rb,j);
-            }
-        } catch (ServiceException e) {
-
-        }
+        reloadJourneys();
         //this is just for testing atm
         HBox vBox = new HBox();
         Button drawButton = new Button("draw polyline!");
@@ -92,8 +78,25 @@ public class HighlightsViewController {
                 googleMap = mapView.getMap();
             }
         });
-        //borderPane.setCenter(map.getMapView());
         mapContainer.getChildren().add(map.getMapView());
+    }
+
+    public void reloadJourneys(){
+        try {
+            List<Journey> listOfJourneys = clusterService.getAllJourneys();
+            if(listOfJourneys.size()>0){
+                journeys.getChildren().clear();
+            }
+            final ToggleGroup group = new ToggleGroup();
+            for(Journey j: listOfJourneys){
+                RadioButton rb = new RadioButton(j.getName());
+                rb.setToggleGroup(group);
+                journeys.getChildren().add(rb);
+                journeyRadioButtonsHashMap.put(rb,j);
+            }
+        } catch (ServiceException e) {
+
+        }
     }
 
     private void drawDestinationsAsPolyline(LatLong[] path){

@@ -39,6 +39,7 @@ public class Organizer {
     @Autowired private PhotographerService photographerService;
     @Autowired private ClusterService clusterService;
     @Autowired private Inspector inspectorController;
+    @Autowired private HighlightsViewController highlightsViewController;
 
     @Autowired private TagService tagService;
     @Autowired private PhotoFilter filter;
@@ -176,6 +177,7 @@ public class Organizer {
         filter.getIncludedJourneys().clear();
         filter.getIncludedJourneys().addAll(values);
         handleFilterChange();
+        highlightsViewController.reloadJourneys();
     }
     private void handleMonthsChange(List<YearMonth> values) {
         LOGGER.debug("month filter changed");
