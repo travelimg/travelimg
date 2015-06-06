@@ -1,7 +1,6 @@
 package at.ac.tuwien.qse.sepm.service;
 
 import at.ac.tuwien.qse.sepm.entities.Journey;
-import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
 
 import java.util.List;
@@ -15,6 +14,14 @@ public interface ClusterService {
      * @throws ServiceException propagates DAOExceptions
      */
     List<Journey> getAllJourneys() throws ServiceException;
+
+    /**
+     * Adds a new place to the datastore.
+     *
+     * @param place Place to be created in the datastore.
+     * @throws ServiceException If creation of record fails.
+     */
+    void addPlace(Place place) throws ServiceException;
 
     /**
      * Creates a journey and clusters this journey in places.

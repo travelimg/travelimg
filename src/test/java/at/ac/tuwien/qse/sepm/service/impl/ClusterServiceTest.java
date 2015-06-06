@@ -43,10 +43,6 @@ public class ClusterServiceTest {
     @Test
     public void testClusteringService() {
         try {
-//            clusterService.cluster(photoDAO.readAll());
-//            clusterService.addJourney(inputJourneys[0]);
-//            clusterService.addJourney(inputJourneys[1]);
-//            clusterService.addJourney(inputJourneys[2]);
             clusterService.clusterJourney(inputJourneys[0]);
             clusterService.clusterJourney(inputJourneys[1]);
             clusterService.clusterJourney(inputJourneys[2]);

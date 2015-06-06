@@ -125,7 +125,8 @@ public class Photo {
         if (id != null ? !id.equals(photo.id) : photo.id != null) return false;
         if (photographer != null ? !photographer.equals(photo.photographer) : photo.photographer != null) return false;
         if (rating != null ? !rating.equals(photo.rating) : photo.rating != null) return false;
-        if (place.getId() != photo.getPlace().getId()) return false;
+        if (place != null ? place.getId() != photo.getPlace().getId() : place != null) return false;
+        if (journey != null ? journey.getId() != photo.getJourney().getId() : journey != null) return false;
         return !(datetime != null ? !datetime.equals(photo.datetime) : photo.datetime != null);
 
     }

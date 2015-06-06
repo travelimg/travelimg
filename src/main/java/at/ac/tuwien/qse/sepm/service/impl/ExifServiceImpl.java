@@ -131,23 +131,25 @@ public class ExifServiceImpl implements ExifService {
                     continue;
 
                 if (element.contains("journey")) {
-                    String[] tempJourney = element.split(".");
+                    String[] tempJourney = element.split("\\.");
 
                     LocalDateTime startdate = LocalDateTime.parse(tempJourney[2], dateFormatter);
 
-                LocalDateTime enddate = LocalDateTime.parse(tempJourney[3], dateFormatter);
+                    LocalDateTime enddate = LocalDateTime.parse(tempJourney[3], dateFormatter);
 
-                photoService.addJourneyToPhotos(Arrays.asList(photo),
-                        new Journey(0, tempJourney[1], startdate, enddate));
-            }
+                    photoService.addJourneyToPhotos(Arrays.asList(photo),
+                            new Journey(0, tempJourney[1], startdate, enddate));
+                    continue;
+                }
 
-            if (element.contains("place")) {
-                String[] tempPlace = element.split(".");
-                photoService.addPlaceToPhotos(Arrays.asList(photo),
-                        new Place(0, tempPlace[1], tempPlace[2]));
-            }
+                if (element.contains("place")) {
+                    String[] tempPlace = element.split("\\.");
+                    photoService.addPlaceToPhotos(Arrays.asList(photo),
+                            new Place(0, tempPlace[1], tempPlace[2]));
+                    continue;
+                }
 
-            // tags
+                // tags
                 Tag tag = new Tag(null, element);
                 Tag tempTag = tagService.readName(tag);
                 if (tempTag == null) {
@@ -169,21 +171,22 @@ public class ExifServiceImpl implements ExifService {
         File jpegImageFile = new File(photo.getPath());
         File tempFile = new File(photo.getPath() + "d");
         OutputStream os = null;
-            boolean canThrow = false;
+        boolean canThrow = false;
 
-            String tags = "travelimg";
+        String tags = "travelimg";
 
-            for (Tag element : photo.getTags()) {
-                tags += "/" + element.getName();
-            }
+        for (Tag element : photo.getTags()) {
+            tags += "/" + element.getName();
+        }
 
-            if (photo.getJourney() != null) {
-                Journey journey = photo.getJourney();
-                tags += "/journey" + journey.getName() + "." + journey.getStartDate() + "." + journey.getEndDate();
-            }
-            if (photo.getPlace() != null) {
-                Place place = photo.getPlace();
-                tags += "/place" + place.getCountry() + "." + place.getCity();
+        if (photo.getJourney() != null) {
+            Journey journey = photo.getJourney();
+            tags += "/journey." + journey.getName() + "." + journey.getStartDate()
+                    .format(dateFormatter) + "." + journey.getEndDate().format(dateFormatter);
+        }
+        if (photo.getPlace() != null) {
+            Place place = photo.getPlace();
+            tags += "/place." + place.getCity() + "." + place.getCountry();
         }
 
         try {

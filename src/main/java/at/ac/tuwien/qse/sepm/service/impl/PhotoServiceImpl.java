@@ -188,14 +188,6 @@ public class PhotoServiceImpl implements PhotoService {
         if (photos == null) {
             throw new ServiceException("List<Photo> photos is null");
         }
-        try {
-            placeDAO.create(place);
-        } catch (DAOException ex) {
-            LOGGER.error("Place-creation with {}, {} failed.", place);
-            throw new ServiceException("Creation of Place failed.", ex);
-        } catch (ValidationException e) {
-            throw new ServiceException("Failed to validate entity", e);
-        }
 
         for (Photo photo : photos) {
             photo.setPlace(place);
