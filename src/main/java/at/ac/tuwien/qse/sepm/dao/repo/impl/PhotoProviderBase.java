@@ -22,7 +22,7 @@ public abstract class PhotoProviderBase implements PhotoProvider {
         if (file == null) throw new IllegalArgumentException();
         LOGGER.debug("checking {}", file);
         PhotoInfo result = checkImpl(file);
-        LOGGER.info("checked {}", file);
+        LOGGER.info("checked {}", result);
         return result;
     }
 
@@ -37,7 +37,7 @@ public abstract class PhotoProviderBase implements PhotoProvider {
         if (file == null) throw new IllegalArgumentException();
         LOGGER.debug("reading {}", file);
         Photo result = readImpl(file);
-        LOGGER.info("read {}", file);
+        LOGGER.info("read {}", result);
         return result;
     }
 
