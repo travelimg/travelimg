@@ -2,40 +2,61 @@ package at.ac.tuwien.qse.sepm.gui;
 
 
 import at.ac.tuwien.qse.sepm.entities.Journey;
+import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Rating;
+import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.service.ClusterService;
+import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.Polyline;
 import com.lynden.gmapsfx.shapes.PolylineOptions;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import  org.apache.logging.log4j.Logger;
+import  org.apache.logging.log4j.LogManager;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class HighlightsViewController {
 
+    private static final Logger LOGGER = LogManager.getLogger();
     @FXML private BorderPane borderPane;
     @FXML private GoogleMapsScene mapsScene;
     @FXML private VBox journeys, mapContainer;
+    @FXML private VBox photoView;
     @Autowired ClusterService clusterService;
+    @Autowired private PhotoFilter filter;
+    @Autowired private PhotoService photoService;
     private GoogleMapView mapView;
     private GoogleMap googleMap;
     private ArrayList<Marker> markers = new ArrayList<Marker>();
     private ArrayList<Polyline> polylines = new ArrayList<Polyline>();
     private HashMap<RadioButton,Journey> journeyRadioButtonsHashMap = new HashMap<>();
     private Marker actualMarker;
+    private boolean disableReload = false;
+    private Consumer<PhotoFilter> filterChangeCallback;
+    private final ImageGrid<Photo> grid = new ImageGrid<>(PhotoGridTile::new);
+    @FXML private FilterList<Journey> journeyListView;
     private int pos = 0;
 
     public void initialize(){
@@ -72,8 +93,7 @@ public class HighlightsViewController {
         this.mapsScene = map;
         mapView = map.getMapView();
         mapView.addMapInializedListener(new MapComponentInitializedListener() {
-            @Override
-            public void mapInitialized() {
+            @Override public void mapInitialized() {
                 //wait for the map to initialize.
                 googleMap = mapView.getMap();
             }
@@ -90,6 +110,7 @@ public class HighlightsViewController {
             final ToggleGroup group = new ToggleGroup();
             for(Journey j: listOfJourneys){
                 RadioButton rb = new RadioButton(j.getName());
+                rb.setOnAction(this::handleSelectionChange);
                 rb.setToggleGroup(group);
                 journeys.getChildren().add(rb);
                 journeyRadioButtonsHashMap.put(rb,j);
@@ -98,6 +119,77 @@ public class HighlightsViewController {
 
         }
     }
+
+    private void handleSelectionChange(ActionEvent e) {
+        for(RadioButton rb : journeyRadioButtonsHashMap.keySet()){
+            if(rb.isSelected()){
+                Journey j = journeyRadioButtonsHashMap.get(rb);
+                filter.getIncludedJourneys().clear();
+                filter.getIncludedJourneys().add(j);
+                handleFilterChange(filter);
+            }
+        }
+    }
+
+    public PhotoFilter getFilter(){
+        return filter;
+    }
+    private void handleFilterChange(){
+        LOGGER.debug("filter changed");
+        if(filterChangeCallback ==null) return;
+        filterChangeCallback.accept(getFilter());
+    }
+
+    private void handleFilterChange(PhotoFilter filter){
+        this.filter = filter;
+        if(!disableReload) reloadImages();
+    }
+    public void setFilterChangeAction(Consumer<PhotoFilter>callback){
+        LOGGER.debug("setting filter change action");
+        filterChangeCallback = callback;
+    }
+
+    private void reloadImages(){
+
+        try{
+
+            List<Photo> allPhotos = photoService.getAllPhotos(filter)
+                    .stream()
+                    .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
+                    .collect(Collectors.toList());
+            List<Photo> goodPhotos = new ArrayList<>();
+            for(Photo p : allPhotos){
+                if(p.getRating()==(Rating.GOOD)){
+                    goodPhotos.add(p);
+                }
+            }
+            //find all ArchitekturePhotos
+            List<Photo> architektur = new ArrayList<>();
+            List<Photo> essen = new ArrayList<>();
+            for(Photo p : goodPhotos){
+                for(Tag t : p.getTags()){
+                    switch (t.getName()){
+                        case "Architektur": architektur.add(p);
+                            break;
+                        case "Essen" : essen.add(p);
+                    }
+                }
+            }
+            ImageGrid<Photo> archi = new ImageGrid<>(PhotoGridTile::new);
+            ImageGrid<Photo> eat = new ImageGrid<>(PhotoGridTile::new);
+            archi.setItems(architektur);
+            eat.setItems(essen);
+            TitledPane architekt = new TitledPane("Architektur",archi);
+            TitledPane eating = new TitledPane("Essen", eat);
+            grid.setItems(goodPhotos);
+            photoView.getChildren().clear();
+            photoView.getChildren().addAll(architekt,eating);
+        }catch (ServiceException e){
+            //TODO Exceptionhandling
+        }
+    }
+
+
 
     private void drawDestinationsAsPolyline(LatLong[] path){
         //TODO note: this method will expect a list of destinations.
