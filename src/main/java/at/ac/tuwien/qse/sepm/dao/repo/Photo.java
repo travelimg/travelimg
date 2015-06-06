@@ -14,4 +14,28 @@ public class Photo {
     public Path getFile() {
         return file;
     }
+
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Photo))
+            return false;
+
+        Photo photo = (Photo) o;
+
+        if (!file.equals(photo.file))
+            return false;
+
+        return true;
+    }
+
+    @Override public int hashCode() {
+        return file.hashCode();
+    }
+
+    @Override public String toString() {
+        return "Photo{" +
+                "file=" + file +
+                '}';
+    }
 }
