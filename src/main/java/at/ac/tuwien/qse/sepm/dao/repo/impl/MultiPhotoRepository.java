@@ -9,6 +9,9 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Collection;
 
+/**
+ * Repository that is an aggregate of multiple other repositories.
+ */
 public class MultiPhotoRepository extends PhotoRepositoryBase {
 
     public MultiPhotoRepository() {
