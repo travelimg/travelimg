@@ -142,6 +142,10 @@ public abstract class PhotoRepositoryTest {
             @Override public void onDelete(PhotoRepository repository, Path file) {
                 fail();
             }
+
+            @Override public void onError(PhotoRepository repository, PersistenceException error) {
+                throw new RuntimeException(error);
+            }
         });
         object.create(getPhotoFile1(), getPhotoStream1());
         // TODO: test if onCreate was actually called
@@ -190,6 +194,10 @@ public abstract class PhotoRepositoryTest {
             @Override public void onDelete(PhotoRepository repository, Path file) {
                 fail();
             }
+
+            @Override public void onError(PhotoRepository repository, PersistenceException error) {
+                throw new RuntimeException(error);
+            }
         });
         object.update(getPhoto2(getPhotoFile1()));
         // TODO: test if onUpdate was actually called
@@ -228,6 +236,10 @@ public abstract class PhotoRepositoryTest {
                 assertEquals(getPhotoFile1(), file);
                 // TODO: test if repository is equal to the repository object
             }
+
+            @Override public void onError(PhotoRepository repository, PersistenceException error) {
+                throw new RuntimeException(error);
+            }
         });
         object.delete(getPhotoFile1());
         // TODO: test if onUpdate was actually called
@@ -247,6 +259,10 @@ public abstract class PhotoRepositoryTest {
 
             @Override public void onDelete(PhotoRepository repository, Path file) {
                 fail();
+            }
+
+            @Override public void onError(PhotoRepository repository, PersistenceException error) {
+                throw new RuntimeException(error);
             }
         };
         object.addListener(listener);

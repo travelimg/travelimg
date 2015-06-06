@@ -85,5 +85,13 @@ public interface PhotoRepository extends PhotoProvider {
          * @param file path of photo that was deleted
          */
         void onDelete(PhotoRepository repository, Path file);
+
+        /**
+         * Notifies the listener that an error occurred.
+         *
+         * @param repository repository in which the error occurred
+         * @param error the error that occurred
+         */
+        void onError(PhotoRepository repository, PersistenceException error);
     }
 }

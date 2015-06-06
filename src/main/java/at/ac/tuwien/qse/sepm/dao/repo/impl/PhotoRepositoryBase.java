@@ -70,6 +70,11 @@ public abstract class PhotoRepositoryBase
         listeners.forEach(l -> l.onDelete(this, file));
     }
 
+    protected void notifyError(PersistenceException error) {
+        if (error == null) throw new IllegalArgumentException();
+        listeners.forEach(l -> l.onError(this, error));
+    }
+
     protected abstract void createImpl(Path file, InputStream source) throws PersistenceException;
 
     protected abstract void updateImpl(Photo photo) throws PersistenceException;
