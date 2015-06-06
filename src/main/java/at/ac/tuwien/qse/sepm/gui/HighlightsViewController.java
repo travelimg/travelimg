@@ -25,16 +25,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import  org.apache.logging.log4j.Logger;
-import  org.apache.logging.log4j.LogManager;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class HighlightsViewController {
@@ -121,14 +119,12 @@ public class HighlightsViewController {
     }
 
     private void handleSelectionChange(ActionEvent e) {
-        for(RadioButton rb : journeyRadioButtonsHashMap.keySet()){
-            if(rb.isSelected()){
-                Journey j = journeyRadioButtonsHashMap.get(rb);
-                filter.getIncludedJourneys().clear();
-                filter.getIncludedJourneys().add(j);
-                handleFilterChange(filter);
-            }
-        }
+        Journey j = journeyRadioButtonsHashMap.get((RadioButton) e.getSource());
+        LOGGER.debug("Selected journey {}",j.getName());
+        filter.getIncludedJourneys().clear();
+        filter.getIncludedJourneys().add(j);
+        handleFilterChange(filter);
+
     }
 
     public PhotoFilter getFilter(){
