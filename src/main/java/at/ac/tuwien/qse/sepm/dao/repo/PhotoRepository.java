@@ -79,11 +79,11 @@ public interface PhotoRepository extends PhotoProvider {
         void onUpdate(PhotoRepository repository, Path file);
 
         /**
-         * Notifies the listener that a photo was removed from a repository.
+         * Notifies the listener that a photo was deleted from a repository.
          *
-         * @param repository repository from which the photo was removed
-         * @param file path of photo that was removed
+         * @param repository repository from which the photo was deleted
+         * @param file path of photo that was deleted
          */
-        void onRemove(PhotoRepository repository, Path file);
+        void onDelete(PhotoRepository repository, Path file);
     }
 }
