@@ -71,6 +71,8 @@ public class ClusterServiceImpl implements ClusterService {
             if (Math.abs(element.getLatitude() - latitude) > 1
                     && Math.abs(element.getLongitude() - longitude) > 1) {
                 place = geoService.getPlaceByGeoData(element.getLatitude(), element.getLongitude());
+                place.setLatitude(element.getLatitude());
+                place.setLongitude(element.getLongitude());
                 logger.debug("New place-cluster: " + place.getId() + " " + place.getCity());
                 addPlace(place);
             }
