@@ -8,6 +8,9 @@ import org.apache.logging.log4j.LogManager;
 import java.nio.file.Path;
 import java.util.Collection;
 
+/**
+ * Photo cache that stores photo instances in an SQLite database.
+ */
 public class JdbcPhotoCache extends PhotoCacheBase {
 
     public JdbcPhotoCache() {
