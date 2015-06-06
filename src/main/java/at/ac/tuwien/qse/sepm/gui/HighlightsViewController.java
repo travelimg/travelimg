@@ -37,14 +37,13 @@ import java.util.stream.Collectors;
 
 public class HighlightsViewController {
 
-    private static final Logger LOGGER = LogManager.getLogger();
     @FXML private BorderPane borderPane;
     @FXML private GoogleMapsScene mapsScene;
-    @FXML private VBox journeys, mapContainer;
-    @FXML private VBox photoView;
-    @Autowired ClusterService clusterService;
-    @Autowired private PhotoFilter filter;
+    @FXML private VBox journeys, mapContainer, photoView;
+    @FXML private FilterList<Journey> journeyListView;
+    @Autowired private ClusterService clusterService;
     @Autowired private PhotoService photoService;
+    @Autowired private PhotoFilter filter;
     private GoogleMapView mapView;
     private GoogleMap googleMap;
     private ArrayList<Marker> markers = new ArrayList<Marker>();
@@ -54,8 +53,8 @@ public class HighlightsViewController {
     private boolean disableReload = false;
     private Consumer<PhotoFilter> filterChangeCallback;
     private final ImageGrid<Photo> grid = new ImageGrid<>(PhotoGridTile::new);
-    @FXML private FilterList<Journey> journeyListView;
     private int pos = 0;
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public void initialize(){
         reloadJourneys();
