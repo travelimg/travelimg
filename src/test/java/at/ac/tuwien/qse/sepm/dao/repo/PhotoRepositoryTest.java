@@ -283,13 +283,13 @@ public abstract class PhotoRepositoryTest {
         }
     }
 
-    private Photo getPhoto1() {
+    protected Photo getPhoto1() {
         return getPhoto1(getPhotoFile1());
     }
-    private Photo getPhoto2() {
+    protected Photo getPhoto2() {
         return getPhoto2(getPhotoFile2());
     }
-    private Photo getPhoto1(Path file) {
+    protected Photo getPhoto1(Path file) {
         Photo photo = new Photo(file);
         photo.setDate(LocalDateTime.of(1993, 3, 30, 7, 5));
         photo.setLongitude(17);
@@ -301,7 +301,7 @@ public abstract class PhotoRepositoryTest {
         photo.getTags().add("people");
         return photo;
     }
-    private Photo getPhoto2(Path file) {
+    protected Photo getPhoto2(Path file) {
         Photo photo = new Photo(file);
         photo.setDate(LocalDateTime.of(2014, 8, 14, 15, 36));
         photo.setLongitude(42);
@@ -313,10 +313,10 @@ public abstract class PhotoRepositoryTest {
         photo.getTags().add("india");
         return photo;
     }
-    private InputStream getPhotoStream1() {
+    protected InputStream getPhotoStream1() {
         return new ByteArrayInputStream(new byte[] { 1 });
     }
-    private InputStream getPhotoStream2() {
+    protected InputStream getPhotoStream2() {
         return new ByteArrayInputStream(new byte[] { 2 });
     }
 }
