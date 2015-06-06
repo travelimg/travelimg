@@ -22,4 +22,11 @@ public class PhotoInfo {
     public LocalDateTime getModified() {
         return modified;
     }
+
+    @Override public String toString() {
+        return "PhotoInfo{" +
+                "file=" + file +
+                ", modified=" + modified +
+                '}';
+    }
 }
