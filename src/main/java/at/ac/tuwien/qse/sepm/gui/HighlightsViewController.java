@@ -100,6 +100,7 @@ public class HighlightsViewController {
     }
 
     public void reloadJourneys(){
+        journeyRadioButtonsHashMap.clear();
         try {
             List<Journey> listOfJourneys = clusterService.getAllJourneys();
             if(listOfJourneys.size()>0){
