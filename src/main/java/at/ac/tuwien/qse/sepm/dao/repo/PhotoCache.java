@@ -1,5 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
+import java.nio.file.Path;
+
 /**
  * Storage for photo instances.
  */
@@ -16,13 +18,13 @@ public interface PhotoCache extends PhotoProvider {
     void put(Photo photo) throws PersistenceException;
 
     /**
-     * Puts a photo into the cache, replacing it if it already exists.
+     * Removes a photo from the cache.
      *
-     * The photo can be read immediately after the method returns.
+     * The photo can no longer be read after the method returns.
      *
-     * @param photo photo that should be put into the cache
+     * @param file path of photo that should be removed from the cache
      * @throws PersistenceException failed to perform operation
      * @throws PhotoNotFoundException photo does not exist in the cache
      */
-    void remove(Photo photo) throws PersistenceException;
+    void remove(Path file) throws PersistenceException;
 }
