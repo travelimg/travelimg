@@ -38,6 +38,8 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
         Map<String, Object> parameters = new HashMap<String, Object>(1);
         parameters.put("city", place.getCity());
         parameters.put("country", place.getCountry());
+        parameters.put("latitude", place.getLatitude());
+        parameters.put("longitude", place.getLongitude());
 
         try {
             Number newId = insertPlace.executeAndReturnKey(parameters);
