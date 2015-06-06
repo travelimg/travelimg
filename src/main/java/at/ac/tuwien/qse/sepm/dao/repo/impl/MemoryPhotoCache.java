@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 
 /**
- * Photo cache that stores photos instance in memory.
+ * Photo cache that stores photo instances in memory.
  */
 public class MemoryPhotoCache extends PhotoCacheBase {
 
