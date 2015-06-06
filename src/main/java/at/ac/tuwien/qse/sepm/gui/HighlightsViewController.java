@@ -59,7 +59,7 @@ public class HighlightsViewController {
 
     public void initialize(){
         reloadJourneys();
-        //this is just for testing atm
+        /**to remove - BEGIN**/
         HBox vBox = new HBox();
         Button drawButton = new Button("draw polyline!");
         drawButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -85,6 +85,7 @@ public class HighlightsViewController {
         vBox.getChildren().add(drawButton);
         vBox.getChildren().add(playButton);
         borderPane.setBottom(vBox);
+        /**to remove - END**/
     }
 
     public void setMap(GoogleMapsScene map) {
@@ -124,7 +125,6 @@ public class HighlightsViewController {
         filter.getIncludedJourneys().clear();
         filter.getIncludedJourneys().add(j);
         handleFilterChange(filter);
-
     }
 
     public PhotoFilter getFilter(){
