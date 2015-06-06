@@ -165,13 +165,18 @@ public class HighlightsViewController {
             }
             //find all ArchitekturePhotos
             List<Photo> architektur = new ArrayList<>();
+            int archCounter =0;
+            int eatCoutner =0;
             List<Photo> essen = new ArrayList<>();
             for(Photo p : goodPhotos){
                 for(Tag t : p.getTags()){
                     switch (t.getName()){
-                        case "Architektur": architektur.add(p);
+                        case "Architektur": if(archCounter<5 ) architektur.add(p);
+                            archCounter++;
                             break;
-                        case "Essen" : essen.add(p);
+                        case "Essen" : if(eatCoutner<5)essen.add(p);
+                            eatCoutner++;
+                            break;
                     }
                 }
             }
