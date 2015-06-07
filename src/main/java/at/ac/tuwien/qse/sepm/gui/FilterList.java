@@ -29,6 +29,7 @@ public class FilterList<E> extends VBox {
     private final Map<E, CheckItem> items = new IdentityHashMap<>();
 
     private Consumer<List<E>> changeHandler;
+    private boolean suppressChangeEvents = false;
 
     public FilterList(Function<E, String> valueConverter) {
         if (valueConverter == null) throw new IllegalArgumentException();
@@ -103,11 +104,17 @@ public class FilterList<E> extends VBox {
     }
 
     public void checkAll() {
+        suppressChangeEvents = true;
         items.keySet().forEach(this::check);
+        suppressChangeEvents = false;
+        onChange();
     }
 
     public void uncheckAll() {
+        suppressChangeEvents = true;
         items.keySet().forEach(this::uncheck);
+        suppressChangeEvents = false;
+        onChange();
     }
 
     public void setChangeHandler(Consumer<List<E>> changeHandler) {
@@ -115,7 +122,7 @@ public class FilterList<E> extends VBox {
     }
 
     private void onChange() {
-        if (changeHandler != null) {
+        if (changeHandler != null && !suppressChangeEvents) {
             changeHandler.accept(getChecked());
         }
         updateHeader();
