@@ -2,8 +2,9 @@ package at.ac.tuwien.qse.sepm.gui;
 
 
 import at.ac.tuwien.qse.sepm.entities.*;
+import at.ac.tuwien.qse.sepm.gui.grid.ImageGrid;
 import at.ac.tuwien.qse.sepm.gui.grid.PhotoGridTile;
-import at.ac.tuwien.qse.sepm.gui.grid.ScrollableImageGrid;
+
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.ClusterService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
@@ -53,7 +54,7 @@ public class HighlightsViewController {
     private Marker actualMarker;
     private boolean disableReload = false;
     private Consumer<PhotoFilter> filterChangeCallback;
-    private ScrollableImageGrid grid;
+    private ImageGrid grid;
     private int pos = 0;
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -62,7 +63,7 @@ public class HighlightsViewController {
     @Autowired
     public void setImageCache(ImageCache imageCache) {
         this.imageCache = imageCache;
-        this.grid = new ScrollableImageGrid(imageCache);
+        this.grid = new ImageGrid(imageCache);
     }
 
     public void initialize(){
@@ -197,7 +198,7 @@ public class HighlightsViewController {
                             }
                         }
 
-                        ScrollableImageGrid grid2 = new ScrollableImageGrid(imageCache);
+                        ImageGrid grid2 = new ImageGrid(imageCache);
                         grid2.setPhotos(name);
                         TitledPane tp = new TitledPane(t.getName(), grid2);
 
