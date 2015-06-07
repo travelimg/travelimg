@@ -1,17 +1,12 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
-import at.ac.tuwien.qse.sepm.entities.Journey;
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Photographer;
-import at.ac.tuwien.qse.sepm.entities.Rating;
-import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.service.ClusterService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +23,7 @@ public class PhotoFilter implements Predicate<Photo> {
     private final Set<Photographer> includedPhotographers = new HashSet<>();
     private final Set<Rating> includedRatings = new HashSet<>();
     private final Set<Journey> includedJourneys = new HashSet<>();
-    private final Set<YearMonth> includedMonths = new HashSet<>();
+    private final Set<Place> includedPlaces = new HashSet<>();
     private boolean untaggedIncluded = false;
 
     public PhotoFilter() {
@@ -44,7 +39,7 @@ public class PhotoFilter implements Predicate<Photo> {
         getIncludedPhotographers().addAll(from.getIncludedPhotographers());
         getIncludedRatings().addAll(from.getIncludedRatings());
         getIncludedJourneys().addAll(from.getIncludedJourneys());
-        getIncludedMonths().addAll(from.getIncludedMonths());
+        getIncludedPlaces().addAll(from.getIncludedPlaces());
         setUntaggedIncluded(from.isUntaggedIncluded());
     }
 
@@ -86,12 +81,12 @@ public class PhotoFilter implements Predicate<Photo> {
     }
 
     /**
-     * Get the months a photo must be made in.
+     * Get the places at one of which the photos must have been made.
      *
-     * @return included photographer names
+     * @return included places
      */
-    public Set<YearMonth> getIncludedMonths() {
-        return includedMonths;
+    public Set<Place> getIncludedPlaces() {
+        return includedPlaces;
     }
 
     /**
@@ -117,7 +112,7 @@ public class PhotoFilter implements Predicate<Photo> {
                 && testCategories(photo)
                 && testPhotographer(photo)
                 && testJourney(photo)
-                && testMonth(photo);
+                && testPlace(photo);
     }
 
     private boolean testRating(Photo photo) {
@@ -167,8 +162,8 @@ public class PhotoFilter implements Predicate<Photo> {
         }
     }
 
-    private boolean testMonth(Photo photo) {
-        return getIncludedMonths().contains(YearMonth.from(photo.getDatetime()));
+    private boolean testPlace(Photo photo) {
+        return getIncludedPlaces().contains(photo.getPlace());
     }
 
     private boolean hasCategory(Photo photo) {

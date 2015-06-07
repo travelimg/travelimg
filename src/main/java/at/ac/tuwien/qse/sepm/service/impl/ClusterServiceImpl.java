@@ -34,8 +34,18 @@ public class ClusterServiceImpl implements ClusterService {
         try {
             return journeyDAO.readAll();
         } catch (DAOException ex) {
-            ex.printStackTrace();
+            logger.error("Failed to get all journeys", ex);
             throw new ServiceException("Failed to get all journeys", ex);
+        }
+    }
+
+    @Override
+    public List<Place> getAllPlaces() throws ServiceException {
+        try {
+            return placeDAO.readAll();
+        } catch (DAOException ex) {
+            logger.error("Failed to get all places", ex);
+            throw new ServiceException("Failed to get all places", ex);
         }
     }
 
@@ -76,10 +86,10 @@ public class ClusterServiceImpl implements ClusterService {
             throw new ServiceException("Failed to read photos of journey", e);
         }
 
-        photoService.addJourneyToPhotos(photos, journey);
+            photoService.addJourneyToPhotos(photos, journey);
 
-        for (Photo element : photos) {
-            if (Math.abs(element.getLatitude() - latitude) > 1
+            for (Photo element : photos) {
+                if (Math.abs(element.getLatitude() - latitude) > 1
                     && Math.abs(element.getLongitude() - longitude) > 1) {
                 place = geoService.getPlaceByGeoData(element.getLatitude(), element.getLongitude());
                 place.setLatitude(element.getLatitude());

@@ -27,7 +27,6 @@ public class PhotoFilterTest {
         PhotoFilter filter = new PhotoFilter();
         filter.getIncludedPhotographers().add(new Photographer(1, "John"));
         filter.getIncludedRatings().add(Rating.NONE);
-        filter.getIncludedMonths().add(YearMonth.of(2015, 12));
         filter.setUntaggedIncluded(true);
         return filter;
     }
@@ -158,32 +157,6 @@ public class PhotoFilterTest {
         filter.getIncludedPhotographers().add(new Photographer(1, "John"));
         filter.getIncludedPhotographers().add(new Photographer(2, "Bill"));
         photo.setPhotographer(new Photographer(2, "Bill"));
-
-        assertTrue(filter.test(photo));
-    }
-
-    @Test
-    public void filter_monthPhotoHasDifferent_noMatch() {
-        PhotoFilter filter = createFilter();
-        Photo photo = createMatchingPhoto();
-
-        filter.getIncludedMonths().clear();
-        filter.getIncludedMonths().add(YearMonth.of(2014, 3));
-        filter.getIncludedMonths().add(YearMonth.of(2015, 12));
-        photo.setDatetime(LocalDateTime.of(2012, 10, 1, 0, 0));
-
-        assertFalse(filter.test(photo));
-    }
-
-    @Test
-    public void filter_monthPhotoHasSame_isMatch() {
-        PhotoFilter filter = createFilter();
-        Photo photo = createMatchingPhoto();
-
-        filter.getIncludedMonths().clear();
-        filter.getIncludedMonths().add(YearMonth.of(2014, 3));
-        filter.getIncludedMonths().add(YearMonth.of(2015, 12));
-        photo.setDatetime(LocalDateTime.of(2015, 12, 1, 0, 0));
 
         assertTrue(filter.test(photo));
     }

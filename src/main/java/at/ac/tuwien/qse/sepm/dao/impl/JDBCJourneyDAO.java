@@ -42,6 +42,12 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         // TODO: handle validator exception
         JourneyValidator.validate(journey);
 
+        for (Journey element : readAll()) {
+            if (element.getName() == journey.getName() && element.getStartDate() == journey
+                    .getStartDate() && element.getEndDate() == journey.getStartDate())
+                return element;
+        }
+
         Map<String, Object> parameters = new HashMap<String, Object>(1);
         parameters.put("name", journey.getName());
         parameters.put("start", Timestamp.valueOf(journey.getStartDate()));
@@ -64,7 +70,7 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         JourneyValidator.validate(journey);
         JourneyValidator.validateID(journey.getId());
 
-         try {
+        try {
             jdbcTemplate.update(deleteStatement, journey.getId());
         } catch (DataAccessException ex) {
             logger.error("Failed to delete Journey", ex);

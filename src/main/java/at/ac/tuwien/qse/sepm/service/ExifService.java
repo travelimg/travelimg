@@ -38,11 +38,4 @@ public interface ExifService {
      */
     public void attachDateAndGeoData(Photo photo) throws ServiceException;
 
-    /**
-     * Modifies the exif data of a photo
-     *
-     * @param photo the photo, must have a valid path
-     * @throws ServiceException
-     */
-    public void modifyExifTags(Photo photo) throws ServiceException;
 }

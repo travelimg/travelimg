@@ -6,12 +6,13 @@ import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.event.UIEventType;
 import com.lynden.gmapsfx.javascript.object.*;
 import netscape.javascript.JSException;
+import netscape.javascript.JSObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import netscape.javascript.JSObject;
 
 
 /**
@@ -32,7 +33,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      *
      *
      */
-    public GoogleMapsScene(){
+    public GoogleMapsScene() {
         logger.debug("GoogleMapsScene will be created ");
         this.mapView = new GoogleMapView();
         this.mapView.addMapInializedListener(this);
@@ -45,7 +46,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      * WorldMap Constructor
      * @param l
      */
-    public GoogleMapsScene(ArrayList<Photo> l){
+    public GoogleMapsScene(ArrayList<Photo> l) {
         logger.debug("GoogleMapsScene will be created ");
         this.mapView = new GoogleMapView();
         markers = l;
@@ -53,10 +54,10 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         displayedMarker = new HashMap<>();
         this.mapView.addMapInializedListener(this);
     }
+
     public void setZoom(int zoom) {
         this.map.setZoom(zoom);
     }
-
 
     @Override
     public void mapInitialized() {
@@ -78,32 +79,23 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
             //TODO Markerhandling
         });
 
+        if (markers != null) {
+            for (Photo photo : markers) {
+                Marker m = new Marker(new MarkerOptions()
+                        .position(new LatLong(photo.getLatitude(), photo.getLongitude()))
+                        .visible(Boolean.TRUE).animation(Animation.BOUNCE));
+                m.setTitle("Marker");
 
+                aktivMarker.add(m);
+                displayedMarker.put(m.getVariableName(),
+                        new LatLong(photo.getLatitude(), photo.getLongitude()));
+                map.addUIEventHandler(m, UIEventType.dblclick, (JSObject obj) -> {
+                    //TODO //TODO Markerhandling
+                });
 
-        if(markers!=null){
-            for(Photo photo : markers) {
-
-                    Marker m = new Marker(new MarkerOptions()
-                            .position(new LatLong(photo.getLatitude(), photo.getLongitude()))
-                            .visible(Boolean.TRUE).animation(Animation.BOUNCE));
-                    m.setTitle("Marker");
-
-                    aktivMarker.add(m);
-                    displayedMarker.put(m.getVariableName(),
-                            new LatLong(photo.getLatitude(), photo.getLongitude()));
-                    map.addUIEventHandler(m, UIEventType.dblclick, (JSObject obj) -> {
-                        //TODO //TODO Markerhandling
-                    });
-
-                    map.addMarker(m);
-
-                }
-
-
+                map.addMarker(m);
+            }
         }
-
-
-
     }
 
     /**
@@ -111,10 +103,10 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      * @param x the latitude
      * @param y the longitude
      */
-    public void setCenter(double x, double y){
+    public void setCenter(double x, double y) {
         try {
             this.mapView.setCenter(x, y);
-        }catch (JSException ex) {
+        } catch (JSException ex) {
             logger.debug("Error by initializing Map");
         }
     }
@@ -126,7 +118,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     public GoogleMapView getMapView() {
         try {
             return this.mapView;
-        }catch (JSException ex) {
+        } catch (JSException ex) {
             logger.debug("Error by initializing Map");
         }
         return null;
@@ -137,10 +129,10 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      * @param x width
      * @param y height
      */
-    public void setMaxSize(double x, double y){
+    public void setMaxSize(double x, double y) {
         try {
             mapView.setMaxSize(x, y);
-        }catch (JSException ex) {
+        } catch (JSException ex) {
             logger.debug("Error by initializing Map");
         }
     }
@@ -148,13 +140,13 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     /**
      * removes all Marker from Map
      */
-    public void removeAktiveMarker(){
+    public void removeAktiveMarker() {
         try {
             for (Marker m : aktivMarker) {
                 map.removeMarker(m);
             }
             displayedMarker.clear();
-        }catch (JSException ex) {
+        } catch (JSException ex) {
             logger.debug("Error by initializing Map");
         }
     }
@@ -163,7 +155,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      *  add one marker, which represents the foto, to the map
      * @param photo the photo
      */
-    public void addMarker(Photo photo){
+    public void addMarker(Photo photo) {
         try {
             if (aktivMarker.size() != 0) {
                 removeAktiveMarker();
@@ -187,7 +179,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
             mapView.setCenter(photo.getLatitude(), photo.getLongitude());
             mapView.setZoom(12);
             map.addMarker(m);
-        }catch (JSException ex) {
+        } catch (JSException ex) {
             logger.debug("Error by initializing Map");
         }
     }
@@ -196,7 +188,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      *  try to add some marker
      * @param list list of photos to be displayed on the map
      */
-    public void addMarkerList(List<Photo> list){
+    public void addMarkerList(List<Photo> list) {
         try {
             if (aktivMarker.size() != 0) {
                 removeAktiveMarker();
@@ -207,34 +199,21 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
             }
             map.setZoom(13);
             for (Photo photo : list) {
+                Marker m = new Marker(new MarkerOptions()
+                        .position(new LatLong(photo.getLatitude(), photo.getLongitude()))
+                        .visible(Boolean.TRUE).animation(Animation.BOUNCE));
+                m.setTitle("Marker");
+                aktivMarker.add(m);
+                displayedMarker.put(m.getVariableName(),
+                        new LatLong(photo.getLatitude(), photo.getLongitude()));
+                map.addUIEventHandler(m, UIEventType.click, (JSObject obj) -> {
+                    //TODO Markerhandler
+                });
 
-                    Marker m = new Marker(new MarkerOptions()
-                            .position(new LatLong(photo.getLatitude(), photo.getLongitude()))
-                            .visible(Boolean.TRUE).animation(Animation.BOUNCE));
-                    m.setTitle("Marker");
-                    aktivMarker.add(m);
-                    displayedMarker.put(m.getVariableName(),
-                            new LatLong(photo.getLatitude(), photo.getLongitude()));
-                    map.addUIEventHandler(m, UIEventType.click, (JSObject obj) -> {
-                        //TODO Markerhandler
-
-                    });
-
-                    map.addMarker(m);
-
-
-
+                map.addMarker(m);
             }
-
-
-        }catch (JSException ex) {
+        } catch (JSException ex) {
             logger.debug("Error by initializing Map");
         }
-
-
     }
-
-
-
-
 }

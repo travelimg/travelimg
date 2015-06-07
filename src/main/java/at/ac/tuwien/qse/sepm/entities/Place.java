@@ -63,6 +63,29 @@ public class Place {
         this.journey = journey;
     }
 
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        Place place = (Place) o;
+
+        if (id != place.id)
+            return false;
+        if (!city.equals(place.city))
+            return false;
+        return country.equals(place.country);
+
+    }
+
+    @Override public int hashCode() {
+        int result = id;
+        result = 31 * result + city.hashCode();
+        result = 31 * result + country.hashCode();
+        return result;
+    }
+
     @Override
     public String toString() {
         return "Place{" +

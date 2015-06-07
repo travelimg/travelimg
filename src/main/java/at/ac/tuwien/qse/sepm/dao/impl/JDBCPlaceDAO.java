@@ -37,6 +37,10 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
 
         PlaceValidator.validate(place);
 
+        for(Place element: readAll()) {
+            if(element.getCity() == place.getCity() && element.getCountry() == place.getCountry()) return element;
+        }
+
         Map<String, Object> parameters = new HashMap<String, Object>(1);
         parameters.put("city", place.getCity());
         parameters.put("country", place.getCountry());

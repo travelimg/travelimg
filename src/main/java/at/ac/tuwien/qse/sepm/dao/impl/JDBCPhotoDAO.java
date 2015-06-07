@@ -101,10 +101,9 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
         try {
             jdbcTemplate.update(UPDATE_STATEMENT,
-                    // TODO: Also update photographer ID.
-                    // This is currently not viable since all the read* methods just set the
-                    // photographer to null.
-                    photo.getPath(), photo.getRating().ordinal(), photo.getPlace().getId(),
+                    photo.getPath(),
+                    photo.getRating().ordinal(),
+                    photo.getPlace().getId(),
                     photo.getId());
             logger.debug("Successfully update photo {}", photo);
         } catch (DataAccessException e) {

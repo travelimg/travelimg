@@ -5,35 +5,28 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.gui.dialogs.DeleteDialog;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ExportDialog;
-import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.*;
-import javafx.beans.binding.Bindings;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -152,11 +145,7 @@ public class Inspector {
             onDelete();
         } catch (ServiceException ex) {
             LOGGER.error("failed deleting photos", ex);
-            InfoDialog dialog = new InfoDialog(root, "Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Fehler beim Löschen");
-            dialog.setContentText("Die ausgewählten Fotos konnten nicht gelöscht werden.");
-            dialog.showAndWait();
+            ErrorDialog.show(root, "Fehler beim Löschen", "Die ausgewählten Fotos konnten nicht gelöscht werden.");
         }
     }
 
@@ -165,7 +154,7 @@ public class Inspector {
         try {
             dropboxFolder = dropboxService.getDropboxFolder();
         } catch (ServiceException ex) {
-            // TODO: handle error
+            ErrorDialog.show(root, "Fehler beim Export", "Konnte keinen Dropboxordner finden");
         }
 
         ExportDialog dialog = new ExportDialog(root, dropboxFolder, activePhotos.size());
@@ -177,9 +166,7 @@ public class Inspector {
                 photo -> {
                     // TODO: progressbar
                 },
-                exception -> {
-                    // TODO: handle error
-                }
+                exception -> ErrorDialog.show(root, "Fehler beim Export", "Fehlermeldung: " + exception.getMessage())
         );
     }
 
@@ -204,8 +191,6 @@ public class Inspector {
 
             try {
                 photoservice.savePhotoRating(photo);
-                onUpdate();
-
             } catch (ServiceException ex) {
                 LOGGER.error("Failed saving photo rating.", ex);
                 LOGGER.debug("Resetting rating from {} to {}.", newRating, oldRating);
@@ -218,13 +203,14 @@ public class Inspector {
                 // change will occur in RatingPicker that is the same as the once that caused the error.
                 // That causes an infinite loop of error dialogs.
 
-                InfoDialog dialog = new InfoDialog(root, "Fehler");
-                dialog.setError(true);
-                dialog.setHeaderText("Bewertung fehlgeschlagen");
-                dialog.setContentText("Die Bewertung für das Foto konnte nicht gespeichert werden.");
-                dialog.showAndWait();
+                ErrorDialog.show(root,
+                        "Bewertung fehlgeschlagen",
+                        "Die Bewertung für das Foto konnte nicht gespeichert werden."
+                );
             }
         }
+
+        onUpdate();
     }
 
     private void showDetails(List<Photo> photos) {
@@ -281,7 +267,7 @@ public class Inspector {
                 exifValue.setCellValueFactory(new PropertyValueFactory<>("Value"));
                 exifTable.setItems(exifData);
             } catch (ServiceException e) {
-                // TODO Dialog
+                ErrorDialog.show(root, "Fehler beim Laden der Exif Daten", "Fehlermeldung: " + e.getMessage());
             }
         }
     }
@@ -308,37 +294,34 @@ public class Inspector {
     private class TagListChangeListener implements ListChangeListener<Tag> {
 
         public void onChanged(ListChangeListener.Change<? extends Tag> change) {
+            boolean updateNeeded = false;
+
             while(change.next()) {
 
                 if (change.wasAdded()) {
                     Tag added = change.getAddedSubList().get(0);
                     try {
                         photoservice.addTagToPhotos(activePhotos, added);
-                        onUpdate();
+                        updateNeeded = true;
                     } catch (ServiceException ex) {
                         LOGGER.error("failed adding tag", ex);
-                        InfoDialog dialog = new InfoDialog(root, "Fehler");
-                        dialog.setError(true);
-                        dialog.setHeaderText("Speichern fehlgeschlagen");
-                        dialog.setContentText("Die Kategorien für das Foto konnten nicht gespeichert werden.");
-                        dialog.showAndWait();
+                        ErrorDialog.show(root, "Speichern fehlgeschlagen", "Die Kategorien für das Foto konnten nicht gespeichert werden.");
                     }
                 }
                 if (change.wasRemoved()) {
                     Tag removed = change.getRemoved().get(0);
                     try {
                         photoservice.removeTagFromPhotos(activePhotos, removed);
-                        onUpdate();
+                        updateNeeded = true;
                     } catch (ServiceException ex) {
                         LOGGER.error("failed removing tag", ex);
-                        InfoDialog dialog = new InfoDialog(root, "Fehler");
-                        dialog.setError(true);
-                        dialog.setHeaderText("Speichern fehlgeschlagen");
-                        dialog.setContentText("Die Kategorien für das Foto konnten nicht gespeichert werden.");
-                        dialog.showAndWait();
+                        ErrorDialog.show(root, "Speichern fehlgeschlagen", "Die Kategorien für das Foto konnten nicht gespeichert werden.");
                     }
                 }
             }
+
+            if (updateNeeded)
+                onUpdate();
         }
 
     }

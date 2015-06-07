@@ -32,9 +32,7 @@ public class TagServiceImpl implements TagService {
     public Tag create(Tag tag) throws ServiceException {
         try {
             return tagDAO.create(tag);
-        } catch (DAOException ex) {
-            throw new ServiceException(ex);
-        } catch (ValidationException ex) {
+        } catch (DAOException | ValidationException ex) {
             throw new ServiceException(ex);
         }
     }
