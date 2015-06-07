@@ -33,6 +33,10 @@ public class JourneyDialog extends ResultDialog<Journey> {
 
         journeyAdd.setOnAction(this::handleAdd);
         journeyCancel.setOnAction(this::handleCancel);
+
+        journeyNameField.textProperty().addListener(observable -> updateStatus());
+        journeyBeginDate.valueProperty().addListener(observable -> updateStatus());
+        journeyEndDate.valueProperty().addListener(observable -> updateStatus());
     }
 
     private void handleCancel(ActionEvent actionEvent) {
@@ -50,5 +54,13 @@ public class JourneyDialog extends ResultDialog<Journey> {
 
         setResult(journey);
         close();
+    }
+
+    private void updateStatus() {
+        journeyAdd.setDisable(
+                journeyNameField.getText().isEmpty()
+                || journeyBeginDate.getValue() == null
+                || journeyEndDate.getValue() == null
+        );
     }
 }
