@@ -128,7 +128,7 @@ public class PhotoServiceImpl implements PhotoService {
 
         for (Photo photo : photos) {
             photo.setJourney(journey);
-            exifService.exportMetaToExif(photo);
+//            exifService.exportMetaToExif(photo);
             LOGGER.debug("Leaving addJourneyToPhotos");
         }
     }
@@ -141,7 +141,7 @@ public class PhotoServiceImpl implements PhotoService {
         }
 
         for (Photo photo : photos) {
-            exifService.exportMetaToExif(photo);
+//            exifService.exportMetaToExif(photo);
         }
         Photo p = new Photo();
         p.setPlace(place);
