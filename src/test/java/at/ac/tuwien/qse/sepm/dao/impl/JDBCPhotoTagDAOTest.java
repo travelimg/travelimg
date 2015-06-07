@@ -4,7 +4,6 @@ import at.ac.tuwien.qse.sepm.dao.*;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
-
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
