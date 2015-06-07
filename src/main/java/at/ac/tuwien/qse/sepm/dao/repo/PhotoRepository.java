@@ -9,6 +9,15 @@ import java.nio.file.Path;
 public interface PhotoRepository extends PhotoProvider {
 
     /**
+     * Checks whether the path is valid in this repository.
+     *
+     * @param file path that should be checked
+     * @return true if the path is valid, otherwise false
+     * @throws PersistenceException failed to perform operation
+     */
+    boolean accepts(Path file) throws PersistenceException;
+
+    /**
      * Creates a photo in the repository under the specified file.
      *
      * The photo can be read immediately after the method returns.
@@ -16,7 +25,7 @@ public interface PhotoRepository extends PhotoProvider {
      * @param file path under which the photo should be added
      * @param source stream from which the photo data is read
      * @throws PersistenceException failed to perform operation
-     * @throws PhotoNotFoundException path is not valid in this repository
+     * @throws PersistenceException
      * @throws PhotoAlreadyExistsException path is already a photo in this repository
      */
     void create(Path file, InputStream source) throws PersistenceException;

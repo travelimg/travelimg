@@ -1,9 +1,6 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
-import at.ac.tuwien.qse.sepm.dao.repo.Context;
-import at.ac.tuwien.qse.sepm.dao.repo.Photo;
-import at.ac.tuwien.qse.sepm.dao.repo.PhotoRepository;
-import at.ac.tuwien.qse.sepm.dao.repo.PhotoRepositoryTest;
+import at.ac.tuwien.qse.sepm.dao.repo.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +13,19 @@ public class MemoryPhotoRepositoryTest extends PhotoRepositoryTest {
     private final Path basePath = Paths.get("test/path");
 
     @Override protected Context getContext() {
-        return new Context(basePath);
+        return new Context() {
+            @Override public Path getFile1() {
+                return basePath.resolve("some/file.jpg");
+            }
+
+            @Override public Path getFile2() {
+                return basePath.resolve("other/image.jpg");
+            }
+        };
+    }
+
+    @Override protected void add(PhotoProvider object, Photo photo) throws PersistenceException {
+        ((PhotoRepository)object).create(photo.getFile(), getContext().getStream(photo));
     }
 
     @Override protected PhotoRepository getObject() {

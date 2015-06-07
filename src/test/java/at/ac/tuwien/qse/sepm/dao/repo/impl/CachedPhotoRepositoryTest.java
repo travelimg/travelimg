@@ -20,7 +20,19 @@ public class CachedPhotoRepositoryTest extends PhotoRepositoryTest {
     }
 
     @Override protected Context getContext() {
-        return new Context(basePath);
+        return new Context() {
+            @Override public Path getFile1() {
+                return basePath.resolve("some/file.jpg");
+            }
+
+            @Override public Path getFile2() {
+                return basePath.resolve("other/photo.jpg");
+            }
+        };
+    }
+
+    @Override protected void add(PhotoProvider object, Photo photo) throws PersistenceException {
+        ((PhotoRepository)object).create(photo.getFile(), getContext().getStream(photo));
     }
 
     private PhotoRepository getRepository() {
@@ -40,13 +52,28 @@ public class CachedPhotoRepositoryTest extends PhotoRepositoryTest {
     }
 
     @Test
+    public void sychtonize_modifiedFiles_addedToQueue() throws PersistenceException {
+        PhotoRepository repository = getRepository();
+        Path file = getContext().getFile1();
+        repository.create(file, getContext().getStream1());
+        PhotoCache cache = getCache();
+        cache.put(getContext().getPhoto1());
+        Photo modified = getContext().getModified1();
+        repository.update(modified);
+
+        CachedPhotoRepository object = new CachedPhotoRepository(repository, cache);
+        object.synchronize();
+        assertEquals(modified, cache.read(file));
+    }
+
+    @Test
     public void synchronize_modifiedFiles_updatedInCache() throws PersistenceException {
         PhotoRepository repository = getRepository();
         Path file = getContext().getFile1();
         repository.create(file, getContext().getStream1());
         PhotoCache cache = getCache();
         cache.put(getContext().getPhoto1());
-        Photo modified = getContext().getPhoto1Modified();
+        Photo modified = getContext().getModified1();
         repository.update(modified);
 
         CachedPhotoRepository object = new CachedPhotoRepository(repository, cache);

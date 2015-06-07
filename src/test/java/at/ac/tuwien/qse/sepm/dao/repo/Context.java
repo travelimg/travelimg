@@ -65,35 +65,4 @@ public class Context {
         return applyData1(new Photo(getFile2()));
     }
 
-    public InputStream getStream1() {
-        return new ByteArrayInputStream(new byte[] { 1 });
-    }
-
-    public InputStream getStream2() {
-        return new ByteArrayInputStream(new byte[] { 2 });
-    }
-
-    public Photo read(Path file, InputStream stream) throws IOException {
-        int index = stream.read();
-        switch (index) {
-            case 1 : return applyData1(new Photo(file));
-            case 2 : return applyData2(new Photo(file));
-            default : throw new IOException("Invalid format.");
-        }
-    }
-
-    public void update(Photo photo, OutputStream stream) throws IOException {
-        // Just use the rating to map photo to stream content.
-        switch (photo.getRating()) {
-            case GOOD :
-                stream.write(1);
-                break;
-            case NEUTRAL :
-                stream.write(2);
-                break;
-            default :
-                stream.write(0);
-                break;
-        }
-    }
 }

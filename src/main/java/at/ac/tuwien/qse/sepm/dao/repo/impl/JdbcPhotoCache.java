@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
 import at.ac.tuwien.qse.sepm.dao.repo.PersistenceException;
 import at.ac.tuwien.qse.sepm.dao.repo.Photo;
+import at.ac.tuwien.qse.sepm.dao.repo.PhotoCache;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoInfo;
 import org.apache.logging.log4j.LogManager;
 
@@ -11,33 +12,25 @@ import java.util.Collection;
 /**
  * Photo cache that stores photo instances in an SQLite database.
  */
-public class JdbcPhotoCache extends PhotoCacheBase {
+public class JdbcPhotoCache implements PhotoCache {
 
-    public JdbcPhotoCache() {
-        super(LogManager.getLogger());
-    }
-
-    @Override protected PhotoInfo checkImpl(Path file) throws PersistenceException {
+    @Override public void put(Photo photo) throws PersistenceException {
         throw new UnsupportedOperationException();
     }
 
-    @Override protected Collection<PhotoInfo> checkAllImpl() throws PersistenceException {
+    @Override public void remove(Path file) throws PersistenceException {
         throw new UnsupportedOperationException();
     }
 
-    @Override protected Photo readImpl(Path file) throws PersistenceException {
+    @Override public Collection<Path> index() throws PersistenceException {
         throw new UnsupportedOperationException();
     }
 
-    @Override protected Collection<Photo> readAllImpl() throws PersistenceException {
+    @Override public PhotoInfo check(Path file) throws PersistenceException {
         throw new UnsupportedOperationException();
     }
 
-    @Override protected void putImpl(Photo photo) throws PersistenceException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override protected void removeImpl(Path file) throws PersistenceException {
+    @Override public Photo read(Path file) throws PersistenceException {
         throw new UnsupportedOperationException();
     }
 }

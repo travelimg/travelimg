@@ -1,10 +1,8 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
-import at.ac.tuwien.qse.sepm.dao.repo.PersistenceException;
-import at.ac.tuwien.qse.sepm.dao.repo.Photo;
-import at.ac.tuwien.qse.sepm.dao.repo.PhotoInfo;
-import at.ac.tuwien.qse.sepm.dao.repo.PhotoNotFoundException;
+import at.ac.tuwien.qse.sepm.dao.repo.*;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 /**
@@ -28,12 +27,14 @@ import java.util.stream.Collectors;
  */
 public class PhotoDirectory extends RunnablePhotoRepository {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private final Path path;
+    private final Collection<Listener> listeners = new LinkedList<>();
 
     private WatchService watcher;
 
     public PhotoDirectory(Path path) throws PersistenceException {
-        super(LogManager.getLogger());
         if (path == null) throw new IllegalArgumentException();
         this.path = path;
     }
@@ -47,7 +48,86 @@ public class PhotoDirectory extends RunnablePhotoRepository {
         return path;
     }
 
-    @Override protected PhotoInfo checkImpl(Path file) throws PersistenceException {
+    @Override public boolean accepts(Path file) throws PersistenceException {
+        if (file == null) throw new IllegalArgumentException();
+        return file.startsWith(getPath());
+    }
+
+    @Override public void create(Path file, InputStream source) throws PersistenceException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public void update(Photo photo) throws PersistenceException {
+        if (photo == null) throw new IllegalArgumentException();
+        LOGGER.debug("updating {}", photo);
+
+        Path file = photo.getFile();
+        if (!contains(file)) {
+            LOGGER.debug("directory does not contain file {}", file);
+            throw new PhotoNotFoundException(this, file);
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public void delete(Path file) throws PersistenceException {
+        if (file == null) throw new IllegalArgumentException();
+        LOGGER.debug("deleting {}", file);
+
+        if (!contains(file)) {
+            LOGGER.debug("directory does not contain file {}", file);
+            throw new PhotoNotFoundException(this, file);
+        }
+        try {
+            Files.delete(file);
+        } catch (IOException ex) {
+            LOGGER.debug("failed deleting file {}", file);
+            LOGGER.info("deleted {}", file);
+            throw new PersistenceException(ex);
+        }
+    }
+
+    @Override public void addListener(Listener listener) {
+        if (listener == null) throw new IllegalArgumentException();
+        listeners.add(listener);
+        LOGGER.info("added listener {}", listener);
+    }
+
+    @Override public void removeListener(Listener listener) {
+        if (listener == null) throw new IllegalArgumentException();
+        listeners.remove(listener);
+        LOGGER.info("removed listener {}", listener);
+    }
+
+    @Override public boolean contains(Path file) throws PersistenceException {
+        LOGGER.debug("contains {}", file);
+        boolean result = Files.exists(file) && file.startsWith(getPath());
+        LOGGER.info("contains {} is {}", file, result);
+        return result;
+    }
+
+    @Override public Collection<Path> index() throws PersistenceException {
+        LOGGER.debug("indexing");
+
+        // Directory is created on demand. So if no photos have been added yet, it may not exist.
+        // Files.list fails if that is the case.
+        if (!Files.exists(getPath())) {
+            LOGGER.debug("directory does not exist at {}", getPath());
+            return new ArrayList<>(0);
+        }
+        try {
+            Collection<Path> files = Files.list(getPath()).collect(Collectors.toList());
+            LOGGER.debug("found {} files in directory", files.size());
+            LOGGER.info("indexed {}", files.size());
+            return files;
+        } catch (IOException ex) {
+            throw new PersistenceException(ex);
+        }
+    }
+
+    @Override public PhotoInfo check(Path file) throws PersistenceException {
+        if (file == null) throw new IllegalArgumentException();
+        LOGGER.debug("checking {}", file);
+
         if (!contains(file)) {
             LOGGER.debug("directory does not contain file {}", file);
             return null;
@@ -61,77 +141,21 @@ public class PhotoDirectory extends RunnablePhotoRepository {
         }
 
         LocalDateTime time = LocalDateTime.ofInstant(fileTime.toInstant(), ZoneId.systemDefault());
-        return new PhotoInfo(file, time);
+        PhotoInfo info = new PhotoInfo(file, time);
+        LOGGER.info("checked {}", info);
+        return info;
     }
 
-    @Override protected Collection<PhotoInfo> checkAllImpl() throws PersistenceException {
-        // Directory is created on demand. So if no photos have been added yet, it may not exist.
-        // Files.list fails if that is the case.
-        if (!Files.exists(getPath())) {
-            LOGGER.debug("directory does not exist at {}", getPath());
-            return new ArrayList<>(0);
-        }
-        try {
-            Collection<Path> files = Files.list(getPath()).collect(Collectors.toList());
-            Collection<PhotoInfo> result = new ArrayList<>(files.size());
-            LOGGER.debug("found {} files in directory {}", files.size(), getPath());
-            for (Path file : files) {
-                result.add(check(file));
-            }
-            return result;
-        } catch (IOException ex) {
-            throw new PersistenceException(ex);
-        }
-    }
+    @Override public Photo read(Path file) throws PersistenceException {
+        if (file == null) throw new IllegalArgumentException();
+        LOGGER.debug("reading {}", file);
 
-    @Override protected Photo readImpl(Path file) throws PersistenceException {
         if (!contains(file)) {
             LOGGER.debug("directory does not contain file {}", file);
             throw new PhotoNotFoundException(this, file);
         }
 
         throw new UnsupportedOperationException();
-    }
-
-    @Override protected Collection<Photo> readAllImpl() throws PersistenceException {
-        try {
-            Collection<Path> files = Files.list(getPath()).collect(Collectors.toList());
-            Collection<Photo> photos = new ArrayList<>(files.size());
-            LOGGER.debug("found {} files in directory {}", files.size(), getPath());
-            for (Path file : files) {
-                Photo photo = read(file);
-                photos.add(photo);
-            }
-            return photos;
-        } catch (IOException ex) {
-            throw new PersistenceException(ex);
-        }
-    }
-
-    @Override protected void createImpl(Path file, InputStream source) throws PersistenceException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override protected void updateImpl(Photo photo) throws PersistenceException {
-        Path file = photo.getFile();
-        if (!contains(file)) {
-            LOGGER.debug("directory does not contain file {}", file);
-            throw new PhotoNotFoundException(this, file);
-        }
-        throw new UnsupportedOperationException();
-    }
-
-    @Override protected void deleteImpl(Path file) throws PersistenceException {
-        if (!contains(file)) {
-            LOGGER.debug("directory does not contain file {}", file);
-            throw new PhotoNotFoundException(this, file);
-        }
-        try {
-            Files.delete(file);
-        } catch (IOException ex) {
-            LOGGER.debug("failed deleting file {}", file);
-            throw new PersistenceException(ex);
-        }
     }
 
     protected Photo read(Path file, InputStream stream) throws IOException {
@@ -140,10 +164,6 @@ public class PhotoDirectory extends RunnablePhotoRepository {
 
     protected void update(Photo photo, OutputStream stream) throws IOException {
         throw new UnsupportedOperationException();
-    }
-
-    private boolean contains(Path file) {
-        return Files.exists(file) && file.startsWith(getPath());
     }
 
     private void runSetUp() throws PersistenceException {
@@ -155,7 +175,7 @@ public class PhotoDirectory extends RunnablePhotoRepository {
         } catch (IOException ex) {
             LOGGER.error("failed creating watcher for directory {}", getPath());
             stop();
-            notifyError(new PersistenceException(ex));
+            //notifyError(new PersistenceException(ex));
             return;
         }
 
@@ -168,7 +188,7 @@ public class PhotoDirectory extends RunnablePhotoRepository {
             LOGGER.error("failed registering watcher for directory {}", getPath());
             LOGGER.error(ex);
             stop();
-            notifyError(new PersistenceException(ex));
+            //notifyError(new PersistenceException(ex));
 
             try {
                 watcher.close();
@@ -202,13 +222,13 @@ public class PhotoDirectory extends RunnablePhotoRepository {
             LOGGER.debug("received file event {} for file {}", kind, file);
 
             if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-                notifyCreate(file);
+                listeners.forEach(l -> l.onCreate(this, file));
             }
             if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                notifyUpdate(file);
+                listeners.forEach(l -> l.onUpdate(this, file));
             }
             if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
-                notifyDelete(file);
+                listeners.forEach(l -> l.onDelete(this, file));
             }
         }
 
@@ -227,9 +247,5 @@ public class PhotoDirectory extends RunnablePhotoRepository {
             LOGGER.error("failed closing watcher for directory {}", getPath());
             LOGGER.error(ex);
         }
-    }
-
-    private void stop() {
-        // TODO
     }
 }

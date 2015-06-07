@@ -3,26 +3,26 @@ package at.ac.tuwien.qse.sepm.dao.repo.impl;
 import at.ac.tuwien.qse.sepm.dao.repo.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Photo repository that stores photo files in memory.
  */
-public class MemoryPhotoRepository extends PhotoRepositoryBase {
+public class MemoryPhotoRepository implements PhotoRepository {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final Path basePath;
     private final Map<Path, Object> files = new HashMap<>();
     private final Map<Path, LocalDateTime> modified = new HashMap<>();
+    private final Collection<Listener> listeners = new LinkedList<>();
 
     public MemoryPhotoRepository(Path basePath) {
-        super(LogManager.getLogger());
         if (basePath == null) throw new IllegalArgumentException();
         this.basePath = basePath;
     }
@@ -31,49 +31,23 @@ public class MemoryPhotoRepository extends PhotoRepositoryBase {
         return basePath;
     }
 
-    @Override protected PhotoInfo checkImpl(Path file) throws PersistenceException {
-        if (!files.containsKey(file)) {
-            return null;
-        }
-
-        LocalDateTime date = LocalDateTime.from(modified.get(file));
-        return new PhotoInfo(file, date);
-    }
-
-    @Override protected Collection<PhotoInfo> checkAllImpl() throws PersistenceException {
-        Collection<PhotoInfo> result = new ArrayList<>(files.size());
-        for (Path file : files.keySet()) {
-            result.add(check(file));
-        }
+    @Override public boolean accepts(Path file) throws PersistenceException {
+        if (file == null) throw new IllegalArgumentException();
+        LOGGER.debug("accepting {}", file);
+        boolean result = file.startsWith(getBasePath());
+        LOGGER.info("accepts {} is {}", file, result);
         return result;
     }
 
-    @Override protected Photo readImpl(Path file) throws PersistenceException {
-        if (!files.containsKey(file)) {
-            throw new PhotoNotFoundException(this, file);
-        }
+    @Override public void create(Path file, InputStream source) throws PersistenceException {
+        if (file == null) throw new IllegalArgumentException();
+        if (source == null) throw new IllegalArgumentException();
+        LOGGER.debug("creating {}", file);
 
-        InputStream stream = new ByteArrayInputStream((byte[])files.get(file));
-        try {
-            return read(file, stream);
-        } catch (IOException ex) {
-            throw new PersistenceException(ex);
-        }
-    }
-
-    @Override protected Collection<Photo> readAllImpl() throws PersistenceException {
-        Collection<Photo> result = new ArrayList<>(files.size());
-        for (Path file : files.keySet()) {
-            result.add(read(file));
-        }
-        return result;
-    }
-
-    @Override protected void createImpl(Path file, InputStream source) throws PersistenceException {
         if (!file.startsWith(getBasePath())) {
-            throw new PhotoNotFoundException(this, file);
+            throw new PersistenceException("File is not accepted by this repository.");
         }
-        if (files.containsKey(file)) {
+        if (contains(file)) {
             throw new PhotoAlreadyExistsException(this, file);
         }
 
@@ -81,14 +55,19 @@ public class MemoryPhotoRepository extends PhotoRepositoryBase {
             byte[] array = IOUtils.toByteArray(source);
             files.put(file, array);
             modified.put(file, LocalDateTime.now());
+            LOGGER.info("created {}", file);
+            listeners.forEach(l -> l.onCreate(this, file));
         } catch (IOException ex) {
             throw new PersistenceException(ex);
         }
     }
 
-    @Override protected void updateImpl(Photo photo) throws PersistenceException {
+    @Override public void update(Photo photo) throws PersistenceException {
+        if (photo == null) throw new IllegalArgumentException();
+        LOGGER.debug("updating {}", photo);
+
         Path file = photo.getFile();
-        if (!files.containsKey(file)) {
+        if (!contains(file)) {
             throw new PhotoNotFoundException(this, file);
         }
 
@@ -100,15 +79,76 @@ public class MemoryPhotoRepository extends PhotoRepositoryBase {
         }
         files.put(file, stream.toByteArray());
         modified.put(file, LocalDateTime.now());
+        LOGGER.info("updated {}", photo);
+        listeners.forEach(l -> l.onUpdate(this, file));
     }
 
-    @Override protected void deleteImpl(Path file) throws PersistenceException {
-        if (!files.containsKey(file)) {
+    @Override public void delete(Path file) throws PersistenceException {
+        if (file == null) throw new IllegalArgumentException();
+        LOGGER.debug("deleting {}", file);
+
+        if (!contains(file)) {
             throw new PhotoNotFoundException(this, file);
         }
 
         files.remove(file);
         modified.remove(file);
+        LOGGER.info("deleted {}", file);
+        listeners.forEach(l -> l.onDelete(this, file));
+    }
+
+    @Override public void addListener(Listener listener) {
+        if (listener == null) throw new IllegalArgumentException();
+        listeners.add(listener);
+        LOGGER.info("added listener {}", listener);
+    }
+
+    @Override public void removeListener(Listener listener) {
+        if (listener == null) throw new IllegalArgumentException();
+        listeners.remove(listener);
+        LOGGER.info("removed listener {}", listener);
+    }
+
+    @Override public Collection<Path> index() throws PersistenceException {
+        LOGGER.debug("indexing");
+        Collection<Path> result = files.keySet();
+        LOGGER.info("indexed {}", result.size());
+        return result;
+    }
+
+    @Override public boolean contains(Path file) throws PersistenceException {
+        return files.containsKey(file);
+    }
+
+    @Override public PhotoInfo check(Path file) throws PersistenceException {
+        if (file == null) throw new IllegalArgumentException();
+        LOGGER.debug("checking {}", file);
+        if (!contains(file)) {
+            throw new PhotoNotFoundException(this, file);
+        }
+
+        LocalDateTime date = LocalDateTime.from(modified.get(file));
+        PhotoInfo info = new PhotoInfo(file, date);
+        LOGGER.info("checked {}", info);
+        return info;
+    }
+
+    @Override public Photo read(Path file) throws PersistenceException {
+        if (file == null) throw new IllegalArgumentException();
+        LOGGER.debug("reading {}", file);
+
+        if (!contains(file)) {
+            throw new PhotoNotFoundException(this, file);
+        }
+
+        InputStream stream = new ByteArrayInputStream((byte[])files.get(file));
+        try {
+            Photo photo = read(file, stream);
+            LOGGER.info("read {}", photo);
+            return photo;
+        } catch (IOException ex) {
+            throw new PersistenceException(ex);
+        }
     }
 
     protected Photo read(Path file, InputStream stream) throws IOException {

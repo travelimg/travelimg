@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
+import at.ac.tuwien.qse.sepm.entities.Rating;
 import org.junit.Test;
 
 import java.nio.file.Path;
@@ -10,123 +11,52 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
-public abstract class PhotoCacheTest {
+public abstract class PhotoCacheTest extends PhotoProviderTest {
 
     protected abstract PhotoCache getObject();
 
-    @Test
-    public void check_nonExisting_returnsNull() throws PersistenceException {
-        PhotoCache object = getObject();
+    @Override protected Context getContext() {
+        return new Context() {
+            @Override public Path getFile1() {
+                return Paths.get("some/file.jpg");
+            }
 
-        PhotoInfo info = object.check(Paths.get("some/path.jpg"));
-        assertNull(info);
+            @Override public Path getFile2() {
+                return Paths.get("other/photo.jpg");
+            }
+        };
     }
 
-    @Test
-    public void check_existing_returnsNotNull() throws PersistenceException {
-        PhotoCache object = getObject();
-        Path file = Paths.get("some/path.jpg");
-        Photo photo = new Photo(file);
-        object.put(photo);
-
-        PhotoInfo info = object.check(file);
-        assertNotNull(info);
-    }
-
-    @Test
-    public void checkAll_nothingAdded_empty() throws PersistenceException {
-        PhotoCache object = getObject();
-
-        assertTrue(object.checkAll().isEmpty());
-    }
-
-    @Test
-    public void checkAll_someExisting_returnsInfos() throws PersistenceException {
-        PhotoCache object = getObject();
-        Path file1 = Paths.get("some/path.jpg");
-        Path file2 = Paths.get("other/path.jpg");
-        Photo photo1 = new Photo(file1);
-        Photo photo2 = new Photo(file2);
-        object.put(photo1);
-        object.put(photo2);
-
-        Collection<Path> files = object.checkAll().stream()
-                .map(PhotoInfo::getFile)
-                .collect(Collectors.toList());
-        assertEquals(2, files.size());
-        assertTrue(files.contains(file1));
-        assertTrue(files.contains(file2));
-    }
-
-    @Test(expected = PhotoNotFoundException.class)
-    public void read_nonExisting_throws() throws PersistenceException {
-        PhotoCache object = getObject();
-        Path file = Paths.get("some/path.jpg");
-
-        object.read(file);
-    }
-
-    @Test
-    public void read_existing_returnsPhoto() throws PersistenceException {
-        PhotoCache object = getObject();
-        Path file = Paths.get("some/path.jpg");
-        Photo photo = new Photo(file);
-        object.put(photo);
-
-        assertEquals(photo, object.read(file));
-    }
-
-    @Test
-    public void readAll_nothingAdded_empty() throws PersistenceException {
-        PhotoCache object = getObject();
-
-        assertTrue(object.readAll().isEmpty());
-    }
-
-    @Test
-    public void readAll_someExisting_returnsPhotos() throws PersistenceException {
-        PhotoCache object = getObject();
-        Path file1 = Paths.get("some/path.jpg");
-        Path file2 = Paths.get("other/path.jpg");
-        Photo photo1 = new Photo(file1);
-        Photo photo2 = new Photo(file2);
-        object.put(photo1);
-        object.put(photo2);
-
-        Collection<Photo> photos = object.readAll();
-        assertEquals(2, photos.size());
-        assertTrue(photos.contains(photo1));
-        assertTrue(photos.contains(photo2));
+    @Override protected void add(PhotoProvider object, Photo photo) throws PersistenceException {
+        ((PhotoCache)object).put(photo);
     }
 
     @Test
     public void put_valid_persists() throws PersistenceException {
         PhotoCache object = getObject();
-        Path file = Paths.get("some/path.jpg");
-        Photo photo = new Photo(file);
+        Photo photo = getContext().getPhoto1();
 
         object.put(photo);
-        assertEquals(photo, object.read(file));
+        assertEquals(photo, object.read(photo.getFile()));
     }
 
     @Test
     public void put_valid_updatesModificationTime() throws PersistenceException {
         PhotoCache object = getObject();
-        Path file = Paths.get("some/path.jpg");
-        Photo photo1 = new Photo(file);
-        Photo photo2 = new Photo(file);
+        Photo photo = getContext().getPhoto1();
+        Photo modified = getContext().getModified1();
 
         LocalDateTime now = LocalDateTime.now();
-        object.put(photo1);
-        object.put(photo2);
-        PhotoInfo info = object.check(file);
+        object.put(photo);
+        object.put(modified);
+        PhotoInfo info = object.check(photo.getFile());
         assertTrue(!info.getModified().isBefore(now));
     }
 
     @Test(expected = PhotoNotFoundException.class)
     public void remove_nonExisting_throws() throws PersistenceException {
         PhotoCache object = getObject();
-        Path file = Paths.get("some/path.jpg");
+        Path file = getContext().getFile1();
 
         object.remove(file);
     }
@@ -134,11 +64,10 @@ public abstract class PhotoCacheTest {
     @Test
     public void remove_existing_persists() throws PersistenceException {
         PhotoCache object = getObject();
-        Path file = Paths.get("some/path.jpg");
-        Photo photo = new Photo(file);
+        Photo photo = getContext().getPhoto1();
         object.put(photo);
 
-        object.remove(file);
-        assertTrue(object.checkAll().isEmpty());
+        object.remove(photo.getFile());
+        assertTrue(object.index().isEmpty());
     }
 }

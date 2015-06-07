@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.dao.repo;
 
 import org.junit.Test;
 
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -10,95 +11,12 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
-public abstract class PhotoRepositoryTest {
+public abstract class PhotoRepositoryTest extends PhotoProviderTest {
 
     protected abstract PhotoRepository getObject();
     protected abstract Context getContext();
 
-    @Test
-    public void check_nonExisting_returnsNull() throws PersistenceException {
-        PhotoRepository object = getObject();
-        Path file = getContext().getFile1();
-
-        PhotoInfo info = object.check(file);
-        assertNull(info);
-    }
-
-    @Test
-    public void check_existing_returnsNotNull() throws PersistenceException {
-        PhotoRepository object = getObject();
-        Path file = getContext().getFile1();
-        object.create(file, getContext().getStream1());
-
-        PhotoInfo info = object.check(file);
-        assertNotNull(info);
-    }
-
-    @Test
-    public void checkAll_nothingAdded_empty() throws PersistenceException {
-        PhotoRepository object = getObject();
-
-        assertTrue(object.checkAll().isEmpty());
-    }
-
-    @Test
-    public void checkAll_someExisting_returnsInfos() throws PersistenceException {
-        PhotoRepository object = getObject();
-        Path file1 = getContext().getFile1();
-        Path file2 = getContext().getFile2();
-        object.create(file1, getContext().getStream1());
-        object.create(file2, getContext().getStream2());
-
-        Collection<Path> files = object.checkAll().stream()
-                .map(PhotoInfo::getFile)
-                .collect(Collectors.toList());
-        assertEquals(2, files.size());
-        assertTrue(files.contains(file1));
-        assertTrue(files.contains(file2));
-    }
-
-    @Test(expected = PhotoNotFoundException.class)
-    public void read_nonExisting_throws() throws PersistenceException {
-        PhotoRepository object = getObject();
-        Path file = getContext().getFile1();
-
-        object.read(file);
-    }
-
-    @Test
-    public void read_existing_returnsPhoto() throws PersistenceException {
-        PhotoRepository object = getObject();
-        Path file = getContext().getFile1();
-        object.create(file, getContext().getStream1());
-
-        Photo photo = getContext().getPhoto1();
-        assertEquals(photo, object.read(file));
-    }
-
-    @Test
-    public void readAll_nothingAdded_empty() throws PersistenceException {
-        PhotoRepository object = getObject();
-
-        assertTrue(object.readAll().isEmpty());
-    }
-
-    @Test
-    public void readAll_someExisting_returnsPhotos() throws PersistenceException {
-        PhotoRepository object = getObject();
-        Path file1 = getContext().getFile1();
-        Path file2 = getContext().getFile2();
-        Photo photo1 = getContext().getPhoto1();
-        Photo photo2 = getContext().getPhoto2();
-        object.create(file1, getContext().getStream1());
-        object.create(file2, getContext().getStream2());
-
-        Collection<Photo> photos = object.readAll();
-        assertEquals(2, photos.size());
-        assertTrue(photos.contains(photo1));
-        assertTrue(photos.contains(photo2));
-    }
-
-    @Test(expected = PhotoNotFoundException.class)
+    @Test(expected = PersistenceException.class)
     public void create_invalidPath_throws() throws PersistenceException {
         PhotoRepository object = getObject();
         Path file = Paths.get("X:/yz");
@@ -142,7 +60,7 @@ public abstract class PhotoRepositoryTest {
         object.create(file, getContext().getStream1());
         MockListener listener = new MockListener();
         object.addListener(listener);
-        Photo modified = getContext().getPhoto1Modified();
+        Photo modified = getContext().getModified1();
 
         object.update(modified);
 
@@ -167,7 +85,7 @@ public abstract class PhotoRepositoryTest {
         PhotoRepository object = getObject();
         Path file = getContext().getFile1();
         object.create(file, getContext().getStream1());
-        Photo modified = getContext().getPhoto1Modified();
+        Photo modified = getContext().getModified1();
 
         object.update(modified);
         assertEquals(modified, object.read(file));
@@ -179,7 +97,7 @@ public abstract class PhotoRepositoryTest {
         Path file = getContext().getFile1();
         object.create(file, getContext().getStream1());
         LocalDateTime now = LocalDateTime.now();
-        Photo modified = getContext().getPhoto1Modified();
+        Photo modified = getContext().getModified1();
 
         object.update(modified);
         assertTrue(!object.check(file).getModified().isBefore(now));
@@ -217,7 +135,7 @@ public abstract class PhotoRepositoryTest {
         object.create(file, getContext().getStream1());
 
         object.delete(file);
-        assertNull(object.check(file));
+        assertFalse(object.contains(file));
     }
 
     @Test
@@ -244,7 +162,7 @@ public abstract class PhotoRepositoryTest {
         MockListener listener = new MockListener();
         object.addListener(listener);
         Path file = getContext().getFile1();
-        Photo modified = getContext().getPhoto1Modified();
+        Photo modified = getContext().getModified1();
 
         object.removeListener(listener);
         object.create(file, getContext().getStream1());
@@ -255,5 +173,53 @@ public abstract class PhotoRepositoryTest {
         assertTrue(listener.getUpdateNotifications().isEmpty());
         assertTrue(listener.getDeleteNotifications().isEmpty());
         assertTrue(listener.getErrorNotifications().isEmpty());
+    }
+
+    public abstract class Context extends PhotoProviderTest.Context {
+
+        public InputStream getStream(Photo photo) {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            try {
+                update(photo, output);
+                byte[] data = output.toByteArray();
+                ByteArrayInputStream input = new ByteArrayInputStream(data);
+                return input;
+            } catch (IOException ex) {
+                // This kind of stream should not throw that.
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public InputStream getStream1() {
+            return new ByteArrayInputStream(new byte[] { 1 });
+        }
+
+        public InputStream getStream2() {
+            return new ByteArrayInputStream(new byte[] { 2 });
+        }
+
+        public Photo read(Path file, InputStream stream) throws IOException {
+            int index = stream.read();
+            switch (index) {
+                case 1 : return applyData1(new Photo(file));
+                case 2 : return applyData2(new Photo(file));
+                default : throw new IOException("Invalid format.");
+            }
+        }
+
+        public void update(Photo photo, OutputStream stream) throws IOException {
+            // Just use the rating to map photo to stream content.
+            switch (photo.getRating()) {
+                case GOOD :
+                    stream.write(1);
+                    break;
+                case NEUTRAL :
+                    stream.write(2);
+                    break;
+                default :
+                    stream.write(0);
+                    break;
+            }
+        }
     }
 }
