@@ -162,4 +162,54 @@ public class TagServiceImpl implements TagService {
         LOGGER.debug("Leaving getTagsForPhoto with {}", photo);
         return tagList;
     }
+
+    @Override public List<Tag> getMostWanted(List<Photo> l) throws ServiceException {
+        LOGGER.debug("Entering getMostWanted with{}",l);
+        HashMap<Tag, Integer> tagcounter = new HashMap<>();
+        for (Photo p : l) {
+            for (Tag t : p.getTags()) {
+                if (tagcounter.size() == 0) {
+                    tagcounter.put(t, 1);
+                } else {
+                    boolean neu = true;
+                    for (Tag ta : tagcounter.keySet()) {
+                        if (ta.getId() == t.getId()) {
+                            tagcounter.replace(ta, tagcounter.get(ta), tagcounter.get(ta) + 1);
+                            neu = false;
+                        }
+                    }
+                    if (neu)
+                        tagcounter.put(t, 1);
+
+                }
+            }
+        }
+        LOGGER.debug("Count Tags per Photo",tagcounter);
+        List<Tag> returnList = new ArrayList<>();
+
+        for (int i = 0; i < 5; i++) {
+            Tag tag = null;
+            if (tagcounter.size() != 0) {
+                for (Tag t : tagcounter.keySet()) {
+                    if (tag == null) {
+                        tag = t;
+                    } else {
+                        if (tagcounter.get(tag) < tagcounter.get(t)) {
+                            tag = t;
+                        }
+                    }
+                }
+                returnList.add(tag);
+                tagcounter.remove(tag);
+            }
+        }
+
+        if(returnList.size()==0){
+            throw  new ServiceException("No Tags found");
+        }
+        LOGGER.debug("Leaving getMostWanted {}");
+        return returnList;
+
+    }
+
 }

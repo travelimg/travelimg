@@ -21,6 +21,8 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+        import static org.junit.Assert.assertTrue;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
@@ -102,13 +104,9 @@ public class TagTest {
     }
 
     @Test
-    @WithData
-    public void test_get_all_tags() throws ServiceException {
-        assertThat(tagService.getAllTags(), containsInAnyOrder(
-                new Tag(1, "Person"),
-                new Tag(2, "Essen"),
-                new Tag(3, "Natur")
-        ));
+    @WithData public void test_get_all_tags() throws ServiceException {
+        assertThat(tagService.getAllTags(), containsInAnyOrder(new Tag(1, "Person"),
+                new Tag(2, "Essen"), new Tag(3, "Natur")));
     }
 
     @Test(expected = ServiceException.class)
@@ -211,6 +209,42 @@ public class TagTest {
         // assert that p2 was not affected
         assertThat(getTags(p2), equalTo(toList(t2)));
     }
+    @Test
+    @WithData
+    public void test_getMostWantet() throws  ServiceException{
+        Photo p0 = getPhoto(0);
+        Photo p1 = getPhoto(1);
+        Photo p2 = getPhoto(2);
+
+        Tag t0 = tagService.getAllTags().get(0);
+        Tag t1 = tagService.getAllTags().get(1);
+        Tag t2 = tagService.getAllTags().get(2);
+        Tag t4 = new Tag(4, "Test");
+        Tag t5 = new Tag(5, "test2");
+        Tag t6 = new Tag(6, "test3");
+        Tag t7 = new Tag(7,"test4");
+        tagService.create(t4);
+        tagService.create(t5);
+        tagService.create(t6);
+        tagService.create(t7);
+        tagService.addTagToPhotos(toList(p0, p1), t0);
+        tagService.addTagToPhotos(toList(p1, p0), t1);
+        tagService.addTagToPhotos(toList(p2, p1), t2);
+        tagService.addTagToPhotos(toList(p0, p2), t4);
+        tagService.addTagToPhotos(toList(p0, p1, p2), t5);
+        tagService.addTagToPhotos(toList(p1), t6);
+        List<Tag> liste = tagService.getMostWanted(toList(p0,p1,p2));
+        assertTrue(liste.size()<6);
+
+        assertTrue(liste.contains(t0));
+        assertTrue(liste.contains(t1));
+        assertTrue(liste.contains(t2));
+        assertTrue(liste.contains(t4));
+        assertTrue(liste.contains(t5));
+        assertFalse(liste.contains(t6));
+
+    }
+
 
     @Test
     @WithData
