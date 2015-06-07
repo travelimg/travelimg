@@ -39,6 +39,17 @@ public class ClusterServiceImpl implements ClusterService {
         }
     }
 
+    @Override
+    public List<Place> getPlacesByJourney(Journey journey) throws ServiceException {
+        try {
+            return placeDAO.readByJourney(journey);
+        } catch (DAOException e) {
+            throw new ServiceException("Failed to get places", e);
+        } catch (ValidationException e) {
+            throw new ServiceException("Failed to validate journey id", e);
+        }
+    }
+
     @Override public void addPlace(Place place) throws ServiceException {
         try {
             placeDAO.create(place);
@@ -71,6 +82,9 @@ public class ClusterServiceImpl implements ClusterService {
             if (Math.abs(element.getLatitude() - latitude) > 1
                     && Math.abs(element.getLongitude() - longitude) > 1) {
                 place = geoService.getPlaceByGeoData(element.getLatitude(), element.getLongitude());
+                place.setLatitude(element.getLatitude());
+                place.setLongitude(element.getLongitude());
+                place.setJourney(journey);
                 logger.debug("New place-cluster: " + place.getId() + " " + place.getCity());
                 addPlace(place);
             }

@@ -7,6 +7,8 @@ import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -23,8 +26,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class) @ContextConfiguration("classpath:test-config.xml") @TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true) public class ExifServiceTest {
     private static final Logger logger = LogManager.getLogger(ClusterServiceTest.class);

@@ -16,6 +16,14 @@ public interface ClusterService {
     List<Journey> getAllJourneys() throws ServiceException;
 
     /**
+     * Read and return places of a journey.
+     * @param journey the journey containing its id.
+     * @return the places
+     * @throws ServiceException propagates DAOExceptions
+     */
+    List<Place> getPlacesByJourney(Journey journey) throws ServiceException;
+
+    /**
      * Adds a new place to the datastore.
      *
      * @param place Place to be created in the datastore.

@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.dao;
 
+import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 
@@ -50,4 +51,13 @@ public interface PlaceDAO {
      * @throws ValidationException If the id is invalid.
      */
     Place getById(int id) throws DAOException, ValidationException;
+
+    /**
+     * Retrieve places of a journey
+     * @param  journey The journey containing the id
+     * @return Returns the places
+     * @throws DAOException If the data store fails to deliver the records.
+     * @throws ValidationException If the id is invalid.
+     */
+    public List<Place> readByJourney(Journey journey) throws DAOException, ValidationException;
 }
