@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class PaginatedImageGrid extends Pagination {
 
@@ -75,9 +76,17 @@ public class PaginatedImageGrid extends Pagination {
      * @param photo The photo to be added
      */
     public void addPhoto(Photo photo) {
-        // TODO: insert photo in correct order in this.photo (sorted by time)
-        // and invalidate the cache
-        LOGGER.error("Not implemented addPhoto");
+        photos.add(photo);
+
+        photos = photos.stream()
+                .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
+                .collect(Collectors.toList());
+
+        pageCache.clear();
+
+        // force relayout
+        setPageCount(calculatePageCount() + 1);
+        setPageCount(calculatePageCount());
     }
 
     public void setSelectionChangeAction(Consumer<Set<Photo>> selectionChangeAction) {
