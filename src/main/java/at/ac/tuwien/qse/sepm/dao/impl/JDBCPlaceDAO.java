@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PlaceDAO;
+import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.validators.PlaceValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
@@ -22,6 +23,7 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
     private static final String readAllStatement = "SELECT id, city, country FROM PLACE;";
     private static final String deleteStatement = "DELETE FROM PLACE WHERE id=?;";
     private static final String updateStatement = "UPDATE PLACE SET city = ?, country = ? WHERE id = ?";
+    private static final String readByJourneyStatement = "SELECT id, city, country, latitude, longitude FROM PLACE WHERE journey_id=?;";
     private SimpleJdbcInsert insertPlace;
 
     @Override @Autowired public void setDataSource(DataSource dataSource) {
@@ -115,6 +117,27 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
                                 throws SQLException {
                             return new Place(id, resultSet.getString(1),
                                     resultSet.getString(2));
+                        }
+                    });
+        } catch (DataAccessException ex) {
+            logger.error("Failed to read a Place", ex);
+            throw new DAOException("Failed to read a Place", ex);
+        }
+    }
+
+    @Override public List<Place> readByJourney(Journey journey) throws DAOException, ValidationException {
+        logger.debug("readByJourney ", journey.getId());
+
+        try {
+            return this.jdbcTemplate.query(
+                    readByJourneyStatement,
+                    new Object[]{journey.getId()},
+                    new RowMapper<Place>() {
+                        public Place mapRow(ResultSet rs, int rowNum) throws SQLException {
+                            Place place = new Place(rs.getInt(1),rs.getString(2),rs.getString(3));
+                            place.setLatitude(rs.getDouble(4));
+                            place.setLongitude(rs.getDouble(5));
+                            return place;
                         }
                     });
         } catch (DataAccessException ex) {
