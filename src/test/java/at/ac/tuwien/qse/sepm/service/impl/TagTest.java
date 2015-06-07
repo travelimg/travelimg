@@ -258,14 +258,10 @@ public class TagTest {
                 tagService.removeTagFromPhotos(toList(p0),t);
             }
         }
-<<<<<<< HEAD
+        
         List<Tag> liste = tagService.getMostFrequentTags(toList(p0));
     }
 
-=======
-        List<Tag> liste = tagService.getMostWanted(toList(p0));
-    }
->>>>>>> modify getMostWanted() in TagServiceImpl.java; create new test test_getMostWantetWithNoTags() in TagTest.java
     @Test
     @WithData
     public void test_no_tags_available_for_photos() throws ServiceException {
