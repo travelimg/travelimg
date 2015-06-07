@@ -148,7 +148,7 @@ public class HighlightsViewController {
      * generate for every Tag(only 5) a TitlePane and fill the pane with the right Fotos
      * add every TitlePane to the GUI
      */
-    private void H{
+    private void reloadImages(){
 
         try{
 
