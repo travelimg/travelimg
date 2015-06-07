@@ -306,7 +306,6 @@ public class Inspector {
             boolean updateNeeded = false;
 
             while(change.next()) {
-
                 if (change.wasAdded()) {
                     Tag added = change.getAddedSubList().get(0);
                     try {
