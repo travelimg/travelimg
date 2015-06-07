@@ -11,9 +11,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class TagServiceImpl implements TagService {
 
@@ -84,44 +83,25 @@ public class TagServiceImpl implements TagService {
         }
     }
 
-    @Override public List<Tag> getMostWantet(List<Photo> l) throws ServiceException {
-        HashMap<Tag,Integer> tagcounter = new HashMap<>();
-        for(Photo p: l){
-            for(Tag t: p.getTags()){
+    @Override public List<Tag> getMostFrequentTags(List<Photo> photos) throws ServiceException {
+        HashMap<Tag, Integer> counter = new HashMap<>();
 
-                if(tagcounter.size()==0){
-                    tagcounter.put(t,1);
-                }else{
-                    boolean neu = true;
-                    for(Tag ta:tagcounter.keySet()){
-                        if(ta.getId() == t.getId()){
-                            tagcounter.replace(ta,tagcounter.get(ta),tagcounter.get(ta)+1);
-                            neu = false;
-                        }
-                    }
-                    if(neu) tagcounter.put(t,1);
+        // count the frequency of each tag
+        for (Photo photo: photos) {
+            for (Tag tag: photo.getTags()) {
+                if (counter.containsKey(tag)) {
+                    counter.put(tag, counter.get(tag) + 1);
+                } else {
+                    counter.put(tag, 1);
                 }
             }
         }
 
-        List<Tag> returnList = new ArrayList<>();
-        for( int i =0; i<5; i++) {
-            Tag tag = null;
-            if (tagcounter.size() != 0) {
-                for (Tag t : tagcounter.keySet()) {
-                    if (tag == null) {
-                        tag = t;
-                    } else {
-                        if (tagcounter.get(tag) < tagcounter.get(t)) {
-                            tag = t;
-                        }
-                    }
-                }
-                returnList.add(tag);
-                tagcounter.remove(tag);
-
-            }
-        }
-        return returnList;
+        // return the most frequent tags
+        return counter.entrySet().stream()
+                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                .limit(5)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 }
