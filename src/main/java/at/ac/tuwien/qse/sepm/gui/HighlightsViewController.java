@@ -55,7 +55,6 @@ public class HighlightsViewController {
     private static final Logger LOGGER = LogManager.getLogger();
 
     public void initialize(){
-        reloadJourneys();
         /**to remove - BEGIN**/
         HBox vBox = new HBox();
         Button playButton = new Button("play!");
@@ -115,7 +114,10 @@ public class HighlightsViewController {
         LOGGER.debug("Selected journey {}",j.getName());
         try {
             places = clusterService.getPlacesByJourney(j);
-            drawDestinationsAsPolyline(toLatLong(places));
+            if(places.size()>0){
+                drawDestinationsAsPolyline(toLatLong(places));
+            }
+
         } catch (ServiceException e1) {
 
         }

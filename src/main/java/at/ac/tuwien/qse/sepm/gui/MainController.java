@@ -50,6 +50,7 @@ public class MainController {
                         }
                         if(t.equals(highlights) && !mapInitialized){
                             highlightsViewController.setMap(new GoogleMapsScene());
+                            highlightsViewController.reloadJourneys();
                             mapInitialized = true;
                         }
                     }

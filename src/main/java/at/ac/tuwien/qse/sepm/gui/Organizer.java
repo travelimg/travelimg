@@ -177,7 +177,6 @@ public class Organizer {
         filter.getIncludedJourneys().clear();
         filter.getIncludedJourneys().addAll(values);
         handleFilterChange();
-        highlightsViewController.reloadJourneys();
     }
     private void handleMonthsChange(List<YearMonth> values) {
         LOGGER.debug("month filter changed");
