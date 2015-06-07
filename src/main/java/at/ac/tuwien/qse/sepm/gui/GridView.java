@@ -18,7 +18,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -124,6 +123,8 @@ public class GridView {
         // queue an update in the main gui
         Platform.runLater(() -> {
             disableReload = true;
+
+            organizer.addPlace(photo.getPlace());
 
             // Ignore photos that are not part of the current filter.
             if (!filter.test(photo)) {

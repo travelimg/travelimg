@@ -86,6 +86,14 @@ public class Organizer {
         return filter;
     }
 
+    public void addPlace(Place place) {
+        List<Place> places = placeListView.getValues();
+        places.add(place);
+
+        placeListView.setValues(places);
+        placeListView.checkAll();
+    }
+
 
     @FXML
     private void initialize() {
