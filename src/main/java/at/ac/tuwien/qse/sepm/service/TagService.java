@@ -77,4 +77,9 @@ public interface TagService extends Service {
      * @throws ServiceException         if an exception occurs on this or an underlying layer
      */
     List<Tag> getTagsForPhoto(Photo photo) throws ServiceException;
+    /**  * Returns a list of the most used Tags,from a list of photos 
+     * * @param l the list of photos  * @return a list of tag s , (the hot 5) 
+     * * @throws ServiceException if retrieval failed 
+     * */
+    List<Tag> getMostWanted(List <Photo> l) throws ServiceException;
 }
