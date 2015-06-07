@@ -3,7 +3,7 @@ package at.ac.tuwien.qse.sepm.gui;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.Tag;
-import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -187,11 +187,7 @@ public class Organizer {
             return list;
         } catch (ServiceException ex) {
             LOGGER.error("fetching categories failed", ex);
-            InfoDialog dialog = new InfoDialog(root, "Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Fehler beim Laden");
-            dialog.setContentText("Foto-Kategorien konnten nicht geladen werden.");
-            dialog.showAndWait();
+            ErrorDialog.show(root, "Fehler beim Laden", "Foto-Kategorien konnten nicht geladen werden.");
             return new ArrayList<>();
         }
     }
@@ -203,11 +199,7 @@ public class Organizer {
             return list;
         } catch (ServiceException ex) {
             LOGGER.error("fetching photographers failed", ex);
-            InfoDialog dialog = new InfoDialog(root, "Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Fehler beim Laden");
-            dialog.setContentText("Fotografen konnten nicht geladen werden.");
-            dialog.showAndWait();
+            ErrorDialog.show(root, "Fehler beim Laden", "Fotografen konnten nicht geladen werden.");
             return new ArrayList<>();
         }
     }
@@ -222,11 +214,7 @@ public class Organizer {
             return list;
         } catch (ServiceException ex) {
             LOGGER.error("fetching months\" failed", ex);
-            InfoDialog dialog = new InfoDialog(root, "Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Fehler beim Laden");
-            dialog.setContentText("Monate konnten nicht geladen werden.");
-            dialog.showAndWait();
+            ErrorDialog.show(root, "Fehler beim Laden", "Monate konnten nicht geladen werden.");
             return new ArrayList<>();
         }
     }
