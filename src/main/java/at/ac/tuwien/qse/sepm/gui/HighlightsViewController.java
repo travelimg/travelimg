@@ -57,7 +57,6 @@ public class HighlightsViewController {
     private ImageGrid grid;
     private int pos = 0;
     private static final Logger LOGGER = LogManager.getLogger();
-
     private ImageCache imageCache;
 
     @Autowired
@@ -100,6 +99,7 @@ public class HighlightsViewController {
 
     public void reloadJourneys(){
         journeyRadioButtonsHashMap.clear();
+        photoView.getChildren().clear();
         try {
             List<Journey> listOfJourneys = clusterService.getAllJourneys();
             if(listOfJourneys.size()>0){
@@ -162,59 +162,71 @@ public class HighlightsViewController {
      * generate for every Tag(only 5) a TitlePane and fill the pane with the right Fotos
      * add every TitlePane to the GUI
      */
-    private void reloadImages(){
-
-        try{
-
-            List<Photo> allPhotos = photoService.getAllPhotos(filter)
-                    .stream()
-                    .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
-                    .collect(Collectors.toList());
-            List<Photo> goodPhotos = new ArrayList<>();
-            for(Photo p : allPhotos){
-                if(p.getRating()==(Rating.GOOD)){
-                    goodPhotos.add(p);
-                }
+    public void reloadImages(){
+        boolean rbIsSet =false;
+        for(RadioButton r:journeyRadioButtonsHashMap.keySet()){
+            if(r.isSelected()){
+                System.out.println(journeyRadioButtonsHashMap.get(r).getName());
+                rbIsSet=true;
             }
-            if(goodPhotos.size()==0){
-                photoView.getChildren().clear();
-                Label lab = new Label();
-                lab.setText("Es sind kein mit 'good' bewerteten Fotos zu dieser Reise vorhanden");
-                photoView.getChildren().add(lab);
+        }
+        if(rbIsSet=true) {
+            try {
 
-            }else {
-                try {
-                    List<Tag> taglist = tagService.getMostFrequentTags(goodPhotos);
+                List<Photo> allPhotos = photoService.getAllPhotos(filter).stream()
+                        .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
+                        .collect(Collectors.toList());
+                List<Photo> goodPhotos = new ArrayList<>();
+                for (Photo p : allPhotos) {
+                    if (p.getRating() == (Rating.GOOD)) {
+                        goodPhotos.add(p);
+                    }
+                }
+                if (goodPhotos.size() == 0) {
                     photoView.getChildren().clear();
-                    for (Tag t : taglist) {
-                        List<Photo> name = new ArrayList<>();
-                        int counter = 0;
-                        for (Photo p : goodPhotos) {
-                            for (Tag t2 : p.getTags()) {
-                                if (t.getId() == t2.getId() && counter < 5) {
-                                    name.add(p);
-                                    counter++;
+                    Label lab = new Label();
+                    lab.setText("Es sind kein mit 'good' bewerteten Fotos zu dieser Reise vorhanden");
+                    photoView.getChildren().add(lab);
+
+                } else {
+                    try {
+                        List<Tag> taglist = tagService.getMostFrequentTags(goodPhotos);
+                        photoView.getChildren().clear();
+                        for (Tag t : taglist) {
+                            List<Photo> name = new ArrayList<>();
+                            int counter = 0;
+                            for (Photo p : goodPhotos) {
+                                for (Tag t2 : p.getTags()) {
+                                    if (t.getId() == t2.getId() && counter < 5) {
+                                        name.add(p);
+                                        counter++;
+                                    }
                                 }
                             }
+
+                            ImageGrid grid2 = new ImageGrid(imageCache);
+                            grid2.setPhotos(name);
+                            TitledPane tp = new TitledPane(t.getName(), grid2);
+
+                            photoView.getChildren().add(tp);
                         }
-
-                        ImageGrid grid2 = new ImageGrid(imageCache);
-                        grid2.setPhotos(name);
-                        TitledPane tp = new TitledPane(t.getName(), grid2);
-
-                        photoView.getChildren().add(tp);
+                    } catch (ServiceException e) {
+                        LOGGER.debug("Photos habe keine Tag's ", e);
+                        photoView.getChildren().clear();
+                        grid.setPhotos(goodPhotos);
+                        photoView.getChildren().add(grid);
                     }
-                } catch (ServiceException e) {
-                    LOGGER.debug("Photos habe keine Tag's ", e);
-                    photoView.getChildren().clear();
-                    grid.setPhotos(goodPhotos);
-                    photoView.getChildren().add(grid);
                 }
+            } catch (ServiceException e) {
+                photoView.getChildren().clear();
+                Label lab = new Label();
+                lab.setText("Keine Fotos vorhanden");
+                photoView.getChildren().add(lab);
             }
-            }catch (ServiceException e){
+        }else{
             photoView.getChildren().clear();
             Label lab = new Label();
-            lab.setText("Keine Fotos vorhanden");
+            lab.setText("Bitte eine Reise auswählen");
             photoView.getChildren().add(lab);
         }
     }
