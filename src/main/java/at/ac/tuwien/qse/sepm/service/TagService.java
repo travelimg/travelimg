@@ -48,9 +48,10 @@ public interface TagService extends Service {
 
     /**
      * Returns a list of the most used Tags, from a list of photos
-     * @param l the list of photos
-     * @return a list of tag s , (the hot 5)
+     *
+     * @param photos the list of photos
+     * @return a list of most used tags (at most 5)
      * @throws ServiceException if retrieval failed
      */
-    List<Tag> getMostWantet(List<Photo> l) throws ServiceException;
+    List<Tag> getMostFrequentTags(List<Photo> photos) throws ServiceException;
 }

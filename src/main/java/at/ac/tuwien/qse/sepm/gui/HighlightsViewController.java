@@ -160,7 +160,7 @@ public class HighlightsViewController {
                     goodPhotos.add(p);
                 }
             }
-            List<Tag> taglist = tagService.getMostWantet(goodPhotos);
+            List<Tag> taglist = tagService.getMostFrequentTags(goodPhotos);
             photoView.getChildren().clear();
             for(Tag t: taglist){
                 List<Photo> name = new ArrayList<>();
