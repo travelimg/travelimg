@@ -8,7 +8,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root minHeight="400" styleClass="dialog,import-dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root minHeight="300" styleClass="dialog,import-dialog" stylesheets="@style.css"
+         type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <BorderPane prefWidth="560.0">
             <top>
