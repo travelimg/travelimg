@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
-public class ImageGridPage extends ScrollableImageGrid {
+public class ImageGridPage extends ImageGrid {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
