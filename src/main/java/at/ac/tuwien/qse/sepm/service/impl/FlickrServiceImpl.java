@@ -180,7 +180,8 @@ public class FlickrServiceImpl implements FlickrService {
                 if (i == 0) {
                     SearchParameters searchParameters = new SearchParameters();
                     searchParameters.setTags(tags);
-                    logger.debug("Using for search tags {}",tags);
+
+                    logger.debug("Using for search tags {}", (Object[])tags);
                     if (useGeoData) {
                         logger.debug("Using for search latitude {} and longitude {}",latitude,longitude);
                         searchParameters.setLatitude(String.valueOf(latitude));

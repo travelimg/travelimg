@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -124,7 +123,7 @@ public class DropboxExportTest {
         assertThat(errorHandler.exceptionOccured(), is(false));
 
         // ensure all photos were uploaded
-        assertEquals(photos.size(), uploaded.size());
+        assertThat(photos.size(), is(uploaded.size()));
 
         // expected source paths is current path in travelimg directory
         List<Path> expectedSourcePaths = photos.stream()
@@ -139,7 +138,7 @@ public class DropboxExportTest {
         List<Pair<Path, Path>> copyOperations = ioHandler.copiedFiles;
 
         // ensure photos were copied to dropbox folder
-        assertEquals(photos.size(), copyOperations.size());
+        assertThat(photos.size(), is(copyOperations.size()));
         
         for(Pair<Path, Path> copyOp : copyOperations) {
             Path source = copyOp.getKey();
