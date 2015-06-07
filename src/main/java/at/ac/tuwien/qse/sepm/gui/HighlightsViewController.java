@@ -103,7 +103,9 @@ public class HighlightsViewController {
                 journeyRadioButtonsHashMap.put(rb,j);
             }
         } catch (ServiceException e) {
-
+            Label lab = new Label();
+            lab.setText("keine Reisen vorhanden");
+            journeys.getChildren().add(lab);
         }
     }
 
@@ -146,7 +148,7 @@ public class HighlightsViewController {
      * generate for every Tag(only 5) a TitlePane and fill the pane with the right Fotos
      * add every TitlePane to the GUI
      */
-    private void reloadImages(){
+    private void H{
 
         try{
 
@@ -160,28 +162,45 @@ public class HighlightsViewController {
                     goodPhotos.add(p);
                 }
             }
-            List<Tag> taglist = tagService.getMostFrequentTags(goodPhotos);
-            photoView.getChildren().clear();
-            for(Tag t: taglist){
-                List<Photo> name = new ArrayList<>();
-                int counter =0;
-                for(Photo p:goodPhotos){
-                    for(Tag t2 : p.getTags()){
-                        if(t.getId()==t2.getId() && counter <5){
-                            name.add(p);
-                            counter++;
+            if(goodPhotos.size()==0){
+                photoView.getChildren().clear();
+                Label lab = new Label();
+                lab.setText("Es sind kein mit 'good' bewerteten Fotos zu dieser Reise vorhanden");
+                photoView.getChildren().add(lab);
+
+            }else {
+                try {
+                    List<Tag> taglist = tagService.getMostFrequentTags(goodPhotos);
+                    photoView.getChildren().clear();
+                    for (Tag t : taglist) {
+                        List<Photo> name = new ArrayList<>();
+                        int counter = 0;
+                        for (Photo p : goodPhotos) {
+                            for (Tag t2 : p.getTags()) {
+                                if (t.getId() == t2.getId() && counter < 5) {
+                                    name.add(p);
+                                    counter++;
+                                }
+                            }
                         }
+                        ImageGrid<Photo> grid2 = new ImageGrid<>(PhotoGridTile::new);
+                        grid2.setItems(name);
+                        TitledPane tp = new TitledPane(t.getName(), grid2);
+
+                        photoView.getChildren().add(tp);
                     }
+                } catch (ServiceException e) {
+                    LOGGER.debug("Photos habe keine Tag's ", e);
+                    photoView.getChildren().clear();
+                    grid.setItems(goodPhotos);
+                    photoView.getChildren().add(grid);
                 }
-                ImageGrid<Photo> grid2 = new ImageGrid<>(PhotoGridTile::new);
-                grid2.setItems(name);
-                TitledPane tp = new TitledPane(t.getName(),grid2);
-
-                photoView.getChildren().add(tp);
             }
-
-        }catch (ServiceException e){
-            //TODO Exceptionhandling
+            }catch (ServiceException e){
+            photoView.getChildren().clear();
+            Label lab = new Label();
+            lab.setText("Keine Fotos vorhanden");
+            photoView.getChildren().add(lab);
         }
     }
 

@@ -96,7 +96,9 @@ public class TagServiceImpl implements TagService {
                 }
             }
         }
-
+        if(counter.size()==0){
+            throw  new ServiceException("Keine Tags vorhanden");
+        }
         // return the most frequent tags
         return counter.entrySet().stream()
                 .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
