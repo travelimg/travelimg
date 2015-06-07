@@ -1,5 +1,6 @@
-package at.ac.tuwien.qse.sepm.gui;
+package at.ac.tuwien.qse.sepm.gui.grid;
 
+import at.ac.tuwien.qse.sepm.entities.Photo;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -10,7 +11,7 @@ import javafx.scene.layout.StackPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public abstract class ImageGridTile<E> extends StackPane {
+public abstract class ImageGridTile extends StackPane {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int IMG_SIZE = 200;
@@ -21,7 +22,7 @@ public abstract class ImageGridTile<E> extends StackPane {
 
     private Image image = null;
     private boolean selected = false;
-    private E item = null;
+    private Photo photo = null;
 
     public ImageGridTile() {
         getStyleClass().add("image-tile");
@@ -41,20 +42,31 @@ public abstract class ImageGridTile<E> extends StackPane {
     }
 
     /**
-     * Set the item this tile represents.
+     * Set the photo this tile represents.
      *
-     * @param item item this tile represents, or null
+     * @param photo photo this tile represents, or null
      */
-    public void setItem(E item) {
-        this.item = item;
-        if (item == null) indicateLoading();
+    public void setPhoto(Photo photo, Image image) {
+        Photo oldPhoto = getPhoto();
+
+        this.photo = photo;
+        this.image = image;
+        if (photo == null) {
+            indicateLoading();
+            return;
+        }
+
+        // Only reload image if necessary.
+        if (oldPhoto == null || !photo.getPath().equals(oldPhoto.getPath())) {
+            loadImage(image);
+        }
     }
 
     /**
-     * @return item this tile represents, or null
+     * @return photo this tile represents, or null
      */
-    public E getItem() {
-        return item;
+    public Photo getPhoto() {
+        return photo;
     }
 
     /**
@@ -102,21 +114,23 @@ public abstract class ImageGridTile<E> extends StackPane {
     }
 
     /**
-     * Loads an image to be displayed in the tile. The image is loaded in the background, so it does
-     * not block the GUI.
+     * Display an image in the tile
      *
-     * @param url URL of the image
+     * @param image The image to be loaded
      */
-    protected void loadImage(String url) {
+    protected void loadImage(Image image) {
         indicateLoading();
-        image = new Image(url, imageView.getFitWidth(), imageView.getFitHeight(), false, true, true);
+
         imageView.setImage(image);
         image.progressProperty().addListener((observable, oldValue, newValue) -> {
-            // Image is fully loaded.
-            if (newValue.doubleValue() == 1.0) {
-                indicateLoaded();
-            }
+                // Image is fully loaded.
+                if (newValue.doubleValue() == 1.0) {
+                    indicateLoaded();
+                }
         });
+
+        if(image.getProgress() == 1.0)
+            indicateLoaded();
     }
 
     private void indicateLoading() {
