@@ -47,15 +47,6 @@ public interface TagService extends Service {
     List<Tag> getAllTags() throws ServiceException;
 
     /**
-     * Returns a list of the most used Tags, from a list of photos
-     *
-     * @param photos the list of photos
-     * @return a list of most used tags (at most 5)
-     * @throws ServiceException if retrieval failed
-     */
-    List<Tag> getMostFrequentTags(List<Photo> photos) throws ServiceException;
-
-    /**
      * Add Tag <tt>tag</tt> to every photo in list <tt>photos</tt>. If a photo already has this tag,
      * then it will keep it.
      *
@@ -86,4 +77,13 @@ public interface TagService extends Service {
      * @throws ServiceException         if an exception occurs on this or an underlying layer
      */
     List<Tag> getTagsForPhoto(Photo photo) throws ServiceException;
+
+    /**
+     * Returns a list of the most used Tags, from a list of photos
+     *
+     * @param photos the list of photos
+     * @return a list of most used tags (at most 5)
+     * @throws ServiceException if retrieval failed
+     */
+    List<Tag> getMostFrequentTags(List <Photo> photos) throws ServiceException;
 }

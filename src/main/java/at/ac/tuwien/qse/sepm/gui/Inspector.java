@@ -303,6 +303,7 @@ public class Inspector {
     private class TagListChangeListener implements ListChangeListener<Tag> {
 
         public void onChanged(ListChangeListener.Change<? extends Tag> change) {
+
             boolean updateNeeded = false;
 
             while(change.next()) {

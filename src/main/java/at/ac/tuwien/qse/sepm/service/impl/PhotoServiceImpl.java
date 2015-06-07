@@ -4,7 +4,6 @@ import at.ac.tuwien.qse.sepm.dao.*;
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
-import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
@@ -57,6 +56,7 @@ public class PhotoServiceImpl implements PhotoService {
         }
     }
 
+
     @Override public void editPhotos(List<Photo> photos, Photo photo) throws ServiceException {
         if (photos == null) {
             throw new ServiceException("List<Photo> photos is null");
@@ -75,7 +75,8 @@ public class PhotoServiceImpl implements PhotoService {
         }
     }
 
-    @Override public List<Photo> getAllPhotos() throws ServiceException {
+    @Override
+    public List<Photo> getAllPhotos() throws ServiceException {
         LOGGER.debug("Retrieving all photos...");
         try {
             return photoDAO.readAll();
@@ -84,9 +85,13 @@ public class PhotoServiceImpl implements PhotoService {
         }
     }
 
-    @Override public List<Photo> getAllPhotos(Predicate<Photo> filter) throws ServiceException {
+    @Override
+    public List<Photo> getAllPhotos(Predicate<Photo> filter) throws ServiceException {
         LOGGER.debug("Entering getAllPhotos with {}", filter);
-        return getAllPhotos().stream().filter(filter).collect(Collectors.toList());
+        return getAllPhotos()
+                .stream()
+                .filter(filter)
+                .collect(Collectors.toList());
     }
 
     @Override public void savePhotoRating(Photo photo) throws ServiceException {
