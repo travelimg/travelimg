@@ -15,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.YearMonth;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 

@@ -99,10 +99,10 @@ public class ExifServiceImpl implements ExifService {
         try {
             ImageMetadata metadata = Imaging.getMetadata(file);
 
-            if(datetime == null)
+            if (datetime == null)
                 datetime = getDateTime(metadata);
 
-            if(Double.compare(latitude, 0.0) == 0 || Double.compare(longitude, 0.0) == 0) {
+            if (Double.compare(latitude, 0.0) == 0 || Double.compare(longitude, 0.0) == 0) {
                 final TiffImageMetadata.GPSInfo gpsInfo = ((JpegImageMetadata)metadata).getExif().getGPS();
                 if (null != gpsInfo) {
                     longitude = gpsInfo.getLongitudeAsDegreesEast();
@@ -114,7 +114,7 @@ public class ExifServiceImpl implements ExifService {
             LOGGER.debug("Error occurred attaching geodate and date", e);
         }
 
-        if(datetime == null)
+        if (datetime == null)
             datetime = LocalDateTime.MIN;
 
         photo.setDatetime(datetime);
@@ -126,7 +126,7 @@ public class ExifServiceImpl implements ExifService {
         if (metadata == null) return null;
 
         final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
-        if(jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL) != null) {
+        if (jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL) != null) {
             String tempDate = jpegMetadata
                     .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL)
                     .getValueDescription();
