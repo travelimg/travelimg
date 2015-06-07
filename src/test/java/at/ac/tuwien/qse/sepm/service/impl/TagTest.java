@@ -21,7 +21,6 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
@@ -106,13 +105,9 @@ public class TagTest {
     }
 
     @Test
-    @WithData
-    public void test_get_all_tags() throws ServiceException {
-        assertThat(tagService.getAllTags(), containsInAnyOrder(
-                new Tag(1, "Person"),
-                new Tag(2, "Essen"),
-                new Tag(3, "Natur")
-        ));
+    @WithData public void test_get_all_tags() throws ServiceException {
+        assertThat(tagService.getAllTags(), containsInAnyOrder(new Tag(1, "Person"),
+                new Tag(2, "Essen"), new Tag(3, "Natur")));
     }
 
     @Test(expected = ServiceException.class)
@@ -215,7 +210,6 @@ public class TagTest {
         // assert that p2 was not affected
         assertThat(getTags(p2), equalTo(toList(t2)));
     }
-
     @Test
     @WithData
     public void test_getMostWantet() throws  ServiceException{
@@ -241,7 +235,7 @@ public class TagTest {
         tagService.addTagToPhotos(toList(p0, p1, p2), t5);
         tagService.addTagToPhotos(toList(p1), t6);
         List<Tag> liste = tagService.getMostFrequentTags(toList(p0,p1,p2));
-        assertTrue(liste.size()<6);
+        assertTrue(liste.size() < 6);
 
         assertTrue(liste.contains(t0));
         assertTrue(liste.contains(t1));
