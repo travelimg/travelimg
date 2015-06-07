@@ -292,7 +292,7 @@ public class Inspector {
                 if (change.wasAdded()) {
                     Tag added = change.getAddedSubList().get(0);
                     try {
-                        photoservice.addTagToPhotos(activePhotos, added);
+                        tagService.addTagToPhotos(activePhotos, added);
                         onUpdate();
                     } catch (ServiceException ex) {
                         LOGGER.error("failed adding tag", ex);
@@ -302,7 +302,7 @@ public class Inspector {
                 if (change.wasRemoved()) {
                     Tag removed = change.getRemoved().get(0);
                     try {
-                        photoservice.removeTagFromPhotos(activePhotos, removed);
+                        tagService.removeTagFromPhotos(activePhotos, removed);
                         onUpdate();
                     } catch (ServiceException ex) {
                         LOGGER.error("failed removing tag", ex);
