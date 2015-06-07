@@ -1,9 +1,13 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.*;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.JourneyDialog;
-import at.ac.tuwien.qse.sepm.service.*;
+import at.ac.tuwien.qse.sepm.service.ClusterService;
+import at.ac.tuwien.qse.sepm.service.PhotographerService;
+import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.TagService;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -22,8 +26,6 @@ import java.util.function.Consumer;
 
 /**
  * Controller for organizer view which is used for browsing photos by month.
- *
- * TODO: Decide whether to call it Organizer or Browser or something else.
  */
 public class Organizer {
 
@@ -194,11 +196,7 @@ public class Organizer {
             return list;
         } catch (ServiceException ex) {
             LOGGER.error("fetching categories failed", ex);
-            InfoDialog dialog = new InfoDialog(root, "Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Fehler beim Laden");
-            dialog.setContentText("Foto-Kategorien konnten nicht geladen werden.");
-            dialog.showAndWait();
+            ErrorDialog.show(root, "Fehler beim Laden", "Foto-Kategorien konnten nicht geladen werden.");
             return new ArrayList<>();
         }
     }
@@ -210,11 +208,7 @@ public class Organizer {
             return list;
         } catch (ServiceException ex) {
             LOGGER.error("fetching photographers failed", ex);
-            InfoDialog dialog = new InfoDialog(root, "Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Fehler beim Laden");
-            dialog.setContentText("Fotografen konnten nicht geladen werden.");
-            dialog.showAndWait();
+            ErrorDialog.show(root, "Fehler beim Laden", "Fotografen konnten nicht geladen werden.");
             return new ArrayList<>();
         }
     }
@@ -244,11 +238,7 @@ public class Organizer {
             return list;
         } catch (ServiceException ex) {
             LOGGER.error("fetching journeys failed", ex);
-            InfoDialog dialog = new InfoDialog(root, "Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Fehler beim Laden");
-            dialog.setContentText("Reisen konnten nicht geladen werden.");
-            dialog.showAndWait();
+            ErrorDialog.show(root, "Fehler beim Laden", "Reisen konnten nicht geladen werden.");
             return new ArrayList<>();
         }
     }

@@ -88,11 +88,8 @@ public class PhotoServiceImpl implements PhotoService {
         return getAllPhotos().stream().filter(filter).collect(Collectors.toList());
     }
 
-    @Override public void requestFullscreenMode(List<Photo> photos) throws ServiceException {
-        //TODO
-    }
-
-    @Override public void addTagToPhotos(List<Photo> photos, Tag tag) throws ServiceException {
+    @Override
+    public void addTagToPhotos(List<Photo> photos, Tag tag) throws ServiceException {
         LOGGER.debug("Entering addTagToPhotos with {}, {}", photos, tag);
         if (photos == null) {
             throw new ServiceException("List<Photo> photos is null");

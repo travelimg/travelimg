@@ -50,7 +50,7 @@ public class FlickrServiceImpl implements FlickrService {
 
     @Override
     public Cancelable downloadPhotos(String tags[], double latitude, double longitude, boolean useGeoData, Consumer<at.ac.tuwien.qse.sepm.entities.Photo> callback,  Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler) throws ServiceException{
-        if(i==0){
+        if (i == 0) {
             downloader = new AsyncDownloader(tags, latitude, longitude, useGeoData, callback, progressCallback, errorHandler);
         }
         executorService.submit(downloader);
@@ -68,10 +68,10 @@ public class FlickrServiceImpl implements FlickrService {
         logger.debug("Shutting down executor...");
         executorService.shutdown();
         File directory = new File(tmpDir);
-        if(directory.exists()){
+        if (directory.exists()) {
             File[] files = directory.listFiles();
             logger.debug("Deleting photos from tmp folder...");
-            for(int i=0; i<files.length; i++) {
+            for (int i = 0; i < files.length; i++) {
                 files[i].delete();
             }
         }
@@ -130,7 +130,7 @@ public class FlickrServiceImpl implements FlickrService {
         at.ac.tuwien.qse.sepm.entities.Photo downloaded = new at.ac.tuwien.qse.sepm.entities.Photo();
         try {
             GeoData geoData = flickr.getPhotosInterface().getGeoInterface().getLocation(id);
-            downloaded.setPath(tmpDir+id+"."+format);
+            downloaded.setPath(tmpDir + id + "." + format);
             downloaded.setLatitude(geoData.getLatitude());
             downloaded.setLongitude(geoData.getLongitude());
             downloaded.setRating(Rating.NONE);
@@ -177,11 +177,11 @@ public class FlickrServiceImpl implements FlickrService {
         protected void execute() {
             Paths.get(tmpDir).toFile().mkdirs();
             try {
-                if(i==0){
+                if (i == 0) {
                     SearchParameters searchParameters = new SearchParameters();
                     searchParameters.setTags(tags);
                     logger.debug("Using for search tags {}",tags);
-                    if(useGeoData){
+                    if (useGeoData) {
                         logger.debug("Using for search latitude {} and longitude {}",latitude,longitude);
                         searchParameters.setLatitude(String.valueOf(latitude));
                         searchParameters.setLongitude(String.valueOf(longitude));
@@ -193,14 +193,14 @@ public class FlickrServiceImpl implements FlickrService {
                     logger.debug("Found {} photos.",list.size());
                 }
                 int nrOfDownloadedPhotos = 0;
-                if(list.size()-i<nrOfPhotosToDownload){
+                if (list.size() - i < nrOfPhotosToDownload) {
                     nrOfPhotosToDownload = list.size()-i;
                 }
                 logger.debug("Start downloading {} photos", nrOfPhotosToDownload);
                 for (;i<list.size();i++) {
 
                     Photo p = list.get(i);
-                    if(nrOfDownloadedPhotos==nrOfPhotosToDownload){
+                    if (nrOfDownloadedPhotos == nrOfPhotosToDownload) {
                         break;
                     }
                     if(!isRunning())
@@ -211,24 +211,20 @@ public class FlickrServiceImpl implements FlickrService {
                     String id = p.getId();
                     String originalSecret = flickr.getPhotosInterface().getInfo(p.getId(),p.getSecret()).getOriginalSecret();
                     String format = p.getOriginalFormat();
-                    String url = "https://farm"+farmId+".staticflickr.com/"+serverId+"/"+id+"_"+originalSecret+"_o."+format;
-                    if(!originalSecret.isEmpty()){
+                    String url = "https://farm" + farmId + ".staticflickr.com/" + serverId + "/" + id + "_" + originalSecret + "_o." + format;
+                    if (!originalSecret.isEmpty()) {
                         downloadPhotoFromFlickr(url,id,format,nrOfDownloadedPhotos,progressCallback);
                         at.ac.tuwien.qse.sepm.entities.Photo downloaded = createPhotoWithGeoData(id,format);
                         logger.debug("Downloaded photo {}",downloaded);
                         callback.accept(downloaded);
                         nrOfDownloadedPhotos++;
-                    }
-                    else{
+                    } else {
                         logger.debug("Can't get original secret for photo.");
                     }
                 }
                 progressCallback.accept(1.0);
 
-            } catch (FlickrException e) {
-                errorHandler.propagate(new ServiceException("Failed to download photo", e));
-                return;
-            } catch (ServiceException e) {
+            } catch (FlickrException | ServiceException e) {
                 errorHandler.propagate(new ServiceException("Failed to download photo", e));
             }
         }

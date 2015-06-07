@@ -1,12 +1,8 @@
 package at.ac.tuwien.qse.sepm.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
-import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -20,13 +16,16 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.CheckListView;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class TagSelector extends VBox {
 
@@ -64,11 +63,9 @@ public class TagSelector extends VBox {
     public void initializeTagList() {
         ObservableList<Tag> tagNames = FXCollections.observableArrayList();
         try {
-            for (Tag tag : tagService.getAllTags()) {
-                tagNames.add(tag);
-            }
+            tagNames.addAll(tagService.getAllTags());
         } catch (ServiceException ex) {
-            //TODO Dialog
+            ErrorDialog.show(getParent(), "Fehler beim Laden der Tags", "Fehlermeldung: " + ex.getMessage());
         }
         tagList.setItems(tagNames);
 
@@ -119,7 +116,7 @@ public class TagSelector extends VBox {
                 tagList.getCheckModel().check(tag);
             }
         } catch (ServiceException ex) {
-            //TODO Dialog
+            ErrorDialog.show(getParent(), "Fehler beim Laden von Tags", "Fehlermeldung: " + ex.getMessage());
         }
         tagList.getCheckModel().getCheckedItems().addListener(tagListChangeListener);
     }

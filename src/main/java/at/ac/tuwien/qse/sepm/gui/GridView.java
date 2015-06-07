@@ -1,9 +1,9 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.FlickrDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
-import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
@@ -106,13 +106,7 @@ public class GridView {
         LOGGER.error("import error", error);
 
         // queue an update in the main gui
-        Platform.runLater(() -> {
-            InfoDialog dialog = new InfoDialog(root, "Import Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Import fehlgeschlagen");
-            dialog.setContentText("Fehlermeldung: " + error.getMessage());
-            dialog.showAndWait();
-        });
+        Platform.runLater(() -> ErrorDialog.show(root, "Import fehlgeschlagen", "Fehlermeldung: " + error.getMessage()));
     }
 
     public void deletePhotos(){
@@ -155,15 +149,11 @@ public class GridView {
                     photoService.getAllPhotos(filter)
                     .stream()
                     .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
-                    .collect(Collectors.toList())
+                            .collect(Collectors.toList())
             );
         } catch (ServiceException ex) {
             LOGGER.error("failed loading fotos", ex);
-            InfoDialog dialog = new InfoDialog(root, "Lade Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Laden von Fotos fehlgeschlagen");
-            dialog.setContentText("Fehlermeldung: " + ex.getMessage());
-            dialog.showAndWait();
+            ErrorDialog.show(root, "Laden von Fotos fehlgeschlagen", "Fehlermeldung: " + ex.getMessage());
         }
     }
 }
