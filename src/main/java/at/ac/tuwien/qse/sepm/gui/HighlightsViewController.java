@@ -2,6 +2,9 @@ package at.ac.tuwien.qse.sepm.gui;
 
 
 import at.ac.tuwien.qse.sepm.entities.*;
+import at.ac.tuwien.qse.sepm.gui.grid.PhotoGridTile;
+import at.ac.tuwien.qse.sepm.gui.grid.ScrollableImageGrid;
+import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.ClusterService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -50,9 +53,17 @@ public class HighlightsViewController {
     private Marker actualMarker;
     private boolean disableReload = false;
     private Consumer<PhotoFilter> filterChangeCallback;
-    private final ImageGrid<Photo> grid = new ImageGrid<>(PhotoGridTile::new);
+    private ScrollableImageGrid grid;
     private int pos = 0;
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private ImageCache imageCache;
+
+    @Autowired
+    public void setImageCache(ImageCache imageCache) {
+        this.imageCache = imageCache;
+        this.grid = new ScrollableImageGrid(imageCache);
+    }
 
     public void initialize(){
         /**to remove - BEGIN**/
@@ -185,8 +196,9 @@ public class HighlightsViewController {
                                 }
                             }
                         }
-                        ImageGrid<Photo> grid2 = new ImageGrid<>(PhotoGridTile::new);
-                        grid2.setItems(name);
+
+                        ScrollableImageGrid grid2 = new ScrollableImageGrid(imageCache);
+                        grid2.setPhotos(name);
                         TitledPane tp = new TitledPane(t.getName(), grid2);
 
                         photoView.getChildren().add(tp);
@@ -194,7 +206,7 @@ public class HighlightsViewController {
                 } catch (ServiceException e) {
                     LOGGER.debug("Photos habe keine Tag's ", e);
                     photoView.getChildren().clear();
-                    grid.setItems(goodPhotos);
+                    grid.setPhotos(goodPhotos);
                     photoView.getChildren().add(grid);
                 }
             }
