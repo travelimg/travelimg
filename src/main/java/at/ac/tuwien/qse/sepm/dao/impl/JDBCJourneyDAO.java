@@ -115,14 +115,14 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         }
     }
 
-    @Override public Journey getByName(String name) throws DAOException, ValidationException {
-        logger.debug("getByName ", name);
-        if (name == null)
-            throw new ValidationException();
+    @Override public Journey getByID(int id) throws DAOException, ValidationException {
+        logger.debug("getByID()" + id);
+
+        JourneyValidator.validateID(id);
 
         try {
             return this.jdbcTemplate
-                    .queryForObject(readStatement, new Object[] { name }, new RowMapper<Journey>() {
+                    .queryForObject(readStatement, new Object[] { id }, new RowMapper<Journey>() {
 
                         @Override public Journey mapRow(ResultSet resultSet, int i)
                                 throws SQLException {

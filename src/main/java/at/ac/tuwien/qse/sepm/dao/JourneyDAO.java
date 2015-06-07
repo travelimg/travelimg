@@ -43,12 +43,12 @@ public interface JourneyDAO {
     List<Journey> readAll() throws DAOException;
 
     /**
-     * Retrive a journey by its name.
+     * Retrive a journey by its id.
      *
-     * @param name The name of the data store entry.
-     * @return Returns journey record with the given name.
+     * @param id The name of the data store entry.
+     * @return Returns journey record with the given id.
      * @throws DAOException        If the data store fails to deliver the record.
-     * @throws ValidationException If the name is null.
+     * @throws ValidationException If the id is invalid.
      */
-    Journey getByName(String name) throws DAOException, ValidationException;
+    Journey getByID(int id) throws DAOException, ValidationException;
 }

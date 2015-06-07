@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.JourneyDAO;
 import at.ac.tuwien.qse.sepm.dao.PlaceDAO;
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Place;
@@ -19,12 +20,14 @@ import java.util.List;
 import java.util.Map;
 
 public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
-    private static final String readStatement = "SELECT city, country FROM PLACE WHERE id=?;";
-    private static final String readAllStatement = "SELECT id, city, country FROM PLACE;";
+    private static final String readStatement = "SELECT city, country, latitude, longitude, journey_id FROM PLACE WHERE id=?;";
+    private static final String readAllStatement = "SELECT id, city, country, latitude, longitude, journey_id FROM PLACE;";
     private static final String deleteStatement = "DELETE FROM PLACE WHERE id=?;";
-    private static final String updateStatement = "UPDATE PLACE SET city = ?, country = ? WHERE id = ?";
+    private static final String updateStatement = "UPDATE PLACE SET city = ?, country = ?, latitude = ?, longitude = ?, journey_id = ? WHERE id = ?";
     private static final String readByJourneyStatement = "SELECT id, city, country, latitude, longitude FROM PLACE WHERE journey_id=?;";
     private SimpleJdbcInsert insertPlace;
+
+    @Autowired JourneyDAO journeyDAO;
 
     @Override @Autowired public void setDataSource(DataSource dataSource) {
         super.setDataSource(dataSource);
@@ -80,7 +83,7 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
 
         try {
             jdbcTemplate
-                    .update(updateStatement, place.getCity(), place.getCountry(), place.getId());
+                    .update(updateStatement, place.getCity(), place.getCountry(), place.getLatitude(), place.getLongitude(), place.getId());
             logger.debug("Successfully updated Place", place);
         } catch (DataAccessException ex) {
             logger.error("Failed updating Place", place);
@@ -94,8 +97,13 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
             List<Place> places = jdbcTemplate.query(readAllStatement, new RowMapper<Place>() {
 
                 @Override public Place mapRow(ResultSet resultSet, int i) throws SQLException {
-                    return new Place(resultSet.getInt(1), resultSet.getString(2),
-                            resultSet.getString(3));
+                    try {
+                        return new Place(resultSet.getInt(1), resultSet.getString(2),
+                                resultSet.getString(3), resultSet.getDouble(4), resultSet.getDouble(5), journeyDAO.getByID(resultSet.getInt(6)));
+                    } catch (ValidationException | DAOException e) {
+                        e.printStackTrace();
+                        throw new RuntimeException();
+                    }
                 }
             });
 
@@ -109,7 +117,7 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
     }
 
     @Override public Place getById(int id) throws DAOException, ValidationException {
-        logger.debug("getByName ", id);
+        logger.debug("getByID ", id);
 
         PlaceValidator.validateID(id);
 
@@ -119,13 +127,18 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
 
                         @Override public Place mapRow(ResultSet resultSet, int i)
                                 throws SQLException {
-                            return new Place(id, resultSet.getString(1),
-                                    resultSet.getString(2));
+                            try {
+                                return new Place(id, resultSet.getString(1),
+                                        resultSet.getString(2), resultSet.getDouble(3), resultSet.getDouble(4), journeyDAO.getByID(resultSet.getInt(5)));
+                            } catch (DAOException | ValidationException e) {
+                                e.printStackTrace();
+                                throw new RuntimeException();
+                            }
                         }
                     });
         } catch (DataAccessException ex) {
             logger.error("Failed to read a Place", ex);
-            throw new DAOException("Failed to read a Place", ex);
+            throw new RuntimeException("Failed to read a Place", ex);
         }
     }
 
@@ -133,14 +146,17 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
         logger.debug("readByJourney ", journey.getId());
 
         try {
-            return this.jdbcTemplate.query(
-                    readByJourneyStatement,
-                    new Object[]{journey.getId()},
+            return this.jdbcTemplate.query(readByJourneyStatement, new Object[] { journey.getId() },
                     new RowMapper<Place>() {
                         public Place mapRow(ResultSet rs, int rowNum) throws SQLException {
-                            Place place = new Place(rs.getInt(1),rs.getString(2),rs.getString(3));
-                            place.setLatitude(rs.getDouble(4));
-                            place.setLongitude(rs.getDouble(5));
+                            Place place = null;
+                            try {
+                                place = new Place(rs.getInt(1), rs.getString(2), rs.getString(3),
+                                        rs.getDouble(4), rs.getDouble(5), journeyDAO.getByID(rs.getInt(6)));
+                            } catch (DAOException | ValidationException e) {
+                                e.printStackTrace();
+                                throw new RuntimeException();
+                            }
                             return place;
                         }
                     });

@@ -9,10 +9,19 @@ public class Place {
     private double longitude;
     private Journey journey;
 
-    public Place(int id, String city, String country) {
+//    public Place(int id, String city, String country) {
+//        this.id = id;
+//        this.city = city;
+//        this.country = country;
+//    }
+
+    public Place(int id, String city, String country, double latitude, double longitude, Journey journey) {
         this.id = id;
         this.city = city;
         this.country = country;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.journey = journey;
     }
 
     public int getId() {

@@ -65,7 +65,7 @@ public class ClusterServiceImpl implements ClusterService {
         logger.debug("clusteringJourney" + journey);
         List<Photo> photos;
         List<Place> places = new ArrayList<Place>();
-        Place place = new Place(1, "Unknown place", "Unknown place");
+        Place place = new Place(1, "Unknown place", "Unknown place", 0.0, 0.0, null);
         double latitude = 1000;
         double longitude = 1000;
 

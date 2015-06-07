@@ -190,7 +190,7 @@ public class PhotoServiceImpl implements PhotoService {
         }
 
         for (Photo photo : photos) {
-            photo.setJourney(journey);
+            photo.getPlace().setJourney(journey);
             exifService.exportMetaToExif(photo);
             LOGGER.debug("Leaving addJourneyToPhotos");
         }

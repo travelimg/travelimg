@@ -7,8 +7,6 @@ import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -28,7 +25,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringJUnit4ClassRunner.class) @ContextConfiguration("classpath:test-config.xml") @Transactional(propagation = Propagation.REQUIRES_NEW) @TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true) public class ExifServiceTest {
     private static final Logger logger = LogManager.getLogger(ClusterServiceTest.class);
@@ -43,6 +41,13 @@ import static org.junit.Assert.*;
                     ImportTest.class.getClassLoader().getResource("db/testimages").getPath())
             .toString() + "/";
 
+    Journey inputJourney = new Journey(1, "TestJourney", LocalDateTime.of(2005, 9, 10, 15, 44, 8),
+            LocalDateTime.of(2005, 9, 12, 15, 44, 8));
+
+    Tag inputTag = new Tag(3, "Testtag");
+
+    Place inputPlace = new Place(2, "Vienna", "Austria", 48.20, 16.37, inputJourney);
+
     private List<Photo> inputPhotos = new ArrayList<Photo>() {{
         add(new Photo(6, defaultPhotographer, sourceDir + "/exif/6.jpg", Rating.NONE,
                 LocalDateTime.of(2005, 9, 11, 15, 43, 55), 39.73934166666667, -104.99156111111111,
@@ -52,7 +57,7 @@ import static org.junit.Assert.*;
                 null));
         add(new Photo(8, defaultPhotographer, sourceDir + "/exif/8.jpg", Rating.NONE,
                 LocalDateTime.of(2005, 9, 11, 15, 48, 7), 39.73994444444445, -104.98952777777778,
-                new Place(1, "Vienna", "Austria")));
+                new Place(1, "Vienna", "Austria", 48.20, 16.37, inputJourney)));
     }};
 
     private List<Photo> expectedPhotos = new ArrayList<Photo>() {{
@@ -64,20 +69,14 @@ import static org.junit.Assert.*;
                 null));
         add(new Photo(8, defaultPhotographer, sourceDir + "/exif/8.jpg", Rating.NONE,
                 LocalDateTime.of(2005, 9, 11, 15, 48, 7), 39.73994444444445, -104.98952777777778,
-                new Place(1, "Vienna", "Austria")));
+                new Place(1, "Vienna", "Austria", 48.20, 16.37, inputJourney)));
     }};
-
-
-
 
     @Autowired private ExifService exifService;
     @Autowired private JourneyDAO journeyDAO;
     @Autowired private PlaceDAO placeDAO;
     @Autowired private TagDAO tagDA0;
     @Autowired private PhotoDAO photoDAO;
-
-    Tag inputTag = new Tag(3, "Testtag");
-
 
     @WithData @Test public void testTagExportToPhotoFile()
             throws ServiceException, ValidationException, DAOException {
@@ -98,9 +97,6 @@ import static org.junit.Assert.*;
         assertEquals(inputPhotos.get(2).getTags(), expectedPhotos.get(2).getTags());
     }
 
-    Journey inputJourney = new Journey(1, "TestJourney", LocalDateTime.of(2005, 9, 10, 15, 44, 8),
-            LocalDateTime.of(2005, 9, 12, 15, 44, 8));
-
     @WithData @Test public void testJourneyExportToPhotoFile()
             throws ServiceException, ValidationException, DAOException {
         logger.debug("Entering testJourneyExportToPhotoFile()");
@@ -113,15 +109,14 @@ import static org.junit.Assert.*;
             e.printStackTrace();
         }
 
-        inputPhotos.get(0).setJourney(inputJourney);
+        inputPhotos.get(0).getPlace().setJourney(inputJourney);
         exifService.exportMetaToExif(inputPhotos.get(0));
         exifService.getTagsFromExif(expectedPhotos.get(0));
-        assertEquals(inputPhotos.get(0).getJourney(), expectedPhotos.get(0).getJourney());
+        assertEquals(inputPhotos.get(0).getPlace().getJourney(), expectedPhotos.get(0).getPlace().getJourney());
         List<Journey> journeyList = journeyDAO.readAll();
         assertNotNull(journeyList);
     }
 
-    Place inputPlace = new Place(2, "Vienna", "Austria");
 
     @WithData @Test public void testPlaceExportToPhotoFile()
             throws ServiceException, ValidationException, DAOException {
@@ -135,13 +130,13 @@ import static org.junit.Assert.*;
             e.printStackTrace();
         }
 
-    inputPhotos.get(1).setPlace(inputPlace);
-    exifService.exportMetaToExif(inputPhotos.get(1));
-    exifService.getTagsFromExif(expectedPhotos.get(1));
-    assertEquals(inputPhotos.get(1).getPlace(), expectedPhotos.get(1).getPlace());
-    List<Place> placeList = placeDAO.readAll();
-    assertNotNull(placeList);
-}
+        inputPhotos.get(1).setPlace(inputPlace);
+        exifService.exportMetaToExif(inputPhotos.get(1));
+        exifService.getTagsFromExif(expectedPhotos.get(1));
+        assertEquals(inputPhotos.get(1).getPlace(), expectedPhotos.get(1).getPlace());
+        List<Place> placeList = placeDAO.readAll();
+        assertNotNull(placeList);
+    }
 
 }
 
