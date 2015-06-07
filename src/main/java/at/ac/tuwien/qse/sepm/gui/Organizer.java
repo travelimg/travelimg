@@ -1,12 +1,13 @@
 package at.ac.tuwien.qse.sepm.gui;
 
-import at.ac.tuwien.qse.sepm.entities.Journey;
-import at.ac.tuwien.qse.sepm.entities.Photographer;
-import at.ac.tuwien.qse.sepm.entities.Rating;
-import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.*;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.JourneyDialog;
-import at.ac.tuwien.qse.sepm.service.*;
+import at.ac.tuwien.qse.sepm.service.ClusterService;
+import at.ac.tuwien.qse.sepm.service.PhotographerService;
+import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.TagService;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -17,18 +18,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * Controller for organizer view which is used for browsing photos by month.
- *
- * TODO: Decide whether to call it Organizer or Browser or something else.
  */
 public class Organizer {
 
@@ -52,6 +49,7 @@ public class Organizer {
     @FXML private FilterList<Tag> categoryListView;
     @FXML private FilterList<Photographer> photographerListView;
     @FXML private FilterList<Journey> journeyListView;
+    @FXML private PlaceFilterList placeListView;
 
     @FXML private Button resetButton;
 
@@ -88,6 +86,14 @@ public class Organizer {
         return filter;
     }
 
+    public void addPlace(Place place) {
+        List<Place> places = placeListView.getValues();
+        places.add(place);
+
+        placeListView.setValues(places);
+        placeListView.checkAll();
+    }
+
 
     @FXML
     private void initialize() {
@@ -119,8 +125,12 @@ public class Organizer {
         });
         journeyListView.setTitle("Reisen");
         journeyListView.setChangeHandler(this::handleJourneysChange);
+        placeListView = new PlaceFilterList();
+        placeListView.setTitle("Orte");
+        placeListView.setChangeHandler(this::handlePlacesChange);
 
-        filterContainer.getChildren().addAll(ratingListView, categoryListView, photographerListView, journeyListView);
+        filterContainer.getChildren().addAll(ratingListView, categoryListView, photographerListView, journeyListView,
+                placeListView);
 
 
         refreshLists();
@@ -158,6 +168,12 @@ public class Organizer {
         filter.getIncludedJourneys().addAll(values);
         handleFilterChange();
     }
+    private void handlePlacesChange(List<Place> values) {
+        LOGGER.debug("place filter changed");
+        filter.getIncludedPlaces().clear();
+        filter.getIncludedPlaces().addAll(values);
+        handleFilterChange();
+    }
 
     private void refreshLists() {
         LOGGER.debug("refreshing filter");
@@ -166,6 +182,7 @@ public class Organizer {
         categoryListView.setValues(getAllCategories());
         photographerListView.setValues(getAllPhotographers());
         journeyListView.setValues(getAllJourneys());
+        placeListView.setValues(getAllPlaces());
     }
     private List<Rating> getAllRatings() {
         LOGGER.debug("fetching ratings");
@@ -187,11 +204,7 @@ public class Organizer {
             return list;
         } catch (ServiceException ex) {
             LOGGER.error("fetching categories failed", ex);
-            InfoDialog dialog = new InfoDialog(root, "Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Fehler beim Laden");
-            dialog.setContentText("Foto-Kategorien konnten nicht geladen werden.");
-            dialog.showAndWait();
+            ErrorDialog.show(root, "Fehler beim Laden", "Foto-Kategorien konnten nicht geladen werden.");
             return new ArrayList<>();
         }
     }
@@ -203,11 +216,7 @@ public class Organizer {
             return list;
         } catch (ServiceException ex) {
             LOGGER.error("fetching photographers failed", ex);
-            InfoDialog dialog = new InfoDialog(root, "Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Fehler beim Laden");
-            dialog.setContentText("Fotografen konnten nicht geladen werden.");
-            dialog.showAndWait();
+            ErrorDialog.show(root, "Fehler beim Laden", "Fotografen konnten nicht geladen werden.");
             return new ArrayList<>();
         }
     }
@@ -229,12 +238,33 @@ public class Organizer {
         }
     }
 
+    private List<Place> getAllPlaces() {
+        LOGGER.debug("fetching journeys");
+        try {
+            List<Place> list = clusterService.getAllPlaces();
+            //list.sort((a, b) -> a.getName().compareTo(b.getName()));
+            return list;
+        } catch (ServiceException ex) {
+            LOGGER.error("fetching journeys failed", ex);
+            ErrorDialog.show(root, "Fehler beim Laden", "Reisen konnten nicht geladen werden.");
+            return new ArrayList<>();
+        }
+    }
+
     private void resetFilter() {
+        // don't update the filter until all list views have been reset
+        Consumer<PhotoFilter> savedCallback = filterChangeCallback;
+        filterChangeCallback = null;
+
         refreshLists();
         inspectorController.refreshTags();
         categoryListView.checkAll();
         ratingListView.checkAll();
         photographerListView.checkAll();
         journeyListView.checkAll();
+        placeListView.checkAll();
+        
+        // restore the callback and handle the change
+        filterChangeCallback = savedCallback;
     }
 }

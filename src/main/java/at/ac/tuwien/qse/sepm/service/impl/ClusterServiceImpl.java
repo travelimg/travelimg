@@ -34,8 +34,18 @@ public class ClusterServiceImpl implements ClusterService {
         try {
             return journeyDAO.readAll();
         } catch (DAOException ex) {
-            ex.printStackTrace();
+            logger.error("Failed to get all journeys", ex);
             throw new ServiceException("Failed to get all journeys", ex);
+        }
+    }
+
+    @Override
+    public List<Place> getAllPlaces() throws ServiceException {
+        try {
+            return placeDAO.readAll();
+        } catch (DAOException ex) {
+            logger.error("Failed to get all places", ex);
+            throw new ServiceException("Failed to get all places", ex);
         }
     }
 

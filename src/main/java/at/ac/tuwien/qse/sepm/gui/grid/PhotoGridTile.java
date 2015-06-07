@@ -1,4 +1,4 @@
-package at.ac.tuwien.qse.sepm.gui;
+package at.ac.tuwien.qse.sepm.gui.grid;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Rating;
@@ -12,14 +12,12 @@ import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PhotoGridTile extends ImageGridTile<Photo> {
+public class PhotoGridTile extends ImageGridTile {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -30,9 +28,6 @@ public class PhotoGridTile extends ImageGridTile<Photo> {
     private final Label taggingIndicator = new Label();
     private final Tooltip taggingIndicatorTooltip = new Tooltip();
     private final Label dateLabel = new Label();
-
-    private Image image = null;
-    private boolean selected = false;
 
     public PhotoGridTile() {
         getStyleClass().add("photo-tile");
@@ -58,30 +53,13 @@ public class PhotoGridTile extends ImageGridTile<Photo> {
         overlay.setRight(ratingIndicator);
     }
 
-    @Override public void setItem(Photo photo) {
-        Photo oldPhoto = getItem();
-        super.setItem(photo);
+    @Override public void setPhoto(Photo photo, Image image) {
+        super.setPhoto(photo, image);
         if (photo == null) return;
 
-        // Only reload image if necessary.
-        if (oldPhoto == null || !photo.getPath().equals(oldPhoto.getPath())) {
-            showImage(photo.getPath());
-        }
         showRating(photo.getRating());
         showTags(photo.getTags());
         showDate(photo.getDatetime());
-    }
-
-    private void showImage(String path) {
-        File file = new File(path);
-        String url = null;
-        try {
-            url = file.toURI().toURL().toString();
-        } catch (MalformedURLException ex) {
-            LOGGER.error("photo URL is malformed", ex);
-            // TODO: handle exception
-        }
-        loadImage(url);
     }
 
     private void showRating(Rating rating) {

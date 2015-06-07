@@ -1,9 +1,7 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 
-import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.DropboxService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
@@ -16,7 +14,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -117,7 +114,7 @@ public class DropboxServiceImpl implements DropboxService {
                 return;
             }
 
-            for(Photo photo: photos) {
+            for (Photo photo: photos) {
                 if (!isRunning())
                     return;
 
