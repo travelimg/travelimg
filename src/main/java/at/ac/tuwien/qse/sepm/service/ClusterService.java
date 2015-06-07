@@ -1,7 +1,6 @@
 package at.ac.tuwien.qse.sepm.service;
 
 import at.ac.tuwien.qse.sepm.entities.Journey;
-import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
 
 import java.util.List;
@@ -15,6 +14,14 @@ public interface ClusterService {
      * @throws ServiceException propagates DAOExceptions
      */
     List<Journey> getAllJourneys() throws ServiceException;
+
+    /**
+     * Read and return places of a journey.
+     * @param journey the journey containing its id.
+     * @return the places
+     * @throws ServiceException propagates DAOExceptions
+     */
+    List<Place> getPlacesByJourney(Journey journey) throws ServiceException;
 
     /**
      * Adds a new place to the datastore.

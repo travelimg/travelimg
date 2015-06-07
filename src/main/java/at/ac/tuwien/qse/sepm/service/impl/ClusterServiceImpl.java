@@ -39,6 +39,17 @@ public class ClusterServiceImpl implements ClusterService {
         }
     }
 
+    @Override
+    public List<Place> getPlacesByJourney(Journey journey) throws ServiceException {
+        try {
+            return placeDAO.readByJourney(journey);
+        } catch (DAOException e) {
+            throw new ServiceException("Failed to get places", e);
+        } catch (ValidationException e) {
+            throw new ServiceException("Failed to validate journey id", e);
+        }
+    }
+
     @Override public void addPlace(Place place) throws ServiceException {
         try {
             placeDAO.create(place);
