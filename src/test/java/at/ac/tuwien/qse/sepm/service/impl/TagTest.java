@@ -21,12 +21,13 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-        import static org.junit.Assert.assertTrue;
+
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:test-config.xml")
@@ -105,9 +106,13 @@ public class TagTest {
     }
 
     @Test
-    @WithData public void test_get_all_tags() throws ServiceException {
-        assertThat(tagService.getAllTags(), containsInAnyOrder(new Tag(1, "Person"),
-                new Tag(2, "Essen"), new Tag(3, "Natur")));
+    @WithData
+    public void test_get_all_tags() throws ServiceException {
+        assertThat(tagService.getAllTags(), containsInAnyOrder(
+                new Tag(1, "Person"),
+                new Tag(2, "Essen"),
+                new Tag(3, "Natur")
+        ));
     }
 
     @Test(expected = ServiceException.class)
@@ -210,6 +215,7 @@ public class TagTest {
         // assert that p2 was not affected
         assertThat(getTags(p2), equalTo(toList(t2)));
     }
+
     @Test
     @WithData
     public void test_getMostWantet() throws  ServiceException{
@@ -260,6 +266,7 @@ public class TagTest {
         }
         List<Tag> liste = tagService.getMostFrequentTags(toList(p0));
     }
+
     @Test
     @WithData
     public void test_no_tags_available_for_photos() throws ServiceException {
