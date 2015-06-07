@@ -245,7 +245,20 @@ public class TagTest {
 
     }
 
-
+    @Test(expected = ServiceException.class)
+    @WithData
+    public void test_getMostWantetWithNoTags() throws ServiceException{
+        Photo p0 = getPhoto(0);
+        Photo p1 = getPhoto(1);
+        Photo p2 = getPhoto(2);
+        List<Tag> toRemove = p0.getTags();
+        if(toRemove.size()!=0){
+            for(Tag t: toRemove){
+                tagService.removeTagFromPhotos(toList(p0),t);
+            }
+        }
+        List<Tag> liste = tagService.getMostWanted(toList(p0));
+    }
     @Test
     @WithData
     public void test_no_tags_available_for_photos() throws ServiceException {
