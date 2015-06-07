@@ -24,6 +24,7 @@ public class PhotoServiceImpl implements PhotoService {
 
     private static final Logger LOGGER = LogManager.getLogger();
     @Autowired private PhotoDAO photoDAO;
+
     @Autowired private ExifService exifService;
     @Autowired private PhotoTagDAO photoTagDAO;
     @Autowired private JourneyDAO journeyDAO;
