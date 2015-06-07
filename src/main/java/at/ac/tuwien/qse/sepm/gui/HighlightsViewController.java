@@ -144,7 +144,7 @@ public class HighlightsViewController {
      * Filters all good Photos from the selected journey
      * generate a list of the most used Tags
      * generate for every Tag(only 5) a TitlePane and fill the pane with the right Fotos
-     * add every TitlePane to the GUI 
+     * add every TitlePane to the GUI
      */
     private void reloadImages(){
 

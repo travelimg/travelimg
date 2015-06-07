@@ -83,7 +83,12 @@ public class TagServiceImpl implements TagService {
             throw new ServiceException(e);
         }
     }
-
+    /**
+     * Returns a list of the most used Tags, from a list of photos
+     * @param l the list of photos
+     * @return a list of tag s , (the hot 5)
+     * @throws ServiceException if retrieval failed
+     */
     @Override public List<Tag> getMostWantet(List<Photo> l) throws ServiceException {
         HashMap<Tag,Integer> tagcounter = new HashMap<>();
         for(Photo p: l){
