@@ -1,163 +1,61 @@
 package at.ac.tuwien.qse.sepm.gui;
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import com.sun.javafx.property.adapter.PropertyDescriptor;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.*;
-import javafx.geometry.Insets;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.TilePane;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import javafx.scene.control.SingleSelectionModel;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.awt.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.event.MouseEvent;
 
 /**
  * Controller for the main view.
  */
 public class MainController {
 
-    private static final Logger logger = LogManager.getLogger();
-
-    @Autowired private Organizer organizer;
+    @FXML private Tab grid;
+    @FXML private Tab world;
+    @FXML private Tab slide;
+    @FXML private TabPane root;
+    @Autowired private WorldmapView worldMapView;
     @Autowired private Inspector inspector;
+    @Autowired private SlideshowView slideshowView;
+    private EventHandler<javafx.scene.input.MouseEvent> ehandl;
+    private GoogleMapsScene map;
+    @FXML private void initialize() {
 
-    @FXML private ScrollPane scrollPane;
-
-    @FXML private TilePane tilePane;
-    private ImageTile selectedTile = null;
-
-    private List<Photo> activePhotos = new ArrayList<>();
-
-
-    public MainController() {
-
-    }
-
-    @FXML
-    private void initialize() {
-    }
-
-    /**
-     * Add a photo to the image grid
-     *
-     * @param photo The photo to be added.
-     */
-    public void addPhoto(Photo photo) {
-        ImageTile imageTile = new ImageTile(photo);
-
-        activePhotos.add(photo);
-
-        imageTile.getSelectedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if(newValue) {
-                    if (selectedTile != null) {
-                        selectedTile.unselect();
+        root.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+                    @Override public void changed(ObservableValue<? extends Tab> ov, Tab t,
+                            Tab t1) {
+                        if (t.equals(grid) && t1.equals(world)) {
+                            worldMapView.setMap(inspector.getMap());
+                        }
+                        if (t.equals(world) && t1.equals(grid)) {
+                            inspector.setMap(worldMapView.getMap());
+                        }
+                        if (t.equals(world) && t1.equals(slide)) {
+                            slideshowView.setMap(worldMapView.getMap());
+                        }
+                        if (t.equals(grid) && t1.equals(slide)) {
+                            slideshowView.setMap(inspector.getMap());
+                        }
+                        if (t.equals(slide) && t1.equals(world)) {
+                            worldMapView.setMap(slideshowView.getMap());
+                        }
+                        if (t.equals(slide) && t1.equals(grid)) {
+                            inspector.setMap(slideshowView.getMap());
+                        }
                     }
-                    selectedTile = imageTile;
                 }
-            }
-        });
+        );
+    }
+    public MainController(){
 
-        tilePane.getChildren().add(imageTile);
     }
 
-    /**
-     * Return the List of active photos.
-     *
-     * @return the currently active photos
-     */
-    public List<Photo> getActivePhotos()
-    {
-        return activePhotos;
-    }
-    /**
-     * Clear the image grid and don't show any photos.
-     */
-    public void clearPhotos() {
-        activePhotos.clear();
-        tilePane.getChildren().clear();
-    }
-
-    /**
-     * Widget for one widget in the image grid. Can either be in a selected or an unselected state.
-     */
-    private class ImageTile extends HBox {
-
-        private Photo photo;
-
-        private Image image;
-        private ImageView imageView;
-
-        private BooleanProperty selected = new SimpleBooleanProperty(false);
-
-        public ImageTile(Photo photo) {
-            this.photo = photo;
-
-            try {
-                image = new Image(new FileInputStream(new File(photo.getPath())), 150, 0, true, true);
-            } catch (FileNotFoundException ex) {
-                logger.error("Could not find photo", ex);
-                return;
-            }
-
-            imageView = new ImageView(image);
-            imageView.setFitWidth(150);
-            imageView.setOnMouseClicked(this::handleSelected);
-
-            getStyleClass().add("image-tile-non-selected");
-
-
-            this.getChildren().add(imageView);
-        }
-
-        /**
-         * Select this photo. Triggers an update of the inspector widget.
-         */
-        public void select() {
-            getStyleClass().remove("image-tile-non-selected");
-            getStyleClass().add("image-tile-selected");
-
-            inspector.setActivePhoto(photo);
-
-            this.selected.set(true);
-        }
-
-        /**
-         * Unselect a photo.
-         */
-        public void unselect() {
-            getStyleClass().add("image-tile-non-selected");
-            getStyleClass().remove("image-tile-selected");
-
-            this.selected.set(false);
-        }
-
-        /**
-         * Property which represents if this tile is currently selected or not.
-         * @return The selected property.
-         */
-        public BooleanProperty getSelectedProperty() {
-            return selected;
-        }
-
-        private void handleSelected(MouseEvent event) {
-            select();
-        }
-    }
 }

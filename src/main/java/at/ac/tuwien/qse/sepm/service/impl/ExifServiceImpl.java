@@ -92,46 +92,50 @@ public class ExifServiceImpl implements ExifService {
     @Override
     public void attachDateAndGeoData(Photo photo) throws ServiceException {
         File file = new File(photo.getPath());
-        LocalDateTime datetime;
-        double latitude = 0.0;
-        double longitude = 0.0;
-        final TiffImageMetadata exifMetadata;
-        try {
-            final ImageMetadata metadata = Imaging.getMetadata(file);
-            if (metadata == null) {
-                throw new ServiceException("No metadata found");
-            }
-            final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
-            exifMetadata = jpegMetadata.getExif();
-            if(jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL) != null) {
-                String tempDate = jpegMetadata
-                        .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL)
-                        .getValueDescription();
-                tempDate = tempDate.substring(1, tempDate.length() - 1); // remove enclosing single quotes
+        LocalDateTime datetime = photo.getDatetime();
+        double latitude = photo.getLatitude();
+        double longitude = photo.getLongitude();
 
-                datetime = dateFormatter.parse(tempDate, LocalDateTime::from);
-            } else {
-                throw new ServiceException("Photo has no datetime");
-            }
-        } catch (IOException | ImageReadException e) {
-            //problem here, an invalid photo or one without a datetime is useless
-            throw new ServiceException(e.getMessage(), e);
-        }
         try {
-            if (exifMetadata != null) {
-                final TiffImageMetadata.GPSInfo gpsInfo = exifMetadata.getGPS();
+            ImageMetadata metadata = Imaging.getMetadata(file);
+
+            if(datetime == null)
+                datetime = getDateTime(metadata);
+
+            if(Double.compare(latitude, 0.0) == 0 || Double.compare(longitude, 0.0) == 0) {
+                final TiffImageMetadata.GPSInfo gpsInfo = ((JpegImageMetadata)metadata).getExif().getGPS();
                 if (null != gpsInfo) {
                     longitude = gpsInfo.getLongitudeAsDegreesEast();
                     latitude = gpsInfo.getLatitudeAsDegreesNorth();
                 }
             }
-        } catch (ImageReadException e) {
-            //intentionally ignore this, at least we have successfully read the datetime at this point ;)
-            LOGGER.debug(e);
+        } catch (IOException | ImageReadException e) {
+            // intentionally ignore and use default
+            LOGGER.debug("Error occurred attaching geodate and date", e);
         }
+
+        if(datetime == null)
+            datetime = LocalDateTime.MIN;
+
         photo.setDatetime(datetime);
         photo.setLatitude(latitude);
         photo.setLongitude(longitude);
+    }
+
+    private LocalDateTime getDateTime(ImageMetadata metadata) {
+        if (metadata == null) return null;
+
+        final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
+        if(jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL) != null) {
+            String tempDate = jpegMetadata
+                    .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL)
+                    .getValueDescription();
+            tempDate = tempDate.substring(1, tempDate.length() - 1); // remove enclosing single quotes
+
+            return dateFormatter.parse(tempDate, LocalDateTime::from);
+        } else {
+            return null;
+        }
     }
 
     @Override

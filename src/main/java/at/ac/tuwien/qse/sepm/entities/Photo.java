@@ -1,6 +1,9 @@
 package at.ac.tuwien.qse.sepm.entities;
 
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Photo {
 
@@ -11,6 +14,7 @@ public class Photo {
     private LocalDateTime datetime;
     private double latitude;
     private double longitude;
+    private final List<Tag> tags = new ArrayList<>();
 
     public Photo() {
     }
@@ -91,6 +95,10 @@ public class Photo {
         this.longitude = longitude;
     }
 
+    public List<Tag> getTags() {
+        return tags;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -98,11 +106,12 @@ public class Photo {
 
         Photo photo = (Photo) o;
 
+        if (!Paths.get(path).equals(Paths.get(photo.path))) return false;
+
         if (Double.compare(photo.latitude, latitude) != 0) return false;
         if (Double.compare(photo.longitude, longitude) != 0) return false;
         if (id != null ? !id.equals(photo.id) : photo.id != null) return false;
         if (photographer != null ? !photographer.equals(photo.photographer) : photo.photographer != null) return false;
-        if (path != null ? !path.equals(photo.path) : photo.path != null) return false;
         if (rating != null ? !rating.equals(photo.rating) : photo.rating != null) return false;
         return !(datetime != null ? !datetime.equals(photo.datetime) : photo.datetime != null);
 

@@ -1,9 +1,12 @@
 package at.ac.tuwien.qse.sepm.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
-import at.ac.tuwien.qse.sepm.service.Service;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.TagService;
 import javafx.collections.FXCollections;
@@ -15,16 +18,11 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
-
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.CheckListView;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public class TagSelector extends VBox {
 
@@ -86,7 +84,7 @@ public class TagSelector extends VBox {
     }
 
     /**
-     * calculate and set a good height according to nr of elements
+     * calculate and set a good height according to nr of elements.
      */
     private void setPrefTagListHeight() {
         double height = 60.0;
@@ -129,11 +127,12 @@ public class TagSelector extends VBox {
             alert.setTitle("Hinzufügen bestätigen");
             alert.setHeaderText("Wollen Sie die Kategorie \"" + newCategoryName + "\" wirklich"
                     + " hinzufügen?");
-            alert.setContentText("Im Moment kann die Kategorie dann nicht mehr gelöscht werden");
+            alert.setContentText("Die Kategorie wird dann für alle verwalteten Fotos als Auswahl"
+                    + " zur Verfügung stehen");
 
             Optional<ButtonType> result = alert.showAndWait();
 
-            if (result.get() == ButtonType.OK){
+            if (result.get() == ButtonType.OK) {
                 try {
                     Tag newTag = tagService.create(new Tag(null, newCategoryName));
                     LOGGER.info("Successfully added new category: \"{}\"", newCategoryName);
@@ -197,7 +196,6 @@ public class TagSelector extends VBox {
     }
 
     @FXML
-    @Deprecated
     private void deleteSelectedTag(ActionEvent event) {
         Tag oldTag = tagList.getSelectionModel().getSelectedItem();
 
@@ -210,7 +208,7 @@ public class TagSelector extends VBox {
 
             Optional<ButtonType> result = alert.showAndWait();
 
-            if (result.get() == ButtonType.OK){
+            if (result.get() == ButtonType.OK) {
                 try {
                     tagService.delete(oldTag);
                     LOGGER.info("Successfully deleted category: \"{}\"", oldTag);

@@ -2,12 +2,10 @@ package at.ac.tuwien.qse.sepm.service;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
-import at.ac.tuwien.qse.sepm.util.Cancelable;
-import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 
 import java.time.YearMonth;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public interface PhotoService {
 
@@ -17,16 +15,6 @@ public interface PhotoService {
      * @return a list of months with available photos
      */
     List<YearMonth> getMonthsWithPhotos() throws ServiceException;
-
-    /**
-     * Retrieve a list of photos from a given month.
-     *
-     * @param month Month for which photos will be loaded.
-     * @param callback Called for each matching photo
-     * @param errorHandler Handler for occuring exceptions
-     * @return A list of photos from the given date.
-     */
-    Cancelable loadPhotosByMonth(YearMonth month, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler);
 
     /**
      * delete the delivered List of Photos
@@ -49,6 +37,14 @@ public interface PhotoService {
      * @throws ServiceException
      */
     List<Photo> getAllPhotos() throws ServiceException;
+
+    /**
+     * Get all photos that match the specified filter.
+     *
+     * @param filter filter the photos are tested against
+     * @return list of all available photos that match the filter
+     */
+    List<Photo> getAllPhotos(Predicate<Photo> filter) throws ServiceException;
 
     //TODO comment the method
     void requestFullscreenMode(List<Photo> photos) throws ServiceException;
