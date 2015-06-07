@@ -154,7 +154,7 @@ public class Inspector {
         try {
             dropboxFolder = dropboxService.getDropboxFolder();
         } catch (ServiceException ex) {
-            // TODO: handle error
+            ErrorDialog.show(root, "Fehler beim Export", "Konnte keinen Dropboxordner finden");
         }
 
         ExportDialog dialog = new ExportDialog(root, dropboxFolder, activePhotos.size());
@@ -166,9 +166,7 @@ public class Inspector {
                 photo -> {
                     // TODO: progressbar
                 },
-                exception -> {
-                    // TODO: handle error
-                }
+                exception -> ErrorDialog.show(root, "Fehler beim Export", "Fehlermeldung: " + exception.getMessage())
         );
     }
 
@@ -269,7 +267,7 @@ public class Inspector {
                 exifValue.setCellValueFactory(new PropertyValueFactory<>("Value"));
                 exifTable.setItems(exifData);
             } catch (ServiceException e) {
-                // TODO Dialog
+                ErrorDialog.show(root, "Fehler beim Laden der Exif Daten", "Fehlermeldung: " + e.getMessage());
             }
         }
     }

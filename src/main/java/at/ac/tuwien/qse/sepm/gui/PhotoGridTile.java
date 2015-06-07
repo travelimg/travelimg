@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.gui;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -78,8 +79,8 @@ public class PhotoGridTile extends ImageGridTile<Photo> {
         try {
             url = file.toURI().toURL().toString();
         } catch (MalformedURLException ex) {
-            LOGGER.error("photo URL is malformed", ex);
-            // TODO: handle exception
+            LOGGER.error("Photo URL is malformed. Skipping loading of image", ex);
+            return;
         }
         loadImage(url);
     }
