@@ -27,8 +27,6 @@ import java.util.stream.Collectors;
 
 /**
  * Controller for organizer view which is used for browsing photos by month.
- *
- * TODO: Decide whether to call it Organizer or Browser or something else.
  */
 public class Organizer {
 
