@@ -45,7 +45,8 @@ public class TagTest {
         return tagService.getTagsForPhoto(photo);
     }
 
-    private <T> List<T> toList(T... elements) {
+    @SafeVarargs
+    private final <T> List<T> toList(T... elements) {
         return Arrays.asList(elements);
     }
 
