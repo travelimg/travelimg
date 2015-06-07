@@ -16,6 +16,14 @@ public interface ClusterService {
     List<Journey> getAllJourneys() throws ServiceException;
 
     /**
+     * Read and return all currently saved places.
+     *
+     * @return list of all currently saved places
+     * @throws ServiceException propagates DAOExceptions
+     */
+    List<Place> getAllPlaces() throws ServiceException;
+
+    /**
      * Read and return places of a journey.
      * @param journey the journey containing its id.
      * @return the places

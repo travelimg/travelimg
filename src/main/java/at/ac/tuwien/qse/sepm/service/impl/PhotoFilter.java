@@ -1,10 +1,6 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
-import at.ac.tuwien.qse.sepm.entities.Journey;
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Photographer;
-import at.ac.tuwien.qse.sepm.entities.Rating;
-import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.service.ClusterService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
@@ -27,6 +23,7 @@ public class PhotoFilter implements Predicate<Photo> {
     private final Set<Photographer> includedPhotographers = new HashSet<>();
     private final Set<Rating> includedRatings = new HashSet<>();
     private final Set<Journey> includedJourneys = new HashSet<>();
+    private final Set<Place> includedPlaces = new HashSet<>();
     private boolean untaggedIncluded = false;
 
     public PhotoFilter() {
@@ -42,6 +39,7 @@ public class PhotoFilter implements Predicate<Photo> {
         getIncludedPhotographers().addAll(from.getIncludedPhotographers());
         getIncludedRatings().addAll(from.getIncludedRatings());
         getIncludedJourneys().addAll(from.getIncludedJourneys());
+        getIncludedPlaces().addAll(from.getIncludedPlaces());
         setUntaggedIncluded(from.isUntaggedIncluded());
     }
 
@@ -83,6 +81,15 @@ public class PhotoFilter implements Predicate<Photo> {
     }
 
     /**
+     * Get the places at one of which the photos must have been made.
+     *
+     * @return included places
+     */
+    public Set<Place> getIncludedPlaces() {
+        return includedPlaces;
+    }
+
+    /**
      * Get a value indicating that photos without tags are included.
      *
      * @return true if untagged photos are included, else false
@@ -104,7 +111,8 @@ public class PhotoFilter implements Predicate<Photo> {
         return testRating(photo)
                 && testCategories(photo)
                 && testPhotographer(photo)
-                && testJourney(photo);
+                && testJourney(photo)
+                && testPlace(photo);
     }
 
     private boolean testRating(Photo photo) {
@@ -152,6 +160,10 @@ public class PhotoFilter implements Predicate<Photo> {
         } else {
             return false;
         }
+    }
+
+    private boolean testPlace(Photo photo) {
+        return getIncludedPlaces().contains(photo.getPlace());
     }
 
     private boolean hasCategory(Photo photo) {
