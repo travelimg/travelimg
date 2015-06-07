@@ -73,6 +73,7 @@ public class ClusterServiceImpl implements ClusterService {
                 place = geoService.getPlaceByGeoData(element.getLatitude(), element.getLongitude());
                 place.setLatitude(element.getLatitude());
                 place.setLongitude(element.getLongitude());
+                place.setJourney(journey);
                 logger.debug("New place-cluster: " + place.getId() + " " + place.getCity());
                 addPlace(place);
             }

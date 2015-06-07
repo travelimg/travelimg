@@ -2,7 +2,7 @@ INSERT INTO Photographer(id, name) VALUES (1, 'Test Photographer');
 INSERT INTO Photographer(id, name) VALUES (2, 'Enri');
 INSERT INTO Photographer(id, name) VALUES (3, 'Steve');
 
-INSERT INTO Place(id, city, country, latitude, longitude) VALUES (1, 'Unkown place', 'Unknown place', 0.0, 0.0);
+INSERT INTO Place(id, city, country, latitude, longitude, journey_id) VALUES (1, 'Unkown place', 'Unknown place', 0.0, 0.0, 0);
 
 INSERT INTO Tag(id, name) VALUES (1, 'Person');
 INSERT INTO Tag(id, name) VALUES (2, 'Essen');

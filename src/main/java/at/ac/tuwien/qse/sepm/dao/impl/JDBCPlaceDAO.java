@@ -40,6 +40,7 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
         parameters.put("country", place.getCountry());
         parameters.put("latitude", place.getLatitude());
         parameters.put("longitude", place.getLongitude());
+        parameters.put("journey_id",place.getJourney().getId());
 
         try {
             Number newId = insertPlace.executeAndReturnKey(parameters);
