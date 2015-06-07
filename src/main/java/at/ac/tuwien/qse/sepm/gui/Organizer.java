@@ -34,8 +34,6 @@ public class Organizer {
 
     private static final Logger LOGGER = LogManager.getLogger(Organizer.class);
 
-
-    @Autowired private PhotoService photoService;
     @Autowired private PhotographerService photographerService;
     @Autowired private ClusterService clusterService;
     @Autowired private Inspector inspectorController;
@@ -53,7 +51,6 @@ public class Organizer {
     @FXML private FilterList<Rating> ratingListView;
     @FXML private FilterList<Tag> categoryListView;
     @FXML private FilterList<Photographer> photographerListView;
-    @FXML private FilterList<YearMonth> monthListView;
     @FXML private FilterList<Journey> journeyListView;
 
     @FXML private Button resetButton;
@@ -91,19 +88,6 @@ public class Organizer {
         return filter;
     }
 
-    /**
-     * Add a month to the month list view and check it
-     * @param month the month to be added.
-     */
-    public void addMonth(YearMonth month) {
-        List<YearMonth> months = monthListView.getValues();
-        months.add(month);
-
-        months = months.stream().distinct().collect(Collectors.toList());
-
-        monthListView.setValues(months);
-        monthListView.checkAll();
-    }
 
     @FXML
     private void initialize() {
@@ -135,11 +119,8 @@ public class Organizer {
         });
         journeyListView.setTitle("Reisen");
         journeyListView.setChangeHandler(this::handleJourneysChange);
-        monthListView = new FilterList<>(value -> monthFormatter.format(value));
-        monthListView.setTitle("Monate");
-        monthListView.setChangeHandler(this::handleMonthsChange);
-        filterContainer.getChildren().addAll(ratingListView, categoryListView, photographerListView,
-                monthListView, journeyListView);
+
+        filterContainer.getChildren().addAll(ratingListView, categoryListView, photographerListView, journeyListView);
 
 
         refreshLists();
@@ -177,12 +158,6 @@ public class Organizer {
         filter.getIncludedJourneys().addAll(values);
         handleFilterChange();
     }
-    private void handleMonthsChange(List<YearMonth> values) {
-        LOGGER.debug("month filter changed");
-        filter.getIncludedMonths().clear();
-        filter.getIncludedMonths().addAll(values);
-        handleFilterChange();
-    }
 
     private void refreshLists() {
         LOGGER.debug("refreshing filter");
@@ -191,7 +166,6 @@ public class Organizer {
         categoryListView.setValues(getAllCategories());
         photographerListView.setValues(getAllPhotographers());
         journeyListView.setValues(getAllJourneys());
-        monthListView.setValues(getAllMonths());
     }
     private List<Rating> getAllRatings() {
         LOGGER.debug("fetching ratings");
@@ -254,25 +228,6 @@ public class Organizer {
             return new ArrayList<>();
         }
     }
-    private List<YearMonth> getAllMonths() {
-        LOGGER.debug("fetching months");
-        try {
-            List<YearMonth> list = photoService.getMonthsWithPhotos()
-                    .stream()
-                    .sorted()
-                    .collect(Collectors.toList());
-            LOGGER.debug("fetching months\" succeeded with {} items", list.size());
-            return list;
-        } catch (ServiceException ex) {
-            LOGGER.error("fetching months\" failed", ex);
-            InfoDialog dialog = new InfoDialog(root, "Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Fehler beim Laden");
-            dialog.setContentText("Monate konnten nicht geladen werden.");
-            dialog.showAndWait();
-            return new ArrayList<>();
-        }
-    }
 
     private void resetFilter() {
         refreshLists();
@@ -281,6 +236,5 @@ public class Organizer {
         ratingListView.checkAll();
         photographerListView.checkAll();
         journeyListView.checkAll();
-        monthListView.checkAll();
     }
 }
