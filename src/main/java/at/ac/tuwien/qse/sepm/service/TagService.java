@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.service;
 
+import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 
 import java.util.List;
@@ -44,4 +45,12 @@ public interface TagService extends Service {
      * @throws ServiceException if retrieval failed
      */
     List<Tag> getAllTags() throws ServiceException;
+
+    /**
+     * Returns a list of the most used Tags, from a list of photos
+     * @param l the list of photos
+     * @return a list of tag s , (the hot 5)
+     * @throws ServiceException if retrieval failed
+     */
+    List<Tag> getMostWantet(List<Photo> l) throws ServiceException;
 }

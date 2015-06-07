@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.service.ClusterService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.TagService;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
@@ -14,10 +15,7 @@ import com.lynden.gmapsfx.shapes.PolylineOptions;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TitledPane;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -38,9 +36,11 @@ public class HighlightsViewController {
     @FXML private GoogleMapsScene mapsScene;
     @FXML private VBox journeys, mapContainer, photoView;
     @FXML private FilterList<Journey> journeyListView;
+    @FXML private ScrollPane scrollPhotoView;
     @Autowired private ClusterService clusterService;
     @Autowired private PhotoService photoService;
     @Autowired private PhotoFilter filter;
+    @Autowired private TagService tagService;
     private GoogleMapView mapView;
     private GoogleMap googleMap;
     private ArrayList<Marker> markers = new ArrayList<Marker>();
@@ -140,6 +140,12 @@ public class HighlightsViewController {
         filterChangeCallback = callback;
     }
 
+    /**
+     * Filters all good Photos from the selected journey
+     * generate a list of the most used Tags
+     * generate for every Tag(only 5) a TitlePane and fill the pane with the right Fotos
+     * add every TitlePane to the GUI 
+     */
     private void reloadImages(){
 
         try{
@@ -154,32 +160,26 @@ public class HighlightsViewController {
                     goodPhotos.add(p);
                 }
             }
-            //find all ArchitekturePhotos
-            List<Photo> architektur = new ArrayList<>();
-            int archCounter =0;
-            int eatCoutner =0;
-            List<Photo> essen = new ArrayList<>();
-            for(Photo p : goodPhotos){
-                for(Tag t : p.getTags()){
-                    switch (t.getName()){
-                        case "Architektur": if(archCounter<5 ) architektur.add(p);
-                            archCounter++;
-                            break;
-                        case "Essen" : if(eatCoutner<5)essen.add(p);
-                            eatCoutner++;
-                            break;
+            List<Tag> taglist = tagService.getMostWantet(goodPhotos);
+            photoView.getChildren().clear();
+            for(Tag t: taglist){
+                List<Photo> name = new ArrayList<>();
+                int counter =0;
+                for(Photo p:goodPhotos){
+                    for(Tag t2 : p.getTags()){
+                        if(t.getId()==t2.getId() && counter <5){
+                            name.add(p);
+                            counter++;
+                        }
                     }
                 }
+                ImageGrid<Photo> grid2 = new ImageGrid<>(PhotoGridTile::new);
+                grid2.setItems(name);
+                TitledPane tp = new TitledPane(t.getName(),grid2);
+
+                photoView.getChildren().add(tp);
             }
-            ImageGrid<Photo> archi = new ImageGrid<>(PhotoGridTile::new);
-            ImageGrid<Photo> eat = new ImageGrid<>(PhotoGridTile::new);
-            archi.setItems(architektur);
-            eat.setItems(essen);
-            TitledPane architekt = new TitledPane("Architektur",archi);
-            TitledPane eating = new TitledPane("Essen", eat);
-            grid.setItems(goodPhotos);
-            photoView.getChildren().clear();
-            photoView.getChildren().addAll(architekt,eating);
+
         }catch (ServiceException e){
             //TODO Exceptionhandling
         }
@@ -211,7 +211,7 @@ public class HighlightsViewController {
 
         LatLong [] path = toLatLong(places);
 
-        fitMarkersToScreen(path, pos, pos+1);
+        fitMarkersToScreen(path, pos, pos + 1);
         if(actualMarker!=null){
             googleMap.removeMarker(actualMarker);
         }
@@ -280,8 +280,9 @@ public class HighlightsViewController {
         double lngZoom = Math.floor(Math.log((borderPane.getWidth()-240) / 256 / lngFraction) / 0.6931472);
         double min = Math.min(latZoom, lngZoom);
         min = Math.min(min,21);
-        mapsScene.setZoom((int)min);
-        mapsScene.setCenter((ne.getLatitude()+sw.getLatitude())/2,(ne.getLongitude()+sw.getLongitude())/2);
+        mapsScene.setZoom((int) min);
+        mapsScene.setCenter((ne.getLatitude() + sw.getLatitude()) / 2,
+                (ne.getLongitude() + sw.getLongitude()) / 2);
     }
 
     private LatLong[] getDestinations(){

@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.TagDAO;
+import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -10,6 +11,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class TagServiceImpl implements TagService {
@@ -79,5 +82,46 @@ public class TagServiceImpl implements TagService {
         } catch (DAOException e) {
             throw new ServiceException(e);
         }
+    }
+
+    @Override public List<Tag> getMostWantet(List<Photo> l) throws ServiceException {
+        HashMap<Tag,Integer> tagcounter = new HashMap<>();
+        for(Photo p: l){
+            for(Tag t: p.getTags()){
+
+                if(tagcounter.size()==0){
+                    tagcounter.put(t,1);
+                }else{
+                    boolean neu = true;
+                    for(Tag ta:tagcounter.keySet()){
+                        if(ta.getId() == t.getId()){
+                            tagcounter.replace(ta,tagcounter.get(ta),tagcounter.get(ta)+1);
+                            neu = false;
+                        }
+                    }
+                    if(neu) tagcounter.put(t,1);
+                }
+            }
+        }
+
+        List<Tag> returnList = new ArrayList<>();
+        for( int i =0; i<5; i++) {
+            Tag tag = null;
+            if (tagcounter.size() != 0) {
+                for (Tag t : tagcounter.keySet()) {
+                    if (tag == null) {
+                        tag = t;
+                    } else {
+                        if (tagcounter.get(tag) < tagcounter.get(t)) {
+                            tag = t;
+                        }
+                    }
+                }
+                returnList.add(tag);
+                tagcounter.remove(tag);
+
+            }
+        }
+        return returnList;
     }
 }
