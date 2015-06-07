@@ -46,9 +46,6 @@ public interface PhotoService {
      */
     List<Photo> getAllPhotos(Predicate<Photo> filter) throws ServiceException;
 
-    //TODO comment the method
-    void requestFullscreenMode(List<Photo> photos) throws ServiceException;
-
     /**
      * Add Tag <tt>tag</tt> to every photo in list <tt>photos</tt>. If a photo already has this tag,
      * then it will keep it.

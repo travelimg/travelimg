@@ -79,11 +79,6 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public void requestFullscreenMode(List<Photo> photos) throws ServiceException {
-        //TODO
-    }
-
-    @Override
     public void addTagToPhotos(List<Photo> photos, Tag tag) throws ServiceException {
         LOGGER.debug("Entering addTagToPhotos with {}, {}", photos, tag);
         if (photos == null) {
