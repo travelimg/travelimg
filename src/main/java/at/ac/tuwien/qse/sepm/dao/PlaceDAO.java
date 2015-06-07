@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface PlaceDAO {
     /**
-     * Create the place in the data store.
+     * Create the place in the data store. If the place already exists the existing entry is returned.
      *
      * @param place Place which to create.
      * @return The created Place

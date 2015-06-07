@@ -65,10 +65,10 @@ public class ClusterServiceImpl implements ClusterService {
             throw new ServiceException("Failed to read photos of journey", e);
         }
 
-        photoService.addJourneyToPhotos(photos, journey);
+            photoService.addJourneyToPhotos(photos, journey);
 
-        for (Photo element : photos) {
-            if (Math.abs(element.getLatitude() - latitude) > 1
+            for (Photo element : photos) {
+                if (Math.abs(element.getLatitude() - latitude) > 1
                     && Math.abs(element.getLongitude() - longitude) > 1) {
                 place = geoService.getPlaceByGeoData(element.getLatitude(), element.getLongitude());
                 logger.debug("New place-cluster: " + place.getId() + " " + place.getCity());

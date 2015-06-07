@@ -50,7 +50,7 @@ import static org.junit.Assert.*;
                 null));
         add(new Photo(8, defaultPhotographer, sourceDir + "/exif/8.jpg", Rating.NONE,
                 LocalDateTime.of(2005, 9, 11, 15, 48, 7), 39.73994444444445, -104.98952777777778,
-                null));
+                new Place(1, "Vienna", "Austria")));
     }};
 
     private List<Photo> expectedPhotos = new ArrayList<Photo>() {{
@@ -62,7 +62,7 @@ import static org.junit.Assert.*;
                 null));
         add(new Photo(8, defaultPhotographer, sourceDir + "/exif/8.jpg", Rating.NONE,
                 LocalDateTime.of(2005, 9, 11, 15, 48, 7), 39.73994444444445, -104.98952777777778,
-                null));
+                new Place(1, "Vienna", "Austria")));
     }};
 
 
@@ -74,7 +74,7 @@ import static org.junit.Assert.*;
     @Autowired private TagDAO tagDA0;
     @Autowired private PhotoDAO photoDAO;
 
-    Tag inputTag = new Tag(null, "Testtag");
+    Tag inputTag = new Tag(3, "Testtag");
 
 
     @WithData @Test public void testTagExportToPhotoFile()
@@ -90,13 +90,10 @@ import static org.junit.Assert.*;
             e.printStackTrace();
         }
 
-        photoDAO.create(expectedPhotos.get(2));
         inputPhotos.get(2).getTags().add(inputTag);
         exifService.exportMetaToExif(inputPhotos.get(2));
         exifService.getTagsFromExif(expectedPhotos.get(2));
-        assertEquals(inputPhotos.get(2), expectedPhotos.get(2));
-        List<Tag> tagList = tagDA0.readAll();
-        assertNotNull(tagList);
+        assertEquals(inputPhotos.get(2).getTags(), expectedPhotos.get(2).getTags());
     }
 
     Journey inputJourney = new Journey(1, "TestJourney", LocalDateTime.of(2005, 9, 10, 15, 44, 8),
@@ -117,12 +114,12 @@ import static org.junit.Assert.*;
         inputPhotos.get(0).setJourney(inputJourney);
         exifService.exportMetaToExif(inputPhotos.get(0));
         exifService.getTagsFromExif(expectedPhotos.get(0));
-        assertEquals(inputPhotos.get(0), expectedPhotos.get(0));
+        assertEquals(inputPhotos.get(0).getJourney(), expectedPhotos.get(0).getJourney());
         List<Journey> journeyList = journeyDAO.readAll();
         assertNotNull(journeyList);
     }
 
-    Place inputPlace = new Place(1, "Vienna", "Austria");
+    Place inputPlace = new Place(2, "Vienna", "Austria");
 
     @WithData @Test public void testPlaceExportToPhotoFile()
             throws ServiceException, ValidationException, DAOException {
@@ -136,13 +133,13 @@ import static org.junit.Assert.*;
             e.printStackTrace();
         }
 
-        inputPhotos.get(1).setPlace(inputPlace);
-        exifService.exportMetaToExif(inputPhotos.get(1));
-        exifService.getTagsFromExif(expectedPhotos.get(1));
-        assertEquals(inputPhotos.get(1), expectedPhotos.get(1));
-        List<Place> placeList = placeDAO.readAll();
-        assertNotNull(placeList);
-    }
+    inputPhotos.get(1).setPlace(inputPlace);
+    exifService.exportMetaToExif(inputPhotos.get(1));
+    exifService.getTagsFromExif(expectedPhotos.get(1));
+    assertEquals(inputPhotos.get(1).getPlace(), expectedPhotos.get(1).getPlace());
+    List<Place> placeList = placeDAO.readAll();
+    assertNotNull(placeList);
+}
 
 }
 

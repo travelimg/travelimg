@@ -144,8 +144,10 @@ public class ExifServiceImpl implements ExifService {
 
                 if (element.contains("place")) {
                     String[] tempPlace = element.split("\\.");
+                    Place place = new Place(0, tempPlace[1], tempPlace[2]);
+                    clusterService.addPlace(place);
                     photoService.addPlaceToPhotos(Arrays.asList(photo),
-                            new Place(0, tempPlace[1], tempPlace[2]));
+                            place);
                     continue;
                 }
 
@@ -299,97 +301,6 @@ public class ExifServiceImpl implements ExifService {
         } else {
             return null;
         }
-    }
-
-    @Override public void modifyExifTags(Photo photo) throws ServiceException {
-        /*
-        File tempFile = new File(jpegImageFile.getPath() + "d");
-        OutputStream os = null;
-        boolean canThrow = false;
-        try {
-            TiffOutputSet outputSet = null;
-
-            // note that metadata might be null if no metadata is found.
-            final ImageMetadata metadata = Imaging.getMetadata(jpegImageFile);
-            final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
-            if (null != jpegMetadata) {
-                // note that exif might be null if no Exif metadata is found.
-                final TiffImageMetadata exifMeta = jpegMetadata.getExif();
-
-                if (exifMeta != null) {
-                    // TiffImageMetadata class is immutable (read-only).
-                    // TiffOutputSet class represents the Exif data to write.
-                    //
-                    // Usually, we want to update existing Exif metadata by
-                    // changing
-                    // the values of a few fields, or adding a field.
-                    // In these cases, it is easiest to use getOutputSet() to
-                    // start with a "copy" of the fields read from the image.
-                    outputSet = exifMeta.getOutputSet();
-
-                }
-            }
-
-            // if file does not contain any exif metadata, we create an empty
-            // set of exif metadata. Otherwise, we keep all of the other
-            // existing tags.
-            if (outputSet == null) {
-                outputSet = new TiffOutputSet();
-            }
-
-            TiffOutputDirectory rootDirectory = outputSet.getOrCreateRootDirectory();
-            TiffOutputDirectory exifDirectory = outputSet.getOrCreateExifDirectory();
-            TiffOutputDirectory gpsDirectory = outputSet.getOrCreateGPSDirectory();
-
-            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_EXPOSURE_TIME);
-            exifDirectory.add(ExifTagConstants.EXIF_TAG_EXPOSURE_TIME, RationalNumber
-                    .valueOf(1 / Double.parseDouble(exif.getExposure().substring(2))));
-
-            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_APERTURE_VALUE);
-            exifDirectory.add(ExifTagConstants.EXIF_TAG_APERTURE_VALUE,
-                    RationalNumber.valueOf(exif.getAperture()));
-
-            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_FOCAL_LENGTH);
-            exifDirectory.add(ExifTagConstants.EXIF_TAG_FOCAL_LENGTH,
-                    RationalNumber.valueOf(exif.getFocalLength()));
-
-            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_ISO);
-            exifDirectory.add(ExifTagConstants.EXIF_TAG_ISO, (short) exif.getIso());
-
-            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_FLASH);
-            exifDirectory.add(ExifTagConstants.EXIF_TAG_FLASH, (short) (exif.isFlash() ? 1 : 0));
-
-            rootDirectory.removeField(TiffTagConstants.TIFF_TAG_MAKE);
-            rootDirectory.add(TiffTagConstants.TIFF_TAG_MAKE, exif.getMake());
-
-            rootDirectory.removeField(TiffTagConstants.TIFF_TAG_MODEL);
-            rootDirectory.add(TiffTagConstants.TIFF_TAG_MODEL, exif.getModel());
-
-            gpsDirectory.removeField(GpsTagConstants.GPS_TAG_GPS_ALTITUDE);
-            gpsDirectory.add(GpsTagConstants.GPS_TAG_GPS_ALTITUDE,
-                    RationalNumber.valueOf(exif.getAltitude()));
-
-            outputSet.setGPSInDegrees(exif.getLongitude(), exif.getLatitude());
-
-            os = new FileOutputStream(tempFile);
-            os = new BufferedOutputStream(os);
-
-            new ExifRewriter().updateExifMetadataLossless(jpegImageFile, os, outputSet);
-            canThrow = true;
-            Files.copy(tempFile.toPath(), jpegImageFile.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
-            Files.delete(tempFile.toPath());
-        } catch (ImageReadException | ImageWriteException | IOException e) {
-            e.printStackTrace();
-            throw new ServiceException(e.getMessage(), e);
-        } finally {
-            try {
-                IoUtils.closeQuietly(canThrow, os);
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new ServiceException(e.getMessage(), e);
-            }
-        }*/
     }
 
 }

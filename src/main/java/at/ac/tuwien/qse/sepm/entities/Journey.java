@@ -50,4 +50,30 @@ public class Journey {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        Journey journey = (Journey) o;
+
+        if (id != journey.id)
+            return false;
+        if (!name.equals(journey.name))
+            return false;
+        if (!startDate.equals(journey.startDate))
+            return false;
+        return endDate.equals(journey.endDate);
+
+    }
+
+    @Override public int hashCode() {
+        int result = id;
+        result = 31 * result + name.hashCode();
+        result = 31 * result + startDate.hashCode();
+        result = 31 * result + endDate.hashCode();
+        return result;
+    }
 }
