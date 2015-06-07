@@ -1,4 +1,4 @@
-package at.ac.tuwien.qse.sepm.gui;
+package at.ac.tuwien.qse.sepm.gui.grid;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import javafx.collections.ObservableList;
