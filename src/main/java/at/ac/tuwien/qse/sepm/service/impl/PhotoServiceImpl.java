@@ -24,6 +24,7 @@ public class PhotoServiceImpl implements PhotoService {
 
     private static final Logger LOGGER = LogManager.getLogger();
     @Autowired private PhotoDAO photoDAO;
+
     @Autowired private ExifService exifService;
     @Autowired private PhotoTagDAO photoTagDAO;
     @Autowired private JourneyDAO journeyDAO;
@@ -86,72 +87,6 @@ public class PhotoServiceImpl implements PhotoService {
     @Override public List<Photo> getAllPhotos(Predicate<Photo> filter) throws ServiceException {
         LOGGER.debug("Entering getAllPhotos with {}", filter);
         return getAllPhotos().stream().filter(filter).collect(Collectors.toList());
-    }
-
-    @Override
-    public void addTagToPhotos(List<Photo> photos, Tag tag) throws ServiceException {
-        LOGGER.debug("Entering addTagToPhotos with {}, {}", photos, tag);
-        if (photos == null) {
-            throw new ServiceException("List<Photo> photos is null");
-        }
-        for (Photo photo : photos) {
-            try {
-                photoTagDAO.createPhotoTag(photo, tag);
-                photo.getTags().add(tag);
-                exifService.exportMetaToExif(photo);
-            } catch (DAOException ex) {
-                LOGGER.error("Photo-Tag-creation with {}, {} failed.", photo, tag);
-                throw new ServiceException("Creation of Photo-Tag failed.", ex);
-            } catch (ValidationException e) {
-                throw new ServiceException("Failed to validate entity", e);
-            }
-        }
-        LOGGER.debug("Leaving addTagToPhotos");
-    }
-
-    @Override public void removeTagFromPhotos(List<Photo> photos, Tag tag) throws ServiceException {
-        LOGGER.debug("Entering removeTagFromPhotos with {}, {}", photos, tag);
-        if (photos == null) {
-            throw new ServiceException("List<Photo> photos is null");
-        }
-        for (Photo photo : photos) {
-            try {
-                photoTagDAO.removeTagFromPhoto(photo, tag);
-                photo.getTags().remove(tag);
-                // TODO: handle exception in executorService
-                executorService.execute(new Runnable() {
-                    @Override public void run() {
-                        try {
-                            exifService.exportMetaToExif(photo);
-                        } catch (ServiceException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            } catch (DAOException ex) {
-                LOGGER.error("Removal of Photo-Tag with {}, {} failed.", photo, tag);
-                throw new ServiceException("Photo-Tag removal failed.", ex);
-            } catch (ValidationException e) {
-                throw new ServiceException("Failed to validate entity", e);
-            }
-        }
-        LOGGER.debug("Leaving removeTagFromPhotos");
-    }
-
-    @Override public List<Tag> getTagsForPhoto(Photo photo) throws ServiceException {
-        LOGGER.debug("Entering getTagsForPhoto with {}", photo);
-        List<Tag> tagList;
-        try {
-            tagList = photoTagDAO.readTagsByPhoto(photo);
-            LOGGER.info("Successfully retrieved tags for {}", photo);
-        } catch (DAOException ex) {
-            LOGGER.error("Retrieving tags for {} failed due to DAOException", photo);
-            throw new ServiceException("Could not retrieve tags for photo.", ex);
-        } catch (ValidationException e) {
-            throw new ServiceException("Failed to validate entity", e);
-        }
-        LOGGER.debug("Leaving getTagsForPhoto with {}", photo);
-        return tagList;
     }
 
     @Override public void savePhotoRating(Photo photo) throws ServiceException {

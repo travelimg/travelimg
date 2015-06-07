@@ -111,7 +111,7 @@ public class TagSelector extends VBox {
         tagList.getCheckModel().getCheckedItems().removeListener(tagListChangeListener);
         tagList.getCheckModel().clearChecks();
         try {
-            List<Tag> currentTags = photoservice.getTagsForPhoto(photo);
+            List<Tag> currentTags = tagService.getTagsForPhoto(photo);
             for (Tag tag : currentTags) {
                 tagList.getCheckModel().check(tag);
             }
