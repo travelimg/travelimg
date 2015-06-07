@@ -139,14 +139,13 @@ public class TagServiceImpl implements TagService {
         return tagList;
     }
 
-    @Override public List<Tag> getMostWanted(List<Photo> l) throws ServiceException {
-
-        LOGGER.debug("Entering getMostWanted with{}", l);
+    @Override public List<Tag> getMostFrequentTags(List<Photo> photos) throws ServiceException {
+        LOGGER.debug("Entering getMostFrequentTags with {}", photos);
 
         HashMap<Tag, Integer> counter = new HashMap<>();
-        // count the frequency of each tag
 
-        for (Photo photo : l) {
+        // count the frequency of each tag
+        for (Photo photo : photos) {
             for (Tag tag : photo.getTags()) {
                 if (counter.containsKey(tag)) {
                     counter.put(tag, counter.get(tag) + 1);
@@ -155,14 +154,16 @@ public class TagServiceImpl implements TagService {
                 }
             }
         }
-        if(counter.size()==0){
+
+        if (counter.size() == 0) {
             throw new ServiceException("No Tags found");
         }
-        // return the most fequent tags
-        LOGGER.debug("Leaving getMostWanted {}");
-        return counter.entrySet().stream()
-                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(5)
-                .map(Map.Entry::getKey).collect(Collectors.toList());
 
+        // return the most fequent tags
+        return counter.entrySet().stream()
+                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                .limit(5)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 }
