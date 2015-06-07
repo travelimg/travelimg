@@ -296,7 +296,7 @@ public class Inspector {
 
     private class TagListChangeListener implements ListChangeListener<Tag> {
         public void onChanged(ListChangeListener.Change<? extends Tag> change) {
-            while(change.next()) {
+            while (change.next()) {
 
                 if (change.wasAdded()) {
                     Tag added = change.getAddedSubList().get(0);
