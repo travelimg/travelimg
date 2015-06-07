@@ -3,7 +3,6 @@ package at.ac.tuwien.qse.sepm.gui.grid;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.TilePane;
@@ -17,7 +16,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class ScrollableImageGrid extends ScrollPane {
+public class ImageGrid extends TilePane {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -28,18 +27,10 @@ public class ScrollableImageGrid extends ScrollPane {
 
     private Consumer<Set<Photo>> selectionChangeAction = null;
 
-    private TilePane tilePane = new TilePane();
-
-    public ScrollableImageGrid(ImageCache imageCache) {
+    public ImageGrid(ImageCache imageCache) {
         this.imageCache = imageCache;
 
-        setHbarPolicy(ScrollBarPolicy.NEVER);
-        setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
-        setFitToWidth(true);
-        setFitToHeight(true);
-
-        setContent(tilePane);
-        tilePane.getStyleClass().add("image-grid");
+        getStyleClass().add("image-grid");
     }
 
     public void setPhotos(List<Photo> photos) {
@@ -104,7 +95,7 @@ public class ScrollableImageGrid extends ScrollPane {
 
         // add tile to page
         tiles.add(tile);
-        tilePane.getChildren().add(tile);
+        getChildren().add(tile);
     }
 
     private void handleTileClicked(PhotoGridTile tile, MouseEvent event) {
