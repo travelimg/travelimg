@@ -57,7 +57,21 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override public void editPhotos(List<Photo> photos, Photo photo) throws ServiceException {
-        //TODO
+        if (photos == null) {
+            throw new ServiceException("List<Photo> photos is null");
+        }
+        for (Photo p : photos) {
+            LOGGER.debug("Updating photo {}", p);
+            try {
+                //TODO update all attributes
+                p.setPlace(photo.getPlace());
+                photoDAO.update(p);
+            } catch (DAOException e) {
+                throw new ServiceException(e);
+            } catch (ValidationException e) {
+                throw new ServiceException("Failed to validate entity", e);
+            }
+        }
     }
 
     @Override public List<Photo> getAllPhotos() throws ServiceException {
@@ -190,10 +204,12 @@ public class PhotoServiceImpl implements PhotoService {
         }
 
         for (Photo photo : photos) {
-            photo.setPlace(place);
             exifService.exportMetaToExif(photo);
-            LOGGER.debug("Leaving addPlaceToPhotos");
         }
+        Photo p = new Photo();
+        p.setPlace(place);
+        editPhotos(photos, p);
+        LOGGER.debug("Leaving addPlaceToPhotos");
     }
 
     @Override public void close() {

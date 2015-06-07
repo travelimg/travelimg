@@ -11,7 +11,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +27,6 @@ public class PhotoFilter implements Predicate<Photo> {
     private final Set<Photographer> includedPhotographers = new HashSet<>();
     private final Set<Rating> includedRatings = new HashSet<>();
     private final Set<Journey> includedJourneys = new HashSet<>();
-    private final Set<YearMonth> includedMonths = new HashSet<>();
     private boolean untaggedIncluded = false;
 
     public PhotoFilter() {
@@ -44,7 +42,6 @@ public class PhotoFilter implements Predicate<Photo> {
         getIncludedPhotographers().addAll(from.getIncludedPhotographers());
         getIncludedRatings().addAll(from.getIncludedRatings());
         getIncludedJourneys().addAll(from.getIncludedJourneys());
-        getIncludedMonths().addAll(from.getIncludedMonths());
         setUntaggedIncluded(from.isUntaggedIncluded());
     }
 
@@ -86,15 +83,6 @@ public class PhotoFilter implements Predicate<Photo> {
     }
 
     /**
-     * Get the months a photo must be made in.
-     *
-     * @return included photographer names
-     */
-    public Set<YearMonth> getIncludedMonths() {
-        return includedMonths;
-    }
-
-    /**
      * Get a value indicating that photos without tags are included.
      *
      * @return true if untagged photos are included, else false
@@ -116,8 +104,7 @@ public class PhotoFilter implements Predicate<Photo> {
         return testRating(photo)
                 && testCategories(photo)
                 && testPhotographer(photo)
-                && testJourney(photo)
-                && testMonth(photo);
+                && testJourney(photo);
     }
 
     private boolean testRating(Photo photo) {
@@ -165,10 +152,6 @@ public class PhotoFilter implements Predicate<Photo> {
         } else {
             return false;
         }
-    }
-
-    private boolean testMonth(Photo photo) {
-        return getIncludedMonths().contains(YearMonth.from(photo.getDatetime()));
     }
 
     private boolean hasCategory(Photo photo) {

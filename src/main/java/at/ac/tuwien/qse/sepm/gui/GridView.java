@@ -127,9 +127,6 @@ public class GridView {
         // queue an update in the main gui
         Platform.runLater(() -> {
             disableReload = true;
-            // update filter to show the new month
-            YearMonth month = YearMonth.from(photo.getDatetime());
-            organizer.addMonth(month);
 
             // Ignore photos that are not part of the current filter.
             if (!filter.test(photo)){
