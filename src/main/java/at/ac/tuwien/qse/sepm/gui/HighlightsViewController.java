@@ -1,10 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 
-import at.ac.tuwien.qse.sepm.entities.Journey;
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Rating;
-import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.service.ClusterService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -48,6 +45,7 @@ public class HighlightsViewController {
     private GoogleMap googleMap;
     private ArrayList<Marker> markers = new ArrayList<Marker>();
     private ArrayList<Polyline> polylines = new ArrayList<Polyline>();
+    private List<Place> places;
     private HashMap<RadioButton,Journey> journeyRadioButtonsHashMap = new HashMap<>();
     private Marker actualMarker;
     private boolean disableReload = false;
@@ -60,15 +58,6 @@ public class HighlightsViewController {
         reloadJourneys();
         /**to remove - BEGIN**/
         HBox vBox = new HBox();
-        Button drawButton = new Button("draw polyline!");
-        drawButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-                clearMap();
-                drawDestinationsAsPolyline(getDestinations());
-            }
-        });
         Button playButton = new Button("play!");
         playButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
@@ -81,7 +70,6 @@ public class HighlightsViewController {
                 pos++;
             }
         });
-        vBox.getChildren().add(drawButton);
         vBox.getChildren().add(playButton);
         borderPane.setBottom(vBox);
         /**to remove - END**/
@@ -120,8 +108,15 @@ public class HighlightsViewController {
     }
 
     private void handleSelectionChange(ActionEvent e) {
+        clearMap();
         Journey j = journeyRadioButtonsHashMap.get((RadioButton) e.getSource());
         LOGGER.debug("Selected journey {}",j.getName());
+        try {
+            places = clusterService.getPlacesByJourney(j);
+            drawDestinationsAsPolyline(toLatLong(places));
+        } catch (ServiceException e1) {
+
+        }
         filter.getIncludedJourneys().clear();
         filter.getIncludedJourneys().add(j);
         handleFilterChange(filter);
@@ -193,8 +188,6 @@ public class HighlightsViewController {
 
 
     private void drawDestinationsAsPolyline(LatLong[] path){
-        //TODO note: this method will expect a list of destinations.
-
         PolylineOptions polylineOptions = new PolylineOptions();
         polylineOptions.path(new MVCArray(path))
                 .clickable(false)
@@ -216,7 +209,7 @@ public class HighlightsViewController {
 
     private void playTheJourney(int pos) {
 
-        LatLong [] path = getDestinations();
+        LatLong [] path = toLatLong(places);
 
         fitMarkersToScreen(path, pos, pos+1);
         if(actualMarker!=null){
@@ -320,5 +313,13 @@ public class HighlightsViewController {
         if(actualMarker!=null){
             googleMap.removeMarker(actualMarker);
         }
+    }
+
+    private LatLong[] toLatLong(List<Place> places){
+        LatLong[] path = new LatLong[places.size()];
+        for(int i = 0; i<places.size(); i++){
+            path[i] = new LatLong(places.get(i).getLatitude(),places.get(i).getLongitude());
+        }
+        return path;
     }
 }
