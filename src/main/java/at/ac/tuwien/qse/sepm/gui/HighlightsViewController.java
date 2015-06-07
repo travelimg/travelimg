@@ -100,6 +100,9 @@ public class HighlightsViewController {
     public void reloadJourneys(){
         journeyRadioButtonsHashMap.clear();
         photoView.getChildren().clear();
+        Label lab2 = new Label();
+        lab2.setText("Bitte eine Reise auswählen");
+        photoView.getChildren().add(lab2);
         try {
             List<Journey> listOfJourneys = clusterService.getAllJourneys();
             if(listOfJourneys.size()>0){
