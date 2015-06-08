@@ -64,7 +64,7 @@ public interface AsyncPhotoRepository extends PhotoRepository {
          * @param repository repository in which the operation will be performed
          * @param operation operation that was added
          */
-        void onAdd(AsyncPhotoRepository repository, Operation operation);
+        void onQueue(AsyncPhotoRepository repository, Operation operation);
 
         /**
          * Notifies the listener that an operation was completed.

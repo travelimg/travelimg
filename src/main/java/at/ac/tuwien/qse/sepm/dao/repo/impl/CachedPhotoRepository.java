@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -160,7 +159,7 @@ public class CachedPhotoRepository
     }
 
     protected void notifyOperationAdd(Operation operation) {
-        asyncListeners.forEach(l -> l.onAdd(this, operation));
+        asyncListeners.forEach(l -> l.onQueue(this, operation));
     }
 
     protected void notifyOperationComplete(Operation operation) {

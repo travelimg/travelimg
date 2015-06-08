@@ -22,7 +22,7 @@ public class MockAsyncListener implements AsyncPhotoRepository.AsyncListener {
         return new ArrayList<>(errorNotifications);
     }
 
-    @Override public void onAdd(AsyncPhotoRepository repository, Operation operation) {
+    @Override public void onQueue(AsyncPhotoRepository repository, Operation operation) {
         addNotifications.add(new OperationNotification(repository, operation));
     }
 
