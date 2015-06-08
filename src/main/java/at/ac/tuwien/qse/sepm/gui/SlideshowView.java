@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
 import at.ac.tuwien.qse.sepm.service.SlideshowService;
+import at.ac.tuwien.qse.sepm.gui.grid.ImageGrid;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -32,7 +33,7 @@ public class SlideshowView {
     //private final ImageView imageView = new ImageView();
     private final StackPane container = new StackPane();
 
-    private final ImageGrid<Photo> grid = new ImageGrid<>(SlideGridTile::new);
+    //private final ImageGrid<Photo> grid = new ImageGrid<>(SlideGridTile::new); //TODO:
 
 
 
@@ -71,7 +72,7 @@ public class SlideshowView {
     @FXML
     private void initialize(){
 
-        gridContainer.setContent(grid);
+        //gridContainer.setContent(grid);
 
         Btn_Add.setOnAction(this::handlesetShowSlides);
 
@@ -85,8 +86,8 @@ public class SlideshowView {
     {
         //selectedPhotos= photoGrid.getSelectedPhotos();
         LOGGER.debug(photos.get(0).getPath());
-        grid.addItem(photos.get(0));
-        LOGGER.debug("Count of Items in Grid"+grid.getItems().size());
+        //grid.addItem(photos.get(0)); TODO:
+        //LOGGER.debug("Count of Items in Grid"+grid.getItems().size()); TODO:
 
         setItem(photos.get(0));
         //grid.addItem(photos.get(0));
