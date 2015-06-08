@@ -50,25 +50,25 @@ import static org.junit.Assert.assertNotNull;
     Place inputPlace = new Place(2, "Vienna", "Austria", 48.20, 16.37, inputJourney);
 
     private List<Photo> inputPhotos = new ArrayList<Photo>() {{
-        add(new Photo(6, defaultPhotographer, sourceDir + "/exif/6.jpg", Rating.NONE,
+        add(new Photo(7, defaultPhotographer, sourceDir + "/exif/6.jpg", Rating.NONE,
                 LocalDateTime.of(2005, 9, 11, 15, 43, 55), 39.73934166666667, -104.99156111111111,
                 new Place(1, "Vienna", "Austria", 48.20, 16.37, null)));
-        add(new Photo(7, defaultPhotographer, sourceDir + "/exif/7.jpg", Rating.NONE,
+        add(new Photo(8, defaultPhotographer, sourceDir + "/exif/7.jpg", Rating.NONE,
                 LocalDateTime.of(2005, 9, 11, 15, 44, 8), 39.739336111111115, -104.9916361111111,
                 null));
-        add(new Photo(8, defaultPhotographer, sourceDir + "/exif/8.jpg", Rating.NONE,
+        add(new Photo(6, defaultPhotographer, sourceDir + "/exif/8.jpg", Rating.NONE,
                 LocalDateTime.of(2005, 9, 11, 15, 48, 7), 39.73994444444445, -104.98952777777778,
                 new Place(1, "Vienna", "Austria", 48.20, 16.37, inputJourney)));
     }};
 
     private List<Photo> expectedPhotos = new ArrayList<Photo>() {{
-        add(new Photo(6, defaultPhotographer, sourceDir + "/exif/6.jpg", Rating.NONE,
+        add(new Photo(7, defaultPhotographer, sourceDir + "/exif/6.jpg", Rating.NONE,
                 LocalDateTime.of(2005, 9, 11, 15, 43, 55), 39.73934166666667, -104.99156111111111,
                 null));
-        add(new Photo(7, defaultPhotographer, sourceDir + "/exif/7.jpg", Rating.NONE,
+        add(new Photo(8, defaultPhotographer, sourceDir + "/exif/7.jpg", Rating.NONE,
                 LocalDateTime.of(2005, 9, 11, 15, 44, 8), 39.739336111111115, -104.9916361111111,
                 null));
-        add(new Photo(8, defaultPhotographer, sourceDir + "/exif/8.jpg", Rating.NONE,
+        add(new Photo(6, defaultPhotographer, sourceDir + "/exif/8.jpg", Rating.NONE,
                 LocalDateTime.of(2005, 9, 11, 15, 48, 7), 39.73994444444445, -104.98952777777778,
                 new Place(1, "Vienna", "Austria", 48.20, 16.37, inputJourney)));
     }};
