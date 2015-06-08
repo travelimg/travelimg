@@ -98,8 +98,12 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
 
                 @Override public Place mapRow(ResultSet resultSet, int i) throws SQLException {
                     try {
+                        Journey journey = null;
+                        if (resultSet.getInt(6) != 0)
+                            journey = journeyDAO.getByID(resultSet.getInt(6));
+
                         return new Place(resultSet.getInt(1), resultSet.getString(2),
-                                resultSet.getString(3), resultSet.getDouble(4), resultSet.getDouble(5), journeyDAO.getByID(resultSet.getInt(6)));
+                                resultSet.getString(3), resultSet.getDouble(4), resultSet.getDouble(5), journey);
                     } catch (ValidationException | DAOException e) {
                         e.printStackTrace();
                         throw new RuntimeException();
@@ -128,8 +132,12 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
                         @Override public Place mapRow(ResultSet resultSet, int i)
                                 throws SQLException {
                             try {
+                                Journey journey = null;
+                                if (resultSet.getInt(5) != 0)
+                                    journey = journeyDAO.getByID(resultSet.getInt(5));
+
                                 return new Place(id, resultSet.getString(1),
-                                        resultSet.getString(2), resultSet.getDouble(3), resultSet.getDouble(4), journeyDAO.getByID(resultSet.getInt(5)));
+                                        resultSet.getString(2), resultSet.getDouble(3), resultSet.getDouble(4), journey);
                             } catch (DAOException | ValidationException e) {
                                 e.printStackTrace();
                                 throw new RuntimeException();

@@ -132,7 +132,7 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
                         }
                     });
         } catch (DataAccessException ex) {
-            logger.debug("Failed to read a Journey", ex);
+            logger.debug("Failed to read a Journey");
             return null;
         }
     }

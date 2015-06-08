@@ -131,35 +131,22 @@ public class PhotoFilter implements Predicate<Photo> {
     }
 
     private boolean testJourney(Photo photo) {
-        boolean isBelongsToNoJourneySelected = false;
-        for (Journey journey : getIncludedJourneys()) {
-            if (journey == null) {
-                isBelongsToNoJourneySelected = true;
-            } else if (journey.getStartDate().isBefore(photo.getDatetime())
-                    && journey.getEndDate()
-                    .isAfter(photo.getDatetime())) {
-                return true;
-            }
-        }
-        if (isBelongsToNoJourneySelected) {
-            List<Journey> allJourneys;
-            try {
-                allJourneys = clusterService.getAllJourneys();
-            } catch (ServiceException ex) {
-                LOGGER.error("Retrieving all Journeys failed");
-                allJourneys = new ArrayList<>();
-            }
-            for (Journey journey : allJourneys) {
-                if (journey.getStartDate().isBefore(photo.getDatetime())
-                        && journey.getEndDate()
-                        .isAfter(photo.getDatetime())) {
-                    return false;
+        Journey journey = null;
+        if (photo.getPlace() != null)
+            journey = photo.getPlace().getJourney();
+
+        for (Journey j : getIncludedJourneys()) {
+            if (j == null) {
+                if (journey == null) {
+                    return true; // belongs to no journey
                 }
+            } else {
+                if (j.equals(journey))
+                    return true;
             }
-            return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     private boolean testPlace(Photo photo) {
