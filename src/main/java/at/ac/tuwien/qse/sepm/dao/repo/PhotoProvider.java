@@ -29,16 +29,6 @@ public interface PhotoProvider {
     }
 
     /**
-     * Get meta information for a single photo.
-     *
-     * @param file path of the photo that should be checked
-     * @return meta information for the photo, or {@code null} if it does not exist
-     * @throws PersistenceException failed to perform operation
-     * @throws PhotoNotFoundException photo does not exist in the provider
-     */
-    PhotoInfo check(Path file) throws PersistenceException;
-
-    /**
      * Read a single photo.
      *
      * @param file path of the photo that should be read

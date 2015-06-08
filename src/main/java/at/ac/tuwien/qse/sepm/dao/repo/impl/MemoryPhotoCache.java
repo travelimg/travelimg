@@ -50,19 +50,6 @@ public class MemoryPhotoCache implements PhotoCache {
         return photos.containsKey(file);
     }
 
-    @Override public PhotoInfo check(Path file) throws PersistenceException {
-        if (file == null) throw new IllegalArgumentException();
-        LOGGER.debug("checking {}", file);
-        if (!contains(file)) {
-            throw new PhotoNotFoundException(this, file);
-        }
-
-        LocalDateTime date = LocalDateTime.from(modified.get(file));
-        PhotoInfo info = new PhotoInfo(file, date);
-        LOGGER.info("checked {}", info);
-        return info;
-    }
-
     @Override public Photo read(Path file) throws PersistenceException {
         if (file == null) throw new IllegalArgumentException();
         LOGGER.debug("reading {}", file);

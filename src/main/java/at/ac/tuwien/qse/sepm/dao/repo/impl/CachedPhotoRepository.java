@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.stream.Collectors;
 
 /**
  * Async repository that uses a cache as intermediate storage.
@@ -57,12 +56,11 @@ public class CachedPhotoRepository
     @Override public void synchronize() throws PersistenceException {
         Collection<Path> cachedIndex = getCache().index();
         for (Path file : cachedIndex) {
-            synchronize(file);
-        }
-
-        Collection<Path> storedIndex = getRepository().index();
-        for (Path file : storedIndex) {
-            synchronize(file);
+            if (!getRepository().contains(file)) {
+                getCache().remove(file);
+                continue;
+            }
+            addOperation(new SyncOperation(this, getCache(), file));
         }
     }
 
@@ -114,23 +112,26 @@ public class CachedPhotoRepository
         getRepository().create(file, source);
         Photo photo = getRepository().read(file);
         getCache().put(photo);
+        listeners.forEach(l -> l.onCreate(repository, file));
         LOGGER.info("created {}", file);
     }
 
     @Override public void update(Photo photo) throws PersistenceException {
         LOGGER.debug("updating {}", photo);
-        if (getCache().check(photo.getFile()) == null) {
+        if (!getCache().contains(photo.getFile())) {
             throw new PhotoNotFoundException(this, photo.getFile());
         }
         getCache().put(photo);
-        queue.add(new UpdateOperation(getRepository(), photo));
+        addOperation(new UpdateOperation(getRepository(), photo));
+        listeners.forEach(l -> l.onUpdate(repository, photo.getFile()));
         LOGGER.debug("updated {}", photo);
     }
 
     @Override public void delete(Path file) throws PersistenceException {
         LOGGER.debug("deleting {}", file);
         getCache().remove(file);
-        queue.add(new DeleteOperation(getRepository(), file));
+        addOperation(new DeleteOperation(getRepository(), file));
+        listeners.forEach(l -> l.onDelete(repository, file));
         LOGGER.debug("deleted {}", file);
     }
 
@@ -148,14 +149,6 @@ public class CachedPhotoRepository
 
     @Override public Collection<Path> index() throws PersistenceException {
         return getCache().index();
-    }
-
-    @Override public PhotoInfo check(Path file) throws PersistenceException {
-        if (file == null) throw new IllegalArgumentException();
-        LOGGER.debug("checking {}", file);
-        PhotoInfo info = getCache().check(file);
-        LOGGER.info("checked {}", info);
-        return info;
     }
 
     @Override public Photo read(Path file) throws PersistenceException {
@@ -184,23 +177,6 @@ public class CachedPhotoRepository
         notifyOperationAdd(operation);
     }
 
-    private void synchronize(Path file) throws PersistenceException {
-        boolean sourceExists = getRepository().contains(file);
-        boolean cachedExists = getCache().contains(file);
-
-        if (cachedExists && sourceExists) {
-            LocalDateTime cachedDate = getCache().check(file).getModified();
-            LocalDateTime storedDate = getRepository().check(file).getModified();
-            if (cachedDate.isBefore(storedDate)) {
-                addOperation(new ReadOperation(this, getCache(), file));
-            }
-        } else if (cachedExists) {
-            getCache().remove(file);
-        } else if (sourceExists) {
-            addOperation(new ReadOperation(this, getCache(), file));
-        }
-    }
-
     /******************************/
     /** Operation Implementations */
     /******************************/
@@ -218,11 +194,11 @@ public class CachedPhotoRepository
         }
 
         @Override public Path getFile() {
-            return null;
+            return file;
         }
 
         @Override public Kind getKind() {
-            return null;
+            return kind;
         }
 
         public abstract void perform() throws PersistenceException;
@@ -235,11 +211,11 @@ public class CachedPhotoRepository
         }
     }
 
-    class ReadOperation extends OperationBase {
+    class SyncOperation extends OperationBase {
 
         protected final PhotoCache cache;
 
-        public ReadOperation(PhotoRepository repository, PhotoCache cache, Path file) {
+        public SyncOperation(PhotoRepository repository, PhotoCache cache, Path file) {
             super(repository, file, Kind.READ);
             this.cache = cache;
         }
@@ -247,20 +223,6 @@ public class CachedPhotoRepository
         @Override public void perform() throws PersistenceException {
             Photo photo = repository.read(getFile());
             cache.put(photo);
-        }
-    }
-
-    class CreateOperation extends OperationBase {
-
-        protected final InputStream source;
-
-        public CreateOperation(PhotoRepository repository, Path file, InputStream source) {
-            super(repository, file, Kind.CREATE);
-            this.source = source;
-        }
-
-        @Override public void perform() throws PersistenceException {
-            repository.create(file, source);
         }
     }
 

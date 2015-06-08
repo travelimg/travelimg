@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
 
-public class CachedPhotoRepositoryTest extends PhotoRepositoryTest {
+public class CachedPhotoRepositoryTest extends AsyncPhotoRepositoryTest {
 
     private final Path basePath = Paths.get("test/path");
 
@@ -29,10 +29,6 @@ public class CachedPhotoRepositoryTest extends PhotoRepositoryTest {
                 return basePath.resolve("other/photo.jpg");
             }
         };
-    }
-
-    @Override protected void add(PhotoProvider object, Photo photo) throws PersistenceException {
-        ((PhotoRepository)object).create(photo.getFile(), getContext().getStream(photo));
     }
 
     private PhotoRepository getRepository() {
@@ -97,7 +93,7 @@ public class CachedPhotoRepositoryTest extends PhotoRepositoryTest {
 
         CachedPhotoRepository object = new CachedPhotoRepository(repository, cache);
         object.synchronize();
-        assertNull(cache.check(file));
+        assertFalse(cache.contains(file));
     }
 
     @Test
@@ -114,6 +110,6 @@ public class CachedPhotoRepositoryTest extends PhotoRepositoryTest {
 
         CachedPhotoRepository object = new CachedPhotoRepository(repository, cache);
         object.synchronize();
-        assertNotNull(cache.check(file));
+        assertTrue(cache.contains(file));
     }
 }

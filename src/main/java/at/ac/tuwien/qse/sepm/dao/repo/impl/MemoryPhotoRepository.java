@@ -8,7 +8,10 @@ import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Photo repository that stores photo files in memory.
@@ -118,19 +121,6 @@ public class MemoryPhotoRepository implements PhotoRepository {
 
     @Override public boolean contains(Path file) throws PersistenceException {
         return files.containsKey(file);
-    }
-
-    @Override public PhotoInfo check(Path file) throws PersistenceException {
-        if (file == null) throw new IllegalArgumentException();
-        LOGGER.debug("checking {}", file);
-        if (!contains(file)) {
-            throw new PhotoNotFoundException(this, file);
-        }
-
-        LocalDateTime date = LocalDateTime.from(modified.get(file));
-        PhotoInfo info = new PhotoInfo(file, date);
-        LOGGER.info("checked {}", info);
-        return info;
     }
 
     @Override public Photo read(Path file) throws PersistenceException {

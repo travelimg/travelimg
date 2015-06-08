@@ -55,25 +55,6 @@ public abstract class PhotoProviderTest {
     }
 
     @Test(expected = PhotoNotFoundException.class)
-    public void check_nonExisting_throws() throws PersistenceException {
-        PhotoProvider object = getObject();
-        Path file = getContext().getFile1();
-
-        object.check(file);
-    }
-
-    @Test
-    public void check_existing_returnsInfo() throws PersistenceException {
-        PhotoProvider object = getObject();
-        Photo photo = getContext().getPhoto1();
-        add(object, photo);
-
-        PhotoInfo info = object.check(photo.getFile());
-        assertNotNull(info);
-        assertEquals(photo.getFile(), info.getFile());
-    }
-
-    @Test(expected = PhotoNotFoundException.class)
     public void read_nonExisting_throws() throws PersistenceException {
         PhotoProvider object = getObject();
         Path file = getContext().getFile1();

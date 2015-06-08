@@ -16,6 +16,10 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
     protected abstract PhotoRepository getObject();
     protected abstract Context getContext();
 
+    @Override protected void add(PhotoProvider object, Photo photo) throws PersistenceException {
+        ((PhotoRepository)object).create(photo.getFile(), getContext().getStream(photo));
+    }
+
     @Test(expected = PersistenceException.class)
     public void create_invalidPath_throws() throws PersistenceException {
         PhotoRepository object = getObject();
@@ -44,32 +48,20 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
     }
 
     @Test
-    public void create_valid_updatesModificationTime() throws PersistenceException {
-        PhotoRepository object = getObject();
-        LocalDateTime now = LocalDateTime.now();
-        Path file = getContext().getFile1();
-
-        object.create(file, getContext().getStream1());
-        assertTrue(!object.check(file).getModified().isBefore(now));
-    }
-
-    @Test
     public void create_valid_notifiesListener() throws PersistenceException {
         PhotoRepository object = getObject();
         Path file = getContext().getFile1();
-        object.create(file, getContext().getStream1());
         MockListener listener = new MockListener();
         object.addListener(listener);
-        Photo modified = getContext().getModified1();
 
-        object.update(modified);
+        object.create(file, getContext().getStream1());
 
-        assertTrue(listener.getCreateNotifications().isEmpty());
+        assertTrue(listener.getUpdateNotifications().isEmpty());
         assertTrue(listener.getDeleteNotifications().isEmpty());
         assertTrue(listener.getErrorNotifications().isEmpty());
-        assertEquals(1, listener.getUpdateNotifications().size());
-        assertEquals(object, listener.getUpdateNotifications().get(0).getRepository());
-        assertEquals(file, listener.getUpdateNotifications().get(0).getFile());
+        assertEquals(1, listener.getCreateNotifications().size());
+        assertEquals(object, listener.getCreateNotifications().get(0).getRepository());
+        assertEquals(file, listener.getCreateNotifications().get(0).getFile());
     }
 
     @Test(expected = PhotoNotFoundException.class)
@@ -92,32 +84,22 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
     }
 
     @Test
-    public void update_existing_updatesModificationTime() throws PersistenceException {
-        PhotoRepository object = getObject();
-        Path file = getContext().getFile1();
-        object.create(file, getContext().getStream1());
-        LocalDateTime now = LocalDateTime.now();
-        Photo modified = getContext().getModified1();
-
-        object.update(modified);
-        assertTrue(!object.check(file).getModified().isBefore(now));
-    }
-
-    @Test
     public void update_existing_notifiesListener() throws PersistenceException {
         PhotoRepository object = getObject();
         Path file = getContext().getFile1();
+        object.create(file, getContext().getStream1());
         MockListener listener = new MockListener();
         object.addListener(listener);
+        Photo modified = getContext().getModified1();
 
-        object.create(file, getContext().getStream1());
+        object.update(modified);
 
-        assertTrue(listener.getUpdateNotifications().isEmpty());
+        assertTrue(listener.getCreateNotifications().isEmpty());
         assertTrue(listener.getDeleteNotifications().isEmpty());
         assertTrue(listener.getErrorNotifications().isEmpty());
-        assertEquals(1, listener.getCreateNotifications().size());
-        assertEquals(object, listener.getCreateNotifications().get(0).getRepository());
-        assertEquals(file, listener.getCreateNotifications().get(0).getFile());
+        assertEquals(1, listener.getUpdateNotifications().size());
+        assertEquals(object, listener.getUpdateNotifications().get(0).getRepository());
+        assertEquals(file, listener.getUpdateNotifications().get(0).getFile());
     }
 
     @Test(expected = PhotoNotFoundException.class)

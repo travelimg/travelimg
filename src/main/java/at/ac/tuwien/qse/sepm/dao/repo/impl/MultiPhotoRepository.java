@@ -2,9 +2,7 @@ package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
 import at.ac.tuwien.qse.sepm.dao.repo.PersistenceException;
 import at.ac.tuwien.qse.sepm.dao.repo.Photo;
-import at.ac.tuwien.qse.sepm.dao.repo.PhotoInfo;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoRepository;
-import org.apache.logging.log4j.LogManager;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -40,10 +38,6 @@ public class MultiPhotoRepository implements PhotoRepository {
     }
 
     @Override public Collection<Path> index() throws PersistenceException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override public PhotoInfo check(Path file) throws PersistenceException {
         throw new UnsupportedOperationException();
     }
 

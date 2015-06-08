@@ -24,10 +24,6 @@ public class MemoryPhotoRepositoryTest extends PhotoRepositoryTest {
         };
     }
 
-    @Override protected void add(PhotoProvider object, Photo photo) throws PersistenceException {
-        ((PhotoRepository)object).create(photo.getFile(), getContext().getStream(photo));
-    }
-
     @Override protected PhotoRepository getObject() {
         return new MemoryPhotoRepository(basePath) {
             @Override protected Photo read(Path file, InputStream stream) throws IOException {

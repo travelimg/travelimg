@@ -1,6 +1,8 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
-import at.ac.tuwien.qse.sepm.dao.repo.*;
+import at.ac.tuwien.qse.sepm.dao.repo.PersistenceException;
+import at.ac.tuwien.qse.sepm.dao.repo.Photo;
+import at.ac.tuwien.qse.sepm.dao.repo.PhotoNotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -8,9 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.*;
-import java.nio.file.attribute.FileTime;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -122,28 +121,6 @@ public class PhotoDirectory extends RunnablePhotoRepository {
         } catch (IOException ex) {
             throw new PersistenceException(ex);
         }
-    }
-
-    @Override public PhotoInfo check(Path file) throws PersistenceException {
-        if (file == null) throw new IllegalArgumentException();
-        LOGGER.debug("checking {}", file);
-
-        if (!contains(file)) {
-            LOGGER.debug("directory does not contain file {}", file);
-            return null;
-        }
-        FileTime fileTime;
-        try {
-            fileTime = Files.getLastModifiedTime(file);
-        } catch (IOException ex) {
-            LOGGER.debug("failed reading modification time for file {}", file);
-            throw new PersistenceException(ex);
-        }
-
-        LocalDateTime time = LocalDateTime.ofInstant(fileTime.toInstant(), ZoneId.systemDefault());
-        PhotoInfo info = new PhotoInfo(file, time);
-        LOGGER.info("checked {}", info);
-        return info;
     }
 
     @Override public Photo read(Path file) throws PersistenceException {

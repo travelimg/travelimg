@@ -3,8 +3,6 @@ package at.ac.tuwien.qse.sepm.dao.repo.impl;
 import at.ac.tuwien.qse.sepm.dao.repo.PersistenceException;
 import at.ac.tuwien.qse.sepm.dao.repo.Photo;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoCache;
-import at.ac.tuwien.qse.sepm.dao.repo.PhotoInfo;
-import org.apache.logging.log4j.LogManager;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -23,10 +21,6 @@ public class JdbcPhotoCache implements PhotoCache {
     }
 
     @Override public Collection<Path> index() throws PersistenceException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override public PhotoInfo check(Path file) throws PersistenceException {
         throw new UnsupportedOperationException();
     }
 

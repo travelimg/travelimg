@@ -40,19 +40,6 @@ public abstract class PhotoCacheTest extends PhotoProviderTest {
         assertEquals(photo, object.read(photo.getFile()));
     }
 
-    @Test
-    public void put_valid_updatesModificationTime() throws PersistenceException {
-        PhotoCache object = getObject();
-        Photo photo = getContext().getPhoto1();
-        Photo modified = getContext().getModified1();
-
-        LocalDateTime now = LocalDateTime.now();
-        object.put(photo);
-        object.put(modified);
-        PhotoInfo info = object.check(photo.getFile());
-        assertTrue(!info.getModified().isBefore(now));
-    }
-
     @Test(expected = PhotoNotFoundException.class)
     public void remove_nonExisting_throws() throws PersistenceException {
         PhotoCache object = getObject();
