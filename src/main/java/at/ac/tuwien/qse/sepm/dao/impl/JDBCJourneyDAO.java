@@ -116,7 +116,7 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
     }
 
     @Override public Journey getByID(int id) throws DAOException, ValidationException {
-        logger.debug("getByID()" + id);
+        logger.debug("getByID({})", id);
 
         JourneyValidator.validateID(id);
 
@@ -132,7 +132,7 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
                         }
                     });
         } catch (DataAccessException ex) {
-            logger.debug("Failed to read a Journey");
+            logger.debug("Failed to read a Journey", ex);
             return null;
         }
     }
