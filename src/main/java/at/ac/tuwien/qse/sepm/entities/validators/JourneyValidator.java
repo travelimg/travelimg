@@ -22,7 +22,7 @@ public class JourneyValidator {
         if (entity.getEndDate() == null)
             throw new ValidationException("EndDate can not be null");
 
-        if(entity.getEndDate().isBefore(entity.getStartDate()))
+        if (entity.getEndDate().isBefore(entity.getStartDate()))
             throw new ValidationException("EndDate must not be before StartDate");
     }
 

@@ -59,5 +59,5 @@ public interface PlaceDAO {
      * @throws DAOException If the data store fails to deliver the records.
      * @throws ValidationException If the id is invalid.
      */
-    public List<Place> readByJourney(Journey journey) throws DAOException, ValidationException;
+    List<Place> readByJourney(Journey journey) throws DAOException, ValidationException;
 }
