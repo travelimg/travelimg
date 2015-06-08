@@ -40,7 +40,7 @@ public class JDBCPhotographerDAOTest extends AbstractJDBCDAOTest {
     public void createWithValidParameterShouldPersist() throws ValidationException, DAOException {
         int nrOfRows = countRows();
         Photographer p = photographerDAO.create(new Photographer(null, "Enri"));
-        assertThat(countRows(), is(nrOfRows));
+        assertThat(countRows(), is(nrOfRows + 1));
     }
 
     @Test(expected = ValidationException.class)
