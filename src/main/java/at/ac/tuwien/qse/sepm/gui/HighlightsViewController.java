@@ -216,6 +216,7 @@ public class HighlightsViewController {
                     } catch (ServiceException e) {
                         LOGGER.debug("Photos habe keine Tag's ", e);
                         photoView.getChildren().clear();
+                        grid = new ImageGrid(imageCache);
                         grid.setPhotos(goodPhotos);
                         photoView.getChildren().add(grid);
                     }
