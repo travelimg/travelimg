@@ -259,15 +259,15 @@ public class Inspector {
                 Exif exif = exifService.getExif(photo);
 
                 List<Pair<String, String>> exifList = new ArrayList<Pair<String, String>>() {{
-                    new Pair<>("Aufnahmedatum", photo.getDatetime().toString().replace("T", " "));
-                    new Pair<>("Kamerahersteller", exif.getMake());
-                    new Pair<>("Kameramodell", exif.getModel());
-                    new Pair<>("Belichtungszeit", exif.getExposure() + " Sek.");
-                    new Pair<>("Blende", "f/" + exif.getAperture());
-                    new Pair<>("Brennweite", "" + exif.getFocalLength());
-                    new Pair<>("ISO", "" + exif.getIso());
-                    new Pair<>("Blitz", exif.isFlash() ? "wurde ausgelöst" : "wurde nicht ausgelöst");
-                    new Pair<>("Höhe", "" + exif.getAltitude());
+                    add(new Pair<>("Aufnahmedatum", photo.getDatetime().toString().replace("T", " ")));
+                    add(new Pair<>("Kamerahersteller", exif.getMake()));
+                    add(new Pair<>("Kameramodell", exif.getModel()));
+                    add(new Pair<>("Belichtungszeit", exif.getExposure() + " Sek."));
+                    add(new Pair<>("Blende", "f/" + exif.getAperture()));
+                    add(new Pair<>("Brennweite", "" + exif.getFocalLength()));
+                    add(new Pair<>("ISO", "" + exif.getIso()));
+                    add(new Pair<>("Blitz", exif.isFlash() ? "wurde ausgelöst" : "wurde nicht ausgelöst"));
+                    add(new Pair<>("Höhe", "" + exif.getAltitude()));
                 }};
 
                 ObservableList<Pair<String, String>> exifData = FXCollections.observableArrayList(exifList);
