@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
@@ -29,7 +30,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(SpringJUnit4ClassRunner.class) @ContextConfiguration("classpath:test-config.xml") @Transactional(propagation = Propagation.REQUIRES_NEW) @TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true) public class ExifServiceTest {
+public class ExifServiceTest extends ServiceTestBase {
     private static final Logger logger = LogManager.getLogger(ClusterServiceTest.class);
 
     private static final Photographer defaultPhotographer = new Photographer(1,

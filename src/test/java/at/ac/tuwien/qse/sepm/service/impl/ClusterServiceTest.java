@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.service.impl;
 import at.ac.tuwien.qse.sepm.dao.*;
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
@@ -16,12 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:test-config.xml")
-@Transactional(propagation = Propagation.REQUIRES_NEW)
-@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
 @UsingTable("Photo")
-public class ClusterServiceTest {
+public class ClusterServiceTest extends ServiceTestBase {
 
     private static final Logger logger = LogManager.getLogger(ClusterServiceTest.class);
 

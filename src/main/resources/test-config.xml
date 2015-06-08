@@ -22,13 +22,6 @@
     </jdbc:embedded-database>
 
     <bean id="ioHandler" class="at.ac.tuwien.qse.sepm.util.TestIOHandler"></bean>
-
-    <bean id="transactionManager"
-          class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
-          scope="singleton">
-        <property name="dataSource" ref="dataSource" />
-    </bean>
-
     <bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"
           destroy-method="close">
     </bean>
