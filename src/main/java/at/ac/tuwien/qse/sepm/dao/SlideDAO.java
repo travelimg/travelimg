@@ -1,6 +1,9 @@
 package at.ac.tuwien.qse.sepm.dao;
 
+import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+
+import java.util.List;
 
 /**
  * Created by mb on 08.06.15.
