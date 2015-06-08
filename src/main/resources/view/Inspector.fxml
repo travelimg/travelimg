@@ -37,6 +37,8 @@
                                 <TableColumn fx:id="exifValue" prefWidth="135.0" text="Wert"/>
                             </columns>
                         </TableView>
+                        <ComboBox fx:id="cb_getSlideshows" layoutX="46.0" layoutY="215.0" prefHeight="40.0" prefWidth="165.0" />
+                        <Button fx:id="addToSlideshowButton" text="Add to Slideshow" maxHeight="Infinity" maxWidth="Infinity" styleClass="add" VBox.vgrow="ALWAYS"></Button>
                     </children>
                 </VBox>
             </children>

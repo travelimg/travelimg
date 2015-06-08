@@ -47,7 +47,7 @@
 	<bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
 
 	<bean id="slideService" class="at.ac.tuwien.qse.sepm.service.impl.SlideServiceImpl"></bean>
-	<bean id="slideService" class="at.ac.tuwien.qse.sepm.service.impl.SlideshowServiceImpl"></bean>
+	<bean id="slideshowService" class="at.ac.tuwien.qse.sepm.service.impl.SlideshowServiceImpl"></bean>
 
     <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl"
 			destroy-method="close">
