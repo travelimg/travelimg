@@ -123,10 +123,6 @@ public class PlaceFilterList extends VBox {
 
     private void onChange() {
         if (changeHandler != null) {
-            System.out.println("checked: " + getChecked());
-            for (Map.Entry<Place, CheckItem> entry : items.entrySet()) {
-                System.out.println("" + entry.getKey() + " is " + (entry.getValue().getState() == CheckState.CHECKED));
-            }
             changeHandler.accept(getChecked());
         }
         updateHeader();
