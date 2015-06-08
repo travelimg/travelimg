@@ -3,8 +3,6 @@ package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.grid.ImageGrid;
-import at.ac.tuwien.qse.sepm.gui.grid.PhotoGridTile;
-
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.ClusterService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
@@ -68,7 +66,7 @@ public class HighlightsViewController {
     public void initialize(){
         /**to remove - BEGIN**/
         HBox vBox = new HBox();
-        Button playButton = new Button("play!");
+        Button playButton = new Button("Play selected journey!");
         playButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
             @Override

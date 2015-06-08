@@ -36,7 +36,7 @@
             <top>
                 <VBox fx:id="mapContainer" maxHeight="300.0" />
             </top>
-            <bottom>
+            <center>
                 <ScrollPane fx:id="scrollPhotoView" prefWidth="500" prefHeight="400" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
                     <VBox fx:id="photoView">
                         <children>
@@ -47,7 +47,7 @@
                         </padding>
                     </VBox>
                 </ScrollPane>
-            </bottom>
+            </center>
         </BorderPane>
 
     </center>
