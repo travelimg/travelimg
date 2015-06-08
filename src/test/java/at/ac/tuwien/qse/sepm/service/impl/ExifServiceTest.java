@@ -7,6 +7,7 @@ import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +79,10 @@ import static org.junit.Assert.assertNotNull;
     @Autowired private TagDAO tagDA0;
     @Autowired private PhotoDAO photoDAO;
 
+    @BeforeClass public static void init() {
+        new File(sourceDir + "/exif/").mkdirs();
+    }
+
     @WithData @Test public void testTagExportToPhotoFile()
             throws ServiceException, ValidationException, DAOException {
         logger.debug("Entering testTagExportToPhotoFile()");
@@ -94,7 +99,8 @@ import static org.junit.Assert.assertNotNull;
         inputPhotos.get(2).getTags().add(inputTag);
         exifService.exportMetaToExif(inputPhotos.get(2));
         exifService.getTagsFromExif(expectedPhotos.get(2));
-        assertEquals(inputPhotos.get(2).getTags().get(0).getName(), expectedPhotos.get(2).getTags().get(0).getName());
+        assertEquals(inputPhotos.get(2).getTags().get(
+                0).getName(), expectedPhotos.get(2).getTags().get(0).getName());
     }
 
     @WithData @Test public void testJourneyExportToPhotoFile()
@@ -133,7 +139,8 @@ import static org.junit.Assert.assertNotNull;
         inputPhotos.get(1).setPlace(inputPlace);
         exifService.exportMetaToExif(inputPhotos.get(1));
         exifService.getTagsFromExif(expectedPhotos.get(1));
-        assertEquals(inputPhotos.get(1).getPlace().getCity(), expectedPhotos.get(1).getPlace().getCity());
+        assertEquals(inputPhotos.get(1).getPlace().getCity(),
+                expectedPhotos.get(1).getPlace().getCity());
         assertEquals(inputPhotos.get(1).getPlace().getCountry(), expectedPhotos.get(1).getPlace().getCountry());
         List<Place> placeList = placeDAO.readAll();
         assertNotNull(placeList);
