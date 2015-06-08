@@ -34,7 +34,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private static final String READ_MONTH_STATEMENT = "SELECT YEAR(datetime), MONTH(datetime) from Photo;";
     private static final String GET_BY_ID_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id FROM Photo where id=?";
     private static final String UPDATE_STATEMENT = "UPDATE Photo SET path = ?, rating = ?, place_id = ? WHERE id = ?";
-    private static final String READ_JOURNEY_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id FROM PHOTO WHERE datetime>? AND datetime<? ORDER BY datetime ASC";
+    private static final String READ_JOURNEY_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id FROM PHOTO WHERE datetime>=? AND datetime<=? ORDER BY datetime ASC";
 
     private final String photoDirectory;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.ENGLISH);
