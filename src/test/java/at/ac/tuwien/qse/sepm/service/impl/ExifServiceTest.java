@@ -51,7 +51,7 @@ import static org.junit.Assert.assertNotNull;
     private List<Photo> inputPhotos = new ArrayList<Photo>() {{
         add(new Photo(6, defaultPhotographer, sourceDir + "/exif/6.jpg", Rating.NONE,
                 LocalDateTime.of(2005, 9, 11, 15, 43, 55), 39.73934166666667, -104.99156111111111,
-                null));
+                new Place(1, "Vienna", "Austria", 48.20, 16.37, null)));
         add(new Photo(7, defaultPhotographer, sourceDir + "/exif/7.jpg", Rating.NONE,
                 LocalDateTime.of(2005, 9, 11, 15, 44, 8), 39.739336111111115, -104.9916361111111,
                 null));
@@ -94,7 +94,7 @@ import static org.junit.Assert.assertNotNull;
         inputPhotos.get(2).getTags().add(inputTag);
         exifService.exportMetaToExif(inputPhotos.get(2));
         exifService.getTagsFromExif(expectedPhotos.get(2));
-        assertEquals(inputPhotos.get(2).getTags(), expectedPhotos.get(2).getTags());
+        assertEquals(inputPhotos.get(2).getTags().get(0).getName(), expectedPhotos.get(2).getTags().get(0).getName());
     }
 
     @WithData @Test public void testJourneyExportToPhotoFile()
@@ -133,7 +133,8 @@ import static org.junit.Assert.assertNotNull;
         inputPhotos.get(1).setPlace(inputPlace);
         exifService.exportMetaToExif(inputPhotos.get(1));
         exifService.getTagsFromExif(expectedPhotos.get(1));
-        assertEquals(inputPhotos.get(1).getPlace(), expectedPhotos.get(1).getPlace());
+        assertEquals(inputPhotos.get(1).getPlace().getCity(), expectedPhotos.get(1).getPlace().getCity());
+        assertEquals(inputPhotos.get(1).getPlace().getCountry(), expectedPhotos.get(1).getPlace().getCountry());
         List<Place> placeList = placeDAO.readAll();
         assertNotNull(placeList);
     }
