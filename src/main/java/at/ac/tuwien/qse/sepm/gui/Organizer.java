@@ -42,7 +42,7 @@ public class Organizer {
     @FXML private Button importButton;
     @FXML private Button flickrButton;
     @FXML private Button presentButton;
-    @FXML private Button journeyButton;
+    @FXML private Button addJourneyButton;
 
     @FXML private VBox filterContainer;
     @FXML private FilterList<Rating> ratingListView;
@@ -97,7 +97,7 @@ public class Organizer {
 
     @FXML
     private void initialize() {
-        journeyButton.setOnAction(this::handleJourney);
+        addJourneyButton.setOnAction(this::handleJourney);
         resetButton.setOnAction(event -> resetFilter());
 
         ratingListView = new FilterList<>(value -> {

@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.entities.Photographer;
+import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.service.FlickrService;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
@@ -145,6 +146,7 @@ public class FlickrServiceImpl implements FlickrService {
                 .findFirst()
                 .orElse(new Photographer(1, null)); // default photographer
         downloaded.setPhotographer(photographer);
+        downloaded.setPlace(new Place(1, "Unkown place", "Unknown place", 0.0, 0.0, null));
 
         return downloaded;
     }

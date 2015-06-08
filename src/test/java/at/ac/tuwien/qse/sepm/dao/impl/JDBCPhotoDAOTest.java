@@ -53,15 +53,16 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
             new Photo(3, defaultPhotographer, Paths.get(dataDir, "2005", "09", "11", "3.jpg").toString(), Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9, defaultPlace),
             new Photo(4, defaultPhotographer, Paths.get(dataDir, "2005", "09", "11", "4.jpg").toString(), Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9, defaultPlace),
             new Photo(5, defaultPhotographer, Paths.get(dataDir, "2015", "03", "04", "5.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 3, 4, 0, 0, 0), 12.0, 12.0, defaultPlace),
-            new Photo(6, defaultPhotographer, Paths.get(dataDir, "2015", "05", "17", "6.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
-            new Photo(7, defaultPhotographer, Paths.get(dataDir, "2015", "05", "17", "7.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
-            new Photo(8, defaultPhotographer, Paths.get(dataDir, "2015", "05", "17", "8.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
+            new Photo(6, defaultPhotographer, Paths.get(dataDir, "2005", "09", "11", "4.jpg").toString(), Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9, defaultPlace),
+            new Photo(7, defaultPhotographer, Paths.get(dataDir, "2015", "05", "17", "6.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
+            new Photo(8, defaultPhotographer, Paths.get(dataDir, "2015", "05", "17", "7.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
+            new Photo(9, defaultPhotographer, Paths.get(dataDir, "2015", "05", "17", "8.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
     };
 
     private Photo inputPhotos[] = new Photo[] {
-            new Photo(6, defaultPhotographer, Paths.get(sourceDir, "6.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
-            new Photo(7, defaultPhotographer, Paths.get(sourceDir, "7.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
-            new Photo(8, defaultPhotographer, Paths.get(sourceDir, "8.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
+            new Photo(7, defaultPhotographer, Paths.get(sourceDir, "6.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
+            new Photo(8, defaultPhotographer, Paths.get(sourceDir, "7.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
+            new Photo(9, defaultPhotographer, Paths.get(sourceDir, "8.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
     };
 
     private Photo getInputPhoto(int seq) {
@@ -100,7 +101,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     @Test
     @WithData
     public void testWithData() throws DAOException {
-        assertThat(countRows(), is(5));
+        assertThat(countRows(), is(6));
     }
 
     @Test(expected = ValidationException.class)
@@ -233,7 +234,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     @Test
     @WithData
     public void testReadPhotosByMonthWithData() throws DAOException {
-        assertThat(photoDAO.readPhotosByMonth(expectedMonths[0]).size(), is(3));
+        assertThat(photoDAO.readPhotosByMonth(expectedMonths[0]).size(), is(4));
         assertThat(photoDAO.readPhotosByMonth(expectedMonths[1]).size(), is(2));
     }
 
