@@ -46,6 +46,9 @@
 
 	<bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
 
+	<bean id="slideService" class="at.ac.tuwien.qse.sepm.service.impl.SlideServiceImpl"></bean>
+	<bean id="slideService" class="at.ac.tuwien.qse.sepm.service.impl.SlideshowServiceImpl"></bean>
+
     <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl"
 			destroy-method="close">
 	</bean>
@@ -71,4 +74,5 @@
     <bean id="ratingPicker" class="at.ac.tuwien.qse.sepm.gui.RatingPicker"></bean>
 	<bean id="imageCache" class="at.ac.tuwien.qse.sepm.gui.util.ImageCache"></bean>
 	<bean id="imageGridController" class="at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid"></bean>
+
 </beans>
