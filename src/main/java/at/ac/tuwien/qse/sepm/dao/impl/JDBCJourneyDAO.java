@@ -126,9 +126,9 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
 
                         @Override public Journey mapRow(ResultSet resultSet, int i)
                                 throws SQLException {
-                            return new Journey(resultSet.getInt(1), resultSet.getString(2),
-                                    resultSet.getTimestamp(3).toLocalDateTime(),
-                                    resultSet.getTimestamp(4).toLocalDateTime());
+                            return new Journey(id, resultSet.getString(1),
+                                    resultSet.getTimestamp(2).toLocalDateTime(),
+                                    resultSet.getTimestamp(3).toLocalDateTime());
                         }
                     });
         } catch (DataAccessException ex) {
