@@ -49,7 +49,7 @@ public class Organizer {
     @FXML private FilterList<Tag> categoryListView;
     @FXML private FilterList<Photographer> photographerListView;
     @FXML private FilterList<Journey> journeyListView;
-    @FXML private PlaceFilterList placeListView;
+    @FXML private FilterList<Place> placeListView;
 
     @FXML private Button resetButton;
 
@@ -125,7 +125,10 @@ public class Organizer {
         });
         journeyListView.setTitle("Reisen");
         journeyListView.setChangeHandler(this::handleJourneysChange);
-        placeListView = new PlaceFilterList();
+        placeListView = new FilterList<Place>(value -> {
+            if (value == null) return "Keinem Ort zugeordnet";
+            return value.getCountry() + ", " + value.getCity();
+        });
         placeListView.setTitle("Orte");
         placeListView.setChangeHandler(this::handlePlacesChange);
 
