@@ -23,7 +23,7 @@ import java.util.Map;
 public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
     private static final Logger logger = LogManager.getLogger(JDBCJourneyDAO.class);
 
-    private static final String readStatement = "SELECT name, start, end FROM JOURNEY WHERE id=?;";
+    private static final String readStatement = "SELECT id, name, start, end FROM JOURNEY WHERE id=?;";
     private static final String readAllStatement = "SELECT id, name, start, end FROM JOURNEY;";
     private static final String deleteStatement = "DELETE FROM JOURNEY WHERE id=?;";
     private static final String updateStatement = "UPDATE Journey SET name = ?, start = ?, end = ? WHERE id = ?";
@@ -40,13 +40,11 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
     @Override
     public Journey create(Journey journey) throws DAOException, ValidationException {
         logger.debug("Creating Journey", journey);
-        if (journey == null)
-            throw new ValidationException();
-        // TODO: handle validator exception
+
         JourneyValidator.validate(journey);
 
         for (Journey element : readAll()) {
-            if (element.getName() == journey.getName() && element.getStartDate() == journey
+            if (element.getName().equals(journey.getName()) && element.getStartDate() == journey
                     .getStartDate() && element.getEndDate() == journey.getStartDate())
                 return element;
         }
@@ -64,7 +62,6 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
             logger.error("Failed to create journey", ex);
             throw new DAOException("Failed to create journey", ex);
         }
-
     }
 
     @Override
@@ -90,8 +87,11 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         JourneyValidator.validate(journey);
 
         try {
-            jdbcTemplate.update(updateStatement, journey.getName(), journey.getStartDate(),
-                    journey.getEndDate(), journey.getId());
+            jdbcTemplate.update(updateStatement,
+                    journey.getName(),
+                    journey.getStartDate(),
+                    journey.getEndDate(),
+                    journey.getId());
             logger.debug("Successfully updated Journey", journey);
         } catch (DataAccessException ex) {
             logger.error("Failed updating Journey", journey);
@@ -103,22 +103,11 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
     public List<Journey> readAll() throws DAOException {
         logger.debug("readAll");
         try {
-            List<Journey> journeys = jdbcTemplate.query(readAllStatement, new RowMapper<Journey>() {
-
-                @Override
-                public Journey mapRow(ResultSet resultSet, int i) throws SQLException {
-                    return new Journey(resultSet.getInt(1), resultSet.getString(2),
-                            resultSet.getTimestamp(3).toLocalDateTime(),
-                            resultSet.getTimestamp(4).toLocalDateTime());
-                }
-            });
-
+            List<Journey> journeys = jdbcTemplate.query(readAllStatement, new JourneyMapper());
             logger.debug("Successfully read all journeys");
             return journeys;
         } catch (DataAccessException e) {
             throw new DAOException("Failed to read all journeys", e);
-        } catch (RuntimeException ex) {
-            throw new DAOException(ex.getCause());
         }
     }
 
@@ -129,20 +118,22 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         JourneyValidator.validateID(id);
 
         try {
-            return this.jdbcTemplate
-                    .queryForObject(readStatement, new Object[]{id}, new RowMapper<Journey>() {
-
-                        @Override
-                        public Journey mapRow(ResultSet resultSet, int i)
-                                throws SQLException {
-                            return new Journey(id, resultSet.getString(1),
-                                    resultSet.getTimestamp(2).toLocalDateTime(),
-                                    resultSet.getTimestamp(3).toLocalDateTime());
-                        }
-                    });
+            return this.jdbcTemplate.queryForObject(readStatement, new Object[]{id}, new JourneyMapper());
         } catch (DataAccessException ex) {
             logger.debug("Failed to read a Journey");
             return null;
+        }
+    }
+
+    private class JourneyMapper implements RowMapper<Journey> {
+        @Override
+        public Journey mapRow(ResultSet rs, int rowNum) throws SQLException {
+            return new Journey(
+                    rs.getInt(1),
+                    rs.getString(2),
+                    rs.getTimestamp(3).toLocalDateTime(),
+                    rs.getTimestamp(4).toLocalDateTime()
+            );
         }
     }
 }
