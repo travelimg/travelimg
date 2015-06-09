@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
 import at.ac.tuwien.qse.sepm.dao.*;
+import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,5 +24,10 @@ public class JDBCPlaceDAOTest extends AbstractJDBCDAOTest {
         assertThat(placeDAO.readAll().size(), is(countRows()));
     }
 
+    @Test(expected = ValidationException.class)
+    @WithData
+    public void createWithNullShouldThrow() throws ValidationException, DAOException {
+        placeDAO.create(null);
+    }
 
 }
