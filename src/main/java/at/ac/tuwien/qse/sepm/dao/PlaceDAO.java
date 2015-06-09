@@ -19,15 +19,6 @@ public interface PlaceDAO {
     Place create(Place place) throws DAOException, ValidationException;
 
     /**
-     * Delete an existing place.
-     *
-     * @param place Specifies which place to delete by providing the id.
-     * @throws DAOException        If the data store fails to delete the record.
-     * @throws ValidationException If the place is not a valid entity.
-     */
-    void delete(Place place) throws DAOException, ValidationException;
-
-    /**
      * Update an existing place.
      *
      * @param place Description of the place to update together with the new values.

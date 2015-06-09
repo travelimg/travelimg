@@ -65,21 +65,6 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
     }
 
     @Override
-    public void delete(Place place) throws DAOException, ValidationException {
-        logger.debug("Deleting Place", place);
-
-        PlaceValidator.validate(place);
-        PlaceValidator.validateID(place.getId());
-
-        try {
-            jdbcTemplate.update(deleteStatement, place.getId());
-        } catch (DataAccessException ex) {
-            logger.error("Failed to delete Place", ex);
-            throw new DAOException("Failed to delete Place", ex);
-        }
-    }
-
-    @Override
     public void update(Place place) throws DAOException, ValidationException {
         logger.debug("Updating Place", place);
 
