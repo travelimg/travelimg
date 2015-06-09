@@ -1,10 +1,8 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.entities.*;
-import at.ac.tuwien.qse.sepm.service.ClusterService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,8 +16,6 @@ public class PhotoFilter implements Predicate<Photo> {
     private final Set<Rating> includedRatings = new HashSet<>();
     private final Set<Journey> includedJourneys = new HashSet<>();
     private final Set<Place> includedPlaces = new HashSet<>();
-    @Autowired
-    private ClusterService clusterService;
     private boolean untaggedIncluded = false;
 
     public PhotoFilter() {
