@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.service.GeoService;
+import at.ac.tuwien.qse.sepm.service.Service;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.json.JSONArray;

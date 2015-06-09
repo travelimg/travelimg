@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 public class PhotoFilter implements Predicate<Photo> {
 
     private static final Logger LOGGER = LogManager.getLogger(PhotoFilter.class);
+
     private final Set<Tag> includedCategories = new HashSet<>();
     private final Set<Photographer> includedPhotographers = new HashSet<>();
     private final Set<Rating> includedRatings = new HashSet<>();

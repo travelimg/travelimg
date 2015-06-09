@@ -3,6 +3,9 @@ package at.ac.tuwien.qse.sepm.service;
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 
+/**
+ * Service for reading and changing exif data.
+ */
 public interface ExifService {
 
     /**
@@ -12,7 +15,7 @@ public interface ExifService {
      * @return the exif object, containing the exif data
      * @throws ServiceException
      */
-    public Exif getExif(Photo photo) throws ServiceException;
+    Exif getExif(Photo photo) throws ServiceException;
 
     /**
      * Reads and sets the metadata from a photo which are saved in the user comment entry in the exif data
@@ -20,7 +23,7 @@ public interface ExifService {
      * @param photo the photo, must have a valid path
      * @throws ServiceException
      */
-    public void getTagsFromExif(Photo photo) throws ServiceException;
+    void getTagsFromExif(Photo photo) throws ServiceException;
 
     /**
      * Sets the metadata from a photo to the user comment entry in the exif data of the photofile
@@ -28,7 +31,7 @@ public interface ExifService {
      * @param photo the photo, must have a valid path
      * @throws ServiceException
      */
-    public void exportMetaToExif(Photo photo) throws ServiceException;
+    void exportMetaToExif(Photo photo) throws ServiceException;
 
     /**
      * Reads date, latitude and longitude (if possible)
@@ -36,6 +39,5 @@ public interface ExifService {
      * @param photo the photo, must have a valid path
      * @throws ServiceException
      */
-    public void attachDateAndGeoData(Photo photo) throws ServiceException;
-
+    void attachDateAndGeoData(Photo photo) throws ServiceException;
 }

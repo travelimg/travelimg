@@ -2,6 +2,9 @@ package at.ac.tuwien.qse.sepm.service;
 
 import at.ac.tuwien.qse.sepm.entities.Place;
 
+/**
+ * Service for geodata related operations.
+ */
 public interface GeoService {
 
     /**
