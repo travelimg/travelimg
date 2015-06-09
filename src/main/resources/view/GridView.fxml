@@ -2,14 +2,16 @@
 
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
-<BorderPane fx:id="root" stylesheets="@/view/style.css"
-            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.GridView">
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root"
+            stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8"
+            fx:controller="at.ac.tuwien.qse.sepm.gui.GridView">
 
     <left>
         <fx:include source="/view/Organizer.fxml"></fx:include>
     </left>
     <center>
-        <ScrollPane fx:id="gridContainer" prefWidth="500" prefHeight="400" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true"/>
+        <ScrollPane fx:id="gridContainer" prefWidth="500" prefHeight="400" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                    fitToWidth="true" fitToHeight="true"/>
     </center>
     <right>
         <fx:include source="/view/Inspector.fxml"></fx:include>

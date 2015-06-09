@@ -22,24 +22,14 @@ import java.util.stream.Collectors;
 public class PhotoServiceImpl implements PhotoService {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    @Autowired private PhotoDAO photoDAO;
-    @Autowired private ExifService exifService;
-    @Autowired private PhotoTagDAO photoTagDAO;
-    @Autowired private JourneyDAO journeyDAO;
-    @Autowired private PlaceDAO placeDAO;
-
     ExecutorService executorService = Executors.newFixedThreadPool(1);
+    @Autowired
+    private PhotoDAO photoDAO;
+    @Autowired
+    private JourneyDAO journeyDAO;
 
-    @Override public List<YearMonth> getMonthsWithPhotos() throws ServiceException {
-        LOGGER.debug("Retrieving list of months...");
-        try {
-            return photoDAO.getMonthsWithPhotos();
-        } catch (DAOException ex) {
-            throw new ServiceException(ex);
-        }
-    }
-
-    @Override public void deletePhotos(List<Photo> photos) throws ServiceException {
+    @Override
+    public void deletePhotos(List<Photo> photos) throws ServiceException {
         if (photos == null) {
             throw new ServiceException("List<Photo> photos is null");
         }
@@ -56,7 +46,8 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
 
-    @Override public void editPhotos(List<Photo> photos, Photo photo) throws ServiceException {
+    @Override
+    public void editPhotos(List<Photo> photos, Photo photo) throws ServiceException {
         if (photos == null) {
             throw new ServiceException("List<Photo> photos is null");
         }
@@ -93,7 +84,8 @@ public class PhotoServiceImpl implements PhotoService {
                 .collect(Collectors.toList());
     }
 
-    @Override public void savePhotoRating(Photo photo) throws ServiceException {
+    @Override
+    public void savePhotoRating(Photo photo) throws ServiceException {
         if (photo == null)
             throw new IllegalArgumentException();
         LOGGER.debug("Entering savePhotoRating with {}", photo);
@@ -110,7 +102,8 @@ public class PhotoServiceImpl implements PhotoService {
         LOGGER.debug("Leaving savePhotoRating with {}", photo);
     }
 
-    @Override public void addJourneyToPhotos(List<Photo> photos, Journey journey)
+    @Override
+    public void addJourneyToPhotos(List<Photo> photos, Journey journey)
             throws ServiceException {
         LOGGER.debug("Entering addJourneyToPhotos with {}, {}", photos, journey);
         if (photos == null) {
@@ -132,7 +125,8 @@ public class PhotoServiceImpl implements PhotoService {
         }
     }
 
-    @Override public void addPlaceToPhotos(List<Photo> photos, Place place)
+    @Override
+    public void addPlaceToPhotos(List<Photo> photos, Place place)
             throws ServiceException {
         LOGGER.debug("Entering addPlaceToPhotos with {}, {}", photos, place);
         if (photos == null) {
@@ -148,7 +142,8 @@ public class PhotoServiceImpl implements PhotoService {
         LOGGER.debug("Leaving addPlaceToPhotos");
     }
 
-    @Override public void close() {
+    @Override
+    public void close() {
         executorService.shutdown();
     }
 }

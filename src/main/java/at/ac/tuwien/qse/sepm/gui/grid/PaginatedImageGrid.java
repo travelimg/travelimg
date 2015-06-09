@@ -41,7 +41,7 @@ public class PaginatedImageGrid extends Pagination {
         heightProperty().addListener(this::handleSizeChange);
         activePageProperty.addListener(this::handlePageChange);
     }
-    
+
     public List<Photo> getPhotos() {
         return photos;
     }
@@ -129,7 +129,7 @@ public class PaginatedImageGrid extends Pagination {
         setPageCount(calculatePageCount() + 2);
         setPageCount(calculatePageCount());
 
-        if (currentPage >=   getPageCount()) {
+        if (currentPage >= getPageCount()) {
             setCurrentPageIndex(getPageCount() - 1);
         } else {
             setCurrentPageIndex(currentPage);
@@ -192,7 +192,7 @@ public class PaginatedImageGrid extends Pagination {
     private int getPageIndexForPhoto(Photo photo) {
         int index = photos.indexOf(photo);
 
-        return (int)Math.floor(index / (double)photosPerPage);
+        return (int) Math.floor(index / (double) photosPerPage);
     }
 
     private ImageGridPage getPageForPhoto(Photo photo) {
@@ -200,7 +200,7 @@ public class PaginatedImageGrid extends Pagination {
     }
 
     private int calculatePageCount() {
-        return Math.max(1, (int)Math.ceil(photos.size() / (double)photosPerPage));
+        return Math.max(1, (int) Math.ceil(photos.size() / (double) photosPerPage));
     }
 
     /**
@@ -213,8 +213,8 @@ public class PaginatedImageGrid extends Pagination {
         int size = ImageSize.inPixels(ImageSize.MEDIUM);
         int tileSize = padding + gap + size;
 
-        int photosPerRow = (int)getWidth() / tileSize;
-        int photosPerCol = (int)getHeight() / tileSize;
+        int photosPerRow = (int) getWidth() / tileSize;
+        int photosPerCol = (int) getHeight() / tileSize;
 
         int totalPhotos = photosPerRow * photosPerCol;
 

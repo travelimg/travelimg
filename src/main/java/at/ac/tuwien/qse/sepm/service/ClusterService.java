@@ -25,6 +25,7 @@ public interface ClusterService {
 
     /**
      * Read and return places of a journey.
+     *
      * @param journey the journey containing its id.
      * @return the places
      * @throws ServiceException propagates DAOExceptions
@@ -41,9 +42,10 @@ public interface ClusterService {
 
     /**
      * Creates a journey and clusters this journey in places.
-     *
+     * <p>
      * A journey entry is made in the data record.
      * This journey is then clustered into places (places are at least 1 degree apart from each other)
+     *
      * @param journey Journey to be clustered.
      * @return Returns a list with all the clusters(places).
      * @throws ServiceException If cluster-service fails due to database errors.

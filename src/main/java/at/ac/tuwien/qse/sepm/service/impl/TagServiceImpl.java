@@ -12,24 +12,22 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TagServiceImpl implements TagService {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired private TagDAO tagDAO;
-    @Autowired private PhotoTagDAO photoTagDAO;
+    @Autowired
+    private TagDAO tagDAO;
+    @Autowired
+    private PhotoTagDAO photoTagDAO;
 
-    /**
-     * Create a Tag in the data store.
-     *
-     * @param tag Tag which to create; must not be null; must not already have an id
-     * @return the created Tag
-     * @throws ServiceException If the Tag can not be created or the data store fails to
-     *      create a record.
-     */
+
     @Override
     public Tag create(Tag tag) throws ServiceException {
         try {
@@ -39,15 +37,6 @@ public class TagServiceImpl implements TagService {
         }
     }
 
-    /**
-     * Delete an existing Tag.
-     *
-     * @param tag Specifies which Tag to delete by providing the id;
-     *            must not be null;
-     *            <tt>tag.id</tt> must not be null;
-     * @throws ServiceException If the Tag can not be deleted or the data store fails to
-     *     delete the record.
-     */
     @Override
     public void delete(Tag tag) throws ServiceException {
         try {
@@ -57,7 +46,8 @@ public class TagServiceImpl implements TagService {
         }
     }
 
-    @Override public Tag readName(Tag tag) throws ServiceException {
+    @Override
+    public Tag readName(Tag tag) throws ServiceException {
         try {
             return tagDAO.readName(tag);
         } catch (DAOException e) {
@@ -66,12 +56,6 @@ public class TagServiceImpl implements TagService {
         }
     }
 
-    /**
-     * Return a list of all existing tags.
-     *
-     * @return the list of all available tags
-     * @throws ServiceException if retrieval failed
-     */
     @Override
     public List<Tag> getAllTags() throws ServiceException {
         LOGGER.debug("Retrieving all tags...");
@@ -139,7 +123,8 @@ public class TagServiceImpl implements TagService {
         return tagList;
     }
 
-    @Override public List<Tag> getMostFrequentTags(List<Photo> photos) throws ServiceException {
+    @Override
+    public List<Tag> getMostFrequentTags(List<Photo> photos) throws ServiceException {
         LOGGER.debug("Entering getMostFrequentTags with {}", photos);
 
         HashMap<Tag, Integer> counter = new HashMap<>();
@@ -159,7 +144,7 @@ public class TagServiceImpl implements TagService {
             throw new ServiceException("No Tags found");
         }
 
-        // return the most fequent tags
+        // return the most frequent tags
         return counter.entrySet().stream()
                 .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                 .limit(5)

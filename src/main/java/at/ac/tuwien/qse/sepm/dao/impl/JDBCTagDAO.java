@@ -31,9 +31,12 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
     private static final String deleteStatement = "DELETE FROM TAG WHERE ID=?;";
 
     private SimpleJdbcInsert insertTag;
-    @Autowired private PhotoTagDAO photoTagDao;
+    @Autowired
+    private PhotoTagDAO photoTagDao;
 
-    @Override @Autowired public void setDataSource(DataSource dataSource) {
+    @Override
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
         super.setDataSource(dataSource);
         this.insertTag = new SimpleJdbcInsert(dataSource).withTableName("Tag")
                 .usingGeneratedKeyColumns("id");
@@ -49,7 +52,7 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
     public Tag create(Tag t) throws DAOException, ValidationException {
         logger.debug("Creating Tag {}", t);
         TagValidator.validate(t);
-        if(this.readName(t) != null) throw new ValidationException("Tag already exists");
+        if (this.readName(t) != null) throw new ValidationException("Tag already exists");
         try {
             Map<String, Object> parameters = new HashMap<String, Object>(1);
             parameters.put("name", t.getName());
@@ -71,9 +74,10 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
     public Tag read(Tag t) throws DAOException {
         logger.debug("reading Tag {}", t);
         try {
-            return this.jdbcTemplate.queryForObject(readStatement, new Object[] { t.getId() },
+            return this.jdbcTemplate.queryForObject(readStatement, new Object[]{t.getId()},
                     new RowMapper<Tag>() {
-                        @Override public Tag mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        @Override
+                        public Tag mapRow(ResultSet rs, int rowNum) throws SQLException {
                             Tag t = new Tag();
                             t.setId(rs.getInt(1));
                             t.setName(rs.getString(2));
@@ -95,20 +99,20 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
     public Tag readName(Tag t) throws DAOException {
         logger.debug("reading Tagname {}", t);
         try {
-            return this.jdbcTemplate.queryForObject(readNameStatement, new Object[] { t.getName() },
+            return this.jdbcTemplate.queryForObject(readNameStatement, new Object[]{t.getName()},
                     new RowMapper<Tag>() {
-                        @Override public Tag mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        @Override
+                        public Tag mapRow(ResultSet rs, int rowNum) throws SQLException {
                             Tag t = new Tag();
                             t.setId(rs.getInt(1));
                             t.setName(rs.getString(2));
                             return t;
                         }
                     });
-        } catch(EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException e) {
             logger.debug("Tagname not found: " + t.getName());
             return null;
-        }
-        catch (DataAccessException e) {
+        } catch (DataAccessException e) {
             throw new DAOException("Failed to read a Tag", e);
         }
     }
@@ -141,7 +145,8 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
         logger.debug("reading all Tag's {}");
         try {
             return jdbcTemplate.query(readAllStatement, new RowMapper<Tag>() {
-                @Override public Tag mapRow(ResultSet rs, int rowNum) throws SQLException {
+                @Override
+                public Tag mapRow(ResultSet rs, int rowNum) throws SQLException {
                     return new Tag(rs.getInt(1), rs.getString(2));
                 }
             });

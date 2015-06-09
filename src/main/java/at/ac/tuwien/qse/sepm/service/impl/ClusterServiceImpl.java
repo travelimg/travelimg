@@ -24,13 +24,19 @@ public class ClusterServiceImpl implements ClusterService {
 
     private static final Logger logger = LogManager.getLogger(ClusterServiceImpl.class);
 
-    @Autowired private GeoService geoService;
-    @Autowired private PhotoDAO photoDAO;
-    @Autowired private JourneyDAO journeyDAO;
-    @Autowired private PlaceDAO placeDAO;
-    @Autowired private PhotoService photoService;
+    @Autowired
+    private GeoService geoService;
+    @Autowired
+    private PhotoDAO photoDAO;
+    @Autowired
+    private JourneyDAO journeyDAO;
+    @Autowired
+    private PlaceDAO placeDAO;
+    @Autowired
+    private PhotoService photoService;
 
-    @Override public List<Journey> getAllJourneys() throws ServiceException {
+    @Override
+    public List<Journey> getAllJourneys() throws ServiceException {
         try {
             return journeyDAO.readAll();
         } catch (DAOException ex) {
@@ -60,7 +66,8 @@ public class ClusterServiceImpl implements ClusterService {
         }
     }
 
-    @Override public void addPlace(Place place) throws ServiceException {
+    @Override
+    public void addPlace(Place place) throws ServiceException {
         try {
             placeDAO.create(place);
         } catch (DAOException ex) {
@@ -71,7 +78,8 @@ public class ClusterServiceImpl implements ClusterService {
         }
     }
 
-    @Override public List<Place> clusterJourney(Journey journey) throws ServiceException {
+    @Override
+    public List<Place> clusterJourney(Journey journey) throws ServiceException {
         logger.debug("clusteringJourney" + journey);
         List<Photo> photos;
         List<Place> places = new ArrayList<Place>();
@@ -86,10 +94,10 @@ public class ClusterServiceImpl implements ClusterService {
             throw new ServiceException("Failed to read photos of journey", e);
         }
 
-            photoService.addJourneyToPhotos(photos, journey);
+        photoService.addJourneyToPhotos(photos, journey);
 
-            for (Photo element : photos) {
-                if (Math.abs(element.getLatitude() - latitude) > 1
+        for (Photo element : photos) {
+            if (Math.abs(element.getLatitude() - latitude) > 1
                     && Math.abs(element.getLongitude() - longitude) > 1) {
                 place = geoService.getPlaceByGeoData(element.getLatitude(), element.getLongitude());
                 place.setLatitude(element.getLatitude());

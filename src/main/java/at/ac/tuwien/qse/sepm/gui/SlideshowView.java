@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,6 @@ import java.net.MalformedURLException;
 import java.util.List;
 
 public class SlideshowView {
-
-    private GoogleMapsScene map;
-    private static final org.apache.logging.log4j.Logger logger = LogManager
-            .getLogger(WorldmapView.class);
-
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -184,31 +180,5 @@ public class SlideshowView {
     private void handlesetShowSlides(Event event){
         createSlideshow();
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public void setMap(GoogleMapsScene map){
-        logger.debug("Worldmap wird erstellt");
-
-        this.map = map;
-
-
-    }
-    public GoogleMapsScene getMap(){
-        return this.map;
-    }
-
-
-
+    
 }

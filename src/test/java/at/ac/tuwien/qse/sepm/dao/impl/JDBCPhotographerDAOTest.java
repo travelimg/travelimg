@@ -16,7 +16,8 @@ import static org.junit.Assert.assertTrue;
 @UsingTable("Photographer")
 public class JDBCPhotographerDAOTest extends AbstractJDBCDAOTest {
 
-    @Autowired PhotographerDAO photographerDAO;
+    @Autowired
+    PhotographerDAO photographerDAO;
 
     @Test
     public void testWithEmptyDB() throws DAOException {
@@ -46,7 +47,7 @@ public class JDBCPhotographerDAOTest extends AbstractJDBCDAOTest {
     @Test(expected = ValidationException.class)
     @WithData
     public void updateWithInvalidNameShouldThrow() throws DAOException, ValidationException {
-        photographerDAO.update(new Photographer(1,""));
+        photographerDAO.update(new Photographer(1, ""));
     }
 
     @Test

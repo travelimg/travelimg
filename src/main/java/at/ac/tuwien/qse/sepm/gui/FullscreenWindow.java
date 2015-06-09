@@ -18,9 +18,6 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.List;
 
 
@@ -65,10 +62,10 @@ public class FullscreenWindow extends AnchorPane {
                 if (keyEvent.getCode() == KeyCode.RIGHT) {
                     bt_nextPressed(null);
                 }
-                if(keyEvent.getCode() == KeyCode.LEFT) {
+                if (keyEvent.getCode() == KeyCode.LEFT) {
                     bt_previousPressed(null);
                 }
-                if(keyEvent.getCode() == KeyCode.ESCAPE) {
+                if (keyEvent.getCode() == KeyCode.ESCAPE) {
                     stage.close();
                 }
             }
@@ -80,7 +77,7 @@ public class FullscreenWindow extends AnchorPane {
 
         activeIndex = photos.indexOf(initial);
 
-        if(activeIndex < 0) {
+        if (activeIndex < 0) {
             activeIndex = 0;
         }
 
@@ -105,7 +102,7 @@ public class FullscreenWindow extends AnchorPane {
         logger.info("Button previous pressed!");
 
         activeIndex--;
-        if(activeIndex < 0)
+        if (activeIndex < 0)
             activeIndex += photos.size();
         activeIndex = activeIndex % photos.size();
 

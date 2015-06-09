@@ -32,6 +32,7 @@ public class ImageGridPage extends ImageGrid {
 
     /**
      * Select the n'th photo (index) in the grid.
+     *
      * @param index Specify which photo to select.
      */
     public void selectAt(int index) {
@@ -45,6 +46,7 @@ public class ImageGridPage extends ImageGrid {
 
     /**
      * Return the index of the first selected tile.
+     *
      * @return the index of the first selected tile or -1 if none is selected.
      */
     public int getFirstSelectedIndex() {

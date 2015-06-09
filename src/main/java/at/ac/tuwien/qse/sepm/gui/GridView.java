@@ -27,22 +27,29 @@ import java.util.stream.Collectors;
 public class GridView {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    @Autowired private PhotoService photoService;
-    @Autowired private ImportService importService;
-    @Autowired private FlickrService flickrService;
-    @Autowired private PhotographerService photographerService;
-    @Autowired private Organizer organizer;
-    @Autowired private Inspector inspector;
-
-    @FXML private BorderPane root;
-    @FXML private ScrollPane gridContainer;
-
     private final List<Photo> selection = new ArrayList<Photo>();
+    @Autowired
+    private PhotoService photoService;
+    @Autowired
+    private ImportService importService;
+    @Autowired
+    private FlickrService flickrService;
+    @Autowired
+    private PhotographerService photographerService;
+    @Autowired
+    private Organizer organizer;
+    @Autowired
+    private Inspector inspector;
+    @FXML
+    private BorderPane root;
+    @FXML
+    private ScrollPane gridContainer;
     private Predicate<Photo> filter = new PhotoFilter();
 
-    @Autowired private ImageCache imageCache;
-    @Autowired private PaginatedImageGrid grid = new PaginatedImageGrid();
+    @Autowired
+    private ImageCache imageCache;
+    @Autowired
+    private PaginatedImageGrid grid = new PaginatedImageGrid();
 
     private boolean disableReload = false;
 
@@ -61,7 +68,7 @@ public class GridView {
                     .importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
         });
         organizer.setFlickrAction(() -> {
-            FlickrDialog flickrDialog = new FlickrDialog(root,"Flickr Import",flickrService);
+            FlickrDialog flickrDialog = new FlickrDialog(root, "Flickr Import", flickrService);
             Optional<List<Photo>> photos = flickrDialog.showForResult();
             if (!photos.isPresent()) return;
             importService.importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
@@ -108,8 +115,8 @@ public class GridView {
         Platform.runLater(() -> ErrorDialog.show(root, "Import fehlgeschlagen", "Fehlermeldung: " + error.getMessage()));
     }
 
-    public void deletePhotos(){
-        for(Photo photo : selection){
+    public void deletePhotos() {
+        for (Photo photo : selection) {
             grid.removePhoto(photo);
         }
         selection.clear();
@@ -117,6 +124,7 @@ public class GridView {
 
     /**
      * Called whenever a new photo is imported
+     *
      * @param photo The newly imported    photo
      */
     private void handleImportedPhoto(Photo photo) {
@@ -140,7 +148,7 @@ public class GridView {
     private void handleFilterChange(PhotoFilter filter) {
         this.filter = filter;
 
-        if(!disableReload)
+        if (!disableReload)
             reloadImages();
     }
 
@@ -148,8 +156,8 @@ public class GridView {
         try {
             grid.setPhotos(
                     photoService.getAllPhotos(filter)
-                    .stream()
-                    .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
+                            .stream()
+                            .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
                             .collect(Collectors.toList())
             );
         } catch (ServiceException ex) {

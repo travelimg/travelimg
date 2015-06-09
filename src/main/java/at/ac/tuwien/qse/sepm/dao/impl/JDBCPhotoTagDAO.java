@@ -26,11 +26,12 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
     private static final String DELETE_BY_PHOTO_STRING = "DELETE FROM phototag WHERE photo_id = ?";
     private static final String READ_TAGS_BY_PHOTO_STRING = "SELECT DISTINCT tag_id, name FROM "
             + "(tag JOIN phototag ON id = tag_id) WHERE photo_id = ?";
-    private static final String READ_PHOTOS_BY_TAG_STRING = "SELECT DISTINCT photo_id FROM " 
+    private static final String READ_PHOTOS_BY_TAG_STRING = "SELECT DISTINCT photo_id FROM "
             + "phototag where tag_id = ?";
 
 
-    @Autowired private PhotoDAO photoDAO;
+    @Autowired
+    private PhotoDAO photoDAO;
 
     /**
      * Create a photo-tag entry in database which links Tag <tt>tag</tt> to Photo <tt>photo</tt>.
@@ -38,7 +39,7 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      *
      * @param photo must not be null; photo.id must not be null;
      * @param tag   must not be null; tag.id must not be null;
-     * @throws DAOException: if an exception occurs on persistence layer
+     * @throws DAOException:        if an exception occurs on persistence layer
      * @throws ValidationException: if parameter validation fails
      */
     @Override
@@ -68,7 +69,7 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      *
      * @param photo must not be null; photo.id must not be null;
      * @param tag   must not be null; tag.id must not be null;
-     * @throws DAOException: if an exception occurs on persistence layer
+     * @throws DAOException:        if an exception occurs on persistence layer
      * @throws ValidationException: if parameter validation fails
      */
     @Override
@@ -92,7 +93,7 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      * Delete if existent all photo-tag entries where Tag = <tt>tag</tt>
      *
      * @param tag must not be null; tag.id must not be null;
-     * @throws DAOException: if an exception occurs on persistence layer
+     * @throws DAOException:        if an exception occurs on persistence layer
      * @throws ValidationException: if parameter validation fails
      */
     @Override
@@ -115,7 +116,7 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      * Delete if existent all photo-tag entries where Photo = <tt>photo</tt>
      *
      * @param photo must not be null; photo.id must not be null;
-     * @throws DAOException: if an exception occurs on persistence layer
+     * @throws DAOException:        if an exception occurs on persistence layer
      * @throws ValidationException: if parameter validation fails
      */
     @Override
@@ -140,8 +141,8 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      *
      * @param photo must not be null; photo.id must not be null;
      * @return List with all tags which are linked to <tt>photo</tt> as a PhotoTag;
-     *     If no tag exists, return an empty List.
-     * @throws DAOException if an exception occurs on persistence layer
+     * If no tag exists, return an empty List.
+     * @throws DAOException         if an exception occurs on persistence layer
      * @throws ValidationException: if parameter validation fails
      */
     @Override
@@ -153,8 +154,8 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
         List<Tag> tagList;
         try {
             tagList = jdbcTemplate.query(READ_TAGS_BY_PHOTO_STRING, (rs, rowNum) -> {
-                    return new Tag(rs.getInt("tag_id"), rs.getString("name"));
-                }, photo.getId());
+                return new Tag(rs.getInt("tag_id"), rs.getString("name"));
+            }, photo.getId());
             LOGGER.info("Successfully read tags for {}", photo);
         } catch (DataAccessException ex) {
             LOGGER.error("Reading Tags failed due to DataAccessException");
@@ -169,7 +170,7 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      *
      * @param tag must not be null; tag.id must not be null
      * @return List with all Photos, which are linked to <tt>tag</tt> as a PhotoTag;
-     * @throws DAOException if an exception occurs on persistence layer
+     * @throws DAOException         if an exception occurs on persistence layer
      * @throws ValidationException: if parameter validation fails
      */
     @Override
@@ -181,7 +182,7 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
         List<Photo> photoList = new ArrayList<>();
         try {
             List<Integer> photoIds = jdbcTemplate.query(READ_PHOTOS_BY_TAG_STRING, (rs, rowNum) -> {
-                    return rs.getInt(1);
+                return rs.getInt(1);
             });
 
             for (Integer id : photoIds) {

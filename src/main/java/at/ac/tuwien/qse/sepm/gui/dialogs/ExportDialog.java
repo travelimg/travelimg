@@ -1,7 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui.dialogs;
 
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
-import at.ac.tuwien.qse.sepm.util.ImageFileFilter;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -17,14 +16,17 @@ import java.nio.file.Paths;
 public class ExportDialog extends ResultDialog<String> {
 
     private final String dropboxFolder;
-
-    @FXML private Button browseButton;
-    @FXML private TextField directoryField;
-    @FXML private Button exportButton;
-    @FXML private Button cancelButton;
-    @FXML private Label statusText;
-
     private final int photoCount;
+    @FXML
+    private Button browseButton;
+    @FXML
+    private TextField directoryField;
+    @FXML
+    private Button exportButton;
+    @FXML
+    private Button cancelButton;
+    @FXML
+    private Label statusText;
 
     /**
      * {@inheritDoc}

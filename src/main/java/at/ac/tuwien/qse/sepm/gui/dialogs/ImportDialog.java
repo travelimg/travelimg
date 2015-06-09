@@ -8,13 +8,10 @@ import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.ImageFileFilter;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -34,17 +31,22 @@ import java.util.List;
  */
 public class ImportDialog extends ResultDialog<List<Photo>> {
 
-    private PhotographerService photographerService;
-
-    @FXML private Button browseButton;
-    @FXML private TextField directoryField;
-    @FXML private Button importButton;
-    @FXML private Button cancelButton;
-    @FXML private Label statusText;
-    @FXML private Button addPhotographerButton;
-    @FXML private ComboBox<Photographer> photographerBox;
-
     private final List<Photo> photos = new LinkedList<>();
+    private PhotographerService photographerService;
+    @FXML
+    private Button browseButton;
+    @FXML
+    private TextField directoryField;
+    @FXML
+    private Button importButton;
+    @FXML
+    private Button cancelButton;
+    @FXML
+    private Label statusText;
+    @FXML
+    private Button addPhotographerButton;
+    @FXML
+    private ComboBox<Photographer> photographerBox;
     private ObservableList<Photographer> photographers = FXCollections.observableArrayList();
 
     /**
@@ -168,7 +170,8 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
         statusText.setText(String.format("%d Fotos ausgewählt", count));
     }
 
-    @FXML private void addPhotographer(Event event) {
+    @FXML
+    private void addPhotographer(Event event) {
         try {
             // add new photographer to application
             Photographer photographer = photographerService.create(new Photographer(-1, "Neuer Fotograf"));

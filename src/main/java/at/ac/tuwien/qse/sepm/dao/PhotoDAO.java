@@ -11,7 +11,7 @@ public interface PhotoDAO {
 
     /**
      * Create the photo in the data store.
-     *
+     * <p>
      * The given photo is copied to the image folder and the attributes are recorded in the data store. The exif data is
      * additionally also parsed and stored.
      *
@@ -25,14 +25,13 @@ public interface PhotoDAO {
      * Update an existing photo.
      *
      * @param photo Description of the photo to update together with the new values.
-     *
      * @throws DAOException If the photo does not exist or the data store fails to update the record.
      */
     void update(Photo photo) throws DAOException, ValidationException;
 
     /**
      * Delete an existing photo.
-     *
+     * <p>
      * The corresponding image file is deleted from the image folder.
      *
      * @param photo Specifies which photo to delete by providing the id.
@@ -45,7 +44,7 @@ public interface PhotoDAO {
      *
      * @param id the id of the photo
      * @return The photo belonging to the id
-     * @throws DAOException If the photo can not be retrived.
+     * @throws DAOException        If the photo can not be retrived.
      * @throws ValidationException If the id is invalid.
      */
     Photo getById(int id) throws DAOException, ValidationException;
@@ -76,6 +75,7 @@ public interface PhotoDAO {
 
     /**
      * Retrieve a list of photos from a given journey
+     *
      * @param journey this sets the start and end-date
      * @return the list with the photos
      */

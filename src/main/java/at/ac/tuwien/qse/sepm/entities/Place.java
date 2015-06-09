@@ -66,7 +66,8 @@ public class Place {
         this.journey = journey;
     }
 
-    @Override public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -82,7 +83,8 @@ public class Place {
 
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         int result = id;
         result = 31 * result + city.hashCode();
         result = 31 * result + country.hashCode();

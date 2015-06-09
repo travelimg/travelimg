@@ -1,23 +1,16 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.entities.*;
-import at.ac.tuwien.qse.sepm.service.ClusterService;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
 public class PhotoFilter implements Predicate<Photo> {
 
     private static final Logger LOGGER = LogManager.getLogger(PhotoFilter.class);
-
-    @Autowired private ClusterService clusterService;
 
     private final Set<Tag> includedCategories = new HashSet<>();
     private final Set<Photographer> includedPhotographers = new HashSet<>();
@@ -107,7 +100,8 @@ public class PhotoFilter implements Predicate<Photo> {
         this.untaggedIncluded = untaggedIncluded;
     }
 
-    @Override public boolean test(Photo photo) {
+    @Override
+    public boolean test(Photo photo) {
         return testRating(photo)
                 && testCategories(photo)
                 && testPhotographer(photo)

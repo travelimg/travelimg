@@ -7,16 +7,13 @@ import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import at.ac.tuwien.qse.sepm.util.TestIOHandler;
 import javafx.util.Pair;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -31,20 +28,20 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:test-config.xml")
-@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
-public class ImportTest {
+public class ImportTest extends ServiceTestBase {
 
     private static final Photographer defaultPhotographer = new Photographer(1, "Test Photographer");
     private static final Place defaultPlace = new Place(1, "Unkown place", "Unknown place", 0.0, 0.0, null);
 
     private static final String dataDir = Paths.get(System.getProperty("java.io.tmpdir"), "travelimg").toString();
-    private static final String sourceDir = Paths.get(System.getProperty( "os.name" ).contains( "indow" ) ?
+    private static final String sourceDir = Paths.get(System.getProperty("os.name").contains("indow") ?
             ImportTest.class.getClassLoader().getResource("db/testimages").getPath().substring(1) :
             ImportTest.class.getClassLoader().getResource("db/testimages").getPath()).toString();
-
-
+    List<Photo> inputPhotos = new ArrayList<Photo>() {{
+        add(new Photo(7, defaultPhotographer, sourceDir + "/6.jpg", Rating.NONE, null, 0, 0, defaultPlace));
+        add(new Photo(8, defaultPhotographer, sourceDir + "/7.jpg", Rating.NONE, null, 0, 0, defaultPlace));
+        add(new Photo(9, defaultPhotographer, sourceDir + "/8.jpg", Rating.NONE, null, 0, 0, defaultPlace));
+    }};
     private List<Photo> expectedPhotos = new ArrayList<Photo>() {{
         add(new Photo(7,
                 defaultPhotographer,
@@ -69,23 +66,18 @@ public class ImportTest {
                 -104.98952777777778,
                 defaultPlace));
     }};
-
-    List<Photo> inputPhotos = new ArrayList<Photo>() {{
-        add(new Photo(7, defaultPhotographer, sourceDir + "/6.jpg", Rating.NONE, null, 0, 0, defaultPlace));
-        add(new Photo(8, defaultPhotographer, sourceDir + "/7.jpg", Rating.NONE, null, 0, 0, defaultPlace));
-        add(new Photo(9, defaultPhotographer, sourceDir + "/8.jpg", Rating.NONE, null, 0, 0, defaultPlace));
-    }};
-
-    @Autowired private ImportService importService;
-    @Autowired private TestIOHandler ioHandler;
+    @Autowired
+    private ImportService importService;
+    @Autowired
+    private TestIOHandler ioHandler;
 
     public ImportTest() {
-        for(Photo photo : expectedPhotos) {
+        for (Photo photo : expectedPhotos) {
             String path = photo.getPath().replace("/", File.separator);
             photo.setPath(path);
         }
 
-        for(Photo photo : inputPhotos) {
+        for (Photo photo : inputPhotos) {
             String path = photo.getPath().replace("/", File.separator);
             photo.setPath(path);
         }
@@ -103,8 +95,8 @@ public class ImportTest {
         int interval = 100;
         int maxTimeout = 5000;
         try {
-            while(waited < maxTimeout) {
-                if(task.isFinished()) {
+            while (waited < maxTimeout) {
+                if (task.isFinished()) {
                     return;
                 }
                 Thread.sleep(interval);
@@ -145,7 +137,7 @@ public class ImportTest {
                 .map(p -> Paths.get(p.getPath()))
                 .collect(Collectors.toList());
 
-        for(Pair<Path, Path> copyOp : copiedFiles) {
+        for (Pair<Path, Path> copyOp : copiedFiles) {
             Path source = copyOp.getKey();
             Path dest = copyOp.getValue();
 
@@ -176,6 +168,8 @@ public class ImportTest {
             exceptions.add(exception);
         }
 
-        public boolean exceptionOccured() { return exceptions.size() > 0; }
+        public boolean exceptionOccured() {
+            return exceptions.size() > 0;
+        }
     }
 }

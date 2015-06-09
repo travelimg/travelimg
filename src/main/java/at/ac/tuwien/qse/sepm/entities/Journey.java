@@ -1,11 +1,7 @@
 package at.ac.tuwien.qse.sepm.entities;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * Created by David on 19.05.2015.
- */
 public class Journey {
     private int id;
     private String name;
@@ -51,7 +47,8 @@ public class Journey {
         this.name = name;
     }
 
-    @Override public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -69,7 +66,8 @@ public class Journey {
 
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         int result = id;
         result = 31 * result + name.hashCode();
         result = 31 * result + startDate.hashCode();

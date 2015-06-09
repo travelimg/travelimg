@@ -72,7 +72,8 @@ public abstract class ImageGridTile extends StackPane {
     /**
      * @return modifiable list of children.
      */
-    @Override public ObservableList<Node> getChildren() {
+    @Override
+    public ObservableList<Node> getChildren() {
         return container.getChildren();
     }
 
@@ -123,13 +124,13 @@ public abstract class ImageGridTile extends StackPane {
 
         imageView.setImage(image);
         image.progressProperty().addListener((observable, oldValue, newValue) -> {
-                // Image is fully loaded.
-                if (newValue.doubleValue() == 1.0) {
-                    indicateLoaded();
-                }
+            // Image is fully loaded.
+            if (newValue.doubleValue() == 1.0) {
+                indicateLoaded();
+            }
         });
 
-        if(image.getProgress() == 1.0)
+        if (image.getProgress() == 1.0)
             indicateLoaded();
     }
 

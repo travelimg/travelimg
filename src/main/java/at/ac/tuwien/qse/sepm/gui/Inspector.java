@@ -36,38 +36,46 @@ import java.util.stream.Collectors;
 public class Inspector {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-
-
-    @FXML private BorderPane root;
-
-    @FXML private Node details;
-    @FXML private Node multiAlert;
-
-    @FXML private Button deleteButton;
-    @FXML private Button dropboxButton;
-    @FXML private VBox tagSelectionContainer;
-    @FXML private VBox mapContainer;
-    @FXML private VBox placeholder;
-    @FXML private HBox ratingPickerContainer;
-    @FXML private TableColumn<String, String> exifName;
-    @FXML private TableColumn<String, String> exifValue;
-    @FXML private TableView<Pair<String, String>> exifTable;
-
-
+    private final List<Photo> activePhotos = new ArrayList<>();
+    @FXML
+    private BorderPane root;
+    @FXML
+    private Node details;
+    @FXML
+    private Node multiAlert;
+    @FXML
+    private Button deleteButton;
+    @FXML
+    private Button dropboxButton;
+    @FXML
+    private VBox tagSelectionContainer;
+    @FXML
+    private VBox mapContainer;
+    @FXML
+    private VBox placeholder;
+    @FXML
+    private HBox ratingPickerContainer;
+    @FXML
+    private TableColumn<String, String> exifName;
+    @FXML
+    private TableColumn<String, String> exifValue;
+    @FXML
+    private TableView<Pair<String, String>> exifTable;
     private TagSelector tagSelector;
     private GoogleMapsScene mapsScene;
+    private Consumer<Collection<Photo>> updateHandler;
+    private Consumer<Collection<Photo>> deleteHandler;
 
-    private final List<Photo> activePhotos = new ArrayList<>();
-
-    private Consumer<Collection<Photo>>  updateHandler;
-    private Consumer<Collection<Photo>>  deleteHandler;
-
-    @Autowired private DropboxService dropboxService;
-    @Autowired private PhotoService photoservice;
-    @Autowired private ExifService exifService;
-    @Autowired private TagService tagService;
-    @Autowired private RatingPicker ratingPicker;
+    @Autowired
+    private DropboxService dropboxService;
+    @Autowired
+    private PhotoService photoservice;
+    @Autowired
+    private ExifService exifService;
+    @Autowired
+    private TagService tagService;
+    @Autowired
+    private RatingPicker ratingPicker;
 
     /**
      * Get the photos the inspector currently operates on.
@@ -86,7 +94,7 @@ public class Inspector {
     public void setActivePhotos(Collection<Photo> photos) {
         if (photos == null) photos = new LinkedList<>();
         activePhotos.clear();
-       // mapsScene.removeAktiveMarker();
+        // mapsScene.removeAktiveMarker();
         activePhotos.addAll(photos);
         activePhotos.forEach(photo -> mapsScene.addMarker(photo));
         showDetails(activePhotos);
@@ -97,7 +105,7 @@ public class Inspector {
      *
      * @param updateHandler
      */
-    public void setUpdateHandler(Consumer<Collection<Photo>>  updateHandler) {
+    public void setUpdateHandler(Consumer<Collection<Photo>> updateHandler) {
         this.updateHandler = updateHandler;
     }
 
@@ -109,21 +117,12 @@ public class Inspector {
     public void setDeleteHandler(Consumer<Collection<Photo>> deleteHandler) {
         this.deleteHandler = deleteHandler;
     }
-    public GoogleMapsScene getMap(){
+
+    public GoogleMapsScene getMap() {
         return this.mapsScene;
     }
-    @FXML private void initialize() {
 
-            mapsScene = new GoogleMapsScene();
-            tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService, root);
-            ratingPicker.setRatingChangeHandler(this::handleRatingChange);
-            deleteButton.setOnAction(this::handleDelete);
-            dropboxButton.setOnAction(this::handleDropbox);
-            mapContainer.getChildren().add(mapsScene.getMapView());
-            tagSelectionContainer.getChildren().add(tagSelector);
-
-    }
-    public void setMap(GoogleMapsScene map){
+    public void setMap(GoogleMapsScene map) {
         this.mapsScene = map;
         this.mapsScene = new GoogleMapsScene();
         this.mapsScene.removeAktiveMarker();
@@ -131,6 +130,20 @@ public class Inspector {
         mapContainer.getChildren().add(mapsScene.getMapView());
         details.setVisible(false);
     }
+
+    @FXML
+    private void initialize() {
+
+        mapsScene = new GoogleMapsScene();
+        tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService, root);
+        ratingPicker.setRatingChangeHandler(this::handleRatingChange);
+        deleteButton.setOnAction(this::handleDelete);
+        dropboxButton.setOnAction(this::handleDropbox);
+        mapContainer.getChildren().add(mapsScene.getMapView());
+        tagSelectionContainer.getChildren().add(tagSelector);
+
+    }
+
     private void handleDelete(Event event) {
         if (activePhotos.isEmpty()) {
             return;
@@ -160,7 +173,7 @@ public class Inspector {
         ExportDialog dialog = new ExportDialog(root, dropboxFolder, activePhotos.size());
 
         Optional<String> destinationPath = dialog.showForResult();
-        if(!destinationPath.isPresent()) return;
+        if (!destinationPath.isPresent()) return;
 
         dropboxService.uploadPhotos(activePhotos, destinationPath.get(),
                 photo -> {
@@ -295,7 +308,7 @@ public class Inspector {
     }
 
     public void refreshTags() {
-        if(tagSelector != null) {
+        if (tagSelector != null) {
             tagSelector.initializeTagList();
         }
     }
@@ -306,7 +319,7 @@ public class Inspector {
 
             boolean updateNeeded = false;
 
-            while(change.next()) {
+            while (change.next()) {
                 if (change.wasAdded()) {
                     Tag added = change.getAddedSubList().get(0);
                     try {

@@ -1,39 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<fx:root minHeight="300" styleClass="dialog,import-dialog" stylesheets="@style.css"
-         type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root xmlns:fx="http://javafx.com/fxml/1" minHeight="300" styleClass="dialog,import-dialog"
+         stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8">
     <children>
         <BorderPane prefWidth="560.0">
             <top>
-                <Label maxWidth="Infinity" styleClass="header" text="Reise hinzufügen" />
+                <Label maxWidth="Infinity" styleClass="header" text="Reise hinzufügen"/>
             </top>
             <center>
                 <VBox maxWidth="Infinity" styleClass="body">
                     <children>
-                        <Label text="Neue Reise benennen:" />
-                        <TextField fx:id="journeyNameField" />
+                        <Label text="Neue Reise benennen:"/>
+                        <TextField fx:id="journeyNameField"/>
 
                         <HBox alignment="CENTER" prefHeight="93.0" spacing="64.0">
                             <VBox.margin>
-                                <Insets top="16.0" />
+                                <Insets top="16.0"/>
                             </VBox.margin>
                             <children>
                                 <VBox>
                                     <children>
                                         <Label text="Reisebeginn" alignment="CENTER"/>
-                                        <DatePicker fx:id="journeyBeginDate" />
+                                        <DatePicker fx:id="journeyBeginDate"/>
                                     </children>
                                 </VBox>
 
                                 <VBox>
                                     <children>
                                         <Label text="Reiseende" alignment="CENTER"/>
-                                        <DatePicker fx:id="journeyEndDate" />
+                                        <DatePicker fx:id="journeyEndDate"/>
                                     </children>
                                 </VBox>
                             </children>
@@ -57,8 +56,9 @@
                     <right>
                         <HBox maxWidth="-Infinity" spacing="8.0" BorderPane.alignment="CENTER_RIGHT">
                             <children>
-                                <Button fx:id="journeyCancel" alignment="CENTER_RIGHT" text="ABBRECHEN" />
-                                <Button fx:id="journeyAdd" alignment="CENTER_RIGHT" styleClass="primary" text="HINZUFÜGEN" disable="true"/>
+                                <Button fx:id="journeyCancel" alignment="CENTER_RIGHT" text="ABBRECHEN"/>
+                                <Button fx:id="journeyAdd" alignment="CENTER_RIGHT" styleClass="primary"
+                                        text="HINZUFÜGEN" disable="true"/>
                             </children>
                         </HBox>
                     </right>
