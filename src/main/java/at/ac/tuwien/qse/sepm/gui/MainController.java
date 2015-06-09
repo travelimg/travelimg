@@ -37,31 +37,6 @@ public class MainController {
     @FXML
     private void initialize() {
 
-        root.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
-                                                                        @Override
-                                                                        public void changed(ObservableValue<? extends Tab> ov, Tab t,
-                                                                                            Tab t1) {
-                                                                            if (t.equals(grid) && t1.equals(world)) {
-                                                                                worldMapView.setMap(inspector.getMap());
-                                                                            }
-                                                                            if (t.equals(world) && t1.equals(grid)) {
-                                                                                inspector.setMap(worldMapView.getMap());
-                                                                            }
-                                                                            if (t.equals(world) && t1.equals(slide)) {
-                                                                                slideshowView.setMap(worldMapView.getMap());
-                                                                            }
-                                                                            if (t.equals(grid) && t1.equals(slide)) {
-                                                                                slideshowView.setMap(inspector.getMap());
-                                                                            }
-                                                                            if (t.equals(slide) && t1.equals(world)) {
-                                                                                worldMapView.setMap(slideshowView.getMap());
-                                                                            }
-                                                                            if (t.equals(slide) && t1.equals(grid)) {
-                                                                                inspector.setMap(slideshowView.getMap());
-                                                                            }
-                                                                        }
-                                                                    }
-        );
     }
 
 }

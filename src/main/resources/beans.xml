@@ -64,6 +64,9 @@
     <bean id="tagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTagDAO"></bean>
     <bean id="journeyDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCJourneyDAO"></bean>
     <bean id="placeDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPlaceDAO"></bean>
+    <bean id="slideDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCSlideDAO"></bean>
+    <bean id="slideshowDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCSlideshowDAO"></bean>
+
 
     <bean id="mainController" class="at.ac.tuwien.qse.sepm.gui.MainController"></bean>
     <bean id="gridViewController" class="at.ac.tuwien.qse.sepm.gui.GridView"></bean>
@@ -75,6 +78,4 @@
 	<bean id="imageCache" class="at.ac.tuwien.qse.sepm.gui.util.ImageCache"></bean>
 	<bean id="imageGridController" class="at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid"></bean>
 
-    <bean id="imageCache" class="at.ac.tuwien.qse.sepm.gui.util.ImageCache"></bean>
-    <bean id="imageGridController" class="at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid"></bean>
 </beans>
