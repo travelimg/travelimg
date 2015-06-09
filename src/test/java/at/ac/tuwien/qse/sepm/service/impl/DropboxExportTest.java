@@ -12,13 +12,7 @@ import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import at.ac.tuwien.qse.sepm.util.TestIOHandler;
 import javafx.util.Pair;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -47,8 +41,8 @@ public class DropboxExportTest extends ServiceTestBase {
         int interval = 100;
         int maxTimeout = 5000;
         try {
-            while(waited < maxTimeout) {
-                if(task.isFinished()) {
+            while (waited < maxTimeout) {
+                if (task.isFinished()) {
                     return;
                 }
                 Thread.sleep(interval);
@@ -136,8 +130,8 @@ public class DropboxExportTest extends ServiceTestBase {
 
         // ensure photos were copied to dropbox folder
         assertThat(photos.size(), is(copyOperations.size()));
-        
-        for(Pair<Path, Path> copyOp : copyOperations) {
+
+        for (Pair<Path, Path> copyOp : copyOperations) {
             Path source = copyOp.getKey();
             Path dest = copyOp.getValue();
 
@@ -168,6 +162,8 @@ public class DropboxExportTest extends ServiceTestBase {
             exceptions.add(exception);
         }
 
-        public boolean exceptionOccured() { return exceptions.size() > 0; }
+        public boolean exceptionOccured() {
+            return exceptions.size() > 0;
+        }
     }
 }

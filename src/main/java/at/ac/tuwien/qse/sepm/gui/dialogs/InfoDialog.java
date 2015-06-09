@@ -7,20 +7,23 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
 
 /**
  * Dialog that provides the user with a short message.
  */
 public class InfoDialog extends Dialog {
 
-    @FXML private Node root;
+    @FXML
+    private Node root;
 
-    @FXML private Label headerText;
+    @FXML
+    private Label headerText;
 
-    @FXML private Label contentText;
+    @FXML
+    private Label contentText;
 
-    @FXML private Button cancelButton;
+    @FXML
+    private Button cancelButton;
 
     /**
      * {@inheritDoc}
@@ -34,17 +37,19 @@ public class InfoDialog extends Dialog {
 
     /**
      * Text that is displayed in the header bar.
-     *
+     * <p>
      * It should summarize the reason for the dialog in a few words.
      */
     public String getHeaderText() {
         return headerTextProperty().get();
     }
-    public StringProperty headerTextProperty() {
-        return headerText.textProperty();
-    }
+
     public void setHeaderText(String headerText) {
         headerTextProperty().set(headerText);
+    }
+
+    public StringProperty headerTextProperty() {
+        return headerText.textProperty();
     }
 
     /**
@@ -53,11 +58,13 @@ public class InfoDialog extends Dialog {
     public String getContentText() {
         return contentTextProperty().get();
     }
-    public StringProperty contentTextProperty() {
-        return contentText.textProperty();
-    }
+
     public void setContentText(String contentText) {
         contentTextProperty().set(contentText);
+    }
+
+    public StringProperty contentTextProperty() {
+        return contentText.textProperty();
     }
 
     /**
@@ -66,6 +73,7 @@ public class InfoDialog extends Dialog {
     public boolean isError() {
         return root.getStyleClass().contains("error");
     }
+
     public void setError(boolean isError) {
         if (isError) {
             root.getStyleClass().add("error");

@@ -18,7 +18,6 @@ import org.apache.commons.imaging.util.IoUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -33,11 +32,15 @@ public class ExifServiceImpl implements ExifService {
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter
             .ofPattern("yyyy:MM:dd HH:mm:ss");
 
-    @Autowired PhotoService photoService;
-    @Autowired TagService tagService;
-    @Autowired ClusterService clusterService;
+    @Autowired
+    PhotoService photoService;
+    @Autowired
+    TagService tagService;
+    @Autowired
+    ClusterService clusterService;
 
-    @Override public Exif getExif(Photo photo) throws ServiceException {
+    @Override
+    public Exif getExif(Photo photo) throws ServiceException {
         File file = new File(photo.getPath());
         String exposure = "not available";
         double aperture = 0.0;
@@ -105,7 +108,8 @@ public class ExifServiceImpl implements ExifService {
         }
     }
 
-    @Override public void getTagsFromExif(Photo photo) throws ServiceException {
+    @Override
+    public void getTagsFromExif(Photo photo) throws ServiceException {
         logger.debug("getTagsFromExif" + photo + ":" + photo.getTags());
         File file = new File(photo.getPath());
         String tags = "";
@@ -171,7 +175,8 @@ public class ExifServiceImpl implements ExifService {
         }
     }
 
-    @Override public void exportMetaToExif(Photo photo) throws ServiceException {
+    @Override
+    public void exportMetaToExif(Photo photo) throws ServiceException {
         logger.debug("exportMetaToExif" + photo + ":" + photo.getTags());
         File jpegImageFile = new File(photo.getPath());
         File tempFile = new File(photo.getPath() + "d");
@@ -254,7 +259,8 @@ public class ExifServiceImpl implements ExifService {
         }
     }
 
-    @Override public void attachDateAndGeoData(Photo photo) throws ServiceException {
+    @Override
+    public void attachDateAndGeoData(Photo photo) throws ServiceException {
         File file = new File(photo.getPath());
         LocalDateTime datetime = photo.getDatetime();
         double latitude = photo.getLatitude();

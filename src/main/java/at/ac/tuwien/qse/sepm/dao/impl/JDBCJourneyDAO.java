@@ -29,13 +29,16 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
     private static final String updateStatement = "UPDATE Journey SET name = ?, start = ?, end = ? WHERE id = ?";
     private SimpleJdbcInsert insertJourney;
 
-    @Override @Autowired public void setDataSource(DataSource dataSource) {
+    @Override
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
         super.setDataSource(dataSource);
         this.insertJourney = new SimpleJdbcInsert(dataSource).withTableName("Journey")
                 .usingGeneratedKeyColumns("id");
     }
 
-    @Override public Journey create(Journey journey) throws DAOException, ValidationException {
+    @Override
+    public Journey create(Journey journey) throws DAOException, ValidationException {
         logger.debug("Creating Journey", journey);
         if (journey == null)
             throw new ValidationException();
@@ -64,7 +67,8 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
 
     }
 
-    @Override public void delete(Journey journey) throws DAOException, ValidationException {
+    @Override
+    public void delete(Journey journey) throws DAOException, ValidationException {
         logger.debug("Deleting Journey", journey);
 
         JourneyValidator.validate(journey);
@@ -78,7 +82,8 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         }
     }
 
-    @Override public void update(Journey journey) throws DAOException, ValidationException {
+    @Override
+    public void update(Journey journey) throws DAOException, ValidationException {
         logger.debug("Updating Journey", journey);
 
         JourneyValidator.validateID(journey.getId());
@@ -94,12 +99,14 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         }
     }
 
-    @Override public List<Journey> readAll() throws DAOException {
+    @Override
+    public List<Journey> readAll() throws DAOException {
         logger.debug("readAll");
         try {
             List<Journey> journeys = jdbcTemplate.query(readAllStatement, new RowMapper<Journey>() {
 
-                @Override public Journey mapRow(ResultSet resultSet, int i) throws SQLException {
+                @Override
+                public Journey mapRow(ResultSet resultSet, int i) throws SQLException {
                     return new Journey(resultSet.getInt(1), resultSet.getString(2),
                             resultSet.getTimestamp(3).toLocalDateTime(),
                             resultSet.getTimestamp(4).toLocalDateTime());
@@ -115,16 +122,18 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         }
     }
 
-    @Override public Journey getByID(int id) throws DAOException, ValidationException {
+    @Override
+    public Journey getByID(int id) throws DAOException, ValidationException {
         logger.debug("getByID({})", id);
 
         JourneyValidator.validateID(id);
 
         try {
             return this.jdbcTemplate
-                    .queryForObject(readStatement, new Object[] { id }, new RowMapper<Journey>() {
+                    .queryForObject(readStatement, new Object[]{id}, new RowMapper<Journey>() {
 
-                        @Override public Journey mapRow(ResultSet resultSet, int i)
+                        @Override
+                        public Journey mapRow(ResultSet resultSet, int i)
                                 throws SQLException {
                             return new Journey(id, resultSet.getString(1),
                                     resultSet.getTimestamp(2).toLocalDateTime(),

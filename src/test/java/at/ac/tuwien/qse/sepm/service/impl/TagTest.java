@@ -8,13 +8,7 @@ import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
 import at.ac.tuwien.qse.sepm.service.TagService;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,17 +16,19 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-        import static org.junit.Assert.assertTrue;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TagTest extends ServiceTestBase {
 
-    @Autowired private TagService tagService;
-    @Autowired private PhotoService photoService;
+    @Autowired
+    private TagService tagService;
+    @Autowired
+    private PhotoService photoService;
 
     private Photo getPhoto(int index) throws ServiceException {
         return photoService.getAllPhotos().get(index);
@@ -102,7 +98,8 @@ public class TagTest extends ServiceTestBase {
     }
 
     @Test
-    @WithData public void test_get_all_tags() throws ServiceException {
+    @WithData
+    public void test_get_all_tags() throws ServiceException {
         assertThat(tagService.getAllTags(), containsInAnyOrder(new Tag(1, "Person"),
                 new Tag(2, "Essen"), new Tag(3, "Natur")));
     }
@@ -207,9 +204,10 @@ public class TagTest extends ServiceTestBase {
         // assert that p2 was not affected
         assertThat(getTags(p2), equalTo(toList(t2)));
     }
+
     @Test
     @WithData
-    public void test_getMostWantet() throws  ServiceException{
+    public void test_getMostWantet() throws ServiceException {
         Photo p0 = getPhoto(0);
         Photo p1 = getPhoto(1);
         Photo p2 = getPhoto(2);
@@ -220,7 +218,7 @@ public class TagTest extends ServiceTestBase {
         Tag t4 = new Tag(4, "Test");
         Tag t5 = new Tag(5, "test2");
         Tag t6 = new Tag(6, "test3");
-        Tag t7 = new Tag(7,"test4");
+        Tag t7 = new Tag(7, "test4");
         tagService.create(t4);
         tagService.create(t5);
         tagService.create(t6);
@@ -231,8 +229,8 @@ public class TagTest extends ServiceTestBase {
         tagService.addTagToPhotos(toList(p0, p2), t4);
         tagService.addTagToPhotos(toList(p0, p1, p2), t5);
         tagService.addTagToPhotos(toList(p1), t6);
-        List<Tag> liste = tagService.getMostFrequentTags(toList(p0,p1,p2));
-        assertTrue(liste.size()<6);
+        List<Tag> liste = tagService.getMostFrequentTags(toList(p0, p1, p2));
+        assertTrue(liste.size() < 6);
 
         assertTrue(liste.contains(t0));
         assertTrue(liste.contains(t1));
@@ -245,18 +243,19 @@ public class TagTest extends ServiceTestBase {
 
     @Test(expected = ServiceException.class)
     @WithData
-    public void test_getMostWantetWithNoTags() throws ServiceException{
+    public void test_getMostWantetWithNoTags() throws ServiceException {
         Photo p0 = getPhoto(0);
         Photo p1 = getPhoto(1);
         Photo p2 = getPhoto(2);
         List<Tag> toRemove = p0.getTags();
-        if(toRemove.size()!=0){
-            for(Tag t: toRemove){
-                tagService.removeTagFromPhotos(toList(p0),t);
+        if (toRemove.size() != 0) {
+            for (Tag t : toRemove) {
+                tagService.removeTagFromPhotos(toList(p0), t);
             }
         }
         List<Tag> liste = tagService.getMostFrequentTags(toList(p0));
     }
+
     @Test
     @WithData
     public void test_no_tags_available_for_photos() throws ServiceException {

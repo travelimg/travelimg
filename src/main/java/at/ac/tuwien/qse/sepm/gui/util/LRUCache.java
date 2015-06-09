@@ -6,6 +6,7 @@ import java.util.Map;
 
 /**
  * Fixed sized associative cache using least recently used replacement strategy
+ *
  * @param <K> Type of the key
  * @param <V> Type of the value
  */

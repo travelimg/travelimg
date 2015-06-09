@@ -25,23 +25,26 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
     private static final String deleteStatement = "DELETE FROM PLACE WHERE id=?;";
     private static final String updateStatement = "UPDATE PLACE SET city = ?, country = ?, latitude = ?, longitude = ?, journey_id = ? WHERE id = ?";
     private static final String readByJourneyStatement = "SELECT id, city, country, latitude, longitude FROM PLACE WHERE journey_id=?;";
+    @Autowired
+    JourneyDAO journeyDAO;
     private SimpleJdbcInsert insertPlace;
 
-    @Autowired JourneyDAO journeyDAO;
-
-    @Override @Autowired public void setDataSource(DataSource dataSource) {
+    @Override
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
         super.setDataSource(dataSource);
         this.insertPlace = new SimpleJdbcInsert(dataSource).withTableName("Place")
                 .usingGeneratedKeyColumns("id");
     }
 
-    @Override public Place create(Place place) throws DAOException, ValidationException {
+    @Override
+    public Place create(Place place) throws DAOException, ValidationException {
         logger.debug("Creating Place", place);
 
         PlaceValidator.validate(place);
 
-        for(Place element: readAll()) {
-            if(element.getCity() == place.getCity() && element.getCountry() == place.getCountry()) return element;
+        for (Place element : readAll()) {
+            if (element.getCity() == place.getCity() && element.getCountry() == place.getCountry()) return element;
         }
 
         Map<String, Object> parameters = new HashMap<String, Object>(1);
@@ -49,7 +52,7 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
         parameters.put("country", place.getCountry());
         parameters.put("latitude", place.getLatitude());
         parameters.put("longitude", place.getLongitude());
-        parameters.put("journey_id",place.getJourney().getId());
+        parameters.put("journey_id", place.getJourney().getId());
 
         try {
             Number newId = insertPlace.executeAndReturnKey(parameters);
@@ -61,7 +64,8 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
         }
     }
 
-    @Override public void delete(Place place) throws DAOException, ValidationException {
+    @Override
+    public void delete(Place place) throws DAOException, ValidationException {
         logger.debug("Deleting Place", place);
 
         PlaceValidator.validate(place);
@@ -75,7 +79,8 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
         }
     }
 
-    @Override public void update(Place place) throws DAOException, ValidationException {
+    @Override
+    public void update(Place place) throws DAOException, ValidationException {
         logger.debug("Updating Place", place);
 
         PlaceValidator.validate(place);
@@ -91,12 +96,14 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
         }
     }
 
-    @Override public List<Place> readAll() throws DAOException {
+    @Override
+    public List<Place> readAll() throws DAOException {
         logger.debug("readAll");
         try {
             List<Place> places = jdbcTemplate.query(readAllStatement, new RowMapper<Place>() {
 
-                @Override public Place mapRow(ResultSet resultSet, int i) throws SQLException {
+                @Override
+                public Place mapRow(ResultSet resultSet, int i) throws SQLException {
                     try {
                         Journey journey = null;
                         if (resultSet.getInt(6) != 0)
@@ -120,16 +127,18 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
         }
     }
 
-    @Override public Place getById(int id) throws DAOException, ValidationException {
+    @Override
+    public Place getById(int id) throws DAOException, ValidationException {
         logger.debug("getByID ", id);
 
         PlaceValidator.validateID(id);
 
         try {
             return this.jdbcTemplate
-                    .queryForObject(readStatement, new Object[] { id }, new RowMapper<Place>() {
+                    .queryForObject(readStatement, new Object[]{id}, new RowMapper<Place>() {
 
-                        @Override public Place mapRow(ResultSet resultSet, int i)
+                        @Override
+                        public Place mapRow(ResultSet resultSet, int i)
                                 throws SQLException {
                             try {
                                 Journey journey = null;
@@ -150,11 +159,12 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
         }
     }
 
-    @Override public List<Place> readByJourney(Journey journey) throws DAOException, ValidationException {
+    @Override
+    public List<Place> readByJourney(Journey journey) throws DAOException, ValidationException {
         logger.debug("readByJourney ", journey.getId());
 
         try {
-            return this.jdbcTemplate.query(readByJourneyStatement, new Object[] { journey.getId() },
+            return this.jdbcTemplate.query(readByJourneyStatement, new Object[]{journey.getId()},
                     new RowMapper<Place>() {
                         public Place mapRow(ResultSet rs, int rowNum) throws SQLException {
                             Place place = null;

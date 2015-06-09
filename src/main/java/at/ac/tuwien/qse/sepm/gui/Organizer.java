@@ -30,30 +30,41 @@ import java.util.function.Consumer;
 public class Organizer {
 
     private static final Logger LOGGER = LogManager.getLogger(Organizer.class);
-
-    @Autowired private PhotographerService photographerService;
-    @Autowired private ClusterService clusterService;
-    @Autowired private Inspector inspectorController;
-
-    @Autowired private TagService tagService;
-    @Autowired private PhotoFilter filter;
-
-    @FXML private BorderPane root;
-    @FXML private Button importButton;
-    @FXML private Button flickrButton;
-    @FXML private Button presentButton;
-    @FXML private Button addJourneyButton;
-
-    @FXML private VBox filterContainer;
-    @FXML private FilterList<Rating> ratingListView;
-    @FXML private FilterList<Tag> categoryListView;
-    @FXML private FilterList<Photographer> photographerListView;
-    @FXML private FilterList<Journey> journeyListView;
-    @FXML private FilterList<Place> placeListView;
-
-    @FXML private Button resetButton;
-
     private final DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy MMM");
+    @Autowired
+    private PhotographerService photographerService;
+    @Autowired
+    private ClusterService clusterService;
+    @Autowired
+    private Inspector inspectorController;
+    @Autowired
+    private TagService tagService;
+    @Autowired
+    private PhotoFilter filter;
+    @FXML
+    private BorderPane root;
+    @FXML
+    private Button importButton;
+    @FXML
+    private Button flickrButton;
+    @FXML
+    private Button presentButton;
+    @FXML
+    private Button addJourneyButton;
+    @FXML
+    private VBox filterContainer;
+    @FXML
+    private FilterList<Rating> ratingListView;
+    @FXML
+    private FilterList<Tag> categoryListView;
+    @FXML
+    private FilterList<Photographer> photographerListView;
+    @FXML
+    private FilterList<Journey> journeyListView;
+    @FXML
+    private FilterList<Place> placeListView;
+    @FXML
+    private Button resetButton;
     private Consumer<PhotoFilter> filterChangeCallback;
 
     public void setPresentAction(Runnable callback) {
@@ -102,10 +113,14 @@ public class Organizer {
 
         ratingListView = new FilterList<>(value -> {
             switch (value) {
-                case GOOD: return "Gut";
-                case NEUTRAL: return "Neutral";
-                case BAD: return "Schlecht";
-                default: return "Unbewertet";
+                case GOOD:
+                    return "Gut";
+                case NEUTRAL:
+                    return "Neutral";
+                case BAD:
+                    return "Schlecht";
+                default:
+                    return "Unbewertet";
             }
         });
         ratingListView.setTitle("Bewertungen");
@@ -145,12 +160,14 @@ public class Organizer {
         if (filterChangeCallback == null) return;
         filterChangeCallback.accept(getFilter());
     }
+
     private void handleRatingsChange(List<Rating> values) {
         LOGGER.debug("rating filter changed");
         filter.getIncludedRatings().clear();
         filter.getIncludedRatings().addAll(values);
         handleFilterChange();
     }
+
     private void handleCategoriesChange(List<Tag> values) {
         LOGGER.debug("category filter changed");
         filter.setUntaggedIncluded(values.contains(null));
@@ -159,18 +176,21 @@ public class Organizer {
         filter.getIncludedCategories().addAll(values);
         handleFilterChange();
     }
+
     private void handlePhotographersChange(List<Photographer> values) {
         LOGGER.debug("photographer filter changed");
         filter.getIncludedPhotographers().clear();
         filter.getIncludedPhotographers().addAll(values);
         handleFilterChange();
     }
+
     private void handleJourneysChange(List<Journey> values) {
         LOGGER.debug("journey filter changed");
         filter.getIncludedJourneys().clear();
         filter.getIncludedJourneys().addAll(values);
         handleFilterChange();
     }
+
     private void handlePlacesChange(List<Place> values) {
         LOGGER.debug("place filter changed");
         filter.getIncludedPlaces().clear();
@@ -187,6 +207,7 @@ public class Organizer {
         journeyListView.setValues(getAllJourneys());
         placeListView.setValues(getAllPlaces());
     }
+
     private List<Rating> getAllRatings() {
         LOGGER.debug("fetching ratings");
         List<Rating> list = new LinkedList<Rating>();
@@ -197,6 +218,7 @@ public class Organizer {
         LOGGER.debug("fetching ratings succeeded with {} items", list.size());
         return list;
     }
+
     private List<Tag> getAllCategories() {
         LOGGER.debug("fetching categories");
         try {
@@ -211,6 +233,7 @@ public class Organizer {
             return new ArrayList<>();
         }
     }
+
     private List<Photographer> getAllPhotographers() {
         LOGGER.debug("fetching photographers");
         try {
@@ -223,6 +246,7 @@ public class Organizer {
             return new ArrayList<>();
         }
     }
+
     private List<Journey> getAllJourneys() {
         LOGGER.debug("fetching journeys");
         try {
@@ -266,7 +290,7 @@ public class Organizer {
         photographerListView.checkAll();
         journeyListView.checkAll();
         placeListView.checkAll();
-        
+
         // restore the callback and handle the change
         filterChangeCallback = savedCallback;
     }

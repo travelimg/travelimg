@@ -12,15 +12,20 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TagServiceImpl implements TagService {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired private TagDAO tagDAO;
-    @Autowired private PhotoTagDAO photoTagDAO;
+    @Autowired
+    private TagDAO tagDAO;
+    @Autowired
+    private PhotoTagDAO photoTagDAO;
 
     /**
      * Create a Tag in the data store.
@@ -28,7 +33,7 @@ public class TagServiceImpl implements TagService {
      * @param tag Tag which to create; must not be null; must not already have an id
      * @return the created Tag
      * @throws ServiceException If the Tag can not be created or the data store fails to
-     *      create a record.
+     *                          create a record.
      */
     @Override
     public Tag create(Tag tag) throws ServiceException {
@@ -46,7 +51,7 @@ public class TagServiceImpl implements TagService {
      *            must not be null;
      *            <tt>tag.id</tt> must not be null;
      * @throws ServiceException If the Tag can not be deleted or the data store fails to
-     *     delete the record.
+     *                          delete the record.
      */
     @Override
     public void delete(Tag tag) throws ServiceException {
@@ -57,7 +62,8 @@ public class TagServiceImpl implements TagService {
         }
     }
 
-    @Override public Tag readName(Tag tag) throws ServiceException {
+    @Override
+    public Tag readName(Tag tag) throws ServiceException {
         try {
             return tagDAO.readName(tag);
         } catch (DAOException e) {
@@ -139,7 +145,8 @@ public class TagServiceImpl implements TagService {
         return tagList;
     }
 
-    @Override public List<Tag> getMostFrequentTags(List<Photo> photos) throws ServiceException {
+    @Override
+    public List<Tag> getMostFrequentTags(List<Photo> photos) throws ServiceException {
         LOGGER.debug("Entering getMostFrequentTags with {}", photos);
 
         HashMap<Tag, Integer> counter = new HashMap<>();

@@ -9,9 +9,12 @@ import javafx.scene.control.Label;
 
 public class ConfirmationDialog extends ResultDialog<Boolean> {
 
-    @FXML private Button cancelButton;
-    @FXML private Button confirmButton;
-    @FXML private Label descriptionLabel;
+    @FXML
+    private Button cancelButton;
+    @FXML
+    private Button confirmButton;
+    @FXML
+    private Label descriptionLabel;
 
     /**
      * {@inheritDoc}
@@ -24,7 +27,7 @@ public class ConfirmationDialog extends ResultDialog<Boolean> {
         cancelButton.setOnAction(this::handleCancel);
     }
 
-    private void handleCancel(Event event){
+    private void handleCancel(Event event) {
         setResult(false);
         close();
     }
@@ -34,11 +37,11 @@ public class ConfirmationDialog extends ResultDialog<Boolean> {
         close();
     }
 
-    public void setConfirmButtonText(String text){
+    public void setConfirmButtonText(String text) {
         confirmButton.setText(text);
     }
 
-    public void setCancelButtonText(String text){
+    public void setCancelButtonText(String text) {
         cancelButton.setText(text);
     }
 }

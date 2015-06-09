@@ -10,13 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,17 +68,25 @@ public class ExifServiceTest extends ServiceTestBase {
                 new Place(1, "Vienna", "Austria", 48.20, 16.37, inputJourney)));
     }};
 
-    @Autowired private ExifService exifService;
-    @Autowired private JourneyDAO journeyDAO;
-    @Autowired private PlaceDAO placeDAO;
-    @Autowired private TagDAO tagDA0;
-    @Autowired private PhotoDAO photoDAO;
+    @Autowired
+    private ExifService exifService;
+    @Autowired
+    private JourneyDAO journeyDAO;
+    @Autowired
+    private PlaceDAO placeDAO;
+    @Autowired
+    private TagDAO tagDA0;
+    @Autowired
+    private PhotoDAO photoDAO;
 
-    @BeforeClass public static void init() {
+    @BeforeClass
+    public static void init() {
         new File(sourceDir + "/exif/").mkdirs();
     }
 
-    @WithData @Test public void testTagExportToPhotoFile()
+    @WithData
+    @Test
+    public void testTagExportToPhotoFile()
             throws ServiceException, ValidationException, DAOException {
         logger.debug("Entering testTagExportToPhotoFile()");
 
@@ -104,7 +106,9 @@ public class ExifServiceTest extends ServiceTestBase {
                 0).getName(), expectedPhotos.get(2).getTags().get(0).getName());
     }
 
-    @WithData @Test public void testJourneyExportToPhotoFile()
+    @WithData
+    @Test
+    public void testJourneyExportToPhotoFile()
             throws ServiceException, ValidationException, DAOException {
         logger.debug("Entering testJourneyExportToPhotoFile()");
 
@@ -125,7 +129,9 @@ public class ExifServiceTest extends ServiceTestBase {
     }
 
 
-    @WithData @Test public void testPlaceExportToPhotoFile()
+    @WithData
+    @Test
+    public void testPlaceExportToPhotoFile()
             throws ServiceException, ValidationException, DAOException {
         logger.debug("Entering testPlaceExportToPhotoFile()");
 

@@ -11,11 +11,11 @@ public interface ImportService extends Service {
 
     /**
      * Import a list of photos into the application.
-     *
+     * <p>
      * The import is non-blocking and a callback is called for each photo after it is imported.
      *
-     * @param photos The photos to import.
-     * @param callback Called with the imported photo.
+     * @param photos       The photos to import.
+     * @param callback     Called with the imported photo.
      * @param errorHandler Handler for occurring exceptions.
      */
     Cancelable importPhotos(List<Photo> photos, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler);

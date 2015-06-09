@@ -40,10 +40,14 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.ENGLISH);
     private SimpleJdbcInsert insertPhoto;
 
-    @Autowired private PhotoTagDAO photoTagDAO;
-    @Autowired private PhotographerDAO photographerDAO;
-    @Autowired private PlaceDAO placeDAO;
-    @Autowired private IOHandler ioHandler;
+    @Autowired
+    private PhotoTagDAO photoTagDAO;
+    @Autowired
+    private PhotographerDAO photographerDAO;
+    @Autowired
+    private PlaceDAO placeDAO;
+    @Autowired
+    private IOHandler ioHandler;
 
     public JDBCPhotoDAO(String photoDirectory) {
         this.photoDirectory = photoDirectory;
@@ -196,7 +200,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
         try {
             return jdbcTemplate.query(READ_MONTH_STATEMENT, (rs, rowNum) -> {
-                    return YearMonth.of(rs.getInt(1), rs.getInt(2));
+                return YearMonth.of(rs.getInt(1), rs.getInt(2));
             }).stream()
                     .distinct()
                     .collect(Collectors.toList());
@@ -205,7 +209,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         }
     }
 
-    @Override public List<Photo> readPhotosByJourney(Journey journey) throws DAOException {
+    @Override
+    public List<Photo> readPhotosByJourney(Journey journey) throws DAOException {
         logger.debug("retrieving photos for monthh {}", journey);
 
         try {
@@ -233,7 +238,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private String copyToPhotoDirectory(Photo photo) throws IOException {
         File source = new File(photo.getPath());
 
-        if(!source.exists()) {
+        if (!source.exists()) {
             throw new IOException("File " + source.getPath() + " does not exist");
         }
 
@@ -246,7 +251,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         // create directory structure
         Paths.get(photoDirectory, date).toFile().mkdirs();
 
-        if(source.getPath().equals(dest.getPath()))
+        if (source.getPath().equals(dest.getPath()))
             return photo.getPath();
 
         ioHandler.copyFromTo(source.toPath(), dest.toPath());

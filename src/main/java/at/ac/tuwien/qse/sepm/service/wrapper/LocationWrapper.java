@@ -12,10 +12,11 @@ public class LocationWrapper implements Clusterable {
 
     public LocationWrapper(Photo photo) {
         this.photo = photo;
-        this.points = new double[] { photo.getLatitude(), photo.getLongitude() };
+        this.points = new double[]{photo.getLatitude(), photo.getLongitude()};
     }
 
-    @Override public double[] getPoint() {
+    @Override
+    public double[] getPoint() {
         return points;
     }
 

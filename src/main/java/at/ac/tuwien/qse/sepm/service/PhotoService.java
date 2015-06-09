@@ -3,7 +3,6 @@ package at.ac.tuwien.qse.sepm.service;
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
-import at.ac.tuwien.qse.sepm.entities.Tag;
 
 import java.time.YearMonth;
 import java.util.List;

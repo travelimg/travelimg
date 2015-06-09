@@ -24,14 +24,12 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
     private GoogleMapView mapView;
     private GoogleMap map;
-    private ArrayList<Photo> markers =null;
+    private ArrayList<Photo> markers = null;
     private ArrayList<Marker> aktivMarker;
-    private HashMap<String,LatLong> displayedMarker;
+    private HashMap<String, LatLong> displayedMarker;
 
     /**
      * Default Constructor
-     *
-     *
      */
     public GoogleMapsScene() {
         logger.debug("GoogleMapsScene will be created ");
@@ -44,6 +42,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
     /**
      * WorldMap Constructor
+     *
      * @param l
      */
     public GoogleMapsScene(ArrayList<Photo> l) {
@@ -100,6 +99,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
     /**
      * set the Center of the MapView
+     *
      * @param x the latitude
      * @param y the longitude
      */
@@ -112,7 +112,6 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     }
 
     /**
-     *
      * @return the GoogleMapView
      */
     public GoogleMapView getMapView() {
@@ -126,6 +125,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
     /**
      * set the Size of the map-window
+     *
      * @param x width
      * @param y height
      */
@@ -152,7 +152,8 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     }
 
     /**
-     *  add one marker, which represents the foto, to the map
+     * add one marker, which represents the foto, to the map
+     *
      * @param photo the photo
      */
     public void addMarker(Photo photo) {
@@ -185,7 +186,8 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     }
 
     /**
-     *  try to add some marker
+     * try to add some marker
+     *
      * @param list list of photos to be displayed on the map
      */
     public void addMarkerList(List<Photo> list) {

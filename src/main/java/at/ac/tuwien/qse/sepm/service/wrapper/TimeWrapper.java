@@ -8,16 +8,17 @@ import java.time.ZoneId;
 /**
  * Created by David on 18.05.2015.
  */
-public class TimeWrapper implements Clusterable{
+public class TimeWrapper implements Clusterable {
     private double[] points;
     private Photo photo;
 
     public TimeWrapper(Photo photo) {
         this.photo = photo;
-        this.points = new double[] {photo.getDatetime().atZone(ZoneId.systemDefault()).toEpochSecond()};
+        this.points = new double[]{photo.getDatetime().atZone(ZoneId.systemDefault()).toEpochSecond()};
     }
 
-    @Override public double[] getPoint() {
+    @Override
+    public double[] getPoint() {
         return points;
     }
 

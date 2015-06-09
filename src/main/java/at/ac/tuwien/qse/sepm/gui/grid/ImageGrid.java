@@ -19,12 +19,9 @@ import java.util.stream.Collectors;
 public class ImageGrid extends TilePane {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    private final ImageCache imageCache;
-
-    protected List<Photo> photos = new ArrayList<>();
     protected final List<PhotoGridTile> tiles = new LinkedList<>();
-
+    private final ImageCache imageCache;
+    protected List<Photo> photos = new ArrayList<>();
     private Consumer<Set<Photo>> selectionChangeAction = null;
 
     public ImageGrid(ImageCache imageCache) {

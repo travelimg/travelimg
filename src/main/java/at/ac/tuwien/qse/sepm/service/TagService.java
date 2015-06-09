@@ -13,7 +13,7 @@ public interface TagService extends Service {
      * @param tag Tag which to create; must not be null; must not already have an id
      * @return the created Tag
      * @throws ServiceException If the Tag can not be created or the data store fails to
-     *      create a record.
+     *                          create a record.
      */
     Tag create(Tag tag) throws ServiceException;
 
@@ -25,7 +25,7 @@ public interface TagService extends Service {
      *            must not be null;
      *            <tt>tag.id</tt> must not be null;
      * @throws ServiceException If the Tag can not be deleted or the data store fails to
-     *     delete the record.
+     *                          delete the record.
      */
     void delete(Tag tag) throws ServiceException;
 
@@ -36,7 +36,7 @@ public interface TagService extends Service {
      * @return the Tag-Objekt
      * @throws ServiceException If the Tag can not be retrieved or the data store fails to select the record.
      */
-    Tag readName(Tag  tag) throws ServiceException;
+    Tag readName(Tag tag) throws ServiceException;
 
     /**
      * Return a list of all existing tags.
@@ -52,8 +52,8 @@ public interface TagService extends Service {
      *
      * @param photos must not be null; all elements must not be null; no element.id must be null
      * @param tag    must not be null; tag.id must not be null
-     * @throws ServiceException         if an Exception in this or an underlying
-     *                                  layer occurs
+     * @throws ServiceException if an Exception in this or an underlying
+     *                          layer occurs
      */
     void addTagToPhotos(List<Photo> photos, Tag tag) throws ServiceException;
 
@@ -63,8 +63,8 @@ public interface TagService extends Service {
      *
      * @param photos must not be null; all elements must not be null; no element.id must be null
      * @param tag    must not be null; tag.id must not be null
-     * @throws ServiceException         if an Exception in this or an underlying
-     *                                  layer occurs
+     * @throws ServiceException if an Exception in this or an underlying
+     *                          layer occurs
      */
     void removeTagFromPhotos(List<Photo> photos, Tag tag) throws ServiceException;
 
@@ -74,7 +74,7 @@ public interface TagService extends Service {
      * @param photo must not be null; photo.id must not be null;
      * @return List with all tags which are linked to <tt>photo</tt> as a PhotoTag;
      * If no tag exists, return an empty List.
-     * @throws ServiceException         if an exception occurs on this or an underlying layer
+     * @throws ServiceException if an exception occurs on this or an underlying layer
      */
     List<Tag> getTagsForPhoto(Photo photo) throws ServiceException;
 
@@ -85,5 +85,5 @@ public interface TagService extends Service {
      * @return a list of most used tags (at most 5)
      * @throws ServiceException if retrieval failed
      */
-    List<Tag> getMostFrequentTags(List <Photo> photos) throws ServiceException;
+    List<Tag> getMostFrequentTags(List<Photo> photos) throws ServiceException;
 }

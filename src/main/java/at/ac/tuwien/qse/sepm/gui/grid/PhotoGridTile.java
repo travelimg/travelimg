@@ -53,7 +53,8 @@ public class PhotoGridTile extends ImageGridTile {
         overlay.setRight(ratingIndicator);
     }
 
-    @Override public void setPhoto(Photo photo, Image image) {
+    @Override
+    public void setPhoto(Photo photo, Image image) {
         super.setPhoto(photo, image);
         if (photo == null) return;
 

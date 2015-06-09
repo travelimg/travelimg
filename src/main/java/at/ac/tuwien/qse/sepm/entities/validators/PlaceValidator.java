@@ -1,9 +1,6 @@
 package at.ac.tuwien.qse.sepm.entities.validators;
 
-import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Place;
-
-import java.io.File;
 
 /**
  * Created by David on 21.05.2015.

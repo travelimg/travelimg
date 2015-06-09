@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Photo {
 
+    private final List<Tag> tags = new ArrayList<>();
     private Integer id;
     private Photographer photographer;
     private String path;
@@ -15,7 +16,6 @@ public class Photo {
     private double latitude;
     private double longitude;
     private Place place;
-    private final List<Tag> tags = new ArrayList<>();
 
     public Photo() {
     }
@@ -70,16 +70,16 @@ public class Photo {
         return rating;
     }
 
+    public void setRating(Rating rating) {
+        this.rating = rating;
+    }
+
     public Photographer getPhotographer() {
         return photographer;
     }
 
     public void setPhotographer(Photographer photographer) {
         this.photographer = photographer;
-    }
-
-    public void setRating(Rating rating) {
-        this.rating = rating;
     }
 
     public LocalDateTime getDatetime() {

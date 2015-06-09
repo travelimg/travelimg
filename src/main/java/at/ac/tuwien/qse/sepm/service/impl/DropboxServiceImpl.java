@@ -105,7 +105,7 @@ public class DropboxServiceImpl implements DropboxService {
             // get the target path by combining dropbox root folder and the destination inside the dropbox folder
             try {
                 dest = Paths.get(getDropboxFolder(), destination);
-                if(!Files.exists(dest)) {
+                if (!Files.exists(dest)) {
                     throw new ServiceException("Can't upload to dropboxfolder which does not exist: " + dest.toString());
                 }
             } catch (ServiceException ex) {
@@ -114,7 +114,7 @@ public class DropboxServiceImpl implements DropboxService {
                 return;
             }
 
-            for (Photo photo: photos) {
+            for (Photo photo : photos) {
                 if (!isRunning())
                     return;
 
