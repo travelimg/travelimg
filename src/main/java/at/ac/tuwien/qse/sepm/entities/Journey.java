@@ -2,9 +2,6 @@ package at.ac.tuwien.qse.sepm.entities;
 
 import java.time.LocalDateTime;
 
-/**
- * Created by David on 19.05.2015.
- */
 public class Journey {
     private int id;
     private String name;
