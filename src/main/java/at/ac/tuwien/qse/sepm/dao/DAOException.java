@@ -37,4 +37,10 @@ public class DAOException extends Exception {
     public DAOException(String message, ImageReadException e) {
         super(message, e);
     }
+
+    public static class Unchecked extends RuntimeException {
+        public Unchecked(String s, Throwable throwable) {
+            super(s, throwable);
+        }
+    }
 }
