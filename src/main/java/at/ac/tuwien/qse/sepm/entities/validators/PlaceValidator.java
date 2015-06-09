@@ -2,9 +2,7 @@ package at.ac.tuwien.qse.sepm.entities.validators;
 
 import at.ac.tuwien.qse.sepm.entities.Place;
 
-/**
- * Created by David on 21.05.2015.
- */
+
 public class PlaceValidator {
 
     public static void validate(Place entity) throws ValidationException {

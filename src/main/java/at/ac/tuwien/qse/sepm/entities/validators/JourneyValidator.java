@@ -2,9 +2,6 @@ package at.ac.tuwien.qse.sepm.entities.validators;
 
 import at.ac.tuwien.qse.sepm.entities.Journey;
 
-/**
- * Created by David on 21.05.2015.
- */
 public class JourneyValidator {
 
     public static void validate(Journey entity) throws ValidationException {
