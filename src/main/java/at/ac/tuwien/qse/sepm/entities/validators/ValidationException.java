@@ -23,6 +23,9 @@ public class ValidationException extends Exception {
     }
 
     public static class Unchecked extends RuntimeException {
+        public Unchecked(Throwable throwable) {
+            super(throwable);
+        }
 
         public Unchecked(String s, Throwable throwable) {
             super(s, throwable);
