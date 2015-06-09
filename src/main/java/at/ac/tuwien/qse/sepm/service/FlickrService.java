@@ -6,6 +6,9 @@ import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 
 import java.util.function.Consumer;
 
+/**
+ * Service for accessing and downloading photos from flickr.
+ */
 public interface FlickrService extends Service {
 
     /**
@@ -20,11 +23,10 @@ public interface FlickrService extends Service {
      * @return a Cancelable object, that can be used to interrupt the download
      * @throws ServiceException
      */
-    public Cancelable downloadPhotos(String tags[], double latitude, double longitude, boolean useGeoData, Consumer<Photo> callback, Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler) throws ServiceException;
+    Cancelable downloadPhotos(String tags[], double latitude, double longitude, boolean useGeoData, Consumer<Photo> callback, Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler) throws ServiceException;
 
     /**
      * After calling this method, the service will be ready to load photos again from the beginning.
      */
-    public void reset();
-
+    void reset();
 }

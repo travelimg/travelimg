@@ -7,6 +7,9 @@ import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * Service for uploading photos to dropbox
+ */
 public interface DropboxService extends Service {
 
     /**

@@ -8,14 +8,10 @@ import java.time.YearMonth;
 import java.util.List;
 import java.util.function.Predicate;
 
+/**
+ * Service for manipulating and organizing photos.
+ */
 public interface PhotoService extends Service {
-
-    /**
-     * Retrieve a list of those months for which there are photos.
-     *
-     * @return a list of months with available photos
-     */
-    List<YearMonth> getMonthsWithPhotos() throws ServiceException;
 
     /**
      * delete the delivered List of Photos
