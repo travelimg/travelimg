@@ -6,12 +6,12 @@ import java.util.List;
 
 public class MockAsyncListener implements AsyncPhotoRepository.AsyncListener {
 
-    private final List<OperationNotification> addNotifications = new LinkedList<>();
+    private final List<OperationNotification> queueNotifications = new LinkedList<>();
     private final List<OperationNotification> completeNotifications = new LinkedList<>();
     private final List<ErrorNotification> errorNotifications = new LinkedList<>();
 
-    public List<OperationNotification> getAddNotifications() {
-        return new ArrayList<>(addNotifications);
+    public List<OperationNotification> getQueueNotifications() {
+        return new ArrayList<>(queueNotifications);
     }
 
     public List<OperationNotification> getCompleteNotifications() {
@@ -23,7 +23,7 @@ public class MockAsyncListener implements AsyncPhotoRepository.AsyncListener {
     }
 
     @Override public void onQueue(AsyncPhotoRepository repository, Operation operation) {
-        addNotifications.add(new OperationNotification(repository, operation));
+        queueNotifications.add(new OperationNotification(repository, operation));
     }
 
     @Override public void onComplete(AsyncPhotoRepository repository, Operation operation) {

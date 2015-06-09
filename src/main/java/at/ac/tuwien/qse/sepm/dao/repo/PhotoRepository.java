@@ -25,7 +25,7 @@ public interface PhotoRepository extends PhotoProvider {
      * @param file path under which the photo should be added
      * @param source stream from which the photo data is read
      * @throws PersistenceException failed to perform operation
-     * @throws PersistenceException
+     * @throws PhotoNotFoundException path is not accepted by this repository
      * @throws PhotoAlreadyExistsException path is already a photo in this repository
      */
     void create(Path file, InputStream source) throws PersistenceException;

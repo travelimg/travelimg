@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -20,24 +19,26 @@ public class MemoryPhotoRepository implements PhotoRepository {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final Path basePath;
+    private final PhotoSerializer serializer;
+    private final Path prefix;
     private final Map<Path, Object> files = new HashMap<>();
-    private final Map<Path, LocalDateTime> modified = new HashMap<>();
     private final Collection<Listener> listeners = new LinkedList<>();
 
-    public MemoryPhotoRepository(Path basePath) {
-        if (basePath == null) throw new IllegalArgumentException();
-        this.basePath = basePath;
+    public MemoryPhotoRepository(PhotoSerializer serializer, Path prefix) {
+        if (serializer == null) throw new IllegalArgumentException();
+        if (prefix == null) throw new IllegalArgumentException();
+        this.serializer = serializer;
+        this.prefix = prefix;
     }
 
-    public Path getBasePath() {
-        return basePath;
+    public Path getPrefix() {
+        return prefix;
     }
 
     @Override public boolean accepts(Path file) throws PersistenceException {
         if (file == null) throw new IllegalArgumentException();
         LOGGER.debug("accepting {}", file);
-        boolean result = file.startsWith(getBasePath());
+        boolean result = file.startsWith(getPrefix());
         LOGGER.info("accepts {} is {}", file, result);
         return result;
     }
@@ -47,7 +48,7 @@ public class MemoryPhotoRepository implements PhotoRepository {
         if (source == null) throw new IllegalArgumentException();
         LOGGER.debug("creating {}", file);
 
-        if (!file.startsWith(getBasePath())) {
+        if (!file.startsWith(getPrefix())) {
             throw new PersistenceException("File is not accepted by this repository.");
         }
         if (contains(file)) {
@@ -57,7 +58,6 @@ public class MemoryPhotoRepository implements PhotoRepository {
         try {
             byte[] array = IOUtils.toByteArray(source);
             files.put(file, array);
-            modified.put(file, LocalDateTime.now());
             LOGGER.info("created {}", file);
             listeners.forEach(l -> l.onCreate(this, file));
         } catch (IOException ex) {
@@ -74,14 +74,10 @@ public class MemoryPhotoRepository implements PhotoRepository {
             throw new PhotoNotFoundException(this, file);
         }
 
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        try {
-            update(photo, stream);
-        } catch (IOException ex) {
-            throw new PersistenceException(ex);
-        }
-        files.put(file, stream.toByteArray());
-        modified.put(file, LocalDateTime.now());
+        ByteArrayInputStream is = new ByteArrayInputStream((byte[])files.get(file));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        serializer.update(is, os, photo.getData());
+        files.put(file, os.toByteArray());
         LOGGER.info("updated {}", photo);
         listeners.forEach(l -> l.onUpdate(this, file));
     }
@@ -95,7 +91,6 @@ public class MemoryPhotoRepository implements PhotoRepository {
         }
 
         files.remove(file);
-        modified.remove(file);
         LOGGER.info("deleted {}", file);
         listeners.forEach(l -> l.onDelete(this, file));
     }
@@ -132,20 +127,9 @@ public class MemoryPhotoRepository implements PhotoRepository {
         }
 
         InputStream stream = new ByteArrayInputStream((byte[])files.get(file));
-        try {
-            Photo photo = read(file, stream);
-            LOGGER.info("read {}", photo);
-            return photo;
-        } catch (IOException ex) {
-            throw new PersistenceException(ex);
-        }
-    }
-
-    protected Photo read(Path file, InputStream stream) throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    protected void update(Photo photo, OutputStream stream) throws IOException {
-        throw new UnsupportedOperationException();
+        PhotoMetaData metadata = serializer.read(stream);
+        Photo photo = new Photo(file, metadata);
+        LOGGER.info("read {}", photo);
+        return photo;
     }
 }

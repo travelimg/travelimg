@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
+import at.ac.tuwien.qse.sepm.dao.repo.impl.MockPhotoSerializer;
 import org.junit.Test;
 
 import java.io.*;
@@ -159,17 +160,20 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
 
     public abstract class Context extends PhotoProviderTest.Context {
 
-        public InputStream getStream(Photo photo) {
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            try {
-                update(photo, output);
-                byte[] data = output.toByteArray();
-                ByteArrayInputStream input = new ByteArrayInputStream(data);
-                return input;
-            } catch (IOException ex) {
-                // This kind of stream should not throw that.
-                throw new RuntimeException(ex);
-            }
+        public PhotoSerializer getSerializer() {
+            MockPhotoSerializer serializer = new MockPhotoSerializer();
+            serializer.put(1, getPhotoData1());
+            serializer.put(2, getPhotoData2());
+            return serializer;
+        }
+
+        public InputStream getStream(Photo photo) throws PersistenceException {
+            ByteArrayInputStream is = new ByteArrayInputStream(new byte[0]);
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            getSerializer().update(is, os, photo.getData());
+            byte[] data = os.toByteArray();
+            ByteArrayInputStream input = new ByteArrayInputStream(data);
+            return input;
         }
 
         public InputStream getStream1() {
@@ -178,30 +182,6 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
 
         public InputStream getStream2() {
             return new ByteArrayInputStream(new byte[] { 2 });
-        }
-
-        public Photo read(Path file, InputStream stream) throws IOException {
-            int index = stream.read();
-            switch (index) {
-                case 1 : return applyData1(new Photo(file));
-                case 2 : return applyData2(new Photo(file));
-                default : throw new IOException("Invalid format.");
-            }
-        }
-
-        public void update(Photo photo, OutputStream stream) throws IOException {
-            // Just use the rating to map photo to stream content.
-            switch (photo.getRating()) {
-                case GOOD :
-                    stream.write(1);
-                    break;
-                case NEUTRAL :
-                    stream.write(2);
-                    break;
-                default :
-                    stream.write(0);
-                    break;
-            }
         }
     }
 }

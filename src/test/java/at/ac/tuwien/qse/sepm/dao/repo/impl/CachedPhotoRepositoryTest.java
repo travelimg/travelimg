@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 
 public class CachedPhotoRepositoryTest extends AsyncPhotoRepositoryTest {
 
-    private final Path basePath = Paths.get("test/path");
+    private static final Path PREFIX = Paths.get("test/path");
 
     @Override protected CachedPhotoRepository getObject() {
         return new CachedPhotoRepository(getRepository(), getCache());
@@ -22,25 +22,17 @@ public class CachedPhotoRepositoryTest extends AsyncPhotoRepositoryTest {
     @Override protected Context getContext() {
         return new Context() {
             @Override public Path getFile1() {
-                return basePath.resolve("some/file.jpg");
+                return PREFIX.resolve("some/file.jpg");
             }
 
             @Override public Path getFile2() {
-                return basePath.resolve("other/photo.jpg");
+                return PREFIX.resolve("other/photo.jpg");
             }
         };
     }
 
     private PhotoRepository getRepository() {
-        return new MemoryPhotoRepository(basePath) {
-            @Override protected Photo read(Path file, InputStream stream) throws IOException {
-                return getContext().read(file, stream);
-            }
-
-            @Override protected void update(Photo photo, OutputStream stream) throws IOException {
-                getContext().update(photo, stream);
-            }
-        };
+        return new MemoryPhotoRepository(getContext().getSerializer(), PREFIX);
     }
 
     private PhotoCache getCache() {

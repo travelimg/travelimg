@@ -99,41 +99,41 @@ public abstract class PhotoProviderTest {
         public abstract Path getFile2();
 
         public Photo getPhoto1() {
-            return applyData1(new Photo(getFile1()));
+            return new Photo(getFile1(), getPhotoData1());
         }
 
         public Photo getPhoto2() {
-            return applyData2(new Photo(getFile2()));
+            return new Photo(getFile2(), getPhotoData2());
         }
 
-        public Photo applyData1(Photo photo) {
-            photo.setDate(LocalDateTime.of(1993, 3, 30, 7, 5));
-            photo.setLongitude(17);
-            photo.setLatitude(18);
-            photo.setAltitude(19);
-            photo.setRating(Rating.GOOD);
-            photo.setPhotographer("Kris");
-            photo.getTags().clear();
-            photo.getTags().add("food");
-            photo.getTags().add("india");
-            return photo;
+        public PhotoMetaData getPhotoData1() {
+            PhotoMetaData data = new PhotoMetaData();
+            data.setDate(LocalDateTime.of(1993, 3, 30, 7, 5));
+            data.setLongitude(17.0);
+            data.setLatitude(18.0);
+            data.setRating(Rating.GOOD);
+            data.setPhotographer("Kris");
+            data.getTags().clear();
+            data.getTags().add("food");
+            data.getTags().add("india");
+            return data;
         }
 
-        public Photo applyData2(Photo photo) {
-            photo.setDate(LocalDateTime.of(2014, 8, 14, 15, 36));
-            photo.setLongitude(42);
-            photo.setLatitude(43);
-            photo.setAltitude(44);
-            photo.setRating(Rating.NEUTRAL);
-            photo.setPhotographer("Lukas");
-            photo.getTags().clear();
-            photo.getTags().add("usa");
-            photo.getTags().add("nature");
-            return photo;
+        public PhotoMetaData getPhotoData2() {
+            PhotoMetaData data = new PhotoMetaData();
+            data.setDate(LocalDateTime.of(2014, 8, 14, 15, 36));
+            data.setLongitude(42.0);
+            data.setLatitude(43.0);
+            data.setRating(Rating.NEUTRAL);
+            data.setPhotographer("Lukas");
+            data.getTags().clear();
+            data.getTags().add("usa");
+            data.getTags().add("nature");
+            return data;
         }
 
         public Photo getModified1() {
-            return applyData2(getPhoto1());
+            return new Photo(getFile1(), getPhotoData2());
         }
     }
 }

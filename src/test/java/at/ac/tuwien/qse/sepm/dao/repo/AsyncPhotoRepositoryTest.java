@@ -51,10 +51,10 @@ public abstract class AsyncPhotoRepositoryTest extends PhotoRepositoryTest {
         object.create(getContext().getFile1(), getContext().getStream1());
         object.update(getContext().getModified1());
 
-        assertEquals(1, listener.getAddNotifications().size());
+        assertEquals(1, listener.getQueueNotifications().size());
         assertEquals(0, listener.getCompleteNotifications().size());
         assertEquals(0, listener.getErrorNotifications().size());
-        MockAsyncListener.OperationNotification notification = listener.getAddNotifications().get(0);
+        MockAsyncListener.OperationNotification notification = listener.getQueueNotifications().get(0);
         assertEquals(object, notification.getRepository());
         assertEquals(Operation.Kind.UPDATE, notification.getOperation().getKind());
         assertEquals(getContext().getFile1(), notification.getOperation().getFile());
@@ -68,10 +68,10 @@ public abstract class AsyncPhotoRepositoryTest extends PhotoRepositoryTest {
         object.create(getContext().getFile1(), getContext().getStream1());
         object.delete(getContext().getFile1());
 
-        assertEquals(1, listener.getAddNotifications().size());
+        assertEquals(1, listener.getQueueNotifications().size());
         assertEquals(0, listener.getCompleteNotifications().size());
         assertEquals(0, listener.getErrorNotifications().size());
-        MockAsyncListener.OperationNotification notification = listener.getAddNotifications().get(0);
+        MockAsyncListener.OperationNotification notification = listener.getQueueNotifications().get(0);
         assertEquals(object, notification.getRepository());
         assertEquals(Operation.Kind.DELETE, notification.getOperation().getKind());
         assertEquals(getContext().getFile1(), notification.getOperation().getFile());
@@ -87,7 +87,7 @@ public abstract class AsyncPhotoRepositoryTest extends PhotoRepositoryTest {
 
         assertEquals(1, object.getQueue().size()); // safeguard, since completeNext blocks
         object.completeNext();
-        assertEquals(1, listener.getAddNotifications().size());
+        assertEquals(1, listener.getQueueNotifications().size());
         assertEquals(1, listener.getCompleteNotifications().size());
         assertEquals(0, listener.getErrorNotifications().size());
         MockAsyncListener.OperationNotification notification = listener.getCompleteNotifications().get(0);
