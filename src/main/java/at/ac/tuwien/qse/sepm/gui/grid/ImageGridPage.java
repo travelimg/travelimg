@@ -35,6 +35,9 @@ public class ImageGridPage extends ImageGrid {
      * @param index Specify which photo to select.
      */
     public void selectAt(int index) {
+        if (tiles.isEmpty())
+            return;
+
         PhotoGridTile tile = tiles.get(Math.max(Math.min(tiles.size() - 1, index), 0));
         tile.select();
         onSelectionChange();

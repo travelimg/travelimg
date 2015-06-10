@@ -6,7 +6,6 @@ import javafx.scene.image.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
 
@@ -17,10 +16,6 @@ public class ImageCache {
     private LRUCache<Integer, Image> smallCache = new LRUCache<>(500);
     private LRUCache<Integer, Image> mediumCache = new LRUCache<>(300);
     private LRUCache<Integer, Image> originalCache = new LRUCache<>(5);
-
-    public ImageCache() {
-        System.out.println("ImageCache::new");
-    }
 
     /**
      * Get an image for a photo at the given size.

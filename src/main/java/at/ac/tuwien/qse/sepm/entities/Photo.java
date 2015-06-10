@@ -15,7 +15,6 @@ public class Photo {
     private double latitude;
     private double longitude;
     private Place place;
-    private Journey journey;
     private final List<Tag> tags = new ArrayList<>();
 
     public Photo() {
@@ -126,7 +125,6 @@ public class Photo {
         if (photographer != null ? !photographer.equals(photo.photographer) : photo.photographer != null) return false;
         if (rating != null ? !rating.equals(photo.rating) : photo.rating != null) return false;
         if (place != null ? place.getId() != photo.getPlace().getId() : place != null) return false;
-        if (journey != null ? journey.getId() != photo.getJourney().getId() : journey != null) return false;
         return !(datetime != null ? !datetime.equals(photo.datetime) : photo.datetime != null);
 
     }
@@ -159,13 +157,5 @@ public class Photo {
                 ", longitude=" + longitude +
                 ", place=" + place +
                 '}';
-    }
-
-    public Journey getJourney() {
-        return journey;
-    }
-
-    public void setJourney(Journey journey) {
-        this.journey = journey;
     }
 }

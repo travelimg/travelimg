@@ -11,5 +11,5 @@ public interface GeoService {
      * @return The place at the requested position, containing its city and country information.
      * @throws ServiceException if the coordinates are invalid.
      */
-    public Place getPlaceByGeoData(double latitude, double longitude) throws ServiceException;
+    Place getPlaceByGeoData(double latitude, double longitude) throws ServiceException;
 }

@@ -43,14 +43,14 @@ public class Organizer {
     @FXML private Button importButton;
     @FXML private Button flickrButton;
     @FXML private Button presentButton;
-    @FXML private Button journeyButton;
+    @FXML private Button addJourneyButton;
 
     @FXML private VBox filterContainer;
     @FXML private FilterList<Rating> ratingListView;
     @FXML private FilterList<Tag> categoryListView;
     @FXML private FilterList<Photographer> photographerListView;
     @FXML private FilterList<Journey> journeyListView;
-    @FXML private PlaceFilterList placeListView;
+    @FXML private FilterList<Place> placeListView;
 
     @FXML private Button resetButton;
 
@@ -98,7 +98,7 @@ public class Organizer {
 
     @FXML
     private void initialize() {
-        journeyButton.setOnAction(this::handleJourney);
+        addJourneyButton.setOnAction(this::handleJourney);
         resetButton.setOnAction(event -> resetFilter());
 
         ratingListView = new FilterList<>(value -> {
@@ -126,7 +126,10 @@ public class Organizer {
         });
         journeyListView.setTitle("Reisen");
         journeyListView.setChangeHandler(this::handleJourneysChange);
-        placeListView = new PlaceFilterList();
+        placeListView = new FilterList<Place>(value -> {
+            if (value == null) return "Keinem Ort zugeordnet";
+            return value.getCountry() + ", " + value.getCity();
+        });
         placeListView.setTitle("Orte");
         placeListView.setChangeHandler(this::handlePlacesChange);
 

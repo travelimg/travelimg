@@ -1,11 +1,9 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Photographer;
-import at.ac.tuwien.qse.sepm.entities.Rating;
-import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import org.junit.Test;
+import org.mockito.cglib.core.Local;
 
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -15,11 +13,22 @@ import static org.junit.Assert.assertTrue;
 
 public class PhotoFilterTest {
 
+    private Journey createJourney() {
+        return new Journey(1, "Asia 2014",
+            LocalDateTime.of(2014, 1, 1, 0, 0),
+            LocalDateTime.of(2015, 1, 1, 0, 0));
+    }
+
+    private Place createPlace() {
+        return new Place(1, "Bombay", "India", 10, 20, createJourney());
+    }
+
     private Photo createMatchingPhoto() {
         Photo photo = new Photo();
         photo.setRating(Rating.NONE);
         photo.setPhotographer(new Photographer(1, "John"));
         photo.setDatetime(LocalDateTime.of(2015, 12, 1, 0, 0));
+        photo.setPlace(createPlace());
         return photo;
     }
 
@@ -28,6 +37,8 @@ public class PhotoFilterTest {
         filter.getIncludedPhotographers().add(new Photographer(1, "John"));
         filter.getIncludedRatings().add(Rating.NONE);
         filter.setUntaggedIncluded(true);
+        filter.getIncludedJourneys().add(createJourney());
+        filter.getIncludedPlaces().add(createPlace());
         return filter;
     }
 

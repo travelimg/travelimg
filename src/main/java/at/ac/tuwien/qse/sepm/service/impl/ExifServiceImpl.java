@@ -109,6 +109,7 @@ public class ExifServiceImpl implements ExifService {
         logger.debug("getTagsFromExif" + photo + ":" + photo.getTags());
         File file = new File(photo.getPath());
         String tags = "";
+        Journey journey = null;
 
         try {
             final ImageMetadata metadata = Imaging.getMetadata(file);
@@ -137,17 +138,19 @@ public class ExifServiceImpl implements ExifService {
 
                     LocalDateTime enddate = LocalDateTime.parse(tempJourney[3], dateFormatter);
 
-                    photoService.addJourneyToPhotos(Arrays.asList(photo),
-                            new Journey(0, tempJourney[1], startdate, enddate));
+                    journey = new Journey(0, tempJourney[1], startdate, enddate);
                     continue;
                 }
 
                 if (element.contains("place")) {
-                    String[] tempPlace = element.split("\\.");
-                    Place place = new Place(0, tempPlace[1], tempPlace[2]);
+                    String[] tempPlace = element.split("\\|");
+                    Place place = new Place(0, tempPlace[1], tempPlace[2],
+                            Double.parseDouble(tempPlace[3]), Double.parseDouble(tempPlace[4]),
+                            journey);
                     clusterService.addPlace(place);
-                    photoService.addPlaceToPhotos(Arrays.asList(photo),
-                            place);
+                    photoService.addPlaceToPhotos(Arrays.asList(photo), place);
+                    photoService.addJourneyToPhotos(Arrays.asList(photo),
+                            journey);
                     continue;
                 }
 
@@ -181,14 +184,14 @@ public class ExifServiceImpl implements ExifService {
             tags += "/" + element.getName();
         }
 
-        if (photo.getJourney() != null) {
-            Journey journey = photo.getJourney();
+        if (photo.getPlace() != null) {
+            Journey journey = photo.getPlace().getJourney();
             tags += "/journey." + journey.getName() + "." + journey.getStartDate()
                     .format(dateFormatter) + "." + journey.getEndDate().format(dateFormatter);
-        }
-        if (photo.getPlace() != null) {
+
             Place place = photo.getPlace();
-            tags += "/place." + place.getCity() + "." + place.getCountry();
+            tags += "/place|" + place.getCity() + "|" + place.getCountry() + "|" + place
+                    .getLatitude() + "|" + place.getLongitude();
         }
 
         try {

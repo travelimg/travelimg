@@ -115,24 +115,25 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         }
     }
 
-    @Override public Journey getByName(String name) throws DAOException, ValidationException {
-        logger.debug("getByName ", name);
-        if (name == null)
-            throw new ValidationException();
+    @Override public Journey getByID(int id) throws DAOException, ValidationException {
+        logger.debug("getByID({})", id);
+
+        JourneyValidator.validateID(id);
 
         try {
             return this.jdbcTemplate
-                    .queryForObject(readStatement, new Object[] { name }, new RowMapper<Journey>() {
+                    .queryForObject(readStatement, new Object[] { id }, new RowMapper<Journey>() {
 
                         @Override public Journey mapRow(ResultSet resultSet, int i)
                                 throws SQLException {
-                            return new Journey(resultSet.getInt(1), resultSet.getString(2),
-                                    resultSet.getTimestamp(3).toLocalDateTime(),
-                                    resultSet.getTimestamp(4).toLocalDateTime());
+                            return new Journey(id, resultSet.getString(1),
+                                    resultSet.getTimestamp(2).toLocalDateTime(),
+                                    resultSet.getTimestamp(3).toLocalDateTime());
                         }
                     });
         } catch (DataAccessException ex) {
-            throw new DAOException("Failed to read a Journey", ex);
+            logger.debug("Failed to read a Journey");
+            return null;
         }
     }
 }
