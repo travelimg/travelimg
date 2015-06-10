@@ -18,7 +18,7 @@ public class Place {
         this.journey = journey;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
