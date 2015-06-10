@@ -22,7 +22,6 @@ import java.util.Map;
 public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
     private static final String readStatement = "SELECT id, city, country, latitude, longitude, journey_id FROM PLACE WHERE id=?;";
     private static final String readAllStatement = "SELECT id, city, country, latitude, longitude, journey_id FROM PLACE;";
-    private static final String deleteStatement = "DELETE FROM PLACE WHERE id=?;";
     private static final String updateStatement = "UPDATE PLACE SET city = ?, country = ?, latitude = ?, longitude = ?, journey_id = ? WHERE id = ?";
     private static final String readByJourneyStatement = "SELECT id, city, country, latitude, longitude, journey_id FROM PLACE WHERE journey_id=?;";
     @Autowired
