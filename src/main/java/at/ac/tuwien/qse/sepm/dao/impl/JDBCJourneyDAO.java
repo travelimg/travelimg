@@ -68,7 +68,6 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
     public void delete(Journey journey) throws DAOException, ValidationException {
         logger.debug("Deleting Journey", journey);
 
-        JourneyValidator.validate(journey);
         JourneyValidator.validateID(journey.getId());
 
         try {
