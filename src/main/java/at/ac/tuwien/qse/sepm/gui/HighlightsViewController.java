@@ -26,11 +26,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static java.util.Collections.*;
 
 public class HighlightsViewController {
 
@@ -101,6 +102,7 @@ public class HighlightsViewController {
         Label lab2 = new Label();
         lab2.setText("Bitte eine Reise auswählen");
         photoView.getChildren().add(lab2);
+
         try {
             List<Journey> listOfJourneys = clusterService.getAllJourneys();
             if(listOfJourneys.size()>0){
@@ -183,6 +185,8 @@ public class HighlightsViewController {
                         goodPhotos.add(p);
                     }
                 }
+               Collections.sort((ArrayList)goodPhotos);
+
                 if (goodPhotos.size() == 0) {
                     photoView.getChildren().clear();
                     Label lab = new Label();
@@ -191,26 +195,91 @@ public class HighlightsViewController {
 
                 } else {
                     try {
-                        List<Tag> taglist = tagService.getMostFrequentTags(goodPhotos);
-                        photoView.getChildren().clear();
-                        for (Tag t : taglist) {
-                            List<Photo> name = new ArrayList<>();
-                            int counter = 0;
-                            for (Photo p : goodPhotos) {
-                                for (Tag t2 : p.getTags()) {
-                                    if (t.getId() == t2.getId() && counter < 5) {
-                                        name.add(p);
-                                        counter++;
-                                    }
+                        //get all places with photos from the journey
+
+                        HashMap<Place,List<Photo>> places= new HashMap<>();
+                        for(Photo ph:goodPhotos){
+                            if(places.size()==0){
+                                ArrayList<Photo> list = new ArrayList<>();
+                                list.add(ph);
+
+                                places.put(ph.getPlace(),list);
+                            }else{
+                                if(places.containsKey(ph.getPlace())){
+                                    List<Photo> list2 = places.get(ph.getPlace());
+                                    list2.add(ph);
+
+                                    places.put(ph.getPlace(),list2);
+                                }else{
+                                    ArrayList<Photo> list = new ArrayList<>();
+                                    list.add(ph);
+
+                                    places.put(ph.getPlace(),list);
                                 }
                             }
-
-                            ImageGrid grid2 = new ImageGrid(imageCache);
-                            grid2.setPhotos(name);
-                            TitledPane tp = new TitledPane(t.getName(), grid2);
-
-                            photoView.getChildren().add(tp);
                         }
+                        HashMap<LocalDateTime,Place> orderedPlaces = new HashMap<>();
+                        for(Place ple : places.keySet()){
+                            LocalDateTime min = LocalDateTime.MAX;
+                            for(Photo p: places.get(ple)){
+                                if(p.getDatetime().compareTo(min)<0){
+                                    min = p.getDatetime();
+                                }
+                            }
+                            orderedPlaces.put(min,ple);
+                        }
+                        List<LocalDateTime> sortedKeys= new ArrayList<>(orderedPlaces.keySet());
+                        Collections.sort(sortedKeys);
+
+                        VBox overall = new VBox();
+
+                        for(LocalDateTime time : sortedKeys){
+                            Place p = orderedPlaces.get(time);
+                            TitledPane tp = new TitledPane();
+                            tp.setText(p.getCountry() + " (" + p.getCity() + ") ");
+                            VBox tagTitle = new VBox();
+                            List<Tag> taglist = tagService.getMostFrequentTags(places.get(p));
+                            for (Tag t : taglist) {
+                                List<Photo> name = new ArrayList<>();
+                                int counter = 0;
+                                for (Photo ph : places.get(p)) {
+                                    for (Tag t2 : ph.getTags()) {
+                                        if (t.getId() == t2.getId() && counter < 5) {
+                                            name.add(ph);
+                                            counter++;
+                                        }
+                                    }
+                                }
+
+                                ImageGrid grid2 = new ImageGrid(imageCache);
+                                grid2.setPhotos(name);
+                                TitledPane tp2 = new TitledPane(t.getName(), grid2);
+                                tagTitle.getChildren().add(tp2);
+                            }
+                            tp.setContent(tagTitle);
+                            overall.getChildren().add(tp);
+                        }
+                        photoView.getChildren().addAll(overall);
+//                        List<Tag> taglist = tagService.getMostFrequentTags(goodPhotos);
+//                        photoView.getChildren().clear();
+//                        for (Tag t : taglist) {
+//                            List<Photo> name = new ArrayList<>();
+//                            int counter = 0;
+//                            for (Photo p : goodPhotos) {
+//                                for (Tag t2 : p.getTags()) {
+//                                    if (t.getId() == t2.getId() && counter < 5) {
+//                                        name.add(p);
+//                                        counter++;
+//                                    }
+//                                }
+//                            }
+//
+//                            ImageGrid grid2 = new ImageGrid(imageCache);
+//                            grid2.setPhotos(name);
+//                            TitledPane tp = new TitledPane(t.getName(), grid2);
+//
+//                            photoView.getChildren().add(tp);
+//                        }
                     } catch (ServiceException e) {
                         LOGGER.debug("Photos habe keine Tag's ", e);
                         photoView.getChildren().clear();

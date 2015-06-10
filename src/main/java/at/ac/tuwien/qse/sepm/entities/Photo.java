@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Photo {
+public class Photo implements Comparable<Photo>{
 
     private Integer id;
     private Photographer photographer;
@@ -157,5 +157,9 @@ public class Photo {
                 ", longitude=" + longitude +
                 ", place=" + place +
                 '}';
+    }
+
+    @Override public int compareTo(Photo o) {
+        return this.getDatetime().compareTo(o.getDatetime());
     }
 }
