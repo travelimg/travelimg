@@ -2,7 +2,7 @@ package at.ac.tuwien.qse.sepm.entities;
 
 public class Place {
 
-    private int id;
+    private Integer id;
     private String city;
     private String country;
     private double latitude;
