@@ -73,7 +73,7 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
 
         try {
             jdbcTemplate
-                    .update(updateStatement, place.getCity(), place.getCountry(), place.getLatitude(), place.getLongitude(), place.getId());
+                    .update(updateStatement, place.getCity(), place.getCountry(), place.getLatitude(), place.getLongitude(), place.getJourney().getId(), place.getId());
             logger.debug("Successfully updated Place", place);
         } catch (DataAccessException ex) {
             logger.error("Failed updating Place", place);
