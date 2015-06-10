@@ -9,7 +9,7 @@ public class Place {
     private double longitude;
     private Journey journey;
 
-    public Place(int id, String city, String country, double latitude, double longitude, Journey journey) {
+    public Place(Integer id, String city, String country, double latitude, double longitude, Journey journey) {
         this.id = id;
         this.city = city;
         this.country = country;
@@ -22,7 +22,7 @@ public class Place {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
