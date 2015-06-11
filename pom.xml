@@ -154,5 +154,11 @@
             <artifactId>flickr4java</artifactId>
             <version>${flickr.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>apache-jena-libs</artifactId>
+            <type>pom</type>
+            <version>2.13.0</version>
+        </dependency>
     </dependencies>
 </project>
