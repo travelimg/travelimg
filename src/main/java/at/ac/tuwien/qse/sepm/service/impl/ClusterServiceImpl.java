@@ -106,6 +106,7 @@ public class ClusterServiceImpl implements ClusterService {
             throw new ServiceException("Failed to read photos of journey", e);
         }
 
+        // attach a place to each photo
         for (Photo photo : photos) {
             final double latitude = photo.getLatitude();
             final double longitude = photo.getLongitude();
