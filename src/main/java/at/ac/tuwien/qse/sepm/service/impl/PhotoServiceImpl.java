@@ -1,18 +1,18 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
-import at.ac.tuwien.qse.sepm.dao.*;
+import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.JourneyDAO;
+import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
-import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.YearMonth;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -85,21 +85,21 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public void savePhotoRating(Photo photo) throws ServiceException {
-        if (photo == null)
-            throw new IllegalArgumentException();
-        LOGGER.debug("Entering savePhotoRating with {}", photo);
+    public void editPhoto(Photo photo) throws ServiceException {
+        LOGGER.debug("Entering editPhoto with {}", photo);
+
         try {
             photoDAO.update(photo);
-            LOGGER.info("Successfully saved rating for {}", photo);
+            LOGGER.info("Successfully updated {}", photo);
         } catch (DAOException ex) {
-            LOGGER.error("Saving rating for {} failed to to DAOException", photo);
-            throw new ServiceException("Could not store rating of photo.", ex);
+            LOGGER.error("Updating {} failed due to DAOException", photo);
+            throw new ServiceException("Could update photo.", ex);
         } catch (ValidationException ex) {
-            LOGGER.error("Saving rating for {} failed to to ValidationException", photo);
-            throw new ServiceException("Could not store rating of photo.", ex);
+            LOGGER.error("Updating {} failed due to ValidationException", photo);
+            throw new ServiceException("Could not update photo.", ex);
         }
-        LOGGER.debug("Leaving savePhotoRating with {}", photo);
+
+        LOGGER.debug("Leaving editPhoto with {}", photo);
     }
 
     @Override

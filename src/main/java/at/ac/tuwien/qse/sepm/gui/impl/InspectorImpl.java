@@ -28,7 +28,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -188,7 +187,7 @@ public class InspectorImpl implements Inspector {
             photo.setRating(newRating);
 
             try {
-                photoservice.savePhotoRating(photo);
+                photoservice.editPhoto(photo);
             } catch (ServiceException ex) {
                 LOGGER.error("Failed saving photo rating.", ex);
                 LOGGER.debug("Resetting rating from {} to {}.", newRating, oldRating);

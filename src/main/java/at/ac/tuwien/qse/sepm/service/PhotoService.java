@@ -44,12 +44,12 @@ public interface PhotoService extends Service {
     List<Photo> getAllPhotos(Predicate<Photo> filter) throws ServiceException;
 
     /**
-     * Persists the rating of the specified photo.
+     * Persist the edits made to a photo.
      *
-     * @param photo photo for which the rating should be stored
+     * @param photo photo for which the changes should be stored
      * @throws ServiceException failed to perform operation
      */
-    void savePhotoRating(Photo photo) throws ServiceException;
+    void editPhoto(Photo photo) throws ServiceException;
 
     void addJourneyToPhotos(List<Photo> photos, Journey journey) throws ServiceException;
 
