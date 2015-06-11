@@ -5,6 +5,9 @@ import at.ac.tuwien.qse.sepm.entities.Photographer;
 
 import java.util.List;
 
+/**
+ * Service for managing photographers.
+ */
 public interface PhotographerService {
 
     /**

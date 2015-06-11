@@ -26,23 +26,7 @@ public class PhotoServiceImpl implements PhotoService {
     @Autowired
     private PhotoDAO photoDAO;
     @Autowired
-    private ExifService exifService;
-    @Autowired
-    private PhotoTagDAO photoTagDAO;
-    @Autowired
     private JourneyDAO journeyDAO;
-    @Autowired
-    private PlaceDAO placeDAO;
-
-    @Override
-    public List<YearMonth> getMonthsWithPhotos() throws ServiceException {
-        LOGGER.debug("Retrieving list of months...");
-        try {
-            return photoDAO.getMonthsWithPhotos();
-        } catch (DAOException ex) {
-            throw new ServiceException(ex);
-        }
-    }
 
     @Override
     public void deletePhotos(List<Photo> photos) throws ServiceException {

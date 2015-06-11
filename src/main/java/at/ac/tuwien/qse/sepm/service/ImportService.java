@@ -7,6 +7,9 @@ import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * Service for importing external photos into the users library.
+ */
 public interface ImportService extends Service {
 
     /**
