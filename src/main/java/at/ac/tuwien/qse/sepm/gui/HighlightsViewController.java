@@ -14,6 +14,9 @@ import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.Polyline;
 import com.lynden.gmapsfx.shapes.PolylineOptions;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -22,6 +25,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +41,14 @@ public class HighlightsViewController {
 
     @FXML private BorderPane borderPane;
     @FXML private GoogleMapsScene mapsScene;
-    @FXML private VBox journeys, mapContainer, photoView;
+    @FXML private VBox journeys, mapContainer, photoView, tree;
     @FXML private FilterList<Journey> journeyListView;
     @FXML private ScrollPane scrollPhotoView;
     @Autowired private ClusterService clusterService;
     @Autowired private PhotoService photoService;
     @Autowired private PhotoFilter filter;
     @Autowired private TagService tagService;
+    private Journey selectedJourney;
     private GoogleMapView mapView;
     private GoogleMap googleMap;
     private ArrayList<Marker> markers = new ArrayList<Marker>();
@@ -55,6 +60,7 @@ public class HighlightsViewController {
     private Consumer<PhotoFilter> filterChangeCallback;
     private ImageGrid grid;
     private int pos = 0;
+    private TreeView<String> treeView;
     private static final Logger LOGGER = LogManager.getLogger();
     private ImageCache imageCache;
 
@@ -70,9 +76,8 @@ public class HighlightsViewController {
         Button playButton = new Button("Play selected journey!");
         playButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
-            @Override
-            public void handle(MouseEvent event) {
-                if(pos==0){
+            @Override public void handle(MouseEvent event) {
+                if (pos == 0) {
                     clearMap();
                 }
                 playTheJourney(pos);
@@ -82,6 +87,7 @@ public class HighlightsViewController {
         vBox.getChildren().add(playButton);
         borderPane.setBottom(vBox);
         /**to remove - END**/
+
     }
 
     public void setMap(GoogleMapsScene map) {
@@ -99,6 +105,7 @@ public class HighlightsViewController {
     public void reloadJourneys(){
         journeyRadioButtonsHashMap.clear();
         photoView.getChildren().clear();
+        tree.getChildren().clear();
         Label lab2 = new Label();
         lab2.setText("Bitte eine Reise auswählen");
         photoView.getChildren().add(lab2);
@@ -126,6 +133,7 @@ public class HighlightsViewController {
     private void handleSelectionChange(ActionEvent e) {
         clearMap();
         Journey j = journeyRadioButtonsHashMap.get((RadioButton) e.getSource());
+        selectedJourney = j;
         LOGGER.debug("Selected journey {}",j.getName());
         try {
             places = clusterService.getPlacesByJourney(j);
@@ -152,6 +160,7 @@ public class HighlightsViewController {
 
     private void handleFilterChange(PhotoFilter filter){
         this.filter = filter;
+        tree.getChildren().clear();
         if(!disableReload) reloadImages();
     }
     public void setFilterChangeAction(Consumer<PhotoFilter>callback){
@@ -233,11 +242,17 @@ public class HighlightsViewController {
 
                         VBox overall = new VBox();
 
+                        TreeItem<String> rootItem = new TreeItem<>(selectedJourney.getName());
                         for(LocalDateTime time : sortedKeys){
                             Place p = orderedPlaces.get(time);
                             TitledPane tp = new TitledPane();
                             tp.setText(p.getCountry() + " (" + p.getCity() + ") ");
+
+                            //tree
+                            TreeItem<String> ti = new TreeItem<>(p.getCountry() + " (" + p.getCity() + ") ");
+
                             VBox tagTitle = new VBox();
+
                             List<Tag> taglist = tagService.getMostFrequentTags(places.get(p));
                             for (Tag t : taglist) {
                                 List<Photo> name = new ArrayList<>();
@@ -254,11 +269,18 @@ public class HighlightsViewController {
                                 ImageGrid grid2 = new ImageGrid(imageCache);
                                 grid2.setPhotos(name);
                                 TitledPane tp2 = new TitledPane(t.getName(), grid2);
+                                //Tree
+                                ti.getChildren().add(new TreeItem<String>(t.getName()));
+
                                 tagTitle.getChildren().add(tp2);
                             }
                             tp.setContent(tagTitle);
+                            rootItem.getChildren().add(ti);
                             overall.getChildren().add(tp);
                         }
+                        treeView = new TreeView<>(rootItem);
+                        tree.getChildren().add(new Label("Zeitlicher Verlaufder Reise"));
+                        tree.getChildren().add(treeView);
                         photoView.getChildren().addAll(overall);
 //                        List<Tag> taglist = tagService.getMostFrequentTags(goodPhotos);
 //                        photoView.getChildren().clear();

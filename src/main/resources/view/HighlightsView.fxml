@@ -26,6 +26,16 @@
                 </VBox>
 
             </center>
+            <bottom>
+               <VBox fx:id="tree">
+                   <children>
+
+                   </children>
+                   <padding>
+                       <Insets left="10.0" top="5.0" />
+                   </padding>
+               </VBox>
+            </bottom>
          <padding>
             <Insets top="5.0" />
          </padding>
@@ -51,4 +61,5 @@
         </BorderPane>
 
     </center>
+
 </BorderPane>
