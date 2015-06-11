@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,11 @@ public class WorldmapView {
     private GoogleMapsScene worldMap;
     @Autowired
     private PhotoService photoService;
+    @FXML private Label output = new Label();
+
+    public void setOutput(String s){
+        this.output.setText(s);
+    }
 
     public WorldmapView() {
 
@@ -50,6 +56,7 @@ public class WorldmapView {
         worldMap.setCenter(70.7385, -90.9871);
         worldMap.setZoom(2);
         border.setCenter(worldMap.getMapView());
+        border.setTop(new Label("test"));
     }
 
     /**

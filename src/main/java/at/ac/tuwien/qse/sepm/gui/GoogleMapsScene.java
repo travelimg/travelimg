@@ -1,14 +1,20 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Place;
+import at.ac.tuwien.qse.sepm.service.GeoService;
+import at.ac.tuwien.qse.sepm.service.ServiceException;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.event.UIEventType;
 import com.lynden.gmapsfx.javascript.object.*;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +30,10 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     private ArrayList<Photo> markers = null;
     private ArrayList<Marker> aktivMarker = new ArrayList<>();
     private HashMap<String, LatLong> displayedMarker = new HashMap<>();
-
+    @Autowired
+    private WorldmapView worldmapView;
+    @Autowired
+    private GeoService geoService;
     /**
      * Default Constructor
      */
@@ -63,13 +72,15 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
                 Marker m = new Marker(new MarkerOptions()
                         .position(new LatLong(photo.getLatitude(), photo.getLongitude()))
                         .visible(Boolean.TRUE).animation(Animation.BOUNCE));
-                m.setTitle("Marker");
+                m.setTitle(photo.getPlace().getCountry());
 
                 aktivMarker.add(m);
                 displayedMarker.put(m.getVariableName(),
                         new LatLong(photo.getLatitude(), photo.getLongitude()));
                 map.addUIEventHandler(m, UIEventType.dblclick, (JSObject obj) -> {
-                    //TODO //TODO Markerhandling
+                    System.out.println(displayedMarker.get(m.getVariableName()).toString());
+
+
                 });
 
                 map.addMarker(m);
@@ -135,12 +146,15 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
             Marker m = new Marker(new MarkerOptions()
                     .position(new LatLong(photo.getLatitude(), photo.getLongitude()))
                     .visible(Boolean.TRUE).animation(Animation.BOUNCE));
-            m.setTitle("Marker");
+
+            m.setTitle(photo.getPlace().getCountry());
             aktivMarker.add(m);
             displayedMarker.put(m.getVariableName(), new LatLong(photo.getLatitude(), photo.getLongitude()));
 
             map.addUIEventHandler(m, UIEventType.click, (JSObject obj) -> {
-                //TODO Markerhandler
+                System.out.println(displayedMarker.get(m.getVariableName()).toString());
+
+
 
             });
             mapView.setCenter(photo.getLatitude(), photo.getLongitude());
@@ -148,6 +162,8 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
             map.addMarker(m);
         } catch (JSException ex) {
             logger.debug("Error by initializing Map");
+       // } catch (ServiceException e) {
+            //TODO Exceptionhandling
         }
     }
 
@@ -170,18 +186,25 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
                 Marker m = new Marker(new MarkerOptions()
                         .position(new LatLong(photo.getLatitude(), photo.getLongitude()))
                         .visible(Boolean.TRUE).animation(Animation.BOUNCE));
-                m.setTitle("Marker");
+
+
+                m.setTitle(photo.getPlace().getCountry());
                 aktivMarker.add(m);
                 displayedMarker.put(m.getVariableName(),
                         new LatLong(photo.getLatitude(), photo.getLongitude()));
                 map.addUIEventHandler(m, UIEventType.click, (JSObject obj) -> {
-                    //TODO Markerhandler
+                    System.out.println(displayedMarker.get(m.getVariableName()).toString());
+
+
                 });
 
                 map.addMarker(m);
             }
         } catch (JSException ex) {
             logger.debug("Error by initializing Map");
+        //} catch (ServiceException e) {
+            //TODO ExceptionHandling
+            System.out.println("FEHLER");
         }
     }
 }

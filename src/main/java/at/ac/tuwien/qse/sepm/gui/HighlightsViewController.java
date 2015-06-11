@@ -21,17 +21,24 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.StrokeLineCap;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import javafx.scene.paint.Color;
+import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -63,6 +70,8 @@ public class HighlightsViewController {
     private TreeView<String> treeView;
     private static final Logger LOGGER = LogManager.getLogger();
     private ImageCache imageCache;
+    @FXML
+    private StrokeLineCap lineCap;
 
     @Autowired
     public void setImageCache(ImageCache imageCache) {
@@ -87,6 +96,14 @@ public class HighlightsViewController {
         vBox.getChildren().add(playButton);
         borderPane.setBottom(vBox);
         /**to remove - END**/
+        Line redLine = new Line(20, 20, 900, 20);
+        redLine.setStroke(Color.BLUE);
+        redLine.setStrokeWidth(10);
+        redLine.setStrokeLineCap(StrokeLineCap.BUTT);
+
+        redLine.getStrokeDashArray().addAll(15d, 5d, 15d, 15d, 20d);
+        redLine.setStrokeDashOffset(30);
+        mapContainer.getChildren().add(redLine);
 
     }
 
@@ -281,6 +298,7 @@ public class HighlightsViewController {
                         treeView = new TreeView<>(rootItem);
                         tree.getChildren().add(new Label("Zeitlicher Verlaufder Reise"));
                         tree.getChildren().add(treeView);
+
                         photoView.getChildren().addAll(overall);
 //                        List<Tag> taglist = tagService.getMostFrequentTags(goodPhotos);
 //                        photoView.getChildren().clear();
