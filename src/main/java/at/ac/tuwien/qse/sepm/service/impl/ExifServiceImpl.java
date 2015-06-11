@@ -151,6 +151,7 @@ public class ExifServiceImpl implements ExifService {
                     Place place = new Place(0, tempPlace[1], tempPlace[2],
                             Double.parseDouble(tempPlace[3]), Double.parseDouble(tempPlace[4]),
                             journey);
+                    // TODO: only create records if they don't already exist for the photo
                     clusterService.addPlace(place);
                     photoService.addPlaceToPhotos(Arrays.asList(photo), place);
                     photoService.addJourneyToPhotos(Arrays.asList(photo),

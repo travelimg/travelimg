@@ -31,7 +31,7 @@ public class GeoServiceImpl implements GeoService {
         JSONArray results = obj.getJSONArray("results");
         JSONObject result = results.getJSONObject(0);
         JSONArray addressComponentsArray = result.getJSONArray("address_components");
-        Place p = new Place(1, "Unknown place", "Unknown place", 0.0, 0.0, null);
+        Place p = new Place(1, "Unknown place", "Unknown place", latitude, longitude, null);
         for (int i = 0; i < addressComponentsArray.length(); i++) {
             if (addressComponentsArray.getJSONObject(i).getJSONArray("types").get(0)
                     .equals("locality")) {

@@ -103,6 +103,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
+    @Deprecated
     public void addJourneyToPhotos(List<Photo> photos, Journey journey)
             throws ServiceException {
         LOGGER.debug("Entering addJourneyToPhotos with {}, {}", photos, journey);
@@ -126,6 +127,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
+    @Deprecated
     public void addPlaceToPhotos(List<Photo> photos, Place place)
             throws ServiceException {
         LOGGER.debug("Entering addPlaceToPhotos with {}, {}", photos, place);
