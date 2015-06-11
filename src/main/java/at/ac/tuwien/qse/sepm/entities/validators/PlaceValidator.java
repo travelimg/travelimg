@@ -15,7 +15,7 @@ public class PlaceValidator {
         if (entity.getCountry() == null)
             throw new ValidationException("Country can not be null");
 
-        if(entity.getJourney()== null ){
+        if (entity.getJourney() == null ) {
             throw new ValidationException("Journey can't be null");
         }
     }
