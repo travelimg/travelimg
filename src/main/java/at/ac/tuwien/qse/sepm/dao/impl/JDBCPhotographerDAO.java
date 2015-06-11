@@ -79,7 +79,9 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
 
     public void update(Photographer photographer) throws DAOException, ValidationException {
         logger.debug("Updating photographer {}", photographer);
+
         PhotographerValidator.validate(photographer);
+        PhotographerValidator.validateId(photographer);
 
         try {
             jdbcTemplate.update(UPDATE_STATEMENT, photographer.getName(), photographer.getId());
