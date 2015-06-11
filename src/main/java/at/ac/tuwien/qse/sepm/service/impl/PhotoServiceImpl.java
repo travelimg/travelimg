@@ -22,16 +22,20 @@ import java.util.stream.Collectors;
 public class PhotoServiceImpl implements PhotoService {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    @Autowired private PhotoDAO photoDAO;
+
 
     @Autowired private ExifService exifService;
     @Autowired private PhotoTagDAO photoTagDAO;
-    @Autowired private JourneyDAO journeyDAO;
+
     @Autowired private PlaceDAO placeDAO;
 
     ExecutorService executorService = Executors.newFixedThreadPool(1);
+    @Autowired
+    private PhotoDAO photoDAO;
+    @Autowired
+    private JourneyDAO journeyDAO;
 
-    @Override public List<YearMonth> getMonthsWithPhotos() throws ServiceException {
+    public List<YearMonth> getMonthsWithPhotos() throws ServiceException {
         LOGGER.debug("Retrieving list of months...");
         try {
             return photoDAO.getMonthsWithPhotos();

@@ -28,26 +28,23 @@ import static org.hamcrest.Matchers.empty;
 @UsingTable("Photo")
 public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
+    private static final Photographer defaultPhotographer = new Photographer(1, "Test Photographer");
+    private static final Place defaultPlace = new Place(1, "Unkown place", "Unknown place", 0.0, 0.0, null);
+    private static final String dataDir = Paths.get(System.getProperty("java.io.tmpdir"), "travelimg").toString();
+    private static final String sourceDir = Paths.get(System.getProperty("os.name").contains("indow") ?
+            JDBCPhotoDAOTest.class.getClassLoader().getResource("db/testimages").getPath().substring(1) :
+            JDBCPhotoDAOTest.class.getClassLoader().getResource("db/testimages").getPath()).toString();
     @Autowired
     PhotoDAO photoDAO;
     @Autowired
     TestIOHandler ioHandler;
-
-    private static final Photographer defaultPhotographer = new Photographer(1, "Test Photographer");
-    private static final Place defaultPlace = new Place(1, "Unkown place", "Unknown place", 0.0, 0.0, null);
-
-    private static final String dataDir = Paths.get(System.getProperty("java.io.tmpdir"), "travelimg").toString();
-    private static final String sourceDir = Paths.get(System.getProperty( "os.name" ).contains( "indow" ) ?
-            JDBCPhotoDAOTest.class.getClassLoader().getResource("db/testimages").getPath().substring(1) :
-            JDBCPhotoDAOTest.class.getClassLoader().getResource("db/testimages").getPath()).toString();
-
-    private YearMonth expectedMonths[] = new YearMonth[] {
+    private YearMonth expectedMonths[] = new YearMonth[]{
             YearMonth.of(2005, 9),
             YearMonth.of(2015, 3),
             YearMonth.of(2015, 5)
     };
 
-    private Photo expectedPhotos[] = new Photo[] {
+    private Photo expectedPhotos[] = new Photo[]{
             new Photo(1, defaultPhotographer, Paths.get(dataDir, "2015", "03", "06", "1.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 3, 6, 0, 0, 0), 41.5, 19.5, defaultPlace),
             new Photo(2, defaultPhotographer, Paths.get(dataDir, "2005", "09", "11", "2.jpg").toString(), Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9, defaultPlace),
             new Photo(3, defaultPhotographer, Paths.get(dataDir, "2005", "09", "11", "3.jpg").toString(), Rating.NONE, LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9, defaultPlace),
@@ -59,7 +56,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
             new Photo(9, defaultPhotographer, Paths.get(dataDir, "2015", "05", "17", "8.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
     };
 
-    private Photo inputPhotos[] = new Photo[] {
+    private Photo inputPhotos[] = new Photo[]{
             new Photo(7, defaultPhotographer, Paths.get(sourceDir, "6.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
             new Photo(8, defaultPhotographer, Paths.get(sourceDir, "7.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
             new Photo(9, defaultPhotographer, Paths.get(sourceDir, "8.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115, defaultPlace),
@@ -79,7 +76,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     }
 
     private List<Photo> setPrefix(List<Photo> photos) {
-        for(Photo photo : photos) {
+        for (Photo photo : photos) {
             setDataPrefixDir(photo);
         }
 
@@ -162,7 +159,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     public void testReadAllRecordsExist() throws DAOException, ValidationException {
         List<Photo> photos = setPrefix(photoDAO.readAll());
 
-        for(Photo photo : photos) {
+        for (Photo photo : photos) {
             setDataPrefixDir(photo);
             Photo expected = getExpectedPhoto(photo.getId());
             assertThat(expected, equalTo(photo));
@@ -209,7 +206,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     public void testReadMonthsWithData() throws DAOException {
         assertThat(photoDAO.getMonthsWithPhotos().size(), is(2));
 
-        for(YearMonth month : photoDAO.getMonthsWithPhotos()) {
+        for (YearMonth month : photoDAO.getMonthsWithPhotos()) {
             assertThat(Arrays.asList(expectedMonths), hasItem(month));
         }
     }
@@ -226,7 +223,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
     @Test
     public void testReadPhotosByMonthEmpty() throws DAOException {
-        for(YearMonth month : expectedMonths) {
+        for (YearMonth month : expectedMonths) {
             assertThat(photoDAO.readPhotosByMonth(month).size(), is(0));
         }
     }
@@ -270,7 +267,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
             didThrow = true;
         }
 
-        if(!didThrow) {
+        if (!didThrow) {
             throw new AssertionError("Expected DAOException");
         }
 

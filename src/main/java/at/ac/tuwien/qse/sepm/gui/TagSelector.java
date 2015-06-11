@@ -31,10 +31,14 @@ public class TagSelector extends VBox {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @FXML private CheckListView<Tag> tagList;
-    @FXML private TextField newCatName;
-    @FXML private ToggleButton addCategoryBtn;
-    @FXML private Button deleteTagBtn;
+    @FXML
+    private CheckListView<Tag> tagList;
+    @FXML
+    private TextField newCatName;
+    @FXML
+    private ToggleButton addCategoryBtn;
+    @FXML
+    private Button deleteTagBtn;
     private ListChangeListener<Tag> tagListChangeListener;
 
     private PhotoService photoservice;
@@ -47,7 +51,7 @@ public class TagSelector extends VBox {
      * @param listener defines how to handle the change; must not be null;
      */
     public TagSelector(ListChangeListener<Tag> listener, PhotoService ps, TagService ts,
-            Node root) {
+                       Node root) {
         LOGGER.debug("Instantiate TagSelector");
         this.tagListChangeListener = listener;
         this.photoservice = ps;
@@ -70,15 +74,18 @@ public class TagSelector extends VBox {
         tagList.setItems(tagNames);
 
         tagList.setCellFactory(new Callback<ListView<Tag>, ListCell<Tag>>() {
-            @Override public ListCell<Tag> call(ListView<Tag> p) {
+            @Override
+            public ListCell<Tag> call(ListView<Tag> p) {
                 return new CheckBoxListCell<Tag>(item -> tagList.getItemBooleanProperty(item),
                         new StringConverter<Tag>() {
 
-                            @Override public Tag fromString(String string) {
+                            @Override
+                            public Tag fromString(String string) {
                                 return null;
                             }
 
-                            @Override public String toString(Tag tag) {
+                            @Override
+                            public String toString(Tag tag) {
                                 return tag.getName();
                             }
                         });
@@ -121,7 +128,8 @@ public class TagSelector extends VBox {
         tagList.getCheckModel().getCheckedItems().addListener(tagListChangeListener);
     }
 
-    @FXML private void addCategory(ActionEvent event) {
+    @FXML
+    private void addCategory(ActionEvent event) {
         String newCategoryName = newCatName.getText();
         highlightAddCategoryBtn(null);
 
@@ -179,7 +187,8 @@ public class TagSelector extends VBox {
         tagList.getCheckModel().getCheckedItems().addListener(tagListChangeListener);
     }
 
-    @FXML private void highlightAddCategoryBtn(KeyEvent event) {
+    @FXML
+    private void highlightAddCategoryBtn(KeyEvent event) {
         if (isValidInput(newCatName.getText())) {
             addCategoryBtn.setSelected(true);
         } else {
@@ -187,7 +196,8 @@ public class TagSelector extends VBox {
         }
     }
 
-    @FXML private void deleteSelectedTag(ActionEvent event) {
+    @FXML
+    private void deleteSelectedTag(ActionEvent event) {
         Tag oldTag = tagList.getSelectionModel().getSelectedItem();
 
         if (oldTag != null) {

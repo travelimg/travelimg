@@ -1,12 +1,9 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.entities.*;
-import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import org.junit.Test;
-import org.mockito.cglib.core.Local;
 
 import java.time.LocalDateTime;
-import java.time.YearMonth;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -15,8 +12,8 @@ public class PhotoFilterTest {
 
     private Journey createJourney() {
         return new Journey(1, "Asia 2014",
-            LocalDateTime.of(2014, 1, 1, 0, 0),
-            LocalDateTime.of(2015, 1, 1, 0, 0));
+                LocalDateTime.of(2014, 1, 1, 0, 0),
+                LocalDateTime.of(2015, 1, 1, 0, 0));
     }
 
     private Place createPlace() {

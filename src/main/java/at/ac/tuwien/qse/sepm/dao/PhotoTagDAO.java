@@ -14,7 +14,7 @@ public interface PhotoTagDAO {
      *
      * @param photo must not be null; photo.id must not be null;
      * @param tag   must not be null; tag.id must not be null;
-     * @throws DAOException:             if an exception occurs on persistence layer
+     * @throws DAOException:        if an exception occurs on persistence layer
      * @throws ValidationException: if parameter validation fails
      */
     void createPhotoTag(Photo photo, Tag tag) throws DAOException, ValidationException;
@@ -24,7 +24,7 @@ public interface PhotoTagDAO {
      *
      * @param photo must not be null; photo.id must not be null;
      * @param tag   must not be null; tag.id must not be null;
-     * @throws DAOException:             if an exception occurs on persistence layer
+     * @throws DAOException:        if an exception occurs on persistence layer
      * @throws ValidationException: if parameter validation fails
      */
     void removeTagFromPhoto(Photo photo, Tag tag) throws DAOException, ValidationException;
@@ -33,7 +33,7 @@ public interface PhotoTagDAO {
      * Delete if existent all photo-tag entries where Tag = <tt>tag</tt>
      *
      * @param tag must not be null; tag.id must not be null;
-     * @throws DAOException: if an exception occurs on persistence layer
+     * @throws DAOException:        if an exception occurs on persistence layer
      * @throws ValidationException: if parameter validation fails
      */
     void deleteAllEntriesOfSpecificTag(Tag tag) throws DAOException, ValidationException;
@@ -42,7 +42,7 @@ public interface PhotoTagDAO {
      * Delete if existent all photo-tag entries where Photo = <tt>photo</tt>
      *
      * @param photo must not be null; photo.id must not be null;
-     * @throws DAOException: if an exception occurs on persistence layer
+     * @throws DAOException:        if an exception occurs on persistence layer
      * @throws ValidationException: if parameter validation fails
      */
     void deleteAllEntriesOfSpecificPhoto(Photo photo) throws DAOException, ValidationException;
@@ -52,8 +52,8 @@ public interface PhotoTagDAO {
      *
      * @param photo must not be null; photo.id must not be null;
      * @return List with all tags which are linked to <tt>photo</tt> as a PhotoTag;
-     *     If no tag exists, return an empty List.
-     * @throws DAOException if an exception occurs on persistence layer
+     * If no tag exists, return an empty List.
+     * @throws DAOException         if an exception occurs on persistence layer
      * @throws ValidationException: if parameter validation fails
      */
     List<Tag> readTagsByPhoto(Photo photo) throws DAOException, ValidationException;
@@ -63,7 +63,7 @@ public interface PhotoTagDAO {
      *
      * @param tag must not be null; tag.id must not be null
      * @return List with all Photos, which are linked to <tt>tag</tt> as a PhotoTag;
-     * @throws DAOException if an exception occurs on persistence layer
+     * @throws DAOException         if an exception occurs on persistence layer
      * @throws ValidationException: if parameter validation fails
      */
     List<Photo> readPhotosByTag(Tag tag) throws DAOException, ValidationException;

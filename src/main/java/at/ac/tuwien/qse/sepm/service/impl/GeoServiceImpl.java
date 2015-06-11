@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.service.GeoService;
+import at.ac.tuwien.qse.sepm.service.Service;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.json.JSONArray;
@@ -46,29 +47,27 @@ public class GeoServiceImpl implements GeoService {
     }
 
     private String readUrl(String urlString) throws ServiceException {
-        BufferedReader reader = null;
-        StringBuffer buffer = null;
+
+        URL url;
         try {
-            URL url = new URL(urlString);
-            reader = new BufferedReader(new InputStreamReader(url.openStream()));
-            buffer = new StringBuffer();
-            int read;
-            char[] chars = new char[1024];
-            while ((read = reader.read(chars)) != -1) {
-                buffer.append(chars, 0, read);
-            }
-        } catch (MalformedURLException e) {
-            throw new ServiceException(e.getMessage());
-        } catch (IOException e) {
-            throw new ServiceException(e.getMessage());
-        } finally {
-            if (reader != null)
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    throw new ServiceException(e.getMessage());
-                }
+            url = new URL(urlString);
+        } catch (MalformedURLException ex) {
+            logger.error("Malformed url", ex);
+            throw new ServiceException("Malformed url", ex);
         }
-        return buffer.toString();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+            StringBuilder buffer = new StringBuilder();
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line);
+            }
+
+            return buffer.toString();
+        } catch (IOException ex) {
+            logger.error("Failed to read url {}", url, ex);
+            throw new ServiceException("Failed to read url", ex);
+        }
     }
 }

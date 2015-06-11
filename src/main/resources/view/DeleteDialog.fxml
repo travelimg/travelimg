@@ -4,7 +4,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<fx:root fx:id="root" styleClass="dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root xmlns:fx="http://javafx.com/fxml/1" fx:id="root" styleClass="dialog" stylesheets="@style.css"
+         type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8">
     <children>
         <BorderPane prefWidth="560.0">
             <top>
@@ -38,7 +39,8 @@
                         <HBox spacing="8.0">
                             <children>
                                 <Button fx:id="cancelButton" alignment="CENTER_RIGHT" text="BEHALTEN"/>
-                                <Button fx:id="confirmButton" alignment="CENTER_RIGHT" styleClass="primary" text="LÖSCHEN"/>
+                                <Button fx:id="confirmButton" alignment="CENTER_RIGHT" styleClass="primary"
+                                        text="LÖSCHEN"/>
                             </children>
                         </HBox>
                     </right>

@@ -6,18 +6,13 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.service.DropboxService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import at.ac.tuwien.qse.sepm.util.TestIOHandler;
 import javafx.util.Pair;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,11 +27,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:test-config.xml")
-@Transactional(propagation = Propagation.REQUIRES_NEW)
-@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
-public class DropboxExportTest {
+public class DropboxExportTest extends ServiceTestBase {
 
     @Autowired
     private PhotoService photoService;
@@ -50,8 +41,8 @@ public class DropboxExportTest {
         int interval = 100;
         int maxTimeout = 5000;
         try {
-            while(waited < maxTimeout) {
-                if(task.isFinished()) {
+            while (waited < maxTimeout) {
+                if (task.isFinished()) {
                     return;
                 }
                 Thread.sleep(interval);
@@ -139,8 +130,8 @@ public class DropboxExportTest {
 
         // ensure photos were copied to dropbox folder
         assertThat(photos.size(), is(copyOperations.size()));
-        
-        for(Pair<Path, Path> copyOp : copyOperations) {
+
+        for (Pair<Path, Path> copyOp : copyOperations) {
             Path source = copyOp.getKey();
             Path dest = copyOp.getValue();
 
@@ -171,6 +162,8 @@ public class DropboxExportTest {
             exceptions.add(exception);
         }
 
-        public boolean exceptionOccured() { return exceptions.size() > 0; }
+        public boolean exceptionOccured() {
+            return exceptions.size() > 0;
+        }
     }
 }

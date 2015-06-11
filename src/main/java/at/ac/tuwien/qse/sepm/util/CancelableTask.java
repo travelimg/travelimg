@@ -12,7 +12,7 @@ public abstract class CancelableTask implements Runnable, Cancelable {
      * Return the current execution status of the task.
      *
      * @return true if the task is currently executing else false.
-     * */
+     */
     protected boolean isRunning() {
         return running.get();
     }
@@ -30,7 +30,7 @@ public abstract class CancelableTask implements Runnable, Cancelable {
 
     /**
      * Cancel a running task.
-     *
+     * <p>
      * The processing will stop as soon as possible, but it may not be immediately
      */
     @Override
@@ -45,7 +45,7 @@ public abstract class CancelableTask implements Runnable, Cancelable {
 
     /**
      * Perform the work the task is intended for.
-     *
+     * <p>
      * The running status must continuously be checked and the processing must stop when the task was canceled.
      */
     protected abstract void execute();

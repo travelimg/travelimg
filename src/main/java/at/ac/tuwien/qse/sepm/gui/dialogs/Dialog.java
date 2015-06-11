@@ -19,7 +19,7 @@ public class Dialog extends Pane {
 
     /**
      * @param origin node that provides the stage that serves as the owner of this dialog
-     * @param title title displayed in the top bar of the dialog window
+     * @param title  title displayed in the top bar of the dialog window
      */
     public Dialog(Node origin, String title) {
         Stage owner = (Stage) origin.getScene().getWindow();

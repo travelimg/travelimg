@@ -22,12 +22,11 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+        import static org.junit.Assert.assertTrue;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
-
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:test-config.xml")
@@ -236,8 +235,7 @@ public class TagTest {
         tagService.addTagToPhotos(toList(p0, p1, p2), t5);
         tagService.addTagToPhotos(toList(p1), t6);
         List<Tag> liste = tagService.getMostFrequentTags(toList(p0,p1,p2));
-        assertTrue(liste.size() < 6);
-
+        assertTrue(liste.size()<6);
 
         assertTrue(liste.contains(t0));
         assertTrue(liste.contains(t1));
@@ -260,10 +258,8 @@ public class TagTest {
                 tagService.removeTagFromPhotos(toList(p0),t);
             }
         }
-        
         List<Tag> liste = tagService.getMostFrequentTags(toList(p0));
     }
-
     @Test
     @WithData
     public void test_no_tags_available_for_photos() throws ServiceException {

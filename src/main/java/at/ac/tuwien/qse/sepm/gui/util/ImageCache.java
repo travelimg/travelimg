@@ -19,11 +19,11 @@ public class ImageCache {
 
     /**
      * Get an image for a photo at the given size.
-     *
+     * <p>
      * If it is not already in the cache then load it from disk.
      *
      * @param photo The photo for which to retrieve the image file.
-     * @param size The size for which the photo should be loaded.
+     * @param size  The size for which the photo should be loaded.
      * @return The image at the given size.
      */
     public Image get(Photo photo, ImageSize size) {
@@ -40,7 +40,7 @@ public class ImageCache {
      * Load an image from disk into the cache at the given size.
      *
      * @param photo The image to load.
-     * @param size The size of the resulting image
+     * @param size  The size of the resulting image
      */
     public void load(Photo photo, ImageSize size) {
         String url;
@@ -55,7 +55,7 @@ public class ImageCache {
         Image image;
 
         // load the image in the background at the right size
-        if(size == ImageSize.ORIGINAL)
+        if (size == ImageSize.ORIGINAL)
             image = new Image(url, true);
         else {
             int width, height;

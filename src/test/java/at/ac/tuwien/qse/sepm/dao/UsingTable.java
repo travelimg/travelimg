@@ -9,8 +9,8 @@ import java.lang.annotation.Target;
 /**
  * Provide a test case with a table name which is being tested
  */
-@Retention(value= RetentionPolicy.RUNTIME)
-@Target(value= ElementType.TYPE)
+@Retention(value = RetentionPolicy.RUNTIME)
+@Target(value = ElementType.TYPE)
 public @interface UsingTable {
     String value();
 }

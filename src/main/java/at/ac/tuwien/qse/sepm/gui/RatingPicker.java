@@ -4,27 +4,30 @@ import at.ac.tuwien.qse.sepm.entities.Rating;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Toggle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Collections;
 import java.util.function.Consumer;
 
 public class RatingPicker {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @FXML private Node root;
-    @FXML private Button badButton;
-    @FXML private Button neutralButton;
-    @FXML private Button goodButton;
+    @FXML
+    private Node root;
+    @FXML
+    private Button badButton;
+    @FXML
+    private Button neutralButton;
+    @FXML
+    private Button goodButton;
 
     private Rating rating = null;
     private boolean indetermined = false;
     private Consumer<Rating> ratingChangeHandler;
 
-    @FXML private void initialize() {
+    @FXML
+    private void initialize() {
         badButton.setOnMouseClicked((event) -> handleToggle(badButton, Rating.BAD));
         neutralButton.setOnMouseClicked((event) -> handleToggle(neutralButton, Rating.NEUTRAL));
         goodButton.setOnMouseClicked((event) -> handleToggle(goodButton, Rating.GOOD));

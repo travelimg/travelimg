@@ -1,29 +1,25 @@
 package at.ac.tuwien.qse.sepm.entities;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-/**
- * Created by David on 19.05.2015.
- */
 public class Journey {
-    private int id;
+    private Integer id;
     private String name;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
 
-    public Journey(int id, String name, LocalDateTime startDate, LocalDateTime endDate) {
+    public Journey(Integer id, String name, LocalDateTime startDate, LocalDateTime endDate) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -51,7 +47,8 @@ public class Journey {
         this.name = name;
     }
 
-    @Override public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -69,7 +66,8 @@ public class Journey {
 
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         int result = id;
         result = 31 * result + name.hashCode();
         result = 31 * result + startDate.hashCode();

@@ -1,12 +1,17 @@
 package at.ac.tuwien.qse.sepm.gui;
 
+import com.sun.javafx.property.adapter.PropertyDescriptor;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.awt.*;
+import java.awt.event.MouseEvent;
 
 /**
  * Controller for the main view.

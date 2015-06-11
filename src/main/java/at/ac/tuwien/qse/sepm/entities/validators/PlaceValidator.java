@@ -1,13 +1,8 @@
 package at.ac.tuwien.qse.sepm.entities.validators;
 
-import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Place;
 
-import java.io.File;
 
-/**
- * Created by David on 21.05.2015.
- */
 public class PlaceValidator {
 
     public static void validate(Place entity) throws ValidationException {
@@ -19,6 +14,10 @@ public class PlaceValidator {
 
         if (entity.getCountry() == null)
             throw new ValidationException("Country can not be null");
+
+        if(entity.getJourney()== null ){
+            throw new ValidationException("Journey can't be null");
+        }
     }
 
     /**

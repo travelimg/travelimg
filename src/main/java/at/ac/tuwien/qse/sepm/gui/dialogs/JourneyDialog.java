@@ -19,11 +19,16 @@ public class JourneyDialog extends ResultDialog<Journey> {
 
     private final ClusterService clusterService;
 
-    @FXML private Button journeyAdd;
-    @FXML private TextField journeyNameField;
-    @FXML private DatePicker journeyEndDate;
-    @FXML private Button journeyCancel;
-    @FXML private DatePicker journeyBeginDate;
+    @FXML
+    private Button journeyAdd;
+    @FXML
+    private TextField journeyNameField;
+    @FXML
+    private DatePicker journeyEndDate;
+    @FXML
+    private Button journeyCancel;
+    @FXML
+    private DatePicker journeyBeginDate;
 
     public JourneyDialog(Node origin, ClusterService clusterService) {
         super(origin, "Reise hinzufügen");
@@ -59,8 +64,8 @@ public class JourneyDialog extends ResultDialog<Journey> {
     private void updateStatus() {
         journeyAdd.setDisable(
                 journeyNameField.getText().isEmpty()
-                || journeyBeginDate.getValue() == null
-                || journeyEndDate.getValue() == null
+                        || journeyBeginDate.getValue() == null
+                        || journeyEndDate.getValue() == null
         );
     }
 }

@@ -22,16 +22,17 @@ import java.util.function.Consumer;
 public class ImportServiceImpl implements ImportService {
 
     private static final Logger logger = LogManager.getLogger();
-
-    @Autowired private PhotoDAO photoDAO;
-    @Autowired private ExifService exifService;
     ExecutorService executorService = Executors.newFixedThreadPool(1);
+    @Autowired
+    private PhotoDAO photoDAO;
+    @Autowired
+    private ExifService exifService;
 
     public ImportServiceImpl() {
 
     }
 
-    public Cancelable importPhotos(List<Photo> photos, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler)  {
+    public Cancelable importPhotos(List<Photo> photos, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
         logger.debug("Importing photos");
         AsyncImporter importer = new AsyncImporter(photos, callback, errorHandler);
         executorService.submit(importer);
@@ -58,8 +59,8 @@ public class ImportServiceImpl implements ImportService {
 
         @Override
         protected void execute() {
-            for (Photo p: photos) {
-                if(!isRunning())
+            for (Photo p : photos) {
+                if (!isRunning())
                     return;
 
                 try {

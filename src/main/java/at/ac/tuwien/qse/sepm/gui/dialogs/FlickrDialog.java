@@ -1,7 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui.dialogs;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.gui.GoogleMapsScene;
 import at.ac.tuwien.qse.sepm.service.FlickrService;
@@ -33,7 +32,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import netscape.javascript.JSObject;
@@ -51,17 +53,27 @@ import java.util.function.Consumer;
 
 public class FlickrDialog extends ResultDialog<List<Photo>> {
 
-    @FXML private BorderPane borderPane;
-    @FXML private HBox progress;
-    @FXML private ProgressBar progressBar;
-    @FXML private FlowPane photosFlowPane;
-    @FXML private Button downloadButton, importButton, stopButton;
-    @FXML private Pane mapContainer;
-    @FXML private ScrollPane scrollPane;
-    @FXML private FlowPane keywordsFlowPane;
-    @FXML private TextField keywordTextField;
-    @FXML private DatePicker datePicker;
-
+    private static final Logger logger = LogManager.getLogger();
+    @FXML
+    private BorderPane borderPane;
+    @FXML
+    private HBox progress;
+    @FXML
+    private ProgressBar progressBar;
+    @FXML
+    private FlowPane photosFlowPane;
+    @FXML
+    private Button downloadButton, importButton, stopButton;
+    @FXML
+    private Pane mapContainer;
+    @FXML
+    private ScrollPane scrollPane;
+    @FXML
+    private FlowPane keywordsFlowPane;
+    @FXML
+    private TextField keywordTextField;
+    @FXML
+    private DatePicker datePicker;
     private FlickrService flickrService;
     private GoogleMapView mapView;
     private GoogleMap googleMap;
@@ -69,7 +81,6 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     private LatLong actualLatLong;
     private ArrayList<ImageTile> selectedImages = new ArrayList<ImageTile>();
     private Cancelable downloadTask;
-    private static final Logger logger = LogManager.getLogger();
 
     public FlickrDialog(Node origin, String title, FlickrService flickrService) {
         super(origin, title);
@@ -111,10 +122,10 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
         scrollPane.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
-                if(event.isControlDown() && event.getCode()== KeyCode.A){
+                if (event.isControlDown() && event.getCode() == KeyCode.A) {
                     for (Node n : photosFlowPane.getChildren()) {
-                        if(n instanceof ImageTile){
-                            if(!((ImageTile) n).getSelectedProperty().getValue()){
+                        if (n instanceof ImageTile) {
+                            if (!((ImageTile) n).getSelectedProperty().getValue()) {
                                 ((ImageTile) n).select();
                                 selectedImages.add((ImageTile) n);
                             }
@@ -131,8 +142,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     }
 
 
-
-    public void addKeyword(String keyword){
+    public void addKeyword(String keyword) {
         HBox hbox = new HBox();
         hbox.setStyle("-fx-background-radius: 5; -fx-background-color: #E91E63; ");
         Text text = new Text(keyword);
@@ -168,8 +178,8 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
         downloadButton.setText("Fotos herunterladen");
     }
 
-    private void dropMarker(LatLong ll){
-        if(actualMarker!=null){
+    private void dropMarker(LatLong ll) {
+        if (actualMarker != null) {
             googleMap.removeMarker(actualMarker);
         }
         this.actualLatLong = ll;
@@ -179,20 +189,20 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     }
 
     @FXML
-    public void handleOnDownloadButtonClicked(){
+    public void handleOnDownloadButtonClicked() {
         downloadButton.setDisable(true);
         progress.setVisible(true);
         downloadPhotos();
     }
 
     @FXML
-    public void handleOnImportButtonClicked(){
+    public void handleOnImportButtonClicked() {
         ArrayList<Photo> photos = new ArrayList<Photo>();
-        for(ImageTile i: selectedImages){
+        for (ImageTile i : selectedImages) {
             Photo p = i.getPhoto();
             p.setDatetime(datePicker.getValue().atStartOfDay());
             photos.add(p);
-            logger.debug("Added photo for import {}",p);
+            logger.debug("Added photo for import {}", p);
         }
         setResult(photos);
         selectedImages.clear();
@@ -200,12 +210,12 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     }
 
     @FXML
-    public void handleOnStopButtonClicked(){
-        ConfirmationDialog confirmationDialog = new ConfirmationDialog(borderPane, "Download abbrechen","Download abbrechen?");
+    public void handleOnStopButtonClicked() {
+        ConfirmationDialog confirmationDialog = new ConfirmationDialog(borderPane, "Download abbrechen", "Download abbrechen?");
         Optional<Boolean> confirmed = confirmationDialog.showForResult();
         if (!confirmed.isPresent() || !confirmed.get()) return;
         logger.debug("Canceling the download...");
-        if(downloadTask!=null)
+        if (downloadTask != null)
             downloadTask.cancel();
         progress.setVisible(false);
         progressBar.setProgress(0.0);
@@ -213,12 +223,12 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
 
     }
 
-    private void downloadPhotos(){
+    private void downloadPhotos() {
         ObservableList<Node> test = keywordsFlowPane.getChildren();
         String tags[] = new String[test.size()];
-        for(int i = 0; i<test.size(); i++){
+        for (int i = 0; i < test.size(); i++) {
             HBox h = (HBox) test.get(i);
-            tags[i] = ((Text)h.getChildren().get(0)).getText();
+            tags[i] = ((Text) h.getChildren().get(0)).getText();
         }
 
         try {
@@ -226,55 +236,54 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
             double longitude = 0.0;
             boolean useGeoData = false;
 
-            if(actualMarker!=null){
+            if (actualMarker != null) {
                 latitude = actualLatLong.getLatitude();
                 longitude = actualLatLong.getLongitude();
                 useGeoData = true;
             }
-            downloadTask = flickrService.downloadPhotos(tags,latitude, longitude,useGeoData,new Consumer<Photo>() {
+            downloadTask = flickrService.downloadPhotos(tags, latitude, longitude, useGeoData, new Consumer<Photo>() {
 
-                public void accept(Photo photo) {
+                        public void accept(Photo photo) {
 
-                    Platform.runLater(new Runnable() {
+                            Platform.runLater(new Runnable() {
 
-                        public void run() {
-                            ImageTile imageTile = new ImageTile(photo);
-                            imageTile.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                                @Override
-                                public void handle(MouseEvent event) {
-                                    if (event.isControlDown()) {
-                                        if (imageTile.getSelectedProperty().getValue()) {
-                                            imageTile.unselect();
-                                            selectedImages.remove(imageTile);
-                                        } else {
-                                            imageTile.select();
-                                            selectedImages.add(imageTile);
+                                public void run() {
+                                    ImageTile imageTile = new ImageTile(photo);
+                                    imageTile.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                                        @Override
+                                        public void handle(MouseEvent event) {
+                                            if (event.isControlDown()) {
+                                                if (imageTile.getSelectedProperty().getValue()) {
+                                                    imageTile.unselect();
+                                                    selectedImages.remove(imageTile);
+                                                } else {
+                                                    imageTile.select();
+                                                    selectedImages.add(imageTile);
+                                                }
+                                            } else {
+                                                for (ImageTile i : selectedImages) {
+                                                    i.unselect();
+                                                }
+                                                selectedImages.clear();
+                                                imageTile.select();
+                                                selectedImages.add(imageTile);
+                                            }
+
+                                            if (selectedImages.isEmpty()) {
+                                                importButton.setDisable(true);
+                                            } else {
+                                                importButton.setDisable(false);
+                                            }
                                         }
-                                    } else {
-                                        for (ImageTile i : selectedImages) {
-                                            i.unselect();
-                                        }
-                                        selectedImages.clear();
-                                        imageTile.select();
-                                        selectedImages.add(imageTile);
-                                    }
+                                    });
 
-                                    if(selectedImages.isEmpty()){
-                                        importButton.setDisable(true);
-                                    }
-                                    else{
-                                        importButton.setDisable(false);
-                                    }
+                                    photosFlowPane.getChildren().add(imageTile);
                                 }
                             });
 
-                            photosFlowPane.getChildren().add(imageTile);
                         }
-                    });
 
-                }
-
-            },
+                    },
                     new Consumer<Double>() {
 
                         public void accept(Double downloadProgress) {
@@ -283,7 +292,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
 
                                 public void run() {
                                     progressBar.setProgress(downloadProgress);
-                                    if(downloadProgress==1.0){
+                                    if (downloadProgress == 1.0) {
                                         progress.setVisible(false);
                                         progressBar.setProgress(0.0);
                                         downloadButton.setDisable(false);
@@ -297,12 +306,12 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
                     }
 
 
-                    ,new ErrorHandler<ServiceException>() {
+                    , new ErrorHandler<ServiceException>() {
 
-                public void handle(ServiceException exception) {
-                    //handle errors here
-                }
-            });
+                        public void handle(ServiceException exception) {
+                            //handle errors here
+                        }
+                    });
         } catch (ServiceException e) {
             e.printStackTrace();
         }
@@ -356,12 +365,13 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
             this.selected.set(false);
         }
 
-        public Photo getPhoto(){
+        public Photo getPhoto() {
             return photo;
         }
 
         /**
          * Property which represents if this tile is currently selected or not.
+         *
          * @return The selected property.
          */
         public BooleanProperty getSelectedProperty() {

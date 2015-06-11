@@ -17,10 +17,6 @@ public class App extends Application {
 
     private ClassPathXmlApplicationContext context;
 
-    public static void main(String[] args) {
-        launch(args);
-    }
-
     public App() {
         try {
             context = new ClassPathXmlApplicationContext("beans.xml");
@@ -30,7 +26,12 @@ public class App extends Application {
         }
     }
 
-    @Override public void start(Stage stage) throws Exception {
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
         logger.info("Application started.");
 
         FXMLLoader loader = new FXMLLoader();
@@ -57,7 +58,8 @@ public class App extends Application {
         stage.show();
     }
 
-    @Override public void stop() throws Exception {
+    @Override
+    public void stop() throws Exception {
         super.stop();
 
         context.close();

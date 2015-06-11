@@ -9,9 +9,12 @@ import javafx.scene.control.Label;
 
 public class DeleteDialog extends ResultDialog<Boolean> {
 
-    @FXML private Button cancelButton;
-    @FXML private Button confirmButton;
-    @FXML private Label statusText;
+    @FXML
+    private Button cancelButton;
+    @FXML
+    private Button confirmButton;
+    @FXML
+    private Label statusText;
 
     /**
      * {@inheritDoc}
@@ -29,7 +32,7 @@ public class DeleteDialog extends ResultDialog<Boolean> {
         statusText.setText(String.format(status, photoCount));
     }
 
-    private void handleCancel(Event event){
+    private void handleCancel(Event event) {
         setResult(false);
         close();
     }

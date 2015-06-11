@@ -15,43 +15,22 @@ import java.util.HashMap;
 import java.util.List;
 
 
-/**
- * Created by christoph on 08.05.15.
- */
 public class GoogleMapsScene implements MapComponentInitializedListener {
 
     private static final Logger logger = LogManager.getLogger(GoogleMapsScene.class);
 
     private GoogleMapView mapView;
     private GoogleMap map;
-    private ArrayList<Photo> markers =null;
-    private ArrayList<Marker> aktivMarker;
-    private HashMap<String,LatLong> displayedMarker;
+    private ArrayList<Photo> markers = null;
+    private ArrayList<Marker> aktivMarker = new ArrayList<>();
+    private HashMap<String, LatLong> displayedMarker = new HashMap<>();
 
     /**
      * Default Constructor
-     *
-     *
      */
     public GoogleMapsScene() {
         logger.debug("GoogleMapsScene will be created ");
         this.mapView = new GoogleMapView();
-        this.mapView.addMapInializedListener(this);
-        aktivMarker = new ArrayList<Marker>();
-        displayedMarker = new HashMap<>();
-    }
-
-
-    /**
-     * WorldMap Constructor
-     * @param l
-     */
-    public GoogleMapsScene(ArrayList<Photo> l) {
-        logger.debug("GoogleMapsScene will be created ");
-        this.mapView = new GoogleMapView();
-        markers = l;
-        aktivMarker = new ArrayList<Marker>();
-        displayedMarker = new HashMap<>();
         this.mapView.addMapInializedListener(this);
     }
 
@@ -100,6 +79,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
     /**
      * set the Center of the MapView
+     *
      * @param x the latitude
      * @param y the longitude
      */
@@ -112,7 +92,6 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     }
 
     /**
-     *
      * @return the GoogleMapView
      */
     public GoogleMapView getMapView() {
@@ -122,19 +101,6 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
             logger.debug("Error by initializing Map");
         }
         return null;
-    }
-
-    /**
-     * set the Size of the map-window
-     * @param x width
-     * @param y height
-     */
-    public void setMaxSize(double x, double y) {
-        try {
-            mapView.setMaxSize(x, y);
-        } catch (JSException ex) {
-            logger.debug("Error by initializing Map");
-        }
     }
 
     /**
@@ -152,7 +118,8 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     }
 
     /**
-     *  add one marker, which represents the foto, to the map
+     * add one marker, which represents the foto, to the map
+     *
      * @param photo the photo
      */
     public void addMarker(Photo photo) {
@@ -185,7 +152,8 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     }
 
     /**
-     *  try to add some marker
+     * try to add some marker
+     *
      * @param list list of photos to be displayed on the map
      */
     public void addMarkerList(List<Photo> list) {
