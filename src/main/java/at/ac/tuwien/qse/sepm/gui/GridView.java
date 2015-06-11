@@ -163,8 +163,8 @@ public class GridView {
     private void reloadImages() {
         try {
             grid.setPhotos(photoService.getAllPhotos(filter).stream()
-                            .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
-                            .collect(Collectors.toList()));
+                    .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
+                    .collect(Collectors.toList()));
         } catch (ServiceException ex) {
             LOGGER.error("failed loading fotos", ex);
             ErrorDialog.show(root, "Laden von Fotos fehlgeschlagen",
