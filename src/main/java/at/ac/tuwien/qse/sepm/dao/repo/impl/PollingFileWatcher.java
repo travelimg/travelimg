@@ -21,13 +21,14 @@ public class PollingFileWatcher implements FileWatcher {
 
     private final FileManager fileManager;
 
+    private final Set<String> extensions = new HashSet<>();
     private final Set<Path> directories = new HashSet<>();
     private final Set<Path> knownFiles = new HashSet<>();
     private final Map<Path, LocalDateTime> modified = new HashMap<>();
     private final Collection<Listener> listeners = new LinkedList<>();
 
     public PollingFileWatcher() {
-        this(new DefaultFileManager());
+        this(new PhysicalFileManager());
     }
 
     public PollingFileWatcher(FileManager fileManager) {
@@ -35,8 +36,18 @@ public class PollingFileWatcher implements FileWatcher {
         this.fileManager = fileManager;
     }
 
-    @Override public Set<Path> getDirectories() {
-        return new HashSet<>(directories);
+    /**
+     * Get the a modifiable set of file extensions recognized by this watcher. Only if a file ends
+     * with a period and one of these extensions will it trigger notifications.
+     *
+     * @return set of recognized extensions
+     */
+    public Set<String> getExtensions() {
+        return extensions;
+    }
+
+    @Override public boolean recognizes(Path file) {
+        return checkExtension(file) && checkDirectories(file);
     }
 
     @Override public Collection<Path> index() {
@@ -135,6 +146,7 @@ public class PollingFileWatcher implements FileWatcher {
                     .forEach(dir -> collectFiles(dir, result));
             fileManager.list(directory)
                     .filter(fileManager::isFile)
+                    .filter(this::checkExtension)
                     .forEach(result::add);
         } catch (IOException ex) {
             // NOTE: The path may not exist, or it may be a file, or something else. There is a lot
@@ -143,33 +155,22 @@ public class PollingFileWatcher implements FileWatcher {
         }
     }
 
-    public static interface FileManager {
-
-        Stream<Path> list(Path directory) throws IOException;
-
-        boolean isFile(Path path);
-
-        boolean isDirectory(Path path);
-
-        FileTime getLastModifiedTime(Path path) throws IOException;
+    private boolean checkExtension(Path file) {
+        String fileString = file.toString();
+        for (String ext : extensions) {
+            if (fileString.endsWith("." + ext)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    private static class DefaultFileManager implements FileManager {
-
-        @Override public Stream<Path> list(Path directory) throws IOException {
-            return Files.list(directory);
+    private boolean checkDirectories(Path file) {
+        for (Path dir : directories) {
+            if (file.startsWith(dir)) {
+                return true;
+            }
         }
-
-        @Override public boolean isFile(Path path) {
-            return Files.isRegularFile(path);
-        }
-
-        @Override public boolean isDirectory(Path path) {
-            return Files.isDirectory(path);
-        }
-
-        @Override public FileTime getLastModifiedTime(Path path) throws IOException {
-            return Files.getLastModifiedTime(path);
-        }
+        return false;
     }
 }

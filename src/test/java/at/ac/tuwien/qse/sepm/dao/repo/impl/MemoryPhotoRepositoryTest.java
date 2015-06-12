@@ -19,6 +19,10 @@ public class MemoryPhotoRepositoryTest extends PhotoRepositoryTest {
             @Override public Path getFile2() {
                 return PREFIX.resolve("other/image.jpg");
             }
+
+            @Override public Path getUnacceptedPath() {
+                return Paths.get("somewhere/outside/test/path.jpg");
+            }
         };
     }
 

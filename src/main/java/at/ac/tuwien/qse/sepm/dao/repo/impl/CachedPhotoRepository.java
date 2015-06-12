@@ -15,9 +15,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Async repository that uses a cache as intermediate storage.
  */
-public class CachedPhotoRepository
-        extends RunnablePhotoRepository
-        implements AsyncPhotoRepository {
+public class CachedPhotoRepository implements AsyncPhotoRepository {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -27,11 +25,12 @@ public class CachedPhotoRepository
     private final Collection<Listener> listeners = new LinkedList<>();
     private final Collection<AsyncListener> asyncListeners = new LinkedList<>();
 
-    private final BlockingQueue<OperationBase> queue = new LinkedBlockingQueue<>();
+    private final Queue<OperationBase> queue = new LinkedList<>();
 
     public CachedPhotoRepository(PhotoRepository repository, PhotoCache cache) {
         this.repository = repository;
         this.cache = cache;
+        repository.addListener(new SourceListener());
     }
 
     /**
@@ -59,19 +58,21 @@ public class CachedPhotoRepository
                 getCache().remove(file);
                 continue;
             }
-            addOperation(new SyncOperation(this, getCache(), file));
+            addOperation(new ReadOperation(file));
+        }
+
+        Collection<Path> storedIndex = getRepository().index();
+        for (Path file : storedIndex) {
+            if (!getCache().contains(file)) {
+                addOperation(new ReadOperation(file));
+            }
         }
     }
 
-    @Override public void completeNext() {
-        OperationBase operation;
-        try {
-            operation = queue.take();
-        } catch (InterruptedException ex) {
-            LOGGER.info("run thread interrupted");
-            stop();
-            return;
-        }
+    @Override public boolean completeNext() {
+        if (queue.isEmpty()) return false;
+        OperationBase operation = queue.poll();
+        LOGGER.debug("completing next operation {}", operation);
 
         try {
             operation.perform();
@@ -82,6 +83,7 @@ public class CachedPhotoRepository
 
         LOGGER.debug("successfully performed operation {}", operation);
         notifyOperationComplete(operation);
+        return !queue.isEmpty();
     }
 
     @Override public Queue<Operation> getQueue() {
@@ -91,19 +93,26 @@ public class CachedPhotoRepository
     @Override public void addListener(AsyncListener listener) {
         if (listener == null) throw new IllegalArgumentException();
         asyncListeners.add(listener);
-        LOGGER.info("added listener {}", listener);
+        LOGGER.info("added async listener {}", listener);
     }
 
     @Override public void removeListener(AsyncListener listener) {
         if (listener == null) throw new IllegalArgumentException();
         asyncListeners.remove(listener);
-        LOGGER.info("removed listener {}", listener);
+        LOGGER.info("removed async listener {}", listener);
     }
 
     @Override public boolean accepts(Path file) throws PersistenceException {
         return getRepository().accepts(file);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * This implementation of create is not asynchronous and will only return after the photo was
+     * created in the source repository. This is necessary, since we have to read the photo before
+     * we can add it to the cache.
+     */
     @Override public void create(Path file, InputStream source) throws PersistenceException {
         if (file == null) throw new IllegalArgumentException();
         if (source == null) throw new IllegalArgumentException();
@@ -111,7 +120,7 @@ public class CachedPhotoRepository
         getRepository().create(file, source);
         Photo photo = getRepository().read(file);
         getCache().put(photo);
-        listeners.forEach(l -> l.onCreate(repository, file));
+        notifyCreate(file);
         LOGGER.info("created {}", file);
     }
 
@@ -121,16 +130,16 @@ public class CachedPhotoRepository
             throw new PhotoNotFoundException(this, photo.getFile());
         }
         getCache().put(photo);
-        addOperation(new UpdateOperation(getRepository(), photo));
-        listeners.forEach(l -> l.onUpdate(repository, photo.getFile()));
+        addOperation(new UpdateOperation(photo));
+        notifyUpdate(photo.getFile());
         LOGGER.debug("updated {}", photo);
     }
 
     @Override public void delete(Path file) throws PersistenceException {
         LOGGER.debug("deleting {}", file);
         getCache().remove(file);
-        addOperation(new DeleteOperation(getRepository(), file));
-        listeners.forEach(l -> l.onDelete(repository, file));
+        addOperation(new DeleteOperation(file));
+        notifyDelete(file);
         LOGGER.debug("deleted {}", file);
     }
 
@@ -158,7 +167,19 @@ public class CachedPhotoRepository
         return photo;
     }
 
-    protected void notifyOperationAdd(Operation operation) {
+    private void notifyCreate(Path file) {
+        listeners.forEach(l -> l.onCreate(this, file));
+    }
+
+    private void notifyUpdate(Path file) {
+        listeners.forEach(l -> l.onUpdate(this, file));
+    }
+
+    private void notifyDelete(Path file) {
+        listeners.forEach(l -> l.onDelete(this, file));
+    }
+
+    protected void notifyOperationQueue(Operation operation) {
         asyncListeners.forEach(l -> l.onQueue(this, operation));
     }
 
@@ -173,21 +194,46 @@ public class CachedPhotoRepository
     private void addOperation(OperationBase operation) {
         queue.add(operation);
         LOGGER.debug("added operation {}", operation);
-        notifyOperationAdd(operation);
+        notifyOperationQueue(operation);
     }
 
-    /******************************/
-    /** Operation Implementations */
-    /******************************/
+    /* listener for source repository */
 
-    abstract class OperationBase implements Operation {
+    private class SourceListener implements Listener {
 
-        protected final PhotoRepository repository;
+        @Override public void onCreate(PhotoRepository repository, Path file) {
+            // NOTE: Photo was created in the source repository, so load it into the cache.
+            addOperation(new ReadOperation(file));
+        }
+
+        @Override public void onUpdate(PhotoRepository repository, Path file) {
+            // NOTE: Photo was updated in the source repository, so load it into the cache.
+            addOperation(new ReadOperation(file));
+        }
+
+        @Override public void onDelete(PhotoRepository repository, Path file) {
+            // NOTE: Photo was created in the source repository, so remove it from the cache.
+            try {
+                getCache().remove(file);
+                notifyDelete(file);
+            } catch (PersistenceException ex) {
+                LOGGER.warn("failed removing file from cache {}", file);
+            }
+        }
+
+        @Override public void onError(PhotoRepository repository, PersistenceException error) {
+
+        }
+    }
+
+    /* operation implementations */
+
+    private abstract class OperationBase implements Operation {
+
         protected final Path file;
         protected final Kind kind;
 
-        public OperationBase(PhotoRepository repository, Path file, Kind kind) {
-            this.repository = repository;
+        public OperationBase(Path file, Kind kind) {
             this.file = file;
             this.kind = kind;
         }
@@ -210,43 +256,48 @@ public class CachedPhotoRepository
         }
     }
 
-    class SyncOperation extends OperationBase {
+    private class ReadOperation extends OperationBase {
 
-        protected final PhotoCache cache;
-
-        public SyncOperation(PhotoRepository repository, PhotoCache cache, Path file) {
-            super(repository, file, Kind.READ);
-            this.cache = cache;
+        public ReadOperation(Path file) {
+            super(file, Kind.READ);
         }
 
         @Override public void perform() throws PersistenceException {
+            boolean updated = cache.contains(file);
             Photo photo = repository.read(getFile());
             cache.put(photo);
+            if (updated) {
+                notifyUpdate(file);
+            } else {
+                notifyCreate(file);
+            }
         }
     }
 
-    class UpdateOperation extends OperationBase {
+    private class UpdateOperation extends OperationBase {
 
         protected final Photo photo;
 
-        public UpdateOperation(PhotoRepository repository, Photo photo) {
-            super(repository, photo.getFile(), Kind.UPDATE);
+        public UpdateOperation(Photo photo) {
+            super(photo.getFile(), Kind.UPDATE);
             this.photo = photo;
         }
 
         @Override public void perform() throws PersistenceException {
             repository.update(photo);
+            notifyUpdate(photo.getFile());
         }
     }
 
-    class DeleteOperation extends OperationBase {
+    private class DeleteOperation extends OperationBase {
 
-        public DeleteOperation(PhotoRepository repository, Path file) {
-            super(repository, file, Kind.DELETE);
+        public DeleteOperation(Path file) {
+            super(file, Kind.DELETE);
         }
 
         @Override public void perform() throws PersistenceException {
             repository.delete(file);
+            notifyDelete(file);
         }
     }
 }

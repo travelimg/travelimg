@@ -23,6 +23,7 @@ public abstract class AsyncPhotoRepositoryTest extends PhotoRepositoryTest {
     public void getQueue_updated_returnsUpdateOperation() throws PersistenceException {
         AsyncPhotoRepository object = getObject();
         object.create(getContext().getFile1(), getContext().getStream1());
+        object.completeNext();
         object.update(getContext().getModified1());
 
         assertEquals(1, object.getQueue().size());
@@ -35,8 +36,9 @@ public abstract class AsyncPhotoRepositoryTest extends PhotoRepositoryTest {
     public void getQueue_deleted_returnsDeleteOperation() throws PersistenceException {
         AsyncPhotoRepository object = getObject();
         object.create(getContext().getFile1(), getContext().getStream1());
-        object.delete(getContext().getFile1());
+        object.completeNext();
 
+        object.delete(getContext().getFile1());
         assertEquals(1, object.getQueue().size());
         Operation op = object.getQueue().poll();
         assertEquals(Operation.Kind.DELETE, op.getKind());
@@ -44,17 +46,17 @@ public abstract class AsyncPhotoRepositoryTest extends PhotoRepositoryTest {
     }
 
     @Test
-    public void addListener_update_notifies() throws PersistenceException {
+    public void addAsyncListener_update_notifies() throws PersistenceException {
         AsyncPhotoRepository object = getObject();
         MockAsyncListener listener = new MockAsyncListener();
         object.addListener(listener);
         object.create(getContext().getFile1(), getContext().getStream1());
         object.update(getContext().getModified1());
 
-        assertEquals(1, listener.getQueueNotifications().size());
+        assertEquals(2, listener.getQueueNotifications().size());
         assertEquals(0, listener.getCompleteNotifications().size());
         assertEquals(0, listener.getErrorNotifications().size());
-        MockAsyncListener.OperationNotification notification = listener.getQueueNotifications().get(0);
+        MockAsyncListener.OperationNotification notification = listener.getQueueNotifications().get(1);
         assertEquals(object, notification.getRepository());
         assertEquals(Operation.Kind.UPDATE, notification.getOperation().getKind());
         assertEquals(getContext().getFile1(), notification.getOperation().getFile());
@@ -68,10 +70,10 @@ public abstract class AsyncPhotoRepositoryTest extends PhotoRepositoryTest {
         object.create(getContext().getFile1(), getContext().getStream1());
         object.delete(getContext().getFile1());
 
-        assertEquals(1, listener.getQueueNotifications().size());
+        assertEquals(2, listener.getQueueNotifications().size());
         assertEquals(0, listener.getCompleteNotifications().size());
         assertEquals(0, listener.getErrorNotifications().size());
-        MockAsyncListener.OperationNotification notification = listener.getQueueNotifications().get(0);
+        MockAsyncListener.OperationNotification notification = listener.getQueueNotifications().get(1);
         assertEquals(object, notification.getRepository());
         assertEquals(Operation.Kind.DELETE, notification.getOperation().getKind());
         assertEquals(getContext().getFile1(), notification.getOperation().getFile());
@@ -83,7 +85,6 @@ public abstract class AsyncPhotoRepositoryTest extends PhotoRepositoryTest {
         MockAsyncListener listener = new MockAsyncListener();
         object.addListener(listener);
         object.create(getContext().getFile1(), getContext().getStream1());
-        object.delete(getContext().getFile1());
 
         assertEquals(1, object.getQueue().size()); // safeguard, since completeNext blocks
         object.completeNext();
@@ -92,7 +93,7 @@ public abstract class AsyncPhotoRepositoryTest extends PhotoRepositoryTest {
         assertEquals(0, listener.getErrorNotifications().size());
         MockAsyncListener.OperationNotification notification = listener.getCompleteNotifications().get(0);
         assertEquals(object, notification.getRepository());
-        assertEquals(Operation.Kind.DELETE, notification.getOperation().getKind());
+        assertEquals(Operation.Kind.READ, notification.getOperation().getKind());
         assertEquals(getContext().getFile1(), notification.getOperation().getFile());
     }
 }

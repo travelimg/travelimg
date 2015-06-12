@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
 import at.ac.tuwien.qse.sepm.dao.repo.*;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -15,8 +16,19 @@ public class CachedPhotoRepositoryTest extends AsyncPhotoRepositoryTest {
 
     private static final Path PREFIX = Paths.get("test/path");
 
+    protected PhotoRepository repository;
+    protected PhotoCache cache;
+    protected CachedPhotoRepository object;
+
+    @Before
+    public void setUp() {
+        repository = new MemoryPhotoRepository(getContext().getSerializer(), PREFIX);
+        cache = new MemoryPhotoCache();
+        object = new CachedPhotoRepository(repository, cache);
+    }
+
     @Override protected CachedPhotoRepository getObject() {
-        return new CachedPhotoRepository(getRepository(), getCache());
+        return object;
     }
 
     @Override protected Context getContext() {
@@ -28,19 +40,23 @@ public class CachedPhotoRepositoryTest extends AsyncPhotoRepositoryTest {
             @Override public Path getFile2() {
                 return PREFIX.resolve("other/photo.jpg");
             }
+
+            @Override public Path getUnacceptedPath() {
+                return Paths.get("somewhere/outside/test/path.jpg");
+            }
         };
     }
 
     private PhotoRepository getRepository() {
-        return new MemoryPhotoRepository(getContext().getSerializer(), PREFIX);
+        return repository;
     }
 
     private PhotoCache getCache() {
-        return new MemoryPhotoCache();
+        return cache;
     }
 
     @Test
-    public void sychtonize_modifiedFiles_addedToQueue() throws PersistenceException {
+    public void synchronize_modifiedFiles_addedToQueue() throws PersistenceException {
         PhotoRepository repository = getRepository();
         Path file = getContext().getFile1();
         repository.create(file, getContext().getStream1());
@@ -51,6 +67,7 @@ public class CachedPhotoRepositoryTest extends AsyncPhotoRepositoryTest {
 
         CachedPhotoRepository object = new CachedPhotoRepository(repository, cache);
         object.synchronize();
+        while (object.completeNext());
         assertEquals(modified, cache.read(file));
     }
 
@@ -66,6 +83,7 @@ public class CachedPhotoRepositoryTest extends AsyncPhotoRepositoryTest {
 
         CachedPhotoRepository object = new CachedPhotoRepository(repository, cache);
         object.synchronize();
+        while (object.completeNext());
         assertEquals(modified, cache.read(file));
     }
 
@@ -102,6 +120,7 @@ public class CachedPhotoRepositoryTest extends AsyncPhotoRepositoryTest {
 
         CachedPhotoRepository object = new CachedPhotoRepository(repository, cache);
         object.synchronize();
+        while (object.completeNext());
         assertTrue(cache.contains(file));
     }
 }

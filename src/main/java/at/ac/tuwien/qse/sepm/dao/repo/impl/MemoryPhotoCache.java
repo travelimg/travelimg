@@ -36,13 +36,13 @@ public class MemoryPhotoCache implements PhotoCache {
         }
         photos.remove(file);
         modified.remove(file);
-        LOGGER.info("removed {}", file);
+        LOGGER.debug("removed {}", file);
     }
 
     @Override public Collection<Path> index() throws PersistenceException {
         LOGGER.debug("indexing");
         Collection<Path> result = photos.keySet();
-        LOGGER.info("indexed {}", result.size());
+        LOGGER.debug("indexed {}", result.size());
         return result;
     }
 
@@ -57,7 +57,7 @@ public class MemoryPhotoCache implements PhotoCache {
             throw new PhotoNotFoundException(this, file);
         }
         Photo result = new Photo(photos.get(file));
-        LOGGER.info("read {}", result);
+        LOGGER.debug("read {}", result);
         return result;
     }
 }

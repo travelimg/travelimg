@@ -48,7 +48,7 @@ public class MemoryPhotoRepository implements PhotoRepository {
         if (source == null) throw new IllegalArgumentException();
         LOGGER.debug("creating {}", file);
 
-        if (!file.startsWith(getPrefix())) {
+        if (!accepts(file)) {
             throw new PersistenceException("File is not accepted by this repository.");
         }
         if (contains(file)) {

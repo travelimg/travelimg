@@ -1,9 +1,6 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
 import at.ac.tuwien.qse.sepm.dao.repo.*;
-import org.apache.commons.imaging.Imaging;
-import org.apache.commons.imaging.ImagingException;
-import org.apache.commons.imaging.common.ImageMetadata;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,30 +8,34 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedList;
 
 /**
  * Photo repository that manages photos as files in a directory.
  */
-public class PhotoFileRepository extends RunnablePhotoRepository {
+public class PhotoFileRepository implements PhotoRepository {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private final FileManager fileManager;
     private final FileWatcher watcher;
     private final PhotoSerializer serializer;
 
     private final FileListener listener = new FileListener();
     private final Collection<Listener> listeners = new LinkedList<>();
 
-    public PhotoFileRepository() {
-        this(new PollingFileWatcher(), new JpegSerializer());
+    public PhotoFileRepository(FileWatcher watcher, PhotoSerializer serializer) {
+        this(watcher, serializer, new PhysicalFileManager());
     }
 
-    public PhotoFileRepository(FileWatcher watcher, PhotoSerializer serializer) {
+    public PhotoFileRepository(FileWatcher watcher, PhotoSerializer serializer, FileManager fileManager) {
+        if (fileManager == null) throw new IllegalArgumentException();
         if (watcher == null) throw new IllegalArgumentException();
         if (serializer == null) throw new IllegalArgumentException();
+        this.fileManager = fileManager;
         this.watcher = watcher;
         this.serializer = serializer;
         watcher.addListener(listener);
@@ -46,16 +47,11 @@ public class PhotoFileRepository extends RunnablePhotoRepository {
      * This implementation checks whether the file is a child of any of the directories that are
      * registered to the watcher.
      */
-    @Override public boolean accepts(Path file) throws PersistenceException {
+    @Override public boolean accepts(Path file) {
         if (file == null) throw new IllegalArgumentException();
-        for (Path directory : watcher.getDirectories()) {
-            if (file.startsWith(directory)) {
-                LOGGER.debug("accepting file {} in directory {}", file, directory);
-                return true;
-            }
-        }
-        LOGGER.warn("cannot accept file {}", file);
-        return false;
+        boolean result = watcher.recognizes(file);
+        LOGGER.debug("accepts is {} for {}", result, file);
+        return result;
     }
 
     @Override public void create(Path file, InputStream source) throws PersistenceException {
@@ -74,11 +70,12 @@ public class PhotoFileRepository extends RunnablePhotoRepository {
         }
 
         try {
-            Files.createDirectories(file.getParent());
-            Files.createFile(file);
-            OutputStream destination = Files.newOutputStream(file);
+            fileManager.createDirectories(file);
+            fileManager.createFile(file);
+            OutputStream destination = fileManager.newOutputStream(file);
             IOUtils.copy(source, destination);
             LOGGER.debug("created {}", file);
+            notifyCreate(file);
         } catch (IOException ex) {
             throw new PersistenceException(ex);
         }
@@ -94,19 +91,28 @@ public class PhotoFileRepository extends RunnablePhotoRepository {
             throw new PhotoNotFoundException(this, file);
         }
 
-        Path temp = file.resolve(".temp");
+        Path temp = Paths.get(file.toString() + ".temp");
         InputStream is = null;
         OutputStream os = null;
         try {
+            if (!fileManager.exists(temp)) {
+                try {
+                    fileManager.createFile(temp);
+                } catch (IOException ex) {
+                    LOGGER.warn("failed creating temp file at {}", temp);
+                    throw new PersistenceException(ex);
+                }
+            }
+
             try {
-                is = Files.newInputStream(file);
+                is = fileManager.newInputStream(file);
             } catch (IOException ex) {
                 LOGGER.warn("failed creating input stream for file {}", file);
                 throw new PersistenceException(ex);
             }
 
             try {
-                os = Files.newOutputStream(temp);
+                os = fileManager.newOutputStream(temp);
             } catch (IOException ex) {
                 LOGGER.warn("failed creating output stream for file {}", temp);
                 throw new PersistenceException();
@@ -115,7 +121,8 @@ public class PhotoFileRepository extends RunnablePhotoRepository {
             serializer.update(is, os, photo.getData());
 
             try {
-                Files.copy(temp, file, StandardCopyOption.REPLACE_EXISTING);
+                fileManager.copy(temp, file);
+                notifyUpdate(file);
             } catch (IOException ex) {
                 LOGGER.warn("failed copying {} -> {}", temp, file);
                 throw new PersistenceException(ex);
@@ -139,8 +146,8 @@ public class PhotoFileRepository extends RunnablePhotoRepository {
                 LOGGER.error(ex);
             }
             try {
-                if (Files.exists(temp)) {
-                    Files.delete(temp);
+                if (fileManager.exists(temp)) {
+                    fileManager.delete(temp);
                 }
             } catch (IOException ex) {
                 LOGGER.warn("failed deleting temp file {}", temp);
@@ -158,8 +165,9 @@ public class PhotoFileRepository extends RunnablePhotoRepository {
             throw new PhotoNotFoundException(this, file);
         }
         try {
-            Files.delete(file);
+            fileManager.delete(file);
             LOGGER.info("deleted {}", file);
+            notifyDelete(file);
         } catch (IOException ex) {
             LOGGER.debug("failed deleting file {}", file);
             throw new PersistenceException(ex);
@@ -180,8 +188,8 @@ public class PhotoFileRepository extends RunnablePhotoRepository {
 
     @Override public boolean contains(Path file) throws PersistenceException {
         LOGGER.debug("contains {}", file);
-        boolean result = Files.exists(file) && accepts(file);
-        LOGGER.debug("contains {} is {}", file, result);
+        boolean result = fileManager.isFile(file) && accepts(file);
+        LOGGER.debug("contains is {} for {}", result, file);
         return result;
     }
 
@@ -201,7 +209,25 @@ public class PhotoFileRepository extends RunnablePhotoRepository {
             throw new PhotoNotFoundException(this, file);
         }
 
-        throw new UnsupportedOperationException();
+        InputStream is;
+        try {
+            is = fileManager.newInputStream(file);
+        } catch (IOException ex) {
+            LOGGER.warn("failed opening file {}", file);
+            throw new PersistenceException(ex);
+        }
+
+        PhotoMetadata data = serializer.read(is);
+        Photo photo = new Photo(file, data);
+
+        try {
+            is.close();
+        } catch (IOException ex) {
+            LOGGER.warn("failed closing input stream to file {}", file);
+        }
+
+        LOGGER.debug("read photo {}", photo);
+        return photo;
     }
 
     private void notifyCreate(Path path) {

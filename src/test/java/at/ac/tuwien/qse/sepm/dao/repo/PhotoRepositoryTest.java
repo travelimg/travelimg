@@ -21,11 +21,23 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
         ((PhotoRepository)object).create(photo.getFile(), getContext().getStream(photo));
     }
 
-    @Test(expected = PersistenceException.class)
-    public void create_invalidPath_throws() throws PersistenceException {
+    @Test
+    public void accept_accepted_returnsTrue() throws PersistenceException {
         PhotoRepository object = getObject();
-        Path file = Paths.get("X:/yz");
+        assertTrue(object.accepts(getContext().getFile1()));
+    }
 
+    @Test
+    public void accept_unaccepted_returnsFalse() throws PersistenceException {
+        PhotoRepository object = getObject();
+        assertFalse(object.accepts(getContext().getUnacceptedPath()));
+    }
+
+    @Test(expected = PersistenceException.class)
+    public void create_unacceptedPath_throws() throws PersistenceException {
+        PhotoRepository object = getObject();
+        Path file = getContext().getUnacceptedPath();
+        assertFalse(object.accepts(file));
         object.create(file, getContext().getStream1());
     }
 
@@ -183,5 +195,7 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
         public InputStream getStream2() {
             return new ByteArrayInputStream(new byte[] { 2 });
         }
+
+        public abstract Path getUnacceptedPath();
     }
 }

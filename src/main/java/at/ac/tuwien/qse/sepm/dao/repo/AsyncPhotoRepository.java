@@ -25,12 +25,13 @@ public interface AsyncPhotoRepository extends PhotoRepository {
     void synchronize() throws PersistenceException;
 
     /**
-     * Completes the next operation in the queue, waiting if necessary until an operation becomes
-     * available.
+     * Completes the next operation in the queue. Does nothing if the queue is empty.
      *
      * Notifies the listeners that the operation either was completed or that an error occurred.
+     *
+     * @return true if there is another item in the queue, otherwise false
      */
-    void completeNext();
+    boolean completeNext();
 
     /**
      * Get the operations that have not yet been completed.

@@ -14,11 +14,12 @@ import java.util.Set;
 public interface FileWatcher {
 
     /**
-     * Get the currently registered directories.
+     * Check whether the file would be watched by the watcher.
      *
-     * @return registered directories
+     * @param file file to check
+     * @return true if the file would be watched, else false
      */
-    Set<Path> getDirectories();
+    boolean recognizes(Path file);
 
     /**
      * Get all files in the registered directories.
