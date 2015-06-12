@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.dao.JourneyDAO;
 import at.ac.tuwien.qse.sepm.dao.PlaceDAO;
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Place;
+import at.ac.tuwien.qse.sepm.entities.WikiPlaceInfo;
 import at.ac.tuwien.qse.sepm.entities.validators.PlaceValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,11 +114,28 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
         logger.debug("readByJourney ", journey.getId());
 
         try {
-            return this.jdbcTemplate.query(readByJourneyStatement, new Object[]{journey.getId()}, new PlaceMapper());
+            return this.jdbcTemplate.query(readByJourneyStatement, new Object[] { journey.getId() },
+                    new PlaceMapper());
         } catch (DataAccessException | ValidationException.Unchecked | DAOException.Unchecked ex) {
             logger.error("Failed to read a Place", ex);
             throw new DAOException("Failed to read a Place", ex);
         }
+    }
+
+    /**
+     * Create and return a WikiPlaceInfo object for the given Place <tt>place</tt>.
+     *
+     * @param place must contain non-null and non-empty entries for <tt>place.city</tt>
+     *              <tt>place.country</tt>
+     * @return a new WikiPlaceInfo object for the given Place. The fields may not all be
+     *     initialized - sometimes not all information can be found
+     * @throws DAOException if an exception occurs on DAO level
+     * @throws ValidationException if <tt>place</tt> isn't a valid object
+     */
+    @Override
+    public WikiPlaceInfo createWikiPlaceInfo(Place place) throws DAOException, ValidationException {
+        //TODO implement method
+        return null;
     }
 
     private class PlaceMapper implements RowMapper<Place> {
