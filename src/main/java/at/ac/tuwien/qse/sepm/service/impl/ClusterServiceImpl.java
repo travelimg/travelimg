@@ -17,8 +17,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class ClusterServiceImpl implements ClusterService {
 
@@ -67,11 +67,11 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
-    public void addPlace(Place place) throws ServiceException {
+    public Place addPlace(Place place) throws ServiceException {
         try {
-            placeDAO.create(place);
+            return placeDAO.create(place);
         } catch (DAOException ex) {
-            logger.error("Place-creation with {}, {} failed.", place);
+            logger.error("Place-creation for {} failed.", place);
             throw new ServiceException("Creation of Place failed.", ex);
         } catch (ValidationException e) {
             throw new ServiceException("Failed to validate entity", e);
@@ -79,13 +79,25 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
+    public Journey addJourney(Journey journey) throws ServiceException {
+        try {
+            return journeyDAO.create(journey);
+        } catch (DAOException ex) {
+            logger.error("Journey-creation for {} failed.", journey);
+            throw new ServiceException("Creation of journey failed.", ex);
+        } catch (ValidationException e) {
+            throw new ServiceException("Failed to validate entity", e);
+        }
+    }
+
+    @Override
     public List<Place> clusterJourney(Journey journey) throws ServiceException {
-        logger.debug("clusteringJourney" + journey);
+        logger.debug("clustering journey {}", journey);
+
         List<Photo> photos;
-        List<Place> places = new ArrayList<Place>();
-        Place place = new Place(1, "Unknown place", "Unknown place", 0.0, 0.0, null);
-        double latitude = 1000;
-        double longitude = 1000;
+        List<Place> places = new ArrayList<>();
+
+        addJourney(journey);
 
         try {
             photos = photoDAO.readPhotosByJourney(journey);
@@ -94,23 +106,35 @@ public class ClusterServiceImpl implements ClusterService {
             throw new ServiceException("Failed to read photos of journey", e);
         }
 
-        photoService.addJourneyToPhotos(photos, journey);
+        // attach a place to each photo
+        for (Photo photo : photos) {
+            final double latitude = photo.getLatitude();
+            final double longitude = photo.getLongitude();
 
-        for (Photo element : photos) {
-            if (Math.abs(element.getLatitude() - latitude) > 1
-                    && Math.abs(element.getLongitude() - longitude) > 1) {
-                place = geoService.getPlaceByGeoData(element.getLatitude(), element.getLongitude());
-                place.setLatitude(element.getLatitude());
-                place.setLongitude(element.getLongitude());
-                place.setJourney(journey);
-                logger.debug("New place-cluster: " + place.getId() + " " + place.getCity());
-                addPlace(place);
+            double epsilon = 1.0;
+            Optional<Place> place = places.stream()
+                    .filter(p -> Math.abs(p.getLatitude() - latitude) < epsilon)   // find an existing place in lateral proximity
+                    .filter(p -> Math.abs(p.getLongitude() - longitude) < epsilon) // find an existing place in longitudinal proximity
+                    .findFirst();
+
+            if (!place.isPresent()) {
+                // if no we don't already know a place in close proximity look it up
+                place = Optional.of(lookupPlace(photo, journey));
+                places.add(place.get());
             }
-            latitude = element.getLatitude();
-            longitude = element.getLongitude();
-            photoService.addPlaceToPhotos(Arrays.asList(element), place);
-            places.add(place);
+
+            photo.setPlace(place.get());
+            photoService.editPhoto(photo);
         }
         return places;
+    }
+
+    private Place lookupPlace(Photo photo, Journey journey) throws ServiceException {
+        Place place = geoService.getPlaceByGeoData(photo.getLatitude(), photo.getLongitude());
+        place.setJourney(journey);
+
+        logger.debug("New unknown place cluster: {}", place);
+
+        return addPlace(place);
     }
 }

@@ -4,11 +4,13 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.FlickrDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
+import at.ac.tuwien.qse.sepm.gui.dialogs.JourneyDialog;
 import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
@@ -36,6 +38,8 @@ public class GridView {
     private FlickrService flickrService;
     @Autowired
     private PhotographerService photographerService;
+    @Autowired
+    private ClusterService clusterService;
     @Autowired
     private Organizer organizer;
     @Autowired
@@ -78,6 +82,10 @@ public class GridView {
             FullscreenWindow fullscreen = new FullscreenWindow(imageCache);
             fullscreen.present(grid.getPhotos(), grid.getActivePhoto());
         });
+        organizer.setJourneyAction(() -> {
+            JourneyDialog dialog = new JourneyDialog(root, clusterService);
+            dialog.showForResult();
+        });
 
         organizer.setFilterChangeAction(this::handleFilterChange);
 
@@ -92,20 +100,22 @@ public class GridView {
         });
 
         // Updated photos that no longer match the filter are removed from the grid.
-        inspector.setUpdateHandler(photos -> {
-            photos.stream()
+        inspector.setUpdateHandler(() -> {
+            inspector.getActivePhotos().stream()
                     .filter(filter.negate())
                     .forEach(grid::removePhoto);
-            photos.stream()
+            inspector.getActivePhotos().stream()
                     .filter(filter)
                     .forEach(grid::updatePhoto);
         });
 
         // Deleted photos are removed from the grid.
-        inspector.setDeleteHandler(photos -> photos.forEach(grid::removePhoto));
+        inspector.setDeleteHandler(() -> {
+            inspector.getActivePhotos().forEach(grid::removePhoto);
+        });
 
         // Apply the initial filter.
-        handleFilterChange(organizer.getFilter());
+        handleFilterChange();
     }
 
     private void handleImportError(Throwable error) {
@@ -132,8 +142,6 @@ public class GridView {
         Platform.runLater(() -> {
             disableReload = true;
 
-            organizer.addPlace(photo.getPlace());
-
             // Ignore photos that are not part of the current filter.
             if (!filter.test(photo)) {
                 disableReload = false;
@@ -145,8 +153,8 @@ public class GridView {
         });
     }
 
-    private void handleFilterChange(PhotoFilter filter) {
-        this.filter = filter;
+    private void handleFilterChange() {
+        this.filter = organizer.getFilter();
 
         if (!disableReload)
             reloadImages();
@@ -154,15 +162,13 @@ public class GridView {
 
     private void reloadImages() {
         try {
-            grid.setPhotos(
-                    photoService.getAllPhotos(filter)
-                            .stream()
+            grid.setPhotos(photoService.getAllPhotos(filter).stream()
                             .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
-                            .collect(Collectors.toList())
-            );
+                            .collect(Collectors.toList()));
         } catch (ServiceException ex) {
             LOGGER.error("failed loading fotos", ex);
-            ErrorDialog.show(root, "Laden von Fotos fehlgeschlagen", "Fehlermeldung: " + ex.getMessage());
+            ErrorDialog.show(root, "Laden von Fotos fehlgeschlagen",
+                    "Fehlermeldung: " + ex.getMessage());
         }
     }
 }

@@ -72,8 +72,8 @@
     <bean id="gridViewController" class="at.ac.tuwien.qse.sepm.gui.GridView"></bean>
     <bean id="slideshowViewController" class="at.ac.tuwien.qse.sepm.gui.SlideshowView"></bean>
     <bean id="worldmapViewController" class="at.ac.tuwien.qse.sepm.gui.WorldmapView"></bean>
-    <bean id="organizerController" class="at.ac.tuwien.qse.sepm.gui.Organizer"></bean>
-    <bean id="inspectorController" class="at.ac.tuwien.qse.sepm.gui.Inspector"></bean>
+    <bean id="organizerController" class="at.ac.tuwien.qse.sepm.gui.impl.OrganizerImpl"></bean>
+    <bean id="inspectorController" class="at.ac.tuwien.qse.sepm.gui.impl.InspectorImpl"></bean>
     <bean id="ratingPicker" class="at.ac.tuwien.qse.sepm.gui.RatingPicker"></bean>
 	<bean id="imageCache" class="at.ac.tuwien.qse.sepm.gui.util.ImageCache"></bean>
 	<bean id="imageGridController" class="at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid"></bean>

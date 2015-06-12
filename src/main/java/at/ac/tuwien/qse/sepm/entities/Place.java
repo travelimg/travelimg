@@ -2,14 +2,14 @@ package at.ac.tuwien.qse.sepm.entities;
 
 public class Place {
 
-    private int id;
+    private Integer id;
     private String city;
     private String country;
     private double latitude;
     private double longitude;
     private Journey journey;
 
-    public Place(int id, String city, String country, double latitude, double longitude, Journey journey) {
+    public Place(Integer id, String city, String country, double latitude, double longitude, Journey journey) {
         this.id = id;
         this.city = city;
         this.country = country;
@@ -18,11 +18,11 @@ public class Place {
         this.journey = journey;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

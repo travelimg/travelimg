@@ -3,23 +3,23 @@ package at.ac.tuwien.qse.sepm.entities;
 import java.time.LocalDateTime;
 
 public class Journey {
-    private int id;
+    private Integer id;
     private String name;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
 
-    public Journey(int id, String name, LocalDateTime startDate, LocalDateTime endDate) {
+    public Journey(Integer id, String name, LocalDateTime startDate, LocalDateTime endDate) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

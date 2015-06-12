@@ -68,7 +68,6 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
     public void delete(Journey journey) throws DAOException, ValidationException {
         logger.debug("Deleting Journey", journey);
 
-        JourneyValidator.validate(journey);
         JourneyValidator.validateID(journey.getId());
 
         try {
@@ -89,8 +88,8 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         try {
             jdbcTemplate.update(updateStatement,
                     journey.getName(),
-                    journey.getStartDate(),
-                    journey.getEndDate(),
+                    Timestamp.valueOf(journey.getStartDate()),
+                    Timestamp.valueOf(journey.getEndDate()),
                     journey.getId());
             logger.debug("Successfully updated Journey", journey);
         } catch (DataAccessException ex) {
