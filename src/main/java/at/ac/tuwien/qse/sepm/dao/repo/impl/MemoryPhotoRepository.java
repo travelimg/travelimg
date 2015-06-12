@@ -127,7 +127,7 @@ public class MemoryPhotoRepository implements PhotoRepository {
         }
 
         InputStream stream = new ByteArrayInputStream((byte[])files.get(file));
-        PhotoMetaData metadata = serializer.read(stream);
+        PhotoMetadata metadata = serializer.read(stream);
         Photo photo = new Photo(file, metadata);
         LOGGER.info("read {}", photo);
         return photo;

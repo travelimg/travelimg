@@ -6,7 +6,6 @@ import org.junit.Test;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -106,8 +105,8 @@ public abstract class PhotoProviderTest {
             return new Photo(getFile2(), getPhotoData2());
         }
 
-        public PhotoMetaData getPhotoData1() {
-            PhotoMetaData data = new PhotoMetaData();
+        public PhotoMetadata getPhotoData1() {
+            PhotoMetadata data = new PhotoMetadata();
             data.setDate(LocalDateTime.of(1993, 3, 30, 7, 5));
             data.setLongitude(17.0);
             data.setLatitude(18.0);
@@ -119,8 +118,8 @@ public abstract class PhotoProviderTest {
             return data;
         }
 
-        public PhotoMetaData getPhotoData2() {
-            PhotoMetaData data = new PhotoMetaData();
+        public PhotoMetadata getPhotoData2() {
+            PhotoMetadata data = new PhotoMetadata();
             data.setDate(LocalDateTime.of(2014, 8, 14, 15, 36));
             data.setLongitude(42.0);
             data.setLatitude(43.0);

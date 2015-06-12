@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PhotoMetaData {
+public class PhotoMetadata {
 
     private LocalDateTime date = null;
     private Double longitude = null;
@@ -15,10 +15,10 @@ public class PhotoMetaData {
     private String photographer = null;
     private Set<String> tags = new HashSet<>();
 
-    public PhotoMetaData() {
+    public PhotoMetadata() {
     }
 
-    public PhotoMetaData(PhotoMetaData from) {
+    public PhotoMetadata(PhotoMetadata from) {
         if (from == null) throw new IllegalArgumentException();
         this.date = LocalDateTime.from(from.date);
         this.longitude = from.longitude;
@@ -76,10 +76,10 @@ public class PhotoMetaData {
     @Override public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof PhotoMetaData))
+        if (!(o instanceof PhotoMetadata))
             return false;
 
-        PhotoMetaData that = (PhotoMetaData) o;
+        PhotoMetadata that = (PhotoMetadata) o;
 
         if (date != null ? !date.equals(that.date) : that.date != null)
             return false;

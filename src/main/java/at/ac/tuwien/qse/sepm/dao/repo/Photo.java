@@ -5,13 +5,13 @@ import java.nio.file.Path;
 public class Photo {
 
     private final Path file;
-    private final PhotoMetaData data;
+    private final PhotoMetadata data;
 
     public Photo(Path file) {
-        this(file, new PhotoMetaData());
+        this(file, new PhotoMetadata());
     }
 
-    public Photo(Path file, PhotoMetaData data) {
+    public Photo(Path file, PhotoMetadata data) {
         if (file == null) throw new IllegalArgumentException();
         if (data == null) throw new IllegalArgumentException();
         this.file = file;
@@ -21,14 +21,14 @@ public class Photo {
     public Photo(Photo from) {
         if (from == null) throw new IllegalArgumentException();
         this.file = from.file;
-        this.data = new PhotoMetaData(from.data);
+        this.data = new PhotoMetadata(from.data);
     }
 
     public Path getFile() {
         return file;
     }
 
-    public PhotoMetaData getData() {
+    public PhotoMetadata getData() {
         return data;
     }
 

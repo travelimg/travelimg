@@ -2,7 +2,7 @@ package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
 import at.ac.tuwien.qse.sepm.dao.repo.FormatException;
 import at.ac.tuwien.qse.sepm.dao.repo.PersistenceException;
-import at.ac.tuwien.qse.sepm.dao.repo.PhotoMetaData;
+import at.ac.tuwien.qse.sepm.dao.repo.PhotoMetadata;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoSerializer;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
@@ -25,7 +25,7 @@ public class JpegSerializer implements PhotoSerializer {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
 
-    @Override public PhotoMetaData read(InputStream is) throws PersistenceException {
+    @Override public PhotoMetadata read(InputStream is) throws PersistenceException {
         if (is == null) throw new IllegalArgumentException();
         LOGGER.debug("reading metadata");
 
@@ -37,7 +37,7 @@ public class JpegSerializer implements PhotoSerializer {
             throw new FormatException(ex);
         }
 
-        PhotoMetaData result = new PhotoMetaData();
+        PhotoMetadata result = new PhotoMetadata();
         if (imageData == null) {
             LOGGER.debug("could not find image metadata");
             return result;
@@ -56,7 +56,7 @@ public class JpegSerializer implements PhotoSerializer {
         return result;
     }
 
-    @Override public void update(InputStream is, OutputStream os, PhotoMetaData metadata) throws PersistenceException {
+    @Override public void update(InputStream is, OutputStream os, PhotoMetadata metadata) throws PersistenceException {
         if (is == null) throw new IllegalArgumentException();
         if (os == null) throw new IllegalArgumentException();
         if (metadata == null) throw new IllegalArgumentException();
@@ -65,7 +65,7 @@ public class JpegSerializer implements PhotoSerializer {
 
     }
 
-    private void readDate(JpegImageMetadata input, PhotoMetaData output) {
+    private void readDate(JpegImageMetadata input, PhotoMetadata output) {
         LOGGER.debug("reading date from metadata");
         TiffField field = input.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
         if (field == null) {
@@ -78,7 +78,7 @@ public class JpegSerializer implements PhotoSerializer {
         LOGGER.debug("read date as {}", output.getDate());
     }
 
-    private void readGps(JpegImageMetadata input, PhotoMetaData output) {
+    private void readGps(JpegImageMetadata input, PhotoMetadata output) {
         try {
             TiffImageMetadata tiffData = input.getExif();
             if (tiffData == null) {

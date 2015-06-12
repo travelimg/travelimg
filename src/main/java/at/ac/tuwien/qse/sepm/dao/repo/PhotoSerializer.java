@@ -16,7 +16,7 @@ public interface PhotoSerializer {
      * @throws PersistenceException failed to perform operation
      * @throws FormatException data in the stream is invalid
      */
-    public PhotoMetaData read(InputStream is) throws PersistenceException;
+    public PhotoMetadata read(InputStream is) throws PersistenceException;
 
     /**
      * Rewrites the meta data of a photo.
@@ -29,5 +29,5 @@ public interface PhotoSerializer {
      * @throws PersistenceException failed to perform operation
      * @throws FormatException data in the input stream is invalid
      */
-    public void update(InputStream is, OutputStream os, PhotoMetaData metadata) throws PersistenceException;
+    public void update(InputStream is, OutputStream os, PhotoMetadata metadata) throws PersistenceException;
 }

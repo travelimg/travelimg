@@ -10,15 +10,15 @@ import java.util.Map;
 
 public class MockPhotoSerializer implements PhotoSerializer {
 
-    private final Map<Integer, PhotoMetaData> dataByIndex = new HashMap<>();
-    private final Map<PhotoMetaData, Integer> indicesByData = new HashMap<>();
+    private final Map<Integer, PhotoMetadata> dataByIndex = new HashMap<>();
+    private final Map<PhotoMetadata, Integer> indicesByData = new HashMap<>();
 
-    public void put(int index, PhotoMetaData photo) {
+    public void put(int index, PhotoMetadata photo) {
         dataByIndex.put(index, photo);
         indicesByData.put(photo, index);
     }
 
-    @Override public PhotoMetaData read(InputStream is) throws PersistenceException {
+    @Override public PhotoMetadata read(InputStream is) throws PersistenceException {
         try {
             int index = is.read();
             if (!dataByIndex.containsKey(index)) {
@@ -30,7 +30,7 @@ public class MockPhotoSerializer implements PhotoSerializer {
         }
     }
 
-    @Override public void update(InputStream is, OutputStream os, PhotoMetaData metadata) throws PersistenceException {
+    @Override public void update(InputStream is, OutputStream os, PhotoMetadata metadata) throws PersistenceException {
         try {
             if (!indicesByData.containsKey(metadata)) {
                 throw new FormatException();
