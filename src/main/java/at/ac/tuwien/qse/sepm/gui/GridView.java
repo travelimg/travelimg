@@ -1,12 +1,16 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.FlickrDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
-import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
+import at.ac.tuwien.qse.sepm.gui.dialogs.JourneyDialog;
+import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid;
+import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
@@ -16,8 +20,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.Year;
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,20 +29,31 @@ import java.util.stream.Collectors;
 public class GridView {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    @Autowired private PhotoService photoService;
-    @Autowired private ImportService importService;
-    @Autowired private FlickrService flickrService;
-    @Autowired private PhotographerService photographerService;
-    @Autowired private Organizer organizer;
-    @Autowired private Inspector inspector;
-
-    @FXML private BorderPane root;
-    @FXML private ScrollPane gridContainer;
-
-    private final ImageGrid<Photo> grid = new ImageGrid<>(PhotoGridTile::new);
     private final List<Photo> selection = new ArrayList<Photo>();
+    @Autowired
+    private PhotoService photoService;
+    @Autowired
+    private ImportService importService;
+    @Autowired
+    private FlickrService flickrService;
+    @Autowired
+    private PhotographerService photographerService;
+    @Autowired
+    private ClusterService clusterService;
+    @Autowired
+    private Organizer organizer;
+    @Autowired
+    private Inspector inspector;
+    @FXML
+    private BorderPane root;
+    @FXML
+    private ScrollPane gridContainer;
     private Predicate<Photo> filter = new PhotoFilter();
+
+    @Autowired
+    private ImageCache imageCache;
+    @Autowired
+    private PaginatedImageGrid grid = new PaginatedImageGrid();
 
     private boolean disableReload = false;
 
@@ -59,15 +72,19 @@ public class GridView {
                     .importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
         });
         organizer.setFlickrAction(() -> {
-            FlickrDialog flickrDialog = new FlickrDialog(root,"Flickr Import",flickrService);
+            FlickrDialog flickrDialog = new FlickrDialog(root, "Flickr Import", flickrService);
             Optional<List<Photo>> photos = flickrDialog.showForResult();
             if (!photos.isPresent()) return;
             importService.importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
         });
 
         organizer.setPresentAction(() -> {
-            FullscreenWindow fullscreen = new FullscreenWindow();
-            fullscreen.present(grid.getItems());
+            FullscreenWindow fullscreen = new FullscreenWindow(imageCache);
+            fullscreen.present(grid.getPhotos(), grid.getActivePhoto());
+        });
+        organizer.setJourneyAction(() -> {
+            JourneyDialog dialog = new JourneyDialog(root, clusterService);
+            dialog.showForResult();
         });
 
         organizer.setFilterChangeAction(this::handleFilterChange);
@@ -83,87 +100,75 @@ public class GridView {
         });
 
         // Updated photos that no longer match the filter are removed from the grid.
-        inspector.setUpdateHandler(photos -> {
-            photos.stream()
+        inspector.setUpdateHandler(() -> {
+            inspector.getActivePhotos().stream()
                     .filter(filter.negate())
-                    .forEach(grid::removeItem);
-            photos.stream()
+                    .forEach(grid::removePhoto);
+            inspector.getActivePhotos().stream()
                     .filter(filter)
-                    .forEach(grid::updateItem);
+                    .forEach(grid::updatePhoto);
         });
 
         // Deleted photos are removed from the grid.
-        inspector.setDeleteHandler(photos -> photos.forEach(grid::removeItem));
+        inspector.setDeleteHandler(() -> {
+            inspector.getActivePhotos().forEach(grid::removePhoto);
+        });
 
         // Apply the initial filter.
-        handleFilterChange(organizer.getFilter());
+        handleFilterChange();
     }
 
     private void handleImportError(Throwable error) {
         LOGGER.error("import error", error);
 
         // queue an update in the main gui
-        Platform.runLater(() -> {
-            InfoDialog dialog = new InfoDialog(root, "Import Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Import fehlgeschlagen");
-            dialog.setContentText("Fehlermeldung: " + error.getMessage());
-            dialog.showAndWait();
-        });
+        Platform.runLater(() -> ErrorDialog.show(root, "Import fehlgeschlagen", "Fehlermeldung: " + error.getMessage()));
     }
 
-    public void deletePhotos(){
-        for(Photo photo : selection){
-            grid.removeItem(photo);
+    public void deletePhotos() {
+        for (Photo photo : selection) {
+            grid.removePhoto(photo);
         }
         selection.clear();
     }
 
     /**
      * Called whenever a new photo is imported
+     *
      * @param photo The newly imported    photo
      */
     private void handleImportedPhoto(Photo photo) {
         // queue an update in the main gui
         Platform.runLater(() -> {
             disableReload = true;
-            // update filter to show the new month
-            YearMonth month = YearMonth.from(photo.getDatetime());
-            organizer.addMonth(month);
 
             // Ignore photos that are not part of the current filter.
-            if (!filter.test(photo)){
+            if (!filter.test(photo)) {
                 disableReload = false;
                 return;
             }
-            grid.addItem(photo);
+            grid.addPhoto(photo);
 
             disableReload = false;
         });
     }
 
-    private void handleFilterChange(PhotoFilter filter) {
-        this.filter = filter;
+    private void handleFilterChange() {
+        this.filter = organizer.getFilter();
 
-        if(!disableReload)
+        if (!disableReload)
             reloadImages();
     }
 
     private void reloadImages() {
         try {
-            grid.setItems(
-                    photoService.getAllPhotos(filter)
-                    .stream()
-                    .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
-                    .collect(Collectors.toList())
-            );
+            grid.setPhotos(photoService.getAllPhotos(filter).stream()
+                            .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
+                            .collect(Collectors.toList()));
         } catch (ServiceException ex) {
             LOGGER.error("failed loading fotos", ex);
-            InfoDialog dialog = new InfoDialog(root, "Lade Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Laden von Fotos fehlgeschlagen");
-            dialog.setContentText("Fehlermeldung: " + ex.getMessage());
-            dialog.showAndWait();
+            ErrorDialog.show(root, "Laden von Fotos fehlgeschlagen",
+                    "Fehlermeldung: " + ex.getMessage());
         }
     }
 }

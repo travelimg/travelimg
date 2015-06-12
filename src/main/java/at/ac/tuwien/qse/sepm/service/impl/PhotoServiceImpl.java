@@ -1,11 +1,11 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.JourneyDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
-import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
-import at.ac.tuwien.qse.sepm.dao.TagDAO;
+import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -13,7 +13,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.YearMonth;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,19 +22,11 @@ import java.util.stream.Collectors;
 public class PhotoServiceImpl implements PhotoService {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    @Autowired private PhotoDAO photoDAO;
-    @Autowired private TagDAO tagDAO;
-    @Autowired private PhotoTagDAO photoTagDAO;
-
-    @Override
-    public List<YearMonth> getMonthsWithPhotos() throws ServiceException {
-        LOGGER.debug("Retrieving list of months...");
-        try {
-            return photoDAO.getMonthsWithPhotos();
-        } catch (DAOException ex) {
-            throw new ServiceException(ex);
-        }
-    }
+    ExecutorService executorService = Executors.newFixedThreadPool(1);
+    @Autowired
+    private PhotoDAO photoDAO;
+    @Autowired
+    private JourneyDAO journeyDAO;
 
     @Override
     public void deletePhotos(List<Photo> photos) throws ServiceException {
@@ -43,7 +34,7 @@ public class PhotoServiceImpl implements PhotoService {
             throw new ServiceException("List<Photo> photos is null");
         }
         for (Photo p : photos) {
-            LOGGER.debug("Deleting photo {}",p);
+            LOGGER.debug("Deleting photo {}", p);
             try {
                 photoDAO.delete(p);
             } catch (DAOException e) {
@@ -54,9 +45,24 @@ public class PhotoServiceImpl implements PhotoService {
         }
     }
 
+
     @Override
     public void editPhotos(List<Photo> photos, Photo photo) throws ServiceException {
-        //TODO
+        if (photos == null) {
+            throw new ServiceException("List<Photo> photos is null");
+        }
+        for (Photo p : photos) {
+            LOGGER.debug("Updating photo {}", p);
+            try {
+                //TODO update all attributes
+                p.setPlace(photo.getPlace());
+                photoDAO.update(p);
+            } catch (DAOException e) {
+                throw new ServiceException(e);
+            } catch (ValidationException e) {
+                throw new ServiceException("Failed to validate entity", e);
+            }
+        }
     }
 
     @Override
@@ -79,80 +85,67 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public void requestFullscreenMode(List<Photo> photos) throws ServiceException {
-        //TODO
-    }
+    public void editPhoto(Photo photo) throws ServiceException {
+        LOGGER.debug("Entering editPhoto with {}", photo);
 
-    @Override
-    public void addTagToPhotos(List<Photo> photos, Tag tag) throws ServiceException {
-        LOGGER.debug("Entering addTagToPhotos with {}, {}", photos, tag);
-        if (photos == null) {
-            throw new ServiceException("List<Photo> photos is null");
-        }
-        for (Photo photo : photos) {
-            try {
-                photoTagDAO.createPhotoTag(photo, tag);
-                photo.getTags().add(tag);
-            } catch (DAOException ex) {
-                LOGGER.error("Photo-Tag-creation with {}, {} failed.", photo, tag);
-                throw new ServiceException("Creation of Photo-Tag failed.", ex);
-            } catch (ValidationException e) {
-                throw new ServiceException("Failed to validate entity", e);
-            }
-        }
-        LOGGER.debug("Leaving addTagToPhotos");
-    }
-
-    @Override
-    public void removeTagFromPhotos(List<Photo> photos, Tag tag) throws ServiceException {
-        LOGGER.debug("Entering removeTagFromPhotos with {}, {}", photos, tag);
-        if (photos == null) {
-            throw new ServiceException("List<Photo> photos is null");
-        }
-        for (Photo photo : photos) {
-            try {
-                photoTagDAO.removeTagFromPhoto(photo, tag);
-                photo.getTags().remove(tag);
-            } catch (DAOException ex) {
-                LOGGER.error("Removal of Photo-Tag with {}, {} failed.", photo, tag);
-                throw new ServiceException("Photo-Tag removal failed.", ex);
-            } catch (ValidationException e) {
-                throw new ServiceException("Failed to validate entity", e);
-            }
-        }
-        LOGGER.debug("Leaving removeTagFromPhotos");
-    }
-
-    @Override
-    public List<Tag> getTagsForPhoto(Photo photo) throws ServiceException {
-        LOGGER.debug("Entering getTagsForPhoto with {}", photo);
-        List<Tag> tagList;
         try {
-            tagList = photoTagDAO.readTagsByPhoto(photo);
-            LOGGER.info("Successfully retrieved tags for {}", photo);
+            photoDAO.update(photo);
+            LOGGER.info("Successfully updated {}", photo);
         } catch (DAOException ex) {
-            LOGGER.error("Retrieving tags for {} failed due to DAOException", photo);
-            throw new ServiceException("Could not retrieve tags for photo.", ex);
+            LOGGER.error("Updating {} failed due to DAOException", photo);
+            throw new ServiceException("Could update photo.", ex);
+        } catch (ValidationException ex) {
+            LOGGER.error("Updating {} failed due to ValidationException", photo);
+            throw new ServiceException("Could not update photo.", ex);
+        }
+
+        LOGGER.debug("Leaving editPhoto with {}", photo);
+    }
+
+    @Override
+    @Deprecated
+    public void addJourneyToPhotos(List<Photo> photos, Journey journey)
+            throws ServiceException {
+        LOGGER.debug("Entering addJourneyToPhotos with {}, {}", photos, journey);
+        if (photos == null) {
+            throw new ServiceException("List<Photo> photos is null");
+        }
+        try {
+            journeyDAO.create(journey);
+        } catch (DAOException ex) {
+            LOGGER.error("Journey-creation with {}, {} failed.", journey);
+            throw new ServiceException("Creation of Journey failed.", ex);
         } catch (ValidationException e) {
             throw new ServiceException("Failed to validate entity", e);
         }
-        LOGGER.debug("Leaving getTagsForPhoto with {}", photo);
-        return tagList;
+
+        for (Photo photo : photos) {
+            photo.getPlace().setJourney(journey);
+//            exifService.exportMetaToExif(photo);
+            LOGGER.debug("Leaving addJourneyToPhotos");
+        }
     }
 
-    @Override public void savePhotoRating(Photo photo) throws ServiceException {
-        if (photo == null) throw new IllegalArgumentException();
-        LOGGER.debug("Entering savePhotoRating with {}", photo);
-        try {
-            photoDAO.update(photo);
-            LOGGER.info("Successfully saved rating for {}", photo);
-        } catch (DAOException ex) {
-            LOGGER.error("Saving rating for {} failed to to DAOException", photo);
-            throw new ServiceException("Could not store rating of photo.", ex);
-        } catch (ValidationException ex) {
-            LOGGER.error("Saving rating for {} failed to to ValidationException", photo);
-            throw new ServiceException("Could not store rating of photo.", ex);
+    @Override
+    @Deprecated
+    public void addPlaceToPhotos(List<Photo> photos, Place place)
+            throws ServiceException {
+        LOGGER.debug("Entering addPlaceToPhotos with {}, {}", photos, place);
+        if (photos == null) {
+            throw new ServiceException("List<Photo> photos is null");
         }
-        LOGGER.debug("Leaving savePhotoRating with {}", photo);
+
+        for (Photo photo : photos) {
+//            exifService.exportMetaToExif(photo);
+        }
+        Photo p = new Photo();
+        p.setPlace(place);
+        editPhotos(photos, p);
+        LOGGER.debug("Leaving addPlaceToPhotos");
+    }
+
+    @Override
+    public void close() {
+        executorService.shutdown();
     }
 }

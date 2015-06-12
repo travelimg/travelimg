@@ -6,6 +6,9 @@ import org.apache.commons.imaging.ImageWriteException;
 
 import java.io.IOException;
 
+/**
+ * Exception for service errors.
+ */
 public class ServiceException extends Exception {
     public ServiceException() {
     }

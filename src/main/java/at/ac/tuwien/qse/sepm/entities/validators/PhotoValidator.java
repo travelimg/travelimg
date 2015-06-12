@@ -2,8 +2,6 @@ package at.ac.tuwien.qse.sepm.entities.validators;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 
-import java.io.File;
-
 public class PhotoValidator {
 
     public static void validate(Photo entity) throws ValidationException {

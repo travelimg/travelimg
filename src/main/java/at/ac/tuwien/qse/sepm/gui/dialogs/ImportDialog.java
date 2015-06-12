@@ -2,18 +2,16 @@ package at.ac.tuwien.qse.sepm.gui.dialogs;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
+import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.ImageFileFilter;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -33,17 +31,22 @@ import java.util.List;
  */
 public class ImportDialog extends ResultDialog<List<Photo>> {
 
-    private PhotographerService photographerService;
-
-    @FXML private Button browseButton;
-    @FXML private TextField directoryField;
-    @FXML private Button importButton;
-    @FXML private Button cancelButton;
-    @FXML private Label statusText;
-    @FXML private Button addPhotographerButton;
-    @FXML private ComboBox<Photographer> photographerBox;
-
     private final List<Photo> photos = new LinkedList<>();
+    private PhotographerService photographerService;
+    @FXML
+    private Button browseButton;
+    @FXML
+    private TextField directoryField;
+    @FXML
+    private Button importButton;
+    @FXML
+    private Button cancelButton;
+    @FXML
+    private Label statusText;
+    @FXML
+    private Button addPhotographerButton;
+    @FXML
+    private ComboBox<Photographer> photographerBox;
     private ObservableList<Photographer> photographers = FXCollections.observableArrayList();
 
     /**
@@ -84,13 +87,13 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
         try {
             photographers.addAll(photographerService.readAll());
         } catch (ServiceException ex) {
-            // TODO: show error dialog
+            ErrorDialog.show(getParent(), "Fehler beim Auslesen der Fotografen", "Fehlermeldung: " + ex.getMessage());
         }
 
         photographerBox.setItems(photographers);
 
         // select the first photographer
-        if(photographers.size() > 0) {
+        if (photographers.size() > 0) {
             photographerBox.getSelectionModel().select(0);
         }
     }
@@ -116,12 +119,13 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
         assert (directory.exists()); // import button should be disabled otherwise
 
         Photographer photographer = photographerBox.getSelectionModel().getSelectedItem();
+        Place place = new Place(1, "Unkown place", "Unknown place", 0.0, 0.0, null);
 
         // Fetch all photos from the directory.
         ArrayList<Photo> photos = new ArrayList<>();
         for (final File file : directory.listFiles(new ImageFileFilter())) {
             if (!file.isDirectory()) {
-                photos.add(new Photo(null, photographer, file.getPath(), Rating.NONE, null, 0.0, 0.0));
+                photos.add(new Photo(null, photographer, file.getPath(), Rating.NONE, null, 0.0, 0.0, place));
             }
         }
 
@@ -166,7 +170,8 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
         statusText.setText(String.format("%d Fotos ausgewählt", count));
     }
 
-    @FXML private void addPhotographer(Event event) {
+    @FXML
+    private void addPhotographer(Event event) {
         try {
             // add new photographer to application
             Photographer photographer = photographerService.create(new Photographer(-1, "Neuer Fotograf"));
@@ -174,14 +179,14 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
             photographers.add(photographer);
             photographerBox.getSelectionModel().select(photographer);
         } catch (ServiceException ex) {
-            // TODO
+            ErrorDialog.show(getParent(), "Fehler beim Hinzufügen", "Fehlermeldung: " + ex.getMessage());
         }
     }
 
     private void handlePhotographerChanged(ObservableValue<? extends Photographer> observable, Photographer oldValue, Photographer newValue) {
-        if(oldValue == null) return;
-        if(oldValue.equals(newValue)) return;
-        if(oldValue.getId() != newValue.getId()) return;
+        if (oldValue == null) return;
+        if (oldValue.equals(newValue)) return;
+        if (oldValue.getId().intValue() != newValue.getId().intValue()) return;
 
         // update name of photographer
         try {
@@ -191,7 +196,7 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
             int index = photographerBox.getSelectionModel().getSelectedIndex();
             photographers.set(index, newValue);
         } catch (ServiceException ex) {
-            // TODO
+            ErrorDialog.show(getParent(), "Fehler beim Ändern", "Fehlermeldung: " + ex.getMessage());
         }
     }
 }

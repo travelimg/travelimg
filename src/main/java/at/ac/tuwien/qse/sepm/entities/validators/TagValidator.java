@@ -12,7 +12,7 @@ public class TagValidator {
      *            something other than whitespaces;
      * @throws ValidatorException if any precondition is violated
      */
-    public static void validate(Tag tag) throws ValidationException{
+    public static void validate(Tag tag) throws ValidationException {
         if (tag == null) {
             throw new ValidationException("Entity must not be null");
         }
@@ -33,7 +33,7 @@ public class TagValidator {
      * @param tag must not be null;  <tt>tag.id</tt> must not be null and non-negative
      * @throws ValidationException if any precondition is violated
      */
-    public static void validateID(Tag tag) throws ValidationException{
+    public static void validateID(Tag tag) throws ValidationException {
         if (tag == null) {
             throw new ValidationException("Entity must not be null");
         }

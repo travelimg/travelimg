@@ -13,7 +13,7 @@ public interface PhotographerDAO {
      * @param photographer Photographer to create
      * @return The created photographer
      * @throws ValidationException If the photographer is invalid
-     * @throws DAOException If the photographer cannot be created or the data store fails to create a record.
+     * @throws DAOException        If the photographer cannot be created or the data store fails to create a record.
      */
     Photographer create(Photographer photographer) throws DAOException, ValidationException;
 
@@ -21,7 +21,7 @@ public interface PhotographerDAO {
      * Update given photgrapher
      *
      * @param photographer The photographer to be updated.
-     * @throws DAOException If the photographer can not be updated.
+     * @throws DAOException        If the photographer can not be updated.
      * @throws ValidationException If the photographer is invalid
      */
     void update(Photographer photographer) throws DAOException, ValidationException;

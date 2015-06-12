@@ -3,14 +3,12 @@ package at.ac.tuwien.qse.sepm.gui;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,6 +27,7 @@ public class FilterList<E> extends VBox {
     private final Map<E, CheckItem> items = new IdentityHashMap<>();
 
     private Consumer<List<E>> changeHandler;
+    private boolean suppressChangeEvents = false;
 
     public FilterList(Function<E, String> valueConverter) {
         if (valueConverter == null) throw new IllegalArgumentException();
@@ -103,11 +102,17 @@ public class FilterList<E> extends VBox {
     }
 
     public void checkAll() {
+        suppressChangeEvents = true;
         items.keySet().forEach(this::check);
+        suppressChangeEvents = false;
+        onChange();
     }
 
     public void uncheckAll() {
+        suppressChangeEvents = true;
         items.keySet().forEach(this::uncheck);
+        suppressChangeEvents = false;
+        onChange();
     }
 
     public void setChangeHandler(Consumer<List<E>> changeHandler) {
@@ -115,7 +120,7 @@ public class FilterList<E> extends VBox {
     }
 
     private void onChange() {
-        if (changeHandler != null) {
+        if (changeHandler != null && !suppressChangeEvents) {
             changeHandler.accept(getChecked());
         }
         updateHeader();
@@ -143,6 +148,8 @@ public class FilterList<E> extends VBox {
 
         private final FontAwesomeIconView icon = new FontAwesomeIconView();
         private final Label label = new Label();
+        private final ObjectProperty<CheckState> stateProperty =
+                new SimpleObjectProperty<>(this, "state", CheckState.UNCHECKED);
 
         public CheckItem() {
             getStyleClass().add("check-item");
@@ -157,11 +164,11 @@ public class FilterList<E> extends VBox {
         public ObjectProperty<CheckState> stateProperty() {
             return stateProperty;
         }
-        private final ObjectProperty<CheckState> stateProperty =
-                new SimpleObjectProperty<>(this, "state", CheckState.UNCHECKED);
+
         public CheckState getState() {
             return stateProperty().get();
         }
+
         public void setState(CheckState state) {
             stateProperty().set(state);
             update();

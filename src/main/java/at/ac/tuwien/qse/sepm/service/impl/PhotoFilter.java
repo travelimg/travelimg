@@ -1,30 +1,38 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Photographer;
-import at.ac.tuwien.qse.sepm.entities.Rating;
-import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.time.YearMonth;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 
 public class PhotoFilter implements Predicate<Photo> {
 
+    private static final Logger LOGGER = LogManager.getLogger(PhotoFilter.class);
+
     private final Set<Tag> includedCategories = new HashSet<>();
     private final Set<Photographer> includedPhotographers = new HashSet<>();
     private final Set<Rating> includedRatings = new HashSet<>();
-    private final Set<YearMonth> includedMonths = new HashSet<>();
+    private final Set<Journey> includedJourneys = new HashSet<>();
+    private final Set<Place> includedPlaces = new HashSet<>();
     private boolean untaggedIncluded = false;
 
-    public PhotoFilter() { }
+    public PhotoFilter() {
+    }
 
+    /**
+     * Instantiate new PhotoFilter as a copy of <tt>from</tt>.
+     *
+     * @param from object to be cloned; must not be null
+     */
     public PhotoFilter(PhotoFilter from) {
         getIncludedCategories().addAll(from.getIncludedCategories());
         getIncludedPhotographers().addAll(from.getIncludedPhotographers());
         getIncludedRatings().addAll(from.getIncludedRatings());
-        getIncludedMonths().addAll(from.getIncludedMonths());
+        getIncludedJourneys().addAll(from.getIncludedJourneys());
+        getIncludedPlaces().addAll(from.getIncludedPlaces());
         setUntaggedIncluded(from.isUntaggedIncluded());
     }
 
@@ -48,6 +56,15 @@ public class PhotoFilter implements Predicate<Photo> {
     }
 
     /**
+     * Get the journeys during one of which the photos must have been made.
+     *
+     * @return included journeys
+     */
+    public Set<Journey> getIncludedJourneys() {
+        return includedJourneys;
+    }
+
+    /**
      * Get the ratings a photo must have.
      *
      * @return included ratings
@@ -57,12 +74,12 @@ public class PhotoFilter implements Predicate<Photo> {
     }
 
     /**
-     * Get the months a photo must be made in.
+     * Get the places at one of which the photos must have been made.
      *
-     * @return included photographer names
+     * @return included places
      */
-    public Set<YearMonth> getIncludedMonths() {
-        return includedMonths;
+    public Set<Place> getIncludedPlaces() {
+        return includedPlaces;
     }
 
     /**
@@ -85,10 +102,11 @@ public class PhotoFilter implements Predicate<Photo> {
 
     @Override
     public boolean test(Photo photo) {
-        return  testRating(photo) &&
-                testCategories(photo) &&
-                testPhotographer(photo) &&
-                testMonth(photo);
+        return testRating(photo)
+                && testCategories(photo)
+                && testPhotographer(photo)
+                && testJourney(photo)
+                && testPlace(photo);
     }
 
     private boolean testRating(Photo photo) {
@@ -106,13 +124,34 @@ public class PhotoFilter implements Predicate<Photo> {
         return hasCategory(photo);
     }
 
-    private boolean testMonth(Photo photo) {
-        return getIncludedMonths().contains(YearMonth.from(photo.getDatetime()));
+    private boolean testJourney(Photo photo) {
+        Journey journey = null;
+        if (photo.getPlace() != null)
+            journey = photo.getPlace().getJourney();
+
+        for (Journey j : getIncludedJourneys()) {
+            if (j == null) {
+                if (journey == null) {
+                    return true; // belongs to no journey
+                }
+            } else {
+                if (j.equals(journey))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean testPlace(Photo photo) {
+        return getIncludedPlaces().contains(photo.getPlace());
     }
 
     private boolean hasCategory(Photo photo) {
         for (Tag category : getIncludedCategories()) {
-            if (photo.getTags().contains(category)) return true;
+            if (photo.getTags().contains(category)) {
+                return true;
+            }
         }
         return false;
     }

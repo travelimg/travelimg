@@ -3,9 +3,8 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<BorderPane fx:id="root" prefWidth="240.0" styleClass="organizer" stylesheets="@style.css"
-            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="240.0" styleClass="organizer"
+            stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
             fx:controller="at.ac.tuwien.qse.sepm.gui.Organizer">
     <center>
         <ScrollPane hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
@@ -33,6 +32,16 @@
                         <Tooltip text="Von Flickr importieren"/>
                     </tooltip>
                 </Button>
+
+                <Button fx:id="addJourneyButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                    <graphic>
+                        <FontAwesomeIconView glyphName="PLUS"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Reise hinzufügen"/>
+                    </tooltip>
+                </Button>
+
                 <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                     <graphic>
                         <FontAwesomeIconView glyphName="EXPAND"/>

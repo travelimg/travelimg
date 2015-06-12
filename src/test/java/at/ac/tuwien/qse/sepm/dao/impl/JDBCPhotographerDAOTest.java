@@ -8,23 +8,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static junit.framework.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertTrue;
 
 @UsingTable("Photographer")
 public class JDBCPhotographerDAOTest extends AbstractJDBCDAOTest {
 
-    @Autowired PhotographerDAO photographerDAO;
+    @Autowired
+    PhotographerDAO photographerDAO;
 
     @Test
     public void testWithEmptyDB() throws DAOException {
-        assertEquals(0, countRows());
+        assertThat(countRows(), is(0));
     }
 
     @Test
     @WithData
     public void testWithData() throws DAOException {
-        assertEquals(photographerDAO.readAll().size(), countRows());
+        assertThat(photographerDAO.readAll().size(), is(countRows()));
     }
 
     @Test(expected = ValidationException.class)
@@ -38,20 +41,20 @@ public class JDBCPhotographerDAOTest extends AbstractJDBCDAOTest {
     public void createWithValidParameterShouldPersist() throws ValidationException, DAOException {
         int nrOfRows = countRows();
         Photographer p = photographerDAO.create(new Photographer(null, "Enri"));
-        assertEquals(nrOfRows+1, countRows());
+        assertThat(countRows(), is(nrOfRows + 1));
     }
 
     @Test(expected = ValidationException.class)
     @WithData
     public void updateWithInvalidNameShouldThrow() throws DAOException, ValidationException {
-        photographerDAO.update(new Photographer(1,""));
+        photographerDAO.update(new Photographer(1, ""));
     }
 
     @Test
     @WithData
     public void updateWithValidNameShouldUpdate() throws DAOException, ValidationException {
-        photographerDAO.update(new Photographer(1,"Enri"));
-        assertEquals("Enri",photographerDAO.getById(1).getName());
+        photographerDAO.update(new Photographer(1, "Enri"));
+        assertThat(photographerDAO.getById(1).getName(), equalTo("Enri"));
     }
 
     @Test(expected = DAOException.class)
@@ -65,13 +68,13 @@ public class JDBCPhotographerDAOTest extends AbstractJDBCDAOTest {
     public void readWithValidIdShouldReturnPhotographer() throws DAOException {
         Photographer p = photographerDAO.getById(1);
         assertTrue(p.getName().equals("Test Photographer"));
-        assertEquals(1, countRowsWhere("name = 'Test Photographer'"));
+        assertThat(countRowsWhere("name = 'Test Photographer'"), is(1));
     }
 
     @Test
     @WithData
     public void readAllShouldReturnPhotographers() throws DAOException {
         List<Photographer> photographers = photographerDAO.readAll();
-        assertEquals(countRows(), photographers.size());
+        assertThat(photographers.size(), is(countRows()));
     }
 }

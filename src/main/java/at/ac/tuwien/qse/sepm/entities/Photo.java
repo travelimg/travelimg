@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Photo {
 
+    private final List<Tag> tags = new ArrayList<>();
     private Integer id;
     private Photographer photographer;
     private String path;
@@ -14,12 +15,12 @@ public class Photo {
     private LocalDateTime datetime;
     private double latitude;
     private double longitude;
-    private final List<Tag> tags = new ArrayList<>();
+    private Place place;
 
     public Photo() {
     }
 
-    public Photo(Integer id, Photographer photographer, String path, Rating rating, LocalDateTime datetime, double latitude, double longitude) {
+    public Photo(Integer id, Photographer photographer, String path, Rating rating, LocalDateTime datetime, double latitude, double longitude, Place place) {
         this.id = id;
         this.photographer = photographer;
         this.path = path;
@@ -27,6 +28,7 @@ public class Photo {
         this.datetime = datetime;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.place = place;
     }
 
     public Photo(Photo other) {
@@ -37,6 +39,15 @@ public class Photo {
         this.datetime = other.datetime;
         this.latitude = other.latitude;
         this.longitude = other.longitude;
+        this.place = other.place;
+    }
+
+    public Place getPlace() {
+        return place;
+    }
+
+    public void setPlace(Place place) {
+        this.place = place;
     }
 
     public Integer getId() {
@@ -59,16 +70,16 @@ public class Photo {
         return rating;
     }
 
+    public void setRating(Rating rating) {
+        this.rating = rating;
+    }
+
     public Photographer getPhotographer() {
         return photographer;
     }
 
     public void setPhotographer(Photographer photographer) {
         this.photographer = photographer;
-    }
-
-    public void setRating(Rating rating) {
-        this.rating = rating;
     }
 
     public LocalDateTime getDatetime() {
@@ -113,6 +124,7 @@ public class Photo {
         if (id != null ? !id.equals(photo.id) : photo.id != null) return false;
         if (photographer != null ? !photographer.equals(photo.photographer) : photo.photographer != null) return false;
         if (rating != null ? !rating.equals(photo.rating) : photo.rating != null) return false;
+        if (place != null ? place.getId() != photo.getPlace().getId() : place != null) return false;
         return !(datetime != null ? !datetime.equals(photo.datetime) : photo.datetime != null);
 
     }
@@ -143,6 +155,7 @@ public class Photo {
                 ", datetime=" + datetime +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
+                ", place=" + place +
                 '}';
     }
 }

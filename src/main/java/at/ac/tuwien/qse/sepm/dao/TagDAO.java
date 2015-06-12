@@ -25,6 +25,14 @@ public interface TagDAO {
      */
     Tag read(Tag t) throws DAOException;
 
+    /**
+     * Retrieve an existing Tag
+     *
+     * @param t Specifies which Tag to retrieve by providing the name.
+     * @return the Tag-Objekt
+     * @throws DAOException If the Tag can not be retrieved or the data store fails to select the record.
+     */
+    Tag readName(Tag t) throws DAOException;
 
     /**
      * Delete an existing Tag.

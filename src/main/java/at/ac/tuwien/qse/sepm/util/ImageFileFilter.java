@@ -23,7 +23,7 @@ public class ImageFileFilter implements FileFilter {
         return allowedExtensions.contains(extension);
     }
 
-    public String getExtension(String file){
+    public String getExtension(String file) {
         String extension = "";
 
         int i = file.lastIndexOf('.');

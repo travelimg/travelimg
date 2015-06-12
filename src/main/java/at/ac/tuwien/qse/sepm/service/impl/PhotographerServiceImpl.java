@@ -5,7 +5,6 @@ import at.ac.tuwien.qse.sepm.dao.PhotographerDAO;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
-import at.ac.tuwien.qse.sepm.service.Service;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,7 +43,7 @@ public class PhotographerServiceImpl implements PhotographerService {
 
         try {
             return photographerDAO.readAll();
-        } catch(DAOException ex) {
+        } catch (DAOException ex) {
             LOGGER.debug("Failed to retrieve all photographers", ex);
             throw new ServiceException("Failed to retrieve all photographers", ex);
         }

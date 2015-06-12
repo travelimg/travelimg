@@ -1,9 +1,7 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 
-import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.DropboxService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
@@ -16,7 +14,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,18 +53,24 @@ public class DropboxServiceImpl implements DropboxService {
             LOGGER.error("Could not find dropbox configuration file");
             throw new ServiceException("Could not find dropbox configuration file");
         }
+        LOGGER.debug("dropbox info path is {}", dropboxInfoPath);
 
         String info;
         try {
+            LOGGER.debug("reading dropbox info file");
             info = new String(Files.readAllBytes(dropboxInfoPath));
+            LOGGER.debug("read dropbox info file");
         } catch (IOException ex) {
             LOGGER.error("Failed to read dropbox configuration file", ex);
             throw new ServiceException("Failed to read dropbox configuration file", ex);
         }
 
         try {
+            LOGGER.debug("parsing dropbox info file to JSON");
             JSONObject obj = new JSONObject(info);
-            return obj.getJSONObject("personal").getString("path");
+            String dropboxPath = obj.getJSONObject("personal").getString("path");
+            LOGGER.debug("found dropbox path as {}", dropboxPath);
+            return dropboxPath;
         } catch (JSONException ex) {
             LOGGER.error("Failed to retrieve dropbox folder location", ex);
             return "";
@@ -76,6 +79,7 @@ public class DropboxServiceImpl implements DropboxService {
 
     @Override
     public Cancelable uploadPhotos(List<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
+        LOGGER.debug("uploading photos to {}", destination);
         AsyncExporter exporter = new AsyncExporter(photos, destination, callback, errorHandler);
         executorService.submit(exporter);
 
@@ -103,12 +107,17 @@ public class DropboxServiceImpl implements DropboxService {
 
         @Override
         protected void execute() {
-
+            LOGGER.debug("executing async Dropbox exporter");
             Path dest;
             // get the target path by combining dropbox root folder and the destination inside the dropbox folder
             try {
-                dest = Paths.get(getDropboxFolder(), destination);
-                if(!Files.exists(dest)) {
+                String dropboxPath = getDropboxFolder();
+                LOGGER.debug("building destination from {} and {}", dropboxPath, destination);
+
+                dest = Paths.get(dropboxPath, destination);
+                LOGGER.debug("destination is {}", destination);
+                if (!Files.exists(dest)) {
+                    LOGGER.debug("destination does not exist at {}", dest);
                     throw new ServiceException("Can't upload to dropboxfolder which does not exist: " + dest.toString());
                 }
             } catch (ServiceException ex) {
@@ -117,7 +126,7 @@ public class DropboxServiceImpl implements DropboxService {
                 return;
             }
 
-            for(Photo photo: photos) {
+            for (Photo photo : photos) {
                 if (!isRunning())
                     return;
 

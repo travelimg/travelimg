@@ -2,6 +2,8 @@ package at.ac.tuwien.qse.sepm.gui;
 
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
+import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -16,9 +18,6 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.List;
 
 
@@ -42,8 +41,12 @@ public class FullscreenWindow extends AnchorPane {
 
     private int activeIndex = 0;
 
-    public FullscreenWindow() {
+    private ImageCache imageCache;
+
+    public FullscreenWindow(ImageCache imageCache) {
         FXMLLoadHelper.load(this, this, FullscreenWindow.class, "view/FullScreenDialog.fxml");
+
+        this.imageCache = imageCache;
     }
 
     @FXML
@@ -59,20 +62,22 @@ public class FullscreenWindow extends AnchorPane {
                 if (keyEvent.getCode() == KeyCode.RIGHT) {
                     bt_nextPressed(null);
                 }
-                if(keyEvent.getCode() == KeyCode.LEFT){
+                if (keyEvent.getCode() == KeyCode.LEFT) {
                     bt_previousPressed(null);
                 }
-                if(keyEvent.getCode() == KeyCode.ESCAPE){
+                if (keyEvent.getCode() == KeyCode.ESCAPE) {
                     stage.close();
                 }
             }
         });
     }
 
-    public void present(List<Photo> photos) {
+    public void present(List<Photo> photos, Photo initial) {
         this.photos = photos;
 
-        if(activeIndex >= photos.size()) {
+        activeIndex = photos.indexOf(initial);
+
+        if (activeIndex < 0) {
             activeIndex = 0;
         }
 
@@ -97,7 +102,7 @@ public class FullscreenWindow extends AnchorPane {
         logger.info("Button previous pressed!");
 
         activeIndex--;
-        if(activeIndex < 0)
+        if (activeIndex < 0)
             activeIndex += photos.size();
         activeIndex = activeIndex % photos.size();
 
@@ -110,21 +115,11 @@ public class FullscreenWindow extends AnchorPane {
             return;
         }
 
-        try {
-            image = new Image(
-                    new FileInputStream(
-                            new File(
-                                    photos.get(activeIndex).getPath())),
-                    0,
-                    0,
-                    true,
-                    true
-            );
+        image = imageCache.get(photos.get(activeIndex), ImageSize.ORIGINAL);
+        imageView.setImage(image);
 
-            imageView.setImage(image);
-        } catch (FileNotFoundException ex) {
-            logger.error("Could not find photo", ex);
-        }
+        // handling of images in original size can consume a lot of memory so collect it here
+        System.gc();
     }
 
 }

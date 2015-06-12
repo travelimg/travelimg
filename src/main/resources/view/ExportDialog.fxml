@@ -3,8 +3,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<fx:root styleClass="dialog,export-dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane"
-         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root xmlns:fx="http://javafx.com/fxml/1" styleClass="dialog,export-dialog" stylesheets="@style.css"
+         type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8">
     <children>
         <BorderPane prefWidth="560.0" maxHeight="Infinity">
             <top>
@@ -39,7 +39,8 @@
                         <HBox spacing="8.0">
                             <children>
                                 <Button fx:id="cancelButton" alignment="CENTER_RIGHT" text="ABBRECHEN"/>
-                                <Button fx:id="exportButton" alignment="CENTER_RIGHT" styleClass="primary" text="EXPORTIEREN"/>
+                                <Button fx:id="exportButton" alignment="CENTER_RIGHT" styleClass="primary"
+                                        text="EXPORTIEREN"/>
                             </children>
                         </HBox>
                     </right>
