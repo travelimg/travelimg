@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.service.GeoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -23,7 +24,15 @@ public class GeoServiceImpl implements GeoService {
         String json = readUrl(
                 "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + ","
                         + longitude);
-        JSONObject obj = new JSONObject(json);
+        JSONObject obj = null;
+        try{
+            obj = new JSONObject(json);
+        }
+        catch(JSONException e){
+            logger.error("Error in JSON file {}", e.getMessage());
+            throw new ServiceException(e);
+        }
+
         String status = obj.getString("status");
         if (!status.equals("OK")) {
             return p;
