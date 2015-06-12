@@ -1,9 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui.impl;
 
-import at.ac.tuwien.qse.sepm.entities.Exif;
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Rating;
-import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.*;
 import at.ac.tuwien.qse.sepm.gui.dialogs.DeleteDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
@@ -16,6 +13,7 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -60,6 +58,8 @@ public class InspectorImpl implements Inspector {
     @FXML
     private TableColumn<String, String> exifValue;
     @FXML
+    private ComboBox cb_getSlideshows;
+    @FXML
     private TableView<Pair<String, String>> exifTable;
     private TagSelector tagSelector;
     private GoogleMapsScene mapsScene;
@@ -76,6 +76,8 @@ public class InspectorImpl implements Inspector {
     private TagService tagService;
     @Autowired
     private RatingPicker ratingPicker;
+    @Autowired
+    private SlideshowService slideshowService;
 
     @Override public Collection<Photo> getActivePhotos() {
         return new ArrayList<>(activePhotos);
@@ -127,6 +129,7 @@ public class InspectorImpl implements Inspector {
         dropboxButton.setOnAction(this::handleDropbox);
         mapContainer.getChildren().add(mapsScene.getMapView());
         tagSelectionContainer.getChildren().add(tagSelector);
+        getAllSlideshowsToComboBox();
 
     }
 
@@ -323,6 +326,25 @@ public class InspectorImpl implements Inspector {
             if (updateNeeded)
                 onUpdate();
         }
+
+    }
+
+    private void getAllSlideshowsToComboBox() {
+
+
+        try {
+            List<Slideshow> slideshows;
+            slideshows= slideshowService.getAllSlideshows();
+
+
+            for (int i = 0; i < slideshows.size(); i++)
+                cb_getSlideshows.getItems().addAll(slideshows.get(i).getName());
+
+        } catch (ServiceException e) {
+            e.printStackTrace();
+        }
+        //ArrayList<Slideshow> p = new ArrayList<Slideshow>(slideshows);
+        //ObservableList<Slideshow> observableList1 = FXCollections.observableArrayList(p);
 
     }
 }

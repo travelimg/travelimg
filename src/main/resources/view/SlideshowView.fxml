@@ -5,4 +5,5 @@
             stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8"
             fx:controller="at.ac.tuwien.qse.sepm.gui.SlideshowView">
 
+    <right><fx:include source="/view/SlideshowInspector.fxml"></fx:include></right>
 </BorderPane>
