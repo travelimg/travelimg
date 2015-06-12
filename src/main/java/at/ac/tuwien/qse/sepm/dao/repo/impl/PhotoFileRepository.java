@@ -94,7 +94,59 @@ public class PhotoFileRepository extends RunnablePhotoRepository {
             throw new PhotoNotFoundException(this, file);
         }
 
-        throw new UnsupportedOperationException();
+        Path temp = file.resolve(".temp");
+        InputStream is = null;
+        OutputStream os = null;
+        try {
+            try {
+                is = Files.newInputStream(file);
+            } catch (IOException ex) {
+                LOGGER.warn("failed creating input stream for file {}", file);
+                throw new PersistenceException(ex);
+            }
+
+            try {
+                os = Files.newOutputStream(temp);
+            } catch (IOException ex) {
+                LOGGER.warn("failed creating output stream for file {}", temp);
+                throw new PersistenceException();
+            }
+
+            serializer.update(is, os, photo.getData());
+
+            try {
+                Files.copy(temp, file, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException ex) {
+                LOGGER.warn("failed copying {} -> {}", temp, file);
+                throw new PersistenceException(ex);
+            }
+
+        } finally {
+            try {
+                if (is != null) {
+                    is.close();
+                }
+            } catch (IOException ex) {
+                LOGGER.warn("failed closing input stream for file {}");
+                LOGGER.error(ex);
+            }
+            try {
+                if (os != null) {
+                    os.close();
+                }
+            } catch (IOException ex) {
+                LOGGER.warn("failed closing output stream for file {}");
+                LOGGER.error(ex);
+            }
+            try {
+                if (Files.exists(temp)) {
+                    Files.delete(temp);
+                }
+            } catch (IOException ex) {
+                LOGGER.warn("failed deleting temp file {}", temp);
+                LOGGER.error(ex);
+            }
+        }
     }
 
     @Override public void delete(Path file) throws PersistenceException {
