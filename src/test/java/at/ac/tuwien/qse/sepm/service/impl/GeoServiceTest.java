@@ -11,6 +11,7 @@ import org.mockito.stubbing.Answer;
 
 import java.io.File;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -36,6 +37,30 @@ public class GeoServiceTest extends ServiceTestBase {
         Place p = geoService.getPlaceByGeoData(43.325430, 15.028193);
         assertThat(p.getCity(), equalTo("Unknown city"));
         assertThat(p.getCountry(), equalTo("Unknown country"));
+    }
+
+    @Test
+    public void testOnlyCountryAvailable() throws ServiceException {
+        switchArgumentOfReadUrlMethod("ok_nocity_noadmarealvl1_country.json");
+        Place p = geoService.getPlaceByGeoData(41.5042718,19.5180115);
+        assertThat(p.getCity(), equalTo("Unknown city"));
+        assertThat(p.getCountry(), equalTo("Albanien"));
+    }
+
+    @Test
+    public void testStatusOkCityNotAvailableButAdministrativeAreaLevel1AndCountryAvailable() throws ServiceException {
+        switchArgumentOfReadUrlMethod("ok_nocity_admarealvl1_country.json");
+        Place p = geoService.getPlaceByGeoData(35.102218,24.959834);
+        assertThat(p.getCity(), equalTo("Kreta"));
+        assertThat(p.getCountry(), equalTo("Griechenland"));
+    }
+
+    @Test
+    public void testStatusOkCityAndCountryAvailable() throws ServiceException {
+        switchArgumentOfReadUrlMethod("ok_city_country.json");
+        Place p = geoService.getPlaceByGeoData(48.224904,16.214717);
+        assertThat(p.getCity(), equalTo("Wien"));
+        assertThat(p.getCountry(), containsString("sterreich"));
     }
 
     /**

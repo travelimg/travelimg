@@ -35,24 +35,35 @@ public class GeoServiceImpl implements GeoService {
 
         String status = obj.getString("status");
         if (!status.equals("OK")) {
+            logger.debug("Status is {}",status);
             return p;
         }
-        JSONArray results = obj.getJSONArray("results");
-        JSONObject result = results.getJSONObject(0);
-        JSONArray addressComponentsArray = result.getJSONArray("address_components");
 
-        for (int i = 0; i < addressComponentsArray.length(); i++) {
-            if (addressComponentsArray.getJSONObject(i).getJSONArray("types").get(0).equals(
-                    "locality")) {
-                p.setCity(addressComponentsArray.getJSONObject(i).getString("long_name"));
-            }
-            else if (addressComponentsArray.getJSONObject(i).getJSONArray("types").get(0).equals(
-                    "administrative_area_level_1")) {
-                p.setCity(addressComponentsArray.getJSONObject(i).getString("long_name"));
-            }
-            if (addressComponentsArray.getJSONObject(i).getJSONArray("types").get(0).equals(
-                    "country")){
-                p.setCountry(addressComponentsArray.getJSONObject(i).getString("long_name"));
+        JSONArray results = obj.getJSONArray("results");
+        logger.debug("Got {} address_components",results.length());
+        for(int i = 0; i<results.length(); i++){
+            JSONObject result = results.getJSONObject(i);
+            JSONArray addressComponentsArray = result.getJSONArray("address_components");
+            for (int j = 0; j < addressComponentsArray.length(); j++) {
+                if(!p.getCity().equals("Unknown city") && !p.getCountry().equals("Unknown country")){
+                    //stop here, as we found the city and country
+                    break;
+                }
+                if (p.getCountry().equals("Unknown country") && addressComponentsArray.getJSONObject(j).getJSONArray("types").get(0).equals(
+                        "country")){
+                    logger.debug("Found country {} at address_component[{}]",addressComponentsArray.getJSONObject(j).getString("long_name"),i);
+                    p.setCountry(addressComponentsArray.getJSONObject(j).getString("long_name"));
+                }
+                if (p.getCity().equals("Unknown city") && addressComponentsArray.getJSONObject(j).getJSONArray("types").get(0).equals(
+                        "locality")) {
+                    logger.debug("Found city {} at address_component[{}]",addressComponentsArray.getJSONObject(j).getString("long_name"),i);
+                    p.setCity(addressComponentsArray.getJSONObject(j).getString("long_name"));
+                }
+                else if (p.getCity().equals("Unknown city") && addressComponentsArray.getJSONObject(j).getJSONArray("types").get(0).equals(
+                        "administrative_area_level_1")) {
+                    logger.debug("Found administrative level area {} at address_component[{}]",addressComponentsArray.getJSONObject(j).getString("long_name"),i);
+                    p.setCity(addressComponentsArray.getJSONObject(j).getString("long_name"));
+                }
             }
         }
 
