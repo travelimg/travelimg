@@ -23,8 +23,6 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
 
     private static final String READ_ALL_STATEMENT = "SELECT id, photo_id, slideshow_id, orderposition FROM SLIDE;";
 
-    //private static final String
-
     private SimpleJdbcInsert insertSlide;
 
     @Override
@@ -38,11 +36,10 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
 
 
     @Override public void create(Slide slide) throws DAOException, ValidationException {
-
         logger.debug("Creating slide {}",slide);
 
         try {
-            Map<String, Object> parameters = new HashMap<String, Object>(1);
+            Map<String, Object> parameters = new HashMap<>();
             parameters.put("id", slide.getId());
             parameters.put("photo_id", slide.getPhoto_id());
             parameters.put("slideshow_id",slide.getSlideshow_id());
@@ -53,8 +50,6 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
             logger.error("Failed to create slide", ex);
             throw new DAOException("Failed to create slide", ex);
         }
-
-
     }
 
     @Override public void delete(Slide slide) throws DAOException, ValidationException {
@@ -67,15 +62,16 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
         try {
             return jdbcTemplate.query(READ_ALL_STATEMENT, new RowMapper<Slide>() {
                 @Override public Slide mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    return new Slide(rs.getInt(1),rs.getInt(2),rs.getInt(3),rs.getInt(4));
+                    return new Slide(
+                            rs.getInt(1),
+                            rs.getInt(2),
+                            rs.getInt(3),
+                            rs.getInt(4)
+                    );
                 }
             });
         } catch (DataAccessException e) {
             throw new DAOException("Failed to read all slides", e);
-        } catch (RuntimeException ex) {
-            throw new DAOException(ex.getCause());
         }
     }
-
-
 }

@@ -13,7 +13,7 @@ public class Slide {
     private Integer slideshow_id;
     private Integer order;
 
-    public Slide(Integer id, Integer photo_id, Integer slideshow_id,Integer order){
+    public Slide(Integer id, Integer photo_id, Integer slideshow_id, Integer order){
 
         this.id = id;
         this.photo_id = photo_id;

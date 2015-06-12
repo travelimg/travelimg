@@ -5,14 +5,12 @@ import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
 import at.ac.tuwien.qse.sepm.service.SlideshowService;
-import at.ac.tuwien.qse.sepm.gui.grid.ImageGrid;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +64,7 @@ public class SlideshowView {
     }
 
     @FXML
-    private void initialize(){
+    private void initialize() {
 
         //gridContainer.setContent(grid);
 
@@ -78,8 +76,7 @@ public class SlideshowView {
 
 
 
-    public void addPhotoToGrid(List<Photo> photos)
-    {
+    public void addPhotoToGrid(List<Photo> photos) {
         //selectedPhotos= photoGrid.getSelectedPhotos();
         LOGGER.debug(photos.get(0).getPath());
         //grid.addItem(photos.get(0)); TODO:
@@ -126,8 +123,7 @@ public class SlideshowView {
         LOGGER.debug("Done!");
     }
 
-    private void getAllSlideshowsToComboBox()
-    {
+    private void getAllSlideshowsToComboBox() {
 
 
         try {
@@ -135,7 +131,7 @@ public class SlideshowView {
             slideshows= slideShowService.getAllSlideshows();
 
 
-            for(int i=0; i<slideshows.size(); i++)
+            for (int i = 0; i < slideshows.size(); i++)
                 cb_getSlideshows.getItems().addAll(slideshows.get(i).getName());
 
         } catch (ServiceException e) {
@@ -146,19 +142,16 @@ public class SlideshowView {
 
     }
 
-    private void createSlideshow()
-    {
+    private void createSlideshow() {
         try {
             Slideshow slideshow = new Slideshow();
 
             List<Slideshow> slideshows;
             //slideshows= slideShowService.getAllSlideshows();
 
-            if(tf_slideName.getText().isEmpty()) {
+            if (tf_slideName.getText().isEmpty()) {
                 LOGGER.debug("Bitte geben Sie einen Namen für die Slideshow ein!");//TODO: Show an InfoBox
-            }
-            else
-            {
+            } else {
                 slideshow.setId(1);
                 slideshow.setName(tf_slideName.getText());
                 slideshow.setDurationBetweenPhotos(5.0);

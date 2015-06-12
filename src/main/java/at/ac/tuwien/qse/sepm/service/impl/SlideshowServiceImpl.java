@@ -28,7 +28,7 @@ public class SlideshowServiceImpl implements SlideshowService {
 
         try {
             slideshowDAO.create(slideshow);
-        } catch(DAOException | ValidationException ex) {
+        } catch (DAOException | ValidationException ex) {
             throw new ServiceException("Failed to create slideshow",ex);
         }
 
@@ -40,7 +40,7 @@ public class SlideshowServiceImpl implements SlideshowService {
 
         try {
             slideshowDAO.delete(slideshow);
-        } catch(DAOException | ValidationException ex) {
+        } catch (DAOException | ValidationException ex) {
             throw new ServiceException("Failed to delete slideshow",ex);
         }
     }
@@ -50,7 +50,7 @@ public class SlideshowServiceImpl implements SlideshowService {
 
         try {
             return slideshowDAO.readAll();
-        } catch(DAOException ex) {
+        } catch (DAOException ex) {
             throw new ServiceException("Failed to return a List of slideshows",ex);
         }
     }

@@ -23,22 +23,19 @@ public class SlideServiceImpl implements SlideService{
     private SlideDAO slideDAO;
 
     @Override public void create(Slide slide) throws ServiceException {
-        try
-        {
+        try {
             slideDAO.create(slide);
 
-        } catch( DAOException | ValidationException ex) {
+        } catch (DAOException | ValidationException ex) {
             throw new ServiceException("Failed to create Slide", ex);
         }
     }
 
     @Override public void delete(Slide slide) throws ServiceException {
 
-        try
-        {
+        try {
             slideDAO.delete(slide);
-
-        } catch( DAOException | ValidationException ex) {
+        } catch (DAOException | ValidationException ex) {
             throw new ServiceException("Failed to delete slide", ex);
         }
     }

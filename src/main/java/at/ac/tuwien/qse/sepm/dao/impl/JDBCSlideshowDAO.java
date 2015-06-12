@@ -25,10 +25,7 @@ import java.util.Map;
  */
 public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
     private static final String READ_ALL_STATEMENT = "SELECT id, name, durationbetweenphotos FROM SLIDESHOW;";
-
 
     private SimpleJdbcInsert insertSlideshow;
 
@@ -44,28 +41,22 @@ public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
 
     @Override
     public void create(Slideshow slideshow) throws DAOException, ValidationException {
-        LOGGER.debug("Entering createSlideshow with {}",slideshow);
+        logger.debug("Creating slideshow {}", slideshow);
 
+        SlideshowValidator.validate(slideshow);
         SlideshowValidator.validateID(slideshow.getId());
 
-        logger.debug("Creating slideshow {}",slideshow);
-        logger.debug(slideshow.getId());
-
         try {
-            Map<String, Object> parameters = new HashMap<String, Object>(1);
+            Map<String, Object> parameters = new HashMap<>();
             parameters.put("id", slideshow.getId());
             parameters.put("name", slideshow.getName());
-            parameters.put("durationbetweenphotos",slideshow.getDurationBetweenPhotos());
+            parameters.put("durationbetweenphotos", slideshow.getDurationBetweenPhotos());
             Number newId = insertSlideshow.executeAndReturnKey(parameters);
             slideshow.setId((int) newId.longValue());
         } catch (DataAccessException ex) {
             logger.error("Failed to create slideshow", ex);
             throw new DAOException("Failed to create slideshow", ex);
         }
-
-
-
-        //return null;
     }
 
     @Override
@@ -90,14 +81,15 @@ public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
         try {
             return jdbcTemplate.query(READ_ALL_STATEMENT, new RowMapper<Slideshow>() {
                 @Override public Slideshow mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    return new Slideshow(rs.getInt(1),rs.getString(2),rs.getDouble(3));
+                    return new Slideshow(
+                            rs.getInt(1),
+                            rs.getString(2),
+                            rs.getDouble(3)
+                    );
                 }
             });
         } catch (DataAccessException e) {
             throw new DAOException("Failed to read all slides", e);
-        } catch (RuntimeException ex) {
-            throw new DAOException(ex.getCause());
         }
     }
-
 }
