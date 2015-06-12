@@ -27,14 +27,12 @@
 
             </center>
             <bottom>
-               <VBox fx:id="tree">
-                   <children>
+                <Pane fx:id="tree">
+                    <children>
 
-                   </children>
-                   <padding>
-                       <Insets left="10.0" top="5.0" />
-                   </padding>
-               </VBox>
+                    </children>
+
+                </Pane>
             </bottom>
          <padding>
             <Insets top="5.0" />
@@ -47,16 +45,23 @@
                 <VBox fx:id="mapContainer" maxHeight="300.0" />
             </top>
             <center>
-                <ScrollPane fx:id="scrollPhotoView" prefWidth="500" prefHeight="400" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
-                    <VBox fx:id="photoView">
-                        <children>
+                <BorderPane fx:id="FotoContainer" prefWidth="30" >
+                    <top>
 
-                        </children>
-                        <padding>
-                            <Insets left="10.0" top="5.0" />
-                        </padding>
-                    </VBox>
-                </ScrollPane>
+                    </top>
+                    <center>
+                    <ScrollPane fx:id="scrollPhotoView" prefWidth="500" prefHeight="400" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
+                        <VBox fx:id="photoView">
+                            <children>
+
+                            </children>
+                                <padding>
+                                  <Insets left="10.0" top="5.0" />
+                                </padding>
+                       </VBox>
+                     </ScrollPane>
+                    </center>
+                </BorderPane>
             </center>
 
         </BorderPane>

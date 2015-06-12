@@ -14,6 +14,7 @@ import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.Polyline;
 import com.lynden.gmapsfx.shapes.PolylineOptions;
+import com.sun.javafx.scene.text.TextLine;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -27,9 +28,12 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,11 +50,12 @@ import static java.util.Collections.*;
 
 public class HighlightsViewController {
 
-    @FXML private BorderPane borderPane;
+    @FXML private BorderPane borderPane,FotoContainer;
     @FXML private GoogleMapsScene mapsScene;
-    @FXML private VBox journeys, mapContainer, photoView, tree;
+    @FXML private VBox journeys, mapContainer, photoView;
     @FXML private FilterList<Journey> journeyListView;
     @FXML private ScrollPane scrollPhotoView;
+    @FXML private Pane tree;
     @Autowired private ClusterService clusterService;
     @Autowired private PhotoService photoService;
     @Autowired private PhotoFilter filter;
@@ -70,6 +75,7 @@ public class HighlightsViewController {
     private TreeView<String> treeView;
     private static final Logger LOGGER = LogManager.getLogger();
     private ImageCache imageCache;
+    private Line redLine;
     @FXML
     private StrokeLineCap lineCap;
 
@@ -96,14 +102,15 @@ public class HighlightsViewController {
         vBox.getChildren().add(playButton);
         borderPane.setBottom(vBox);
         /**to remove - END**/
-        Line redLine = new Line(20, 20, 900, 20);
-        redLine.setStroke(Color.BLUE);
-        redLine.setStrokeWidth(10);
-        redLine.setStrokeLineCap(StrokeLineCap.BUTT);
+        redLine = new Line(100, 50, 100, 500);
+        redLine.setStroke(Color.DARKGRAY);
+        redLine.setStrokeWidth(3);
+        redLine.setStrokeLineCap(StrokeLineCap.ROUND);
 
-        redLine.getStrokeDashArray().addAll(15d, 5d, 15d, 15d, 20d);
+        redLine.getStrokeDashArray().addAll(2D, 21D);
         redLine.setStrokeDashOffset(30);
-        mapContainer.getChildren().add(redLine);
+
+
 
     }
 
@@ -245,7 +252,9 @@ public class HighlightsViewController {
                             }
                         }
                         HashMap<LocalDateTime,Place> orderedPlaces = new HashMap<>();
+
                         for(Place ple : places.keySet()){
+
                             LocalDateTime min = LocalDateTime.MAX;
                             for(Photo p: places.get(ple)){
                                 if(p.getDatetime().compareTo(min)<0){
@@ -297,29 +306,30 @@ public class HighlightsViewController {
                         }
                         treeView = new TreeView<>(rootItem);
                         tree.getChildren().add(new Label("Zeitlicher Verlaufder Reise"));
-                        tree.getChildren().add(treeView);
+                        tree.getChildren().add(redLine);
+
+                        double distance = redLine.getEndY()-redLine.getStartY();
+
+                        int anz = places.size();
+                        int dist = 550 / anz;
+                        int counter =0;
+                        for(Place p : places.keySet()){
+
+                            Line l = new Line(100,50 + counter * dist,109,50 + counter * dist);
+                            l.setStroke(Color.DARKGRAY);
+                            l.setStrokeWidth(4);
+                            l.setStrokeLineCap(StrokeLineCap.ROUND);
+                            Text text = new Text(120,53 + counter * dist,p.getCountry());
+                            LocalDateTime pTime = places.get(p).get(0).getDatetime();
+                            Text text2 = new Text(4,53 + counter * dist,pTime.getYear()+"-"+pTime.getMonthValue()+"-"+pTime.getDayOfMonth());
+                            tree.getChildren().addAll(l,text,text2);
+                            counter++;
+                        }
+
+                       // tree.getChildren().add(treeView);
 
                         photoView.getChildren().addAll(overall);
-//                        List<Tag> taglist = tagService.getMostFrequentTags(goodPhotos);
-//                        photoView.getChildren().clear();
-//                        for (Tag t : taglist) {
-//                            List<Photo> name = new ArrayList<>();
-//                            int counter = 0;
-//                            for (Photo p : goodPhotos) {
-//                                for (Tag t2 : p.getTags()) {
-//                                    if (t.getId() == t2.getId() && counter < 5) {
-//                                        name.add(p);
-//                                        counter++;
-//                                    }
-//                                }
-//                            }
-//
-//                            ImageGrid grid2 = new ImageGrid(imageCache);
-//                            grid2.setPhotos(name);
-//                            TitledPane tp = new TitledPane(t.getName(), grid2);
-//
-//                            photoView.getChildren().add(tp);
-//                        }
+
                     } catch (ServiceException e) {
                         LOGGER.debug("Photos habe keine Tag's ", e);
                         photoView.getChildren().clear();
@@ -342,6 +352,36 @@ public class HighlightsViewController {
         }
     }
 
+    /**
+     * Returns the radius
+     * @param degrees
+     * @return the dadius
+     */
+    public double ToRadians(double degrees) {
+        double radians = degrees * Math.PI / 180;
+        return radians;
+    }
+
+    /**
+     * Retruns the distance between 2 LatLong Objekts
+     * @param lat1
+     * @param lng1
+     * @param lat2
+     * @param lng2
+     * @return
+     */
+    public double DirectDistance(double lat1, double lng1, double lat2, double lng2) {
+        double earthRadius = 3958.75;
+        double dLat = ToRadians(lat2-lat1);
+        double dLng = ToRadians(lng2-lng1);
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(ToRadians(lat1)) * Math.cos(ToRadians(lat2)) *
+                        Math.sin(dLng/2) * Math.sin(dLng/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double dist = earthRadius * c;
+        double meterConversion = 1609.00;
+        return dist * meterConversion;
+    }
 
 
     private void drawDestinationsAsPolyline(LatLong[] path){
