@@ -2,7 +2,6 @@ package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.service.GeoService;
-import at.ac.tuwien.qse.sepm.service.Service;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.json.JSONArray;
@@ -20,25 +19,30 @@ public class GeoServiceImpl implements GeoService {
 
     public Place getPlaceByGeoData(double latitude, double longitude) throws ServiceException {
         logger.debug("getPlaceByGeoData() Latitude: " + latitude + " Longitude: " + longitude);
+        Place p = new Place(1, "Unknown city", "Unknown country", latitude, longitude, null);
         String json = readUrl(
                 "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + ","
                         + longitude);
         JSONObject obj = new JSONObject(json);
         String status = obj.getString("status");
         if (!status.equals("OK")) {
-            throw new ServiceException("Coordinates are wrong or no information available!");
+            return p;
         }
         JSONArray results = obj.getJSONArray("results");
         JSONObject result = results.getJSONObject(0);
         JSONArray addressComponentsArray = result.getJSONArray("address_components");
-        Place p = new Place(1, "Unknown place", "Unknown place", latitude, longitude, null);
+
         for (int i = 0; i < addressComponentsArray.length(); i++) {
-            if (addressComponentsArray.getJSONObject(i).getJSONArray("types").get(0)
-                    .equals("locality")) {
+            if (addressComponentsArray.getJSONObject(i).getJSONArray("types").get(0).equals(
+                    "locality")) {
                 p.setCity(addressComponentsArray.getJSONObject(i).getString("long_name"));
             }
-            if (addressComponentsArray.getJSONObject(i).getJSONArray("types").get(0)
-                    .equals("country")) {
+            else if (addressComponentsArray.getJSONObject(i).getJSONArray("types").get(0).equals(
+                    "administrative_area_level_1")) {
+                p.setCity(addressComponentsArray.getJSONObject(i).getString("long_name"));
+            }
+            if (addressComponentsArray.getJSONObject(i).getJSONArray("types").get(0).equals(
+                    "country")){
                 p.setCountry(addressComponentsArray.getJSONObject(i).getString("long_name"));
             }
         }
@@ -46,7 +50,7 @@ public class GeoServiceImpl implements GeoService {
         return p;
     }
 
-    private String readUrl(String urlString) throws ServiceException {
+    public String readUrl(String urlString) throws ServiceException {
 
         URL url;
         try {
