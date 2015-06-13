@@ -17,18 +17,18 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class ImageGrid extends TilePane {
+public class ImageGrid<T extends ImageGridTile> extends TilePane {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final ImageCache imageCache;
-    private final Supplier<ImageGridTile> tileFactory;
+    private final Supplier<T> tileFactory;
 
     protected List<Photo> photos = new ArrayList<>();
-    protected final List<ImageGridTile> tiles = new LinkedList<>();
+    protected final List<T> tiles = new LinkedList<>();
     private Consumer<Set<Photo>> selectionChangeAction = null;
 
-    public ImageGrid(ImageCache imageCache, Supplier<ImageGridTile> tileFactory) {
+    public ImageGrid(ImageCache imageCache, Supplier<T> tileFactory) {
         this.imageCache = imageCache;
         this.tileFactory = tileFactory;
 
@@ -90,7 +90,7 @@ public class ImageGrid extends TilePane {
     private void addPhoto(Photo photo) {
         Image image = imageCache.get(photo, ImageSize.MEDIUM);
 
-        ImageGridTile tile = tileFactory.get();
+        T tile = tileFactory.get();
         tile.setPhoto(photo, image);
 
         tile.setOnMouseClicked(event -> handleTileClicked(tile, event));
@@ -98,6 +98,8 @@ public class ImageGrid extends TilePane {
         // add tile to page
         tiles.add(tile);
         getChildren().add(tile);
+
+        onTileAdded(tile);
     }
 
     private void handleTileClicked(ImageGridTile tile, MouseEvent event) {
@@ -128,6 +130,10 @@ public class ImageGrid extends TilePane {
     protected void onSelectionChange() {
         if (selectionChangeAction == null) return;
         selectionChangeAction.accept(getSelectedItems());
+    }
+
+    protected void onTileAdded(T tile) {
+
     }
 
     private Set<Photo> getSelectedItems() {
