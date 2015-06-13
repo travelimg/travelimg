@@ -5,6 +5,8 @@ import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideshowService;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -22,10 +24,20 @@ public class SlideshowOrganizer {
     @Autowired
     private SlideshowService slideshowService;
 
+    private ObjectProperty<Slideshow> selectedSlideshowProperty = new SimpleObjectProperty<>();
+
+    public ObjectProperty<Slideshow> getSelectedSlideshowProperty() {
+        return selectedSlideshowProperty;
+    }
+
     @FXML
     private void initialize() {
         slideshowList.setCellFactory(new SlideshowCellFactory());
-        
+        slideshowList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            selectedSlideshowProperty.setValue(newValue);
+        });
+
+        selectedSlideshowProperty.setValue(null);
         loadSlideshows();
     }
 

@@ -42,6 +42,11 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
 
     }
 
+    public void clear() {
+        tiles.clear();
+        getChildren().clear();
+    }
+
     public void setSelectionChangeAction(Consumer<Set<Photo>> selectionChangeAction) {
         this.selectionChangeAction = selectionChangeAction;
     }

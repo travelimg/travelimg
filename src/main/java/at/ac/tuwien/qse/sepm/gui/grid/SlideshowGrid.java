@@ -1,7 +1,13 @@
 package at.ac.tuwien.qse.sepm.gui.grid;
 
 
+import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Slide;
+import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class SlideshowGrid extends ImageGrid<SlideGridTile> {
 
@@ -9,6 +15,14 @@ public class SlideshowGrid extends ImageGrid<SlideGridTile> {
         super(imageCache, SlideGridTile::new);
     }
 
+    public void setSlideshow(Slideshow slideshow) {
+        clear();
+        List<Photo> photos = slideshow.getSlides().stream()
+                .map(Slide::getPhoto)
+                .collect(Collectors.toList());
+
+        setPhotos(photos);
+    }
 
     @Override
     protected void onTileAdded(SlideGridTile tile) {

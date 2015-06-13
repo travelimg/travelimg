@@ -59,20 +59,16 @@ public class SlideshowView {
 
         getAllSlideshowsToComboBox();
 
+        slideshowOrganizer.getSelectedSlideshowProperty().addListener((observable, oldValue, newValue) -> {
+            grid.setSlideshow(newValue);
+        });
+
     }
 
     private void getAllSlideshowsToComboBox() {
         try {
             List<Slideshow> slideshows;
             slideshows = slideShowService.getAllSlideshows();
-
-            List<Photo> photos = slideshows.get(0).getSlides().stream()
-                    .map(Slide::getPhoto)
-                    .collect(Collectors.toList());
-
-            grid.setPhotos(photos);
-
-
 
             for (int i = 0; i < slideshows.size(); i++)
                 cb_getSlideshows.getItems().addAll(slideshows.get(i).getName());
