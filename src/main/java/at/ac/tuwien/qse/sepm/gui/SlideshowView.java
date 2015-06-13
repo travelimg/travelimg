@@ -36,7 +36,8 @@ public class SlideshowView {
     @FXML private ComboBox cb_getSlideshows;
     @FXML private TextField tf_slideName;
 
-    private SlideshowOrganizer slideshowOrganizer = new SlideshowOrganizer();
+    @Autowired
+    private SlideshowOrganizer slideshowOrganizer
 
     private SlideshowGrid grid = null;
 
@@ -112,7 +113,7 @@ public class SlideshowView {
 
     }
 
-    private void handlesetShowSlides(Event event){
+    private void handlesetShowSlides(Event event) {
         createSlideshow();
     }
 

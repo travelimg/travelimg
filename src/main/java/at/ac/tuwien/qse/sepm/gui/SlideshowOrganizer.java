@@ -22,10 +22,6 @@ public class SlideshowOrganizer {
     @Autowired
     private SlideshowService slideshowService;
 
-    public SlideshowOrganizer() {
-
-    }
-
     @FXML
     private void initialize() {
         slideshowList.setCellFactory(new SlideshowCellFactory());
