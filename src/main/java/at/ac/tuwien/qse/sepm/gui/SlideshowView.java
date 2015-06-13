@@ -28,7 +28,6 @@ public class SlideshowView {
 
     @Autowired private SlideService slideService;
     @Autowired private SlideshowService slideShowService;
-    @Autowired private ImageCache imageCache;
 
     @FXML private BorderPane root;
     @FXML private ScrollPane gridContainer;
@@ -47,8 +46,6 @@ public class SlideshowView {
 
     @Autowired
     public void setImageCache(ImageCache imageCache) {
-        this.imageCache = imageCache;
-
         if (grid == null) {
             this.grid = new SlideshowGrid(imageCache);
         }
