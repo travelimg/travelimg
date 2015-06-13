@@ -47,6 +47,7 @@ public class PollingFileWatcher implements FileWatcher {
     }
 
     @Override public Collection<Path> index() {
+        refresh();
         return new HashSet<>(watched);
     }
 
