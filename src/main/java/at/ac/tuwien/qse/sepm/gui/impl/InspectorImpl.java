@@ -47,8 +47,6 @@ public class InspectorImpl implements Inspector {
     @FXML
     private Button dropboxButton;
     @FXML
-    private Button addToSlideshowButton;
-    @FXML
     private VBox tagSelectionContainer;
     @FXML
     private VBox mapContainer;
@@ -84,7 +82,6 @@ public class InspectorImpl implements Inspector {
     private RatingPicker ratingPicker;
     @Autowired
     private SlideshowService slideshowService;
-
 
     @Override public Collection<Photo> getActivePhotos() {
         return new ArrayList<>(activePhotos);
