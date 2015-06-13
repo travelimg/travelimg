@@ -57,7 +57,7 @@ public class SlideshowView {
     private void initialize() {
         gridContainer.setContent(grid);
 
-        //Btn_Add.setOnAction(this::handlesetShowSlides);
+        Btn_Add.setOnAction(this::handlesetShowSlides);
 
         getAllSlideshowsToComboBox();
 

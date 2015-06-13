@@ -15,4 +15,5 @@
                     fitToWidth="true" fitToHeight="true"/>
     </center>
 
+    <right><fx:include source="/view/SlideshowInspector.fxml"></fx:include></right>
 </BorderPane>

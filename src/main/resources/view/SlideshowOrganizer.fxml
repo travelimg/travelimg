@@ -1,14 +1,38 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
-<taglib xmlns="http://java.sun.com/xml/ns/javaee"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
-        version="2.1">
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="240.0" styleClass="organizer"
+            stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
+            fx:controller="at.ac.tuwien.qse.sepm.gui.SlideshowOrganizer">
+    <center>
+        <ScrollPane hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
+            <ListView fx:id="slideshowList">
 
-    <tlib-version>1.0</tlib-version>
-    <short-name>myshortname</short-name>
-    <uri>http://mycompany.com</uri>
-
-    <!-- Invoke 'Generate' action to add tags or functions -->
-
-</taglib>
+            </ListView>
+        </ScrollPane>
+    </center>
+    <bottom>
+        <HBox prefHeight="40.0" styleClass="navbar">
+            <children>
+                <Button fx:id="importButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                    <graphic>
+                        <FontAwesomeIconView glyphName="Add"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="TODO"/>
+                    </tooltip>
+                </Button>
+                <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                    <graphic>
+                        <FontAwesomeIconView glyphName="EXPAND"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="TODO"/>
+                    </tooltip>
+                </Button>
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>
