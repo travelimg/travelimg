@@ -1,19 +1,15 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
 import at.ac.tuwien.qse.sepm.dao.repo.FileWatcher;
-import at.ac.tuwien.qse.sepm.dao.repo.PersistenceException;
-import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class PollingFileWatcher implements FileWatcher {
 
@@ -23,7 +19,7 @@ public class PollingFileWatcher implements FileWatcher {
 
     private final Set<String> extensions = new HashSet<>();
     private final Set<Path> directories = new HashSet<>();
-    private final Set<Path> knownFiles = new HashSet<>();
+    private final Set<Path> watched = new HashSet<>();
     private final Map<Path, LocalDateTime> modified = new HashMap<>();
     private final Collection<Listener> listeners = new LinkedList<>();
 
@@ -50,8 +46,12 @@ public class PollingFileWatcher implements FileWatcher {
         return checkExtension(file) && checkDirectories(file);
     }
 
+    @Override public boolean watches(Path file) {
+        return watched.contains(file);
+    }
+
     @Override public Collection<Path> index() {
-        return new HashSet<>(knownFiles);
+        return new HashSet<>(watched);
     }
 
     @Override public void register(Path directory) {
@@ -89,16 +89,19 @@ public class PollingFileWatcher implements FileWatcher {
      * If this is the first refresh, all existing files trigger create events.
      */
     public void refresh() {
+        LOGGER.debug("currently watching {} files", watched.size());
+        LOGGER.debug("refreshing");
         Set<Path> physicalFiles = listFiles();
         Set<Path> files = new HashSet<>(physicalFiles);
-        files.addAll(knownFiles);
+        files.addAll(watched);
+        LOGGER.debug("now watching {} files", watched.size());
         files.forEach(file -> refresh(physicalFiles, file));
     }
 
     // Refreshes a single file.
     private void refresh(Set<Path> physicalFiles, Path file) {
         boolean isPhysical = physicalFiles.contains(file);
-        boolean isKnown = knownFiles.contains(file);
+        boolean isKnown = watched.contains(file);
         if (isPhysical && isKnown) {
             LocalDateTime knownModified = modified.get(file);
             LocalDateTime physicalModified = getLastModified(file);
@@ -107,11 +110,11 @@ public class PollingFileWatcher implements FileWatcher {
                 modified.put(file, physicalModified);
             }
         } else if (isPhysical) {
-            knownFiles.add(file);
+            watched.add(file);
             modified.put(file, LocalDateTime.now());
             listeners.forEach(l -> l.onCreate(this, file));
         } else if (isKnown) {
-            knownFiles.remove(file);
+            watched.remove(file);
             modified.remove(file);
             listeners.forEach(l -> l.onDelete(this, file));
         }
@@ -152,6 +155,7 @@ public class PollingFileWatcher implements FileWatcher {
             // NOTE: The path may not exist, or it may be a file, or something else. There is a lot
             // that can happen from outside the application, so we just have to ignore such errors.
             LOGGER.warn("failed listing contents for directory {}", directory);
+            LOGGER.error("error: ", ex);
         }
     }
 
