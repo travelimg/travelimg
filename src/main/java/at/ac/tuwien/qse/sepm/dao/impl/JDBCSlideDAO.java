@@ -45,7 +45,7 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
     }
 
 
-    @Override public void create(Slide slide) throws DAOException, ValidationException {
+    @Override public Slide create(Slide slide) throws DAOException, ValidationException {
         logger.debug("Creating slide {}",slide);
 
         try {
@@ -56,6 +56,8 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
             parameters.put("orderposition",slide.getOrder());
             Number newId = insertSlide.executeAndReturnKey(parameters);
             slide.setId((int) newId.longValue());
+
+            return slide;
         } catch (DataAccessException ex) {
             logger.error("Failed to create slide", ex);
             throw new DAOException("Failed to create slide", ex);

@@ -17,7 +17,7 @@ public interface SlideDAO {
      * @throws DAOException
      * @throws ValidationException
      */
-    void create(Slide slide) throws DAOException, ValidationException;
+    Slide create(Slide slide) throws DAOException, ValidationException;
 
     /**
      * Delete the photo from the slide
