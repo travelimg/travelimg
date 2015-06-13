@@ -122,22 +122,6 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
         }
     }
 
-    /**
-     * Create and return a WikiPlaceInfo object for the given Place <tt>place</tt>.
-     *
-     * @param place must contain non-null and non-empty entries for <tt>place.city</tt>
-     *              <tt>place.country</tt>
-     * @return a new WikiPlaceInfo object for the given Place. The fields may not all be
-     *     initialized - sometimes not all information can be found
-     * @throws DAOException if an exception occurs on DAO level
-     * @throws ValidationException if <tt>place</tt> isn't a valid object
-     */
-    @Override
-    public WikiPlaceInfo createWikiPlaceInfo(Place place) throws DAOException, ValidationException {
-        //TODO implement method
-        return null;
-    }
-
     private class PlaceMapper implements RowMapper<Place> {
         @Override
         public Place mapRow(ResultSet rs, int rowNum) throws SQLException {
