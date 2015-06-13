@@ -19,23 +19,6 @@ public class PhotoFilter implements Predicate<Photo> {
     private final Set<Place> includedPlaces = new HashSet<>();
     private boolean untaggedIncluded = false;
 
-    public PhotoFilter() {
-    }
-
-    /**
-     * Instantiate new PhotoFilter as a copy of <tt>from</tt>.
-     *
-     * @param from object to be cloned; must not be null
-     */
-    public PhotoFilter(PhotoFilter from) {
-        getIncludedCategories().addAll(from.getIncludedCategories());
-        getIncludedPhotographers().addAll(from.getIncludedPhotographers());
-        getIncludedRatings().addAll(from.getIncludedRatings());
-        getIncludedJourneys().addAll(from.getIncludedJourneys());
-        getIncludedPlaces().addAll(from.getIncludedPlaces());
-        setUntaggedIncluded(from.isUntaggedIncluded());
-    }
-
     /**
      * Get the names of the categories included by the filter. A photo is included if it is tagged
      * with at least one of these categories.
