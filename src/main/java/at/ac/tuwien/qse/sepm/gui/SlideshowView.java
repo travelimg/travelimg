@@ -111,5 +111,9 @@ public class SlideshowView {
     private void handlesetShowSlides(Event event){
         createSlideshow();
     }
+
+    public void onSlidesAdded(Slideshow slideshow, List<Slide> slides) {
+        LOGGER.debug("Implement me");
+    }
     
 }
