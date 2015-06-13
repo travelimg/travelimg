@@ -1,5 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui;
 
+import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
+import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;

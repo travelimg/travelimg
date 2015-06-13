@@ -1,10 +1,13 @@
-package at.ac.tuwien.qse.sepm.gui.impl;
+package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.gui.*;
+import at.ac.tuwien.qse.sepm.gui.control.RatingPicker;
+import at.ac.tuwien.qse.sepm.gui.control.TagSelector;
+import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.dialogs.DeleteDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ExportDialog;
@@ -54,7 +57,7 @@ public class InspectorImpl implements Inspector {
     @FXML
     private VBox placeholder;
     @FXML
-    private HBox ratingPickerContainer;
+    private VBox ratingPickerContainer;
     @FXML
     private TableColumn<String, String> exifName;
     @FXML
@@ -74,8 +77,8 @@ public class InspectorImpl implements Inspector {
     private ExifService exifService;
     @Autowired
     private TagService tagService;
-    @Autowired
-    private RatingPicker ratingPicker;
+
+    private RatingPicker ratingPicker = new RatingPicker();
 
     @Override public Collection<Photo> getActivePhotos() {
         return new ArrayList<>(activePhotos);
@@ -119,10 +122,10 @@ public class InspectorImpl implements Inspector {
 
     @FXML
     private void initialize() {
-
         mapsScene = new GoogleMapsScene();
         tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService, root);
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
+        ratingPickerContainer.getChildren().add(ratingPicker);
         deleteButton.setOnAction(this::handleDelete);
         dropboxButton.setOnAction(this::handleDropbox);
         mapContainer.getChildren().add(mapsScene.getMapView());
@@ -162,9 +165,9 @@ public class InspectorImpl implements Inspector {
         if (!destinationPath.isPresent()) return;
 
         dropboxService.uploadPhotos(activePhotos, destinationPath.get(), photo -> {
-                    // TODO: progressbar
-                }, exception -> ErrorDialog.show(root, "Fehler beim Export",
-                        "Fehlermeldung: " + exception.getMessage()));
+            // TODO: progressbar
+        }, exception -> ErrorDialog.show(root, "Fehler beim Export",
+                "Fehlermeldung: " + exception.getMessage()));
     }
 
     private void handleRatingChange(Rating newRating) {

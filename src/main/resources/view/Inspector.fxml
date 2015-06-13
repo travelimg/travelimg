@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="280.0" styleClass="inspector"
             stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
-            fx:controller="at.ac.tuwien.qse.sepm.gui.Inspector">
+            fx:controller="at.ac.tuwien.qse.sepm.gui.controller.Inspector">
     <center>
         <StackPane>
             <children>
@@ -26,7 +26,7 @@
                             </children>
                         </VBox>
                         <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0"/>
-                        <fx:include source="/view/RatingPicker.fxml"/>
+                        <VBox fx:id="ratingPickerContainer"></VBox>
                         <VBox fx:id="tagSelectionContainer">
                             <VBox.margin>
                                 <Insets bottom="5"/>

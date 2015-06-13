@@ -55,12 +55,10 @@
 
     <!-- GUI controller beans -->
     <bean id="mainController" class="at.ac.tuwien.qse.sepm.gui.MainController"></bean>
-    <bean id="gridViewController" class="at.ac.tuwien.qse.sepm.gui.GridView"></bean>
+    <bean id="gridViewController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.GridViewImpl"></bean>
     <bean id="slideshowViewController" class="at.ac.tuwien.qse.sepm.gui.SlideshowView"></bean>
-    <bean id="worldmapViewController" class="at.ac.tuwien.qse.sepm.gui.WorldmapView"></bean>
-    <bean id="organizerController" class="at.ac.tuwien.qse.sepm.gui.impl.OrganizerImpl"></bean>
-    <bean id="inspectorController" class="at.ac.tuwien.qse.sepm.gui.impl.InspectorImpl"></bean>
-    <bean id="ratingPicker" class="at.ac.tuwien.qse.sepm.gui.RatingPicker"></bean>
+    <bean id="worldmapViewController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.WorldmapViewImpl"></bean>
+    <bean id="organizerController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.OrganizerImpl"></bean>
+    <bean id="inspectorController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.InspectorImpl"></bean>
     <bean id="imageCache" class="at.ac.tuwien.qse.sepm.gui.util.ImageCacheImpl"></bean>
-    <bean id="imageGridController" class="at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid"></bean>
 </beans>
