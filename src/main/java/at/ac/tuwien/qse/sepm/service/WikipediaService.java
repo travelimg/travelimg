@@ -1,11 +1,10 @@
-package at.ac.tuwien.qse.sepm.service.impl;
+package at.ac.tuwien.qse.sepm.service;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.WikiPlaceInfo;
-import at.ac.tuwien.qse.sepm.service.WikipediaService;
 
-public class WikipediaServiceImpl implements WikipediaService {
+public interface WikipediaService {
 
     /**
      * Create and return a WikiPlaceInfo object for the given Place <tt>place</tt>.
@@ -16,9 +15,5 @@ public class WikipediaServiceImpl implements WikipediaService {
      *     initialized - sometimes not all information can be found
      * @throws DAOException if an exception occurs on DAO level
      */
-    @Override
-    public WikiPlaceInfo getWikiPlaceInfo(Place place) throws DAOException {
-        //TODO implement method
-        return null;
-    }
+    WikiPlaceInfo getWikiPlaceInfo(Place place) throws DAOException;
 }
