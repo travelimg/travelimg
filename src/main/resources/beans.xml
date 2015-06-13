@@ -32,6 +32,16 @@
 
     <bean id="ioHandler" class="at.ac.tuwien.qse.sepm.util.DefaultIOHandler"></bean>
 
+    <!-- DAO beans -->
+    <bean id="photoTagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoTagDAO"></bean>
+    <bean id="photographerDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotographerDAO"></bean>
+    <bean id="tagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTagDAO"></bean>
+    <bean id="journeyDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCJourneyDAO"></bean>
+    <bean id="placeDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPlaceDAO"></bean>
+    <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
+        <constructor-arg value="${user.home}/travelimg"></constructor-arg>
+    </bean>
+
     <!-- Service beans -->
     <bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"></bean>
     <bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl"></bean>
@@ -45,16 +55,7 @@
 
     <bean id="filter" class="at.ac.tuwien.qse.sepm.service.impl.PhotoFilter"></bean>
 
-    <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
-        <constructor-arg value="${user.home}/travelimg"></constructor-arg>
-    </bean>
-
-    <bean id="photoTagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoTagDAO"></bean>
-    <bean id="photographerDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotographerDAO"></bean>
-    <bean id="tagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTagDAO"></bean>
-    <bean id="journeyDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCJourneyDAO"></bean>
-    <bean id="placeDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPlaceDAO"></bean>
-
+    <!-- GUI controller beans -->
     <bean id="mainController" class="at.ac.tuwien.qse.sepm.gui.MainController"></bean>
     <bean id="gridViewController" class="at.ac.tuwien.qse.sepm.gui.GridView"></bean>
     <bean id="slideshowViewController" class="at.ac.tuwien.qse.sepm.gui.SlideshowView"></bean>
