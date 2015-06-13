@@ -53,8 +53,6 @@
     <bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
     <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl" destroy-method="close"></bean>
 
-    <bean id="filter" class="at.ac.tuwien.qse.sepm.service.impl.PhotoFilter"></bean>
-
     <!-- GUI controller beans -->
     <bean id="mainController" class="at.ac.tuwien.qse.sepm.gui.MainController"></bean>
     <bean id="gridViewController" class="at.ac.tuwien.qse.sepm.gui.GridView"></bean>

@@ -42,8 +42,7 @@ public class OrganizerImpl implements Organizer {
     private Inspector inspectorController;
     @Autowired
     private TagService tagService;
-    @Autowired
-    private PhotoFilter filter;
+
     @FXML
     private BorderPane root;
     @FXML
@@ -68,6 +67,8 @@ public class OrganizerImpl implements Organizer {
     private FilterList<Place> placeListView;
     @FXML
     private Button resetButton;
+
+    private PhotoFilter filter = new PhotoFilter();
     private Runnable filterChangeCallback;
 
     @Override public void setPresentAction(Runnable callback) {

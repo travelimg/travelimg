@@ -48,7 +48,6 @@ public class GridView {
     private BorderPane root;
     @FXML
     private ScrollPane gridContainer;
-    private Predicate<Photo> filter = new PhotoFilter();
 
     @Autowired
     private ImageCache imageCache;
@@ -102,10 +101,10 @@ public class GridView {
         // Updated photos that no longer match the filter are removed from the grid.
         inspector.setUpdateHandler(() -> {
             inspector.getActivePhotos().stream()
-                    .filter(filter.negate())
+                    .filter(organizer.getFilter().negate())
                     .forEach(grid::removePhoto);
             inspector.getActivePhotos().stream()
-                    .filter(filter)
+                    .filter(organizer.getFilter())
                     .forEach(grid::updatePhoto);
         });
 
@@ -143,7 +142,7 @@ public class GridView {
             disableReload = true;
 
             // Ignore photos that are not part of the current filter.
-            if (!filter.test(photo)) {
+            if (!organizer.getFilter().test(photo)) {
                 disableReload = false;
                 return;
             }
@@ -154,15 +153,13 @@ public class GridView {
     }
 
     private void handleFilterChange() {
-        this.filter = organizer.getFilter();
-
         if (!disableReload)
             reloadImages();
     }
 
     private void reloadImages() {
         try {
-            grid.setPhotos(photoService.getAllPhotos(filter).stream()
+            grid.setPhotos(photoService.getAllPhotos(organizer.getFilter()).stream()
                             .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
                             .collect(Collectors.toList()));
         } catch (ServiceException ex) {
