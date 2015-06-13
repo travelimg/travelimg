@@ -44,8 +44,7 @@ public class PhotoFileRepository implements PhotoRepository {
     /**
      * {@inheritDoc}
      *
-     * This implementation checks whether the file is a child of any of the directories that are
-     * registered to the watcher.
+     * This implementation checks whether the file is recognized by the underlying watcher.
      */
     @Override public boolean accepts(Path file) {
         if (file == null) throw new IllegalArgumentException();
@@ -75,7 +74,6 @@ public class PhotoFileRepository implements PhotoRepository {
             OutputStream destination = fileManager.newOutputStream(file);
             IOUtils.copy(source, destination);
             LOGGER.debug("created {}", file);
-            notifyCreate(file);
         } catch (IOException ex) {
             throw new PersistenceException(ex);
         }
@@ -122,7 +120,6 @@ public class PhotoFileRepository implements PhotoRepository {
 
             try {
                 fileManager.copy(temp, file);
-                notifyUpdate(file);
             } catch (IOException ex) {
                 LOGGER.warn("failed copying {} -> {}", temp, file);
                 throw new PersistenceException(ex);
@@ -167,7 +164,6 @@ public class PhotoFileRepository implements PhotoRepository {
         try {
             fileManager.delete(file);
             LOGGER.info("deleted {}", file);
-            notifyDelete(file);
         } catch (IOException ex) {
             LOGGER.debug("failed deleting file {}", file);
             throw new PersistenceException(ex);
@@ -188,7 +184,7 @@ public class PhotoFileRepository implements PhotoRepository {
 
     @Override public boolean contains(Path file) throws PersistenceException {
         LOGGER.debug("contains {}", file);
-        boolean result = fileManager.isFile(file) && accepts(file);
+        boolean result = watcher.recognizes(file) && fileManager.exists(file);
         LOGGER.debug("contains is {} for {}", result, file);
         return result;
     }
