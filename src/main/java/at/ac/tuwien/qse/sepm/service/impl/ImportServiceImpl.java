@@ -22,7 +22,9 @@ import java.util.function.Consumer;
 public class ImportServiceImpl implements ImportService {
 
     private static final Logger logger = LogManager.getLogger();
-    ExecutorService executorService = Executors.newFixedThreadPool(1);
+
+    @Autowired
+    private ExecutorService executorService;
     @Autowired
     private PhotoDAO photoDAO;
     @Autowired
@@ -38,11 +40,6 @@ public class ImportServiceImpl implements ImportService {
         executorService.submit(importer);
 
         return importer;
-    }
-
-    @Override
-    public void close() {
-        executorService.shutdown();
     }
 
     private class AsyncImporter extends CancelableTask {

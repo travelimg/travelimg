@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 /**
  * Service for manipulating and organizing photos.
  */
-public interface PhotoService extends Service {
+public interface PhotoService {
 
     /**
      * delete the delivered List of Photos

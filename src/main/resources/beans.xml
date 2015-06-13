@@ -25,30 +25,23 @@
         <jdbc:script location="classpath:db/insert.sql"/>
     </jdbc:initialize-database>
 
+    <bean id="executor" class="java.util.concurrent.Executors" factory-method="newFixedThreadPool"
+            destroy-method="shutdown">
+        <constructor-arg value="1"></constructor-arg>
+    </bean>
+
     <bean id="ioHandler" class="at.ac.tuwien.qse.sepm.util.DefaultIOHandler"></bean>
 
-    <bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"
-          destroy-method="close">
-    </bean>
-
+    <!-- Service beans -->
+    <bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"></bean>
     <bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl"></bean>
-
-    <bean id="dropboxService" class="at.ac.tuwien.qse.sepm.service.impl.DropboxServiceImpl"
-          destroy-method="close">
-    </bean>
-
+    <bean id="dropboxService" class="at.ac.tuwien.qse.sepm.service.impl.DropboxServiceImpl"></bean>
     <bean id="photographerService" class="at.ac.tuwien.qse.sepm.service.impl.PhotographerServiceImpl"></bean>
-
     <bean id="tagService" class="at.ac.tuwien.qse.sepm.service.impl.TagServiceImpl"></bean>
-
     <bean id="exifService" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
     <bean id="geoService" class="at.ac.tuwien.qse.sepm.service.impl.GeoServiceImpl"></bean>
-
     <bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
-
-    <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl"
-          destroy-method="close">
-    </bean>
+    <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl" destroy-method="close"></bean>
 
     <bean id="filter" class="at.ac.tuwien.qse.sepm.service.impl.PhotoFilter"></bean>
 

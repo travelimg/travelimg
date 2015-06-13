@@ -38,12 +38,15 @@ public class FlickrServiceImpl implements FlickrService {
     private static final String tmpDir = "src/main/resources/tmp/";
     private static final Logger logger = LogManager.getLogger();
     private static int nrOfPhotosToDownload = 10;
-    private ExecutorService executorService = Executors.newFixedThreadPool(1);
     private AsyncDownloader downloader;
     private Flickr flickr;
     private int i = 0;
+
     @Autowired
     private PhotographerService photographerService;
+    @Autowired
+    private ExecutorService executorService;
+
 
     public FlickrServiceImpl() {
         this.flickr = new Flickr(API_KEY, SECRET, new REST());
@@ -66,8 +69,6 @@ public class FlickrServiceImpl implements FlickrService {
 
     @Override
     public void close() {
-        logger.debug("Shutting down executor...");
-        executorService.shutdown();
         File directory = new File(tmpDir);
         if (directory.exists()) {
             File[] files = directory.listFiles();
