@@ -355,7 +355,7 @@ public class InspectorImpl implements Inspector {
     private void handleAddToSlideShow(Event event) {
         SlideshowView slideshowView = new SlideshowView();
         slideshowView.setItem(activePhotos.get(0));
-        LOGGER.debug("Done");
+        LOGGER.debug("Added Slides");
         Slide slide = new Slide();
 
         try
