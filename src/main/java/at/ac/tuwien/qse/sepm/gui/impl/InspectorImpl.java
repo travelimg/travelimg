@@ -61,6 +61,8 @@ public class InspectorImpl implements Inspector {
     @FXML
     private ComboBox<Slideshow> slideshowsCombobox;
     @FXML
+    private Button addToSlideshowButton;
+    @FXML
     private TableView<Pair<String, String>> exifTable;
     private TagSelector tagSelector;
     private GoogleMapsScene mapsScene;
