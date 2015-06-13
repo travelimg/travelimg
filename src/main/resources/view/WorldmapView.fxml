@@ -3,6 +3,6 @@
 <?import javafx.scene.layout.BorderPane?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="border"
             stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8"
-            fx:controller="at.ac.tuwien.qse.sepm.gui.WorldmapView">
+            fx:controller="at.ac.tuwien.qse.sepm.gui.controller.WorldmapView">
 
 </BorderPane>

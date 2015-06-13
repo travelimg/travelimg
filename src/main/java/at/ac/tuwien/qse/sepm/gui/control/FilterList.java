@@ -1,4 +1,4 @@
-package at.ac.tuwien.qse.sepm.gui;
+package at.ac.tuwien.qse.sepm.gui.control;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ObjectProperty;

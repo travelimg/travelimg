@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * Service for uploading photos to dropbox
  */
-public interface DropboxService extends Service {
+public interface DropboxService {
 
     /**
      * Fetch the dropbox base directory.

@@ -36,7 +36,8 @@ public class DropboxServiceImpl implements DropboxService {
             "AppData/Roaming/Dropbox/info.json"
     );
 
-    ExecutorService executorService = Executors.newFixedThreadPool(1);
+    @Autowired
+    private ExecutorService executorService;
 
     @Autowired
     private IOHandler ioHandler;
@@ -84,11 +85,6 @@ public class DropboxServiceImpl implements DropboxService {
         executorService.submit(exporter);
 
         return exporter;
-    }
-
-    @Override
-    public void close() {
-        executorService.shutdown();
     }
 
     private class AsyncExporter extends CancelableTask {

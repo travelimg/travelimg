@@ -33,11 +33,11 @@ public class ExifServiceImpl implements ExifService {
             .ofPattern("yyyy:MM:dd HH:mm:ss");
 
     @Autowired
-    PhotoService photoService;
+    private PhotoService photoService;
     @Autowired
-    TagService tagService;
+    private TagService tagService;
     @Autowired
-    ClusterService clusterService;
+    private ClusterService clusterService;
 
     @Override
     public Exif getExif(Photo photo) throws ServiceException {

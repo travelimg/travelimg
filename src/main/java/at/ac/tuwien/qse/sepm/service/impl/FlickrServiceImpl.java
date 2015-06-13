@@ -38,12 +38,15 @@ public class FlickrServiceImpl implements FlickrService {
     private static final String tmpDir = "src/main/resources/tmp/";
     private static final Logger logger = LogManager.getLogger();
     private static int nrOfPhotosToDownload = 10;
-    private ExecutorService executorService = Executors.newFixedThreadPool(1);
     private AsyncDownloader downloader;
     private Flickr flickr;
     private int i = 0;
+
     @Autowired
     private PhotographerService photographerService;
+    @Autowired
+    private ExecutorService executorService;
+
 
     public FlickrServiceImpl() {
         this.flickr = new Flickr(API_KEY, SECRET, new REST());
@@ -66,8 +69,6 @@ public class FlickrServiceImpl implements FlickrService {
 
     @Override
     public void close() {
-        logger.debug("Shutting down executor...");
-        executorService.shutdown();
         File directory = new File(tmpDir);
         if (directory.exists()) {
             File[] files = directory.listFiles();
@@ -88,7 +89,7 @@ public class FlickrServiceImpl implements FlickrService {
      * @param progressCallback     callback object for the progress of the download
      * @throws ServiceException
      */
-    private void downloadPhotoFromFlickr(String url, String id, String format, int nrOfDownloadedPhotos, Consumer<Double> progressCallback) throws ServiceException {
+    public void downloadPhotoFromFlickr(String url, String id, String format, int nrOfDownloadedPhotos, Consumer<Double> progressCallback) throws ServiceException {
         BufferedInputStream in = null;
         FileOutputStream fout = null;
         try {
@@ -123,25 +124,33 @@ public class FlickrServiceImpl implements FlickrService {
         }
     }
 
+
     /**
      * Creates photo with geo data. This photo is available at flickr.
      *
      * @param id     the id of the photo at flickr
      * @param format the format of the photo
      * @return the photo
-     * @throws ServiceException
+     * @throws ServiceException if the id or format is not correct or if the a photo with that id
+     * doesn't exist.
      */
-    private at.ac.tuwien.qse.sepm.entities.Photo createPhotoWithGeoData(String id, String format) throws ServiceException {
-        at.ac.tuwien.qse.sepm.entities.Photo downloaded = new at.ac.tuwien.qse.sepm.entities.Photo();
-        try {
-            GeoData geoData = flickr.getPhotosInterface().getGeoInterface().getLocation(id);
-            downloaded.setPath(tmpDir + id + "." + format);
-            downloaded.setLatitude(geoData.getLatitude());
-            downloaded.setLongitude(geoData.getLongitude());
-            downloaded.setRating(Rating.NONE);
-        } catch (FlickrException e) {
-            throw new ServiceException(e.getMessage(), e);
+    public at.ac.tuwien.qse.sepm.entities.Photo createPhotoWithGeoData(String id, String format)
+            throws ServiceException {
+        logger.debug("Creating photo with geo data with id: {} and format: {}", id, format);
+        if(id==null || format == null){
+            throw new ServiceException("Photo id or format invalid.");
         }
+        GeoData geoData = null;
+        try {
+            geoData = flickr.getPhotosInterface().getGeoInterface().getLocation(id);
+        } catch (FlickrException e) {
+           throw new ServiceException(e.getMessage());
+        }
+        at.ac.tuwien.qse.sepm.entities.Photo created = new at.ac.tuwien.qse.sepm.entities.Photo();
+        created.setPath(tmpDir + id + "." + format);
+        created.setLatitude(geoData.getLatitude());
+        created.setLongitude(geoData.getLongitude());
+        created.setRating(Rating.NONE);
 
         // attach flickr photographer
         Photographer photographer = photographerService.readAll()
@@ -149,10 +158,10 @@ public class FlickrServiceImpl implements FlickrService {
                 .filter(p -> p.getId() == 2)
                 .findFirst()
                 .orElse(new Photographer(1, null)); // default photographer
-        downloaded.setPhotographer(photographer);
-        downloaded.setPlace(new Place(1, "Unkown place", "Unknown place", 0.0, 0.0, null));
+        created.setPhotographer(photographer);
+        created.setPlace(new Place(1, "Unknown city", "Unknown country", 0.0, 0.0, null));
 
-        return downloaded;
+        return created;
     }
 
     private class AsyncDownloader extends CancelableTask {

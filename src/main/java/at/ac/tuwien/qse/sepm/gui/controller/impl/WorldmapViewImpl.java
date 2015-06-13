@@ -1,7 +1,9 @@
-package at.ac.tuwien.qse.sepm.gui;
+package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.gui.GoogleMapsScene;
+import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import javafx.fxml.FXML;
@@ -12,32 +14,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WorldmapView {
+public class WorldmapViewImpl implements WorldmapView {
     private static final org.apache.logging.log4j.Logger logger = LogManager
-            .getLogger(WorldmapView.class);
+            .getLogger(WorldmapViewImpl.class);
+
     @FXML
     private BorderPane border;
     private GoogleMapsScene worldMap;
     @Autowired
     private PhotoService photoService;
 
-    public WorldmapView() {
-
-    }
-
-    @FXML
-    private void initialize() {
-
-    }
-
+    @Override
     public GoogleMapsScene getMap() {
         return this.worldMap;
     }
 
+    @Override
     public void setMap(GoogleMapsScene map) {
-        logger.debug("Worldmap wird erstellt");
-
-
         this.worldMap = map;
 
         worldMap.removeAktiveMarker();
@@ -59,7 +52,7 @@ public class WorldmapView {
      * @param p    a photo to be added
      * @return true if the Photo is entitled to be added
      */
-    public boolean checkDouble(List<Photo> list, Photo p) {
+    private boolean checkDouble(List<Photo> list, Photo p) {
 
         for (Photo photo : list) {
             if (p.getLatitude() == photo.getLatitude() && p.getLongitude() == photo.getLongitude()) {
@@ -84,7 +77,7 @@ public class WorldmapView {
      * @param l List of Photos to be set as Marker
      * @return List of photos which should be displayed as a marker
      */
-    public List<Photo> deleteDouble(List<Photo> l) {
+    private List<Photo> deleteDouble(List<Photo> l) {
         List<Photo> list = new ArrayList<Photo>();
         for (Photo p : l) {
             if (list.size() == 0) {

@@ -22,7 +22,9 @@ import java.util.stream.Collectors;
 public class PhotoServiceImpl implements PhotoService {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    ExecutorService executorService = Executors.newFixedThreadPool(1);
+
+    @Autowired
+    private ExecutorService executorService;
     @Autowired
     private PhotoDAO photoDAO;
     @Autowired
@@ -142,10 +144,5 @@ public class PhotoServiceImpl implements PhotoService {
         p.setPlace(place);
         editPhotos(photos, p);
         LOGGER.debug("Leaving addPlaceToPhotos");
-    }
-
-    @Override
-    public void close() {
-        executorService.shutdown();
     }
 }
