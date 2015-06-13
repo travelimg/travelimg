@@ -5,20 +5,27 @@ import at.ac.tuwien.qse.sepm.dao.repo.PersistenceException;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoMetadata;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoSerializer;
 import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.ImageWriteException;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.common.ImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
 import org.apache.commons.imaging.formats.tiff.TiffField;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
+import org.apache.commons.imaging.formats.tiff.write.TiffOutputDirectory;
+import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class JpegSerializer implements PhotoSerializer {
 
@@ -60,9 +67,39 @@ public class JpegSerializer implements PhotoSerializer {
         if (is == null) throw new IllegalArgumentException();
         if (os == null) throw new IllegalArgumentException();
         if (metadata == null) throw new IllegalArgumentException();
-        LOGGER.debug("writing to stream metadata {}", metadata);
+        LOGGER.debug("updating photo metadata {}", metadata);
 
+        try {
+            ImageMetadata imageData = Imaging.getMetadata(is, null);
+            if (imageData == null) {
+                LOGGER.debug("could not find image metadata");
+                throw new PersistenceException("No metadata found.");
+            }
+            if (!(imageData instanceof JpegImageMetadata)) {
+                LOGGER.debug("metadata is of unknown type");
+                throw new PersistenceException("Metadata is of unknown type.");
+            }
 
+            JpegImageMetadata jpegData = (JpegImageMetadata)imageData;
+            TiffOutputSet outputSet = new TiffOutputSet();
+            TiffImageMetadata exifData = jpegData.getExif();
+            if (exifData != null) {
+                outputSet = exifData.getOutputSet();
+            }
+
+            TiffOutputDirectory exifDirectory = outputSet.getOrCreateExifDirectory();
+            outputSet.setGPSInDegrees(metadata.getLongitude(), metadata.getLatitude());
+            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
+            exifDirectory.add(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL, DATE_FORMATTER.format(metadata.getDate()));
+
+            new ExifRewriter().updateExifMetadataLossless(is, os, outputSet);
+
+        } catch (IOException | ImageReadException | ImageWriteException ex) {
+            LOGGER.warn("failed updating metadata");
+            throw new PersistenceException(ex);
+        }
+
+        LOGGER.debug("updated photo metadata");
     }
 
     private void readDate(JpegImageMetadata input, PhotoMetadata output) {
