@@ -37,6 +37,7 @@
 
     <bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
     <bean id="photographerService" class="at.ac.tuwien.qse.sepm.service.impl.PhotographerServiceImpl"></bean>
+    <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl"></bean>
 
     <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
         <constructor-arg value="${java.io.tmpdir}/travelimg"></constructor-arg>
