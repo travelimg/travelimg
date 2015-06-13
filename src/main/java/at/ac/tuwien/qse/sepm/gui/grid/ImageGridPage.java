@@ -13,7 +13,7 @@ public class ImageGridPage extends ImageGrid {
     private static final Logger LOGGER = LogManager.getLogger();
 
     public ImageGridPage(List<Photo> photos, ImageCache imageCache) {
-        super(imageCache);
+        super(imageCache, PhotoGridTile::new);
 
         setPhotos(photos);
     }
@@ -39,7 +39,7 @@ public class ImageGridPage extends ImageGrid {
         if (tiles.isEmpty())
             return;
 
-        PhotoGridTile tile = tiles.get(Math.max(Math.min(tiles.size() - 1, index), 0));
+        ImageGridTile tile = tiles.get(Math.max(Math.min(tiles.size() - 1, index), 0));
         tile.select();
         onSelectionChange();
     }
@@ -50,7 +50,7 @@ public class ImageGridPage extends ImageGrid {
      * @return the index of the first selected tile or -1 if none is selected.
      */
     public int getFirstSelectedIndex() {
-        PhotoGridTile selected = tiles.stream()
+        ImageGridTile selected = tiles.stream()
                 .filter(ImageGridTile::isSelected)
                 .findFirst()
                 .orElse(null);

@@ -1,5 +1,7 @@
 package at.ac.tuwien.qse.sepm.service;
 
+import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
 
 import java.util.List;
@@ -38,4 +40,5 @@ public interface SlideshowService {
      */
     List<Slideshow> getAllSlideshows() throws ServiceException;
 
+    List<Slide> addPhotosToSlideshow(List<Photo> photos, Slideshow slideshow) throws ServiceException;
 }

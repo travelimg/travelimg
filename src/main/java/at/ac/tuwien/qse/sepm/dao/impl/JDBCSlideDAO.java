@@ -1,8 +1,13 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.dao.SlideDAO;
+import at.ac.tuwien.qse.sepm.dao.SlideshowDAO;
+import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Slide;
+import at.ac.tuwien.qse.sepm.entities.Slideshow;
+import at.ac.tuwien.qse.sepm.entities.validators.SlideshowValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -16,14 +21,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by mb on 08.06.15.
- */
+
 public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
 
     private static final String READ_ALL_STATEMENT = "SELECT id, photo_id, slideshow_id, orderposition FROM SLIDE;";
+    private static final String READ_ALL_BY_SLIDESHOW_STATEMENT = "SELECT id, photo_id, slideshow_id, orderposition FROM SLIDE WHERE slideshow_id=?;";
 
     private SimpleJdbcInsert insertSlide;
+
+    @Autowired
+    private PhotoDAO photoDAO;
+
+    @Autowired
+    private SlideshowDAO slideshowDAO;
 
     @Override
     @Autowired
@@ -35,17 +45,19 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
     }
 
 
-    @Override public void create(Slide slide) throws DAOException, ValidationException {
+    @Override public Slide create(Slide slide) throws DAOException, ValidationException {
         logger.debug("Creating slide {}",slide);
 
         try {
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("id", slide.getId());
-            parameters.put("photo_id", slide.getPhoto_id());
-            parameters.put("slideshow_id",slide.getSlideshow_id());
+            parameters.put("photo_id", slide.getPhoto().getId());
+            parameters.put("slideshow_id",slide.getSlideshowId());
             parameters.put("orderposition",slide.getOrder());
             Number newId = insertSlide.executeAndReturnKey(parameters);
             slide.setId((int) newId.longValue());
+
+            return slide;
         } catch (DataAccessException ex) {
             logger.error("Failed to create slide", ex);
             throw new DAOException("Failed to create slide", ex);
@@ -56,22 +68,48 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
 
     }
 
+    @Override
+    public List<Slide> getSlidesForSlideshow(int slideshowId) throws DAOException, ValidationException {
+        logger.debug("Retrieving slides for slideshow with id {}", slideshowId);
+
+        SlideshowValidator.validateID(slideshowId);
+
+        try {
+            return jdbcTemplate.query(READ_ALL_BY_SLIDESHOW_STATEMENT,
+                    new SlideMapper(), slideshowId);
+        } catch (DataAccessException | DAOException.Unchecked ex) {
+            logger.error("Failed to retrieve slides for given slideshow", ex);
+            throw new DAOException("Failed to retrieve slides for given slideshow", ex);
+        }
+    }
+
     @Override public List<Slide> readAll() throws DAOException {
         logger.debug("retrieving all slides");
 
         try {
-            return jdbcTemplate.query(READ_ALL_STATEMENT, new RowMapper<Slide>() {
-                @Override public Slide mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    return new Slide(
-                            rs.getInt(1),
-                            rs.getInt(2),
-                            rs.getInt(3),
-                            rs.getInt(4)
-                    );
-                }
-            });
+            return jdbcTemplate.query(READ_ALL_STATEMENT, new SlideMapper());
         } catch (DataAccessException e) {
             throw new DAOException("Failed to read all slides", e);
+        } catch (DAOException.Unchecked ex) {
+            logger.error("Failed to read all slides", ex);
+            throw new DAOException("Failed to read all slides", ex);
+        }
+    }
+
+    private class SlideMapper implements RowMapper<Slide> {
+        @Override
+        public Slide mapRow(ResultSet rs, int rowNum) throws SQLException {
+            int photoId = rs.getInt(2);
+
+            Photo photo;
+
+            try {
+                photo = photoDAO.getById(photoId);
+            } catch (DAOException | ValidationException ex) {
+                throw new DAOException.Unchecked("Failed to retrieve photo with id " + photoId, ex);
+            }
+
+            return new Slide(rs.getInt(1), photo, rs.getInt(3), rs.getInt(4));
         }
     }
 }

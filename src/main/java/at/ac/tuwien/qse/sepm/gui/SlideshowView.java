@@ -1,72 +1,61 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
+import at.ac.tuwien.qse.sepm.gui.grid.SlideshowGrid;
+import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
 import at.ac.tuwien.qse.sepm.service.SlideshowService;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SlideshowView {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final ProgressIndicator progress = new ProgressIndicator();
-    //private final ImageView imageView = new ImageView();
-    private final StackPane container = new StackPane();
-
-    //private final ImageGrid<Photo> grid = new ImageGrid<>(SlideGridTile::new); //TODO:
-
-
-
-    private Image image = null;
-    private boolean selected = false;
-    private Photo item = null;
-
     @Autowired private SlideService slideService;
     @Autowired private SlideshowService slideShowService;
+    @Autowired private ImageCache imageCache;
 
-
-    @FXML private ImageView imageView = new ImageView();
+    @FXML private BorderPane root;
     @FXML private ScrollPane gridContainer;
     @FXML private Button Btn_Add;
     @FXML private ComboBox cb_getSlideshows;
     @FXML private TextField tf_slideName;
 
+    private SlideshowOrganizer slideshowOrganizer = new SlideshowOrganizer();
+
+    private SlideshowGrid grid = null;
+
     public SlideshowView() {
-        //getStyleClass().add("image-tile");
 
-        progress.setMaxWidth(50);
-        progress.setMaxHeight(50);
-        //setMargin(progress, new Insets(16));
-        //setPadding(new Insets(4));
+    }
 
-        imageView.setFitWidth(142);
-        imageView.setFitHeight(142);
-        imageView.setPreserveRatio(true);
+    @Autowired
+    public void setImageCache(ImageCache imageCache) {
+        this.imageCache = imageCache;
 
-
-        //super.getChildren().add(progress);
-        //super.getChildren().add(imageView);
-        //super.getChildren().add(container);
+        if (grid == null) {
+            this.grid = new SlideshowGrid(imageCache);
+        }
     }
 
     @FXML
     private void initialize() {
-
-        //gridContainer.setContent(grid);
+        gridContainer.setContent(grid);
 
         Btn_Add.setOnAction(this::handlesetShowSlides);
 
@@ -74,61 +63,17 @@ public class SlideshowView {
 
     }
 
-
-
-    public void addPhotoToGrid(List<Photo> photos) {
-        //selectedPhotos= photoGrid.getSelectedPhotos();
-        LOGGER.debug(photos.get(0).getPath());
-        //grid.addItem(photos.get(0)); TODO:
-        //LOGGER.debug("Count of Items in Grid"+grid.getItems().size()); TODO:
-
-        setItem(photos.get(0));
-        //grid.addItem(photos.get(0));
-    }
-
-    //@Override
-    public void setItem(Photo photo) {
-        //super.setItem(photo);
-        if (photo == null) return;
-        showImage(photo.getPath());
-        //showRating(photo.getRating());
-        //showTags(photo.getTags());
-        //showDate(photo.getDatetime());
-    }
-
-    private void showImage(String path) {
-        File file = new File(path);
-        String url = null;
-        try {
-            url = file.toURI().toURL().toString();
-        } catch (MalformedURLException ex) {
-            LOGGER.error("photo URL is malformed", ex);
-            // TODO: handle exception
-        }
-        LOGGER.debug(url);
-        loadImage(url);
-    }
-
-    protected void loadImage(String url) {
-        //indicateLoading();
-        //image = new Image(url, imageView.getFitWidth(), imageView.getFitHeight(), false, true, true);
-        image = new Image(url);
-        imageView.setImage(image);
-        /*image.progressProperty().addListener((observable, oldValue, newValue) -> {
-            // Image is fully loaded.
-            if (newValue.doubleValue() == 1.0) {
-                //indicateLoaded();
-            }
-        });*/
-        LOGGER.debug("Done!");
-    }
-
     private void getAllSlideshowsToComboBox() {
-
-
         try {
             List<Slideshow> slideshows;
-            slideshows= slideShowService.getAllSlideshows();
+            slideshows = slideShowService.getAllSlideshows();
+
+            List<Photo> photos = slideshows.get(0).getSlides().stream()
+                    .map(Slide::getPhoto)
+                    .collect(Collectors.toList());
+
+            grid.setPhotos(photos);
+
 
 
             for (int i = 0; i < slideshows.size(); i++)
@@ -137,9 +82,6 @@ public class SlideshowView {
         } catch (ServiceException e) {
             e.printStackTrace();
         }
-        //ArrayList<Slideshow> p = new ArrayList<Slideshow>(slideshows);
-        //ObservableList<Slideshow> observableList1 = FXCollections.observableArrayList(p);
-
     }
 
     private void createSlideshow() {
@@ -172,6 +114,10 @@ public class SlideshowView {
 
     private void handlesetShowSlides(Event event){
         createSlideshow();
+    }
+
+    public void onSlidesAdded(Slideshow slideshow, List<Slide> slides) {
+        LOGGER.debug("Implement me");
     }
     
 }

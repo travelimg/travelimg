@@ -1,23 +1,20 @@
 package at.ac.tuwien.qse.sepm.entities;
 
-/**
- * Created by mb on 08.06.15.
- */
 public class Slide {
+
     public Slide() {
 
     }
 
     private Integer id;
-    private Integer photo_id;
-    private Integer slideshow_id;
+    private Photo photo;
+    private Integer slideshowId;
     private Integer order;
 
-    public Slide(Integer id, Integer photo_id, Integer slideshow_id, Integer order){
-
+    public Slide(Integer id, Photo photo, Integer slideshowId, Integer order) {
         this.id = id;
-        this.photo_id = photo_id;
-        this.slideshow_id = slideshow_id;
+        this.photo = photo;
+        this.slideshowId = slideshowId;
         this.order = order;
 
     }
@@ -30,20 +27,20 @@ public class Slide {
         this.id = id;
     }
 
-    public Integer getPhoto_id() {
-        return photo_id;
+    public Photo getPhoto() {
+        return photo;
     }
 
-    public void setPhoto_id(Integer photo_id) {
-        this.photo_id = photo_id;
+    public void setPhoto(Photo photo) {
+        this.photo = photo;
     }
 
-    public Integer getSlideshow_id() {
-        return slideshow_id;
+    public Integer getSlideshowId() {
+        return slideshowId;
     }
 
-    public void setSlideshow_id(Integer slideshow_id) {
-        this.slideshow_id = slideshow_id;
+    public void setSlideshowId(Integer slideshowId) {
+        this.slideshowId = slideshowId;
     }
 
     public Integer getOrder() {

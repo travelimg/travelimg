@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.SlideDAO;
 import at.ac.tuwien.qse.sepm.dao.SlideshowDAO;
+import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.entities.validators.SlideshowValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
@@ -16,6 +17,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,9 @@ public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
     private static final String READ_ALL_STATEMENT = "SELECT id, name, durationbetweenphotos FROM SLIDESHOW;";
 
     private SimpleJdbcInsert insertSlideshow;
+
+    @Autowired
+    private SlideDAO slideDAO;
 
     @Override
     @Autowired
@@ -79,17 +84,30 @@ public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
         logger.debug("retrieving all slideshows");
 
         try {
-            return jdbcTemplate.query(READ_ALL_STATEMENT, new RowMapper<Slideshow>() {
-                @Override public Slideshow mapRow(ResultSet rs, int rowNum) throws SQLException {
-                    return new Slideshow(
-                            rs.getInt(1),
-                            rs.getString(2),
-                            rs.getDouble(3)
-                    );
-                }
-            });
+            return jdbcTemplate.query(READ_ALL_STATEMENT, new SlideshowMapper());
         } catch (DataAccessException e) {
             throw new DAOException("Failed to read all slides", e);
+        }
+    }
+
+    private class SlideshowMapper implements RowMapper<Slideshow> {
+        @Override
+        public Slideshow mapRow(ResultSet rs, int rowNum) throws SQLException {
+            int slideshowId = rs.getInt(1);
+            List<Slide> slides;
+
+            try {
+                slides = slideDAO.getSlidesForSlideshow(slideshowId);
+            } catch (DAOException | ValidationException ex) {
+                throw new DAOException.Unchecked("Failed to retrieve slides for given slideshow", ex);
+            }
+
+            return new Slideshow(
+                    slideshowId,
+                    rs.getString(2),
+                    rs.getDouble(3),
+                    slides
+            );
         }
     }
 }

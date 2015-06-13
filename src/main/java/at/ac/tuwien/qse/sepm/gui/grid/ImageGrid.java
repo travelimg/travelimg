@@ -14,18 +14,23 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class ImageGrid extends TilePane {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    protected final List<PhotoGridTile> tiles = new LinkedList<>();
+
     private final ImageCache imageCache;
+    private final Supplier<ImageGridTile> tileFactory;
+
     protected List<Photo> photos = new ArrayList<>();
+    protected final List<ImageGridTile> tiles = new LinkedList<>();
     private Consumer<Set<Photo>> selectionChangeAction = null;
 
-    public ImageGrid(ImageCache imageCache) {
+    public ImageGrid(ImageCache imageCache, Supplier<ImageGridTile> tileFactory) {
         this.imageCache = imageCache;
+        this.tileFactory = tileFactory;
 
         getStyleClass().add("image-grid");
     }
@@ -47,7 +52,7 @@ public class ImageGrid extends TilePane {
      * @param photo The photo which should be updated in the grid.
      */
     public void updatePhoto(Photo photo) {
-        PhotoGridTile tile = findTile(photo);
+        ImageGridTile tile = findTile(photo);
         if (tile == null) return;
 
         // update photo in list
@@ -85,7 +90,7 @@ public class ImageGrid extends TilePane {
     private void addPhoto(Photo photo) {
         Image image = imageCache.get(photo, ImageSize.MEDIUM);
 
-        PhotoGridTile tile = new PhotoGridTile();
+        ImageGridTile tile = tileFactory.get();
         tile.setPhoto(photo, image);
 
         tile.setOnMouseClicked(event -> handleTileClicked(tile, event));
@@ -95,7 +100,7 @@ public class ImageGrid extends TilePane {
         getChildren().add(tile);
     }
 
-    private void handleTileClicked(PhotoGridTile tile, MouseEvent event) {
+    private void handleTileClicked(ImageGridTile tile, MouseEvent event) {
         if (event.isControlDown()) {
             if (tile.isSelected()) {
                 deselect(tile);
@@ -108,13 +113,13 @@ public class ImageGrid extends TilePane {
         }
     }
 
-    private void select(PhotoGridTile tile) {
+    private void select(ImageGridTile tile) {
         if (tile == null) return;
         tile.select();
         onSelectionChange();
     }
 
-    private void deselect(PhotoGridTile tile) {
+    private void deselect(ImageGridTile tile) {
         if (tile == null) return;
         tile.deselect();
         onSelectionChange();
@@ -132,8 +137,8 @@ public class ImageGrid extends TilePane {
                 .collect(Collectors.toSet());
     }
 
-    private PhotoGridTile findTile(Photo photo) {
-        for (PhotoGridTile tile : tiles) {
+    private ImageGridTile findTile(Photo photo) {
+        for (ImageGridTile tile : tiles) {
             if (photo.getId().equals(tile.getPhoto().getId())) return tile;
         }
         return null;
