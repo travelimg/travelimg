@@ -358,14 +358,13 @@ public class InspectorImpl implements Inspector {
         LOGGER.debug("Done");
         Slide slide = new Slide();
 
-        try
-        {
+        try {
             slide.setPhoto_id(activePhotos.get(0).getId());
             slide.setOrder(1); //Todo: How to specify the order
             slide.setSlideshow_id(cb_getSlideshows.getSelectionModel().getSelectedIndex()+1);
             slideService.create(slide);
 
-        }catch(ServiceException ex){
+        } catch (ServiceException ex) {
             //TODO: handle error
         }
 
