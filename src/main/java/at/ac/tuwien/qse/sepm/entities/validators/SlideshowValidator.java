@@ -16,7 +16,6 @@ public class SlideshowValidator {
 
         if (entity.getDurationBetweenPhotos() == null)
             throw new ValidationException("Duration between Photos can not be null");
-
     }
 
     /**

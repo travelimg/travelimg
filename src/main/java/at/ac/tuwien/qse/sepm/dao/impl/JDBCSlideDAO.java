@@ -7,6 +7,7 @@ import at.ac.tuwien.qse.sepm.dao.SlideshowDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
+import at.ac.tuwien.qse.sepm.entities.validators.SlideValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.SlideshowValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,9 @@ import java.util.Map;
 
 public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
 
-    private static final String READ_ALL_STATEMENT = "SELECT id, photo_id, slideshow_id, orderposition FROM SLIDE;";
-    private static final String READ_ALL_BY_SLIDESHOW_STATEMENT = "SELECT id, photo_id, slideshow_id, orderposition FROM SLIDE WHERE slideshow_id=?;";
+    private static final String READ_ALL_STATEMENT = "SELECT id, photo_id, slideshow_id, orderposition FROM SLIDE ORDER BY orderposition asc;";
+    private static final String READ_ALL_BY_SLIDESHOW_STATEMENT = "SELECT id, photo_id, slideshow_id, orderposition FROM SLIDE WHERE slideshow_id=? ORDER BY orderposition asc;";
+    private static final String UPDATE_STATEMENT = "UPDATE SLIDE SET photo_id = ?, slideshow_id = ?, orderposition = ? WHERE id = ?;";
 
     private SimpleJdbcInsert insertSlide;
 
@@ -69,10 +71,32 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
     }
 
     @Override
+    public Slide update(Slide slide) throws DAOException, ValidationException {
+        logger.debug("Updating slide {}", slide);
+
+        SlideValidator.validate(slide);
+        SlideValidator.validateID(slide.getId());
+
+        try {
+            jdbcTemplate.update(UPDATE_STATEMENT,
+                    slide.getPhoto().getId(),
+                    slide.getSlideshowId(),
+                    slide.getOrder(),
+                    slide.getId()
+            );
+            logger.debug("Successfully updated slide");
+            return slide;
+        } catch (DataAccessException ex) {
+            logger.error("Failed to update slide", ex);
+            throw new DAOException("Failed to update slide", ex);
+        }
+    }
+
+    @Override
     public List<Slide> getSlidesForSlideshow(int slideshowId) throws DAOException, ValidationException {
         logger.debug("Retrieving slides for slideshow with id {}", slideshowId);
 
-        SlideshowValidator.validateID(slideshowId);
+        SlideValidator.validateID(slideshowId);
 
         try {
             return jdbcTemplate.query(READ_ALL_BY_SLIDESHOW_STATEMENT,

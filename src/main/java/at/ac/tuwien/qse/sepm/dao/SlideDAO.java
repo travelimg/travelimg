@@ -27,6 +27,8 @@ public interface SlideDAO {
      */
     void delete(Slide slide) throws DAOException, ValidationException;
 
+    Slide update(Slide slide) throws DAOException, ValidationException;
+
     List<Slide> getSlidesForSlideshow(int slideshowId) throws DAOException, ValidationException;
 
     /**
