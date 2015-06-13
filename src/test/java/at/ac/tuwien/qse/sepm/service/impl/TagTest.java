@@ -263,4 +263,10 @@ public class TagTest extends ServiceTestBase {
             assertThat(getTags(photo), empty());
         }
     }
+
+    @Test(expected = ServiceException.class)
+    @WithData
+    public void test_create_duplicate_throws() throws ServiceException {
+        tagService.create(new Tag(1, "Person"));
+    }
 }
