@@ -2,6 +2,8 @@ package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.SlideshowDAO;
+import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -55,4 +57,8 @@ public class SlideshowServiceImpl implements SlideshowService {
         }
     }
 
+    @Override
+    public List<Slide> addPhotosToSlideshow(List<Photo> photos, Slideshow slideshow) throws ServiceException {
+        return null;
+    }
 }

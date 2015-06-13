@@ -21,6 +21,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
+import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,13 +61,16 @@ public class InspectorImpl implements Inspector {
     @FXML
     private TableColumn<String, String> exifValue;
     @FXML
-    private ComboBox<Slideshow> cb_getSlideshows;
+    private ComboBox<Slideshow> slideshowsCombobox;
     @FXML
     private TableView<Pair<String, String>> exifTable;
     private TagSelector tagSelector;
     private GoogleMapsScene mapsScene;
     private Runnable updateHandler;
     private Runnable deleteHandler;
+
+    @Autowired
+    private SlideshowView slideshowView;
 
     @Autowired
     private DropboxService dropboxService;
@@ -80,8 +84,7 @@ public class InspectorImpl implements Inspector {
     private RatingPicker ratingPicker;
     @Autowired
     private SlideshowService slideshowService;
-    @Autowired
-    private SlideService slideService;
+
 
     @Override public Collection<Photo> getActivePhotos() {
         return new ArrayList<>(activePhotos);
@@ -121,6 +124,10 @@ public class InspectorImpl implements Inspector {
         if (tagSelector != null) {
             tagSelector.initializeTagList();
         }
+
+        if (slideshowsCombobox != null) {
+            loadSlideshows();
+        }
     }
 
     @FXML
@@ -130,12 +137,13 @@ public class InspectorImpl implements Inspector {
         tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService, root);
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
         deleteButton.setOnAction(this::handleDelete);
-        addToSlideshowButton.setOnAction(this::handleAddToSlideShow);
+        addToSlideshowButton.setOnAction(this::handleAddToSlideshow);
         dropboxButton.setOnAction(this::handleDropbox);
         mapContainer.getChildren().add(mapsScene.getMapView());
         tagSelectionContainer.getChildren().add(tagSelector);
-        getAllSlideshowsToComboBox();
 
+        slideshowsCombobox.setConverter(new SlideshowStringConverter());
+        loadSlideshows();
     }
 
     private void handleDelete(Event event) {
@@ -299,6 +307,32 @@ public class InspectorImpl implements Inspector {
         setActivePhotos(null);
     }
 
+    private void loadSlideshows() {
+        slideshowsCombobox.getItems().clear();
+
+        try {
+            List<Slideshow> slideshows = slideshowService.getAllSlideshows();
+            slideshowsCombobox.getItems().addAll(slideshows);
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Laden aller Slideshows", "Fehlermeldung: " + ex.getMessage());
+        }
+    }
+
+    private void handleAddToSlideshow(Event event) {
+        Slideshow slideshow = slideshowsCombobox.getSelectionModel().getSelectedItem();
+
+        if (slideshow == null) {
+            return;
+        }
+
+        try {
+            List<Slide> slides = slideshowService.addPhotosToSlideshow(activePhotos, slideshow);
+            slideshowView.onSlidesAdded(slideshow, slides);
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Hinzufügen zur Slideshow", "Fehlermeldung: " + ex.getMessage());
+        }
+    }
+
     private class TagListChangeListener implements ListChangeListener<Tag> {
 
         public void onChanged(Change<? extends Tag> change) {
@@ -331,42 +365,17 @@ public class InspectorImpl implements Inspector {
             if (updateNeeded)
                 onUpdate();
         }
-
     }
 
-    private void getAllSlideshowsToComboBox() {
-
-        try {
-            List<Slideshow> slideshows;
-            slideshows= slideshowService.getAllSlideshows();
-
-
-            for (int i = 0; i < slideshows.size(); i++)
-                cb_getSlideshows.getItems().addAll(slideshows.get(i));
-
-        } catch (ServiceException e) {
-            e.printStackTrace();
-        }
-        //ArrayList<Slideshow> p = new ArrayList<Slideshow>(slideshows);
-        //ObservableList<Slideshow> observableList1 = FXCollections.observableArrayList(p);
-
-    }
-
-    private void handleAddToSlideShow(Event event) {
-        LOGGER.debug("Done");
-        Slide slide = new Slide();
-
-        try {
-            slide.setPhoto(activePhotos.get(0));
-            slide.setOrder(1); //Todo: How to specify the order
-            slide.setSlideshowId(cb_getSlideshows.getSelectionModel().getSelectedIndex() + 1);
-            slideService.create(slide);
-
-        } catch (ServiceException ex) {
-            //TODO: handle error
+    private static class SlideshowStringConverter extends StringConverter<Slideshow> {
+        @Override
+        public String toString(Slideshow object) {
+            return object.getName();
         }
 
-
+        @Override
+        public Slideshow fromString(String string) {
+            return null;
+        }
     }
-
 }
