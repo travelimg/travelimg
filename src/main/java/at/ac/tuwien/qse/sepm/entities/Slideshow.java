@@ -52,4 +52,14 @@ public class Slideshow {
     public void setSlides(List<Slide> slides) {
         this.slides = slides;
     }
+
+    @Override
+    public String toString() {
+        return "Slideshow{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", durationBetweenPhotos=" + durationBetweenPhotos +
+                ", slides=" + slides +
+                '}';
+    }
 }

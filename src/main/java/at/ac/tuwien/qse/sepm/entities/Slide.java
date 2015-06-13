@@ -50,4 +50,14 @@ public class Slide {
     public void setOrder(Integer order) {
         this.order = order;
     }
+
+    @Override
+    public String toString() {
+        return "Slide{" +
+                "id=" + id +
+                ", photo=" + photo +
+                ", slideshowId=" + slideshowId +
+                ", order=" + order +
+                '}';
+    }
 }
