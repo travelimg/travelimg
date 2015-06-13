@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.SlideDAO;
 import at.ac.tuwien.qse.sepm.dao.SlideshowDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Slide;
@@ -13,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,6 +26,9 @@ public class SlideshowServiceImpl implements SlideshowService {
 
     @Autowired
     private SlideshowDAO slideshowDAO;
+
+    @Autowired
+    private SlideDAO slideDAO;
 
     @Override
     public void create(Slideshow slideshow) throws ServiceException {
@@ -59,6 +64,22 @@ public class SlideshowServiceImpl implements SlideshowService {
 
     @Override
     public List<Slide> addPhotosToSlideshow(List<Photo> photos, Slideshow slideshow) throws ServiceException {
-        return null;
+        List<Slide> slides = new ArrayList<>();
+        int order = slideshow.getSlides().size() + 1;
+
+        try {
+            for (Photo photo : photos) {
+                Slide slide = new Slide(-1, photo, slideshow.getId(), order);
+                slide = slideDAO.create(slide);
+
+                slides.add(slide);
+                order++;
+            }
+        } catch (DAOException | ValidationException ex) {
+            LOGGER.error("Failed to create slide", ex);
+            throw new ServiceException("Failed to create slide", ex);
+        }
+
+        return slides;
     }
 }
