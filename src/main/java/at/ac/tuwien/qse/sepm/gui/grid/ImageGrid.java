@@ -74,7 +74,7 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
      */
     public void selectAll() {
         LOGGER.debug("selecting all items");
-        tiles.forEach(ImageGridTile::select);
+        tiles.forEach(T::select);
         onSelectionChange();
     }
 
@@ -83,7 +83,7 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
      */
     public void deselectAll() {
         LOGGER.debug("deselecting all items");
-        tiles.forEach(ImageGridTile::deselect);
+        tiles.forEach(T::deselect);
         onSelectionChange();
     }
 
@@ -102,7 +102,7 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
         onTileAdded(tile);
     }
 
-    private void handleTileClicked(ImageGridTile tile, MouseEvent event) {
+    private void handleTileClicked(T tile, MouseEvent event) {
         if (event.isControlDown()) {
             if (tile.isSelected()) {
                 deselect(tile);
@@ -115,13 +115,13 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
         }
     }
 
-    private void select(ImageGridTile tile) {
+    protected void select(T tile) {
         if (tile == null) return;
         tile.select();
         onSelectionChange();
     }
 
-    private void deselect(ImageGridTile tile) {
+    protected void deselect(T tile) {
         if (tile == null) return;
         tile.deselect();
         onSelectionChange();
@@ -138,13 +138,13 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
 
     private Set<Photo> getSelectedItems() {
         return tiles.stream()
-                .filter(ImageGridTile::isSelected)
-                .map(ImageGridTile::getPhoto)
+                .filter(T::isSelected)
+                .map(T::getPhoto)
                 .collect(Collectors.toSet());
     }
 
-    private ImageGridTile findTile(Photo photo) {
-        for (ImageGridTile tile : tiles) {
+    private T findTile(Photo photo) {
+        for (T tile : tiles) {
             if (photo.getId().equals(tile.getPhoto().getId())) return tile;
         }
         return null;
