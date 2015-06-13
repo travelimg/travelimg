@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +30,13 @@ public class SlideshowView {
     @Autowired private SlideshowService slideShowService;
     @Autowired private ImageCache imageCache;
 
+    @FXML private BorderPane root;
     @FXML private ScrollPane gridContainer;
     @FXML private Button Btn_Add;
     @FXML private ComboBox cb_getSlideshows;
     @FXML private TextField tf_slideName;
+
+    private SlideshowOrganizer slideshowOrganizer = new SlideshowOrganizer();
 
     private SlideshowGrid grid = null;
 
