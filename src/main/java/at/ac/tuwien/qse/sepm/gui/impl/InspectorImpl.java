@@ -353,8 +353,6 @@ public class InspectorImpl implements Inspector {
     }
 
     private void handleAddToSlideShow(Event event) {
-        SlideshowView slideshowView = new SlideshowView();
-        slideshowView.setItem(activePhotos.get(0));
         LOGGER.debug("Done");
         Slide slide = new Slide();
 
