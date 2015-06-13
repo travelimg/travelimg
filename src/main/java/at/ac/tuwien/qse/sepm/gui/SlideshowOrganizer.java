@@ -30,10 +30,8 @@ public class SlideshowOrganizer {
     }
 
     private void loadSlideshows() {
-        List<Slideshow> slideshows;
-
         try {
-            slideshows = slideshowService.getAllSlideshows();
+            List<Slideshow> slideshows = slideshowService.getAllSlideshows();
             slideshowList.getItems().addAll(slideshows);
         } catch (ServiceException ex) {
             ErrorDialog.show(slideshowList, "Fehler beim Laden aller Slideshows", "Fehlermeldung: " + ex.getMessage());
