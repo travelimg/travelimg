@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.gui;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.grid.SlideshowGrid;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -40,14 +41,11 @@ public class SlideshowView {
 
     private SlideshowGrid grid = null;
 
-    public SlideshowView() {
-
-    }
-
     @Autowired
     public void setImageCache(ImageCache imageCache) {
         if (grid == null) {
             this.grid = new SlideshowGrid(imageCache);
+            this.grid.setSlideChangedCallback(this::handleSlideChanged);
         }
     }
 
@@ -112,6 +110,14 @@ public class SlideshowView {
 
     public void onSlidesAdded(Slideshow slideshow, List<Slide> slides) {
         LOGGER.debug("Implement me");
+    }
+
+    private void handleSlideChanged(Slide slide) {
+        try {
+            slideService.update(slide);
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Ändern der Slides", "Fehlermeldung: " + ex.getMessage());
+        }
     }
     
 }
