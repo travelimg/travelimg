@@ -37,7 +37,7 @@ public class SlideshowView {
     @FXML private TextField tf_slideName;
 
     @Autowired
-    private SlideshowOrganizer slideshowOrganizer
+    private SlideshowOrganizer slideshowOrganizer;
 
     private SlideshowGrid grid = null;
 
