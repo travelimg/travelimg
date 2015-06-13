@@ -1,22 +1,23 @@
 package at.ac.tuwien.qse.sepm.entities;
 
-/**
- * Created by mb on 08.06.15.
- */
+import java.util.List;
+
 public class Slideshow {
 
     private Integer id;
     private String name;
     private Double durationBetweenPhotos;
+    private List<Slide> slides;
 
-    public Slideshow(){
+    public Slideshow() {
 
     }
 
-    public Slideshow(Integer id, String name, Double durationBetweenPhotos) {
+    public Slideshow(Integer id, String name, Double durationBetweenPhotos, List<Slide> slides) {
         this.id = id;
         this.name = name;
         this.durationBetweenPhotos = durationBetweenPhotos;
+        this.slides = slides;
     }
 
     public Integer getId() {
@@ -42,5 +43,13 @@ public class Slideshow {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Slide> getSlides() {
+        return slides;
+    }
+
+    public void setSlides(List<Slide> slides) {
+        this.slides = slides;
     }
 }

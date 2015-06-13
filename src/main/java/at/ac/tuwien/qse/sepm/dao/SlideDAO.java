@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao;
 
 import at.ac.tuwien.qse.sepm.entities.Slide;
+import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 
 import java.util.List;
@@ -16,7 +17,6 @@ public interface SlideDAO {
      * @throws DAOException
      * @throws ValidationException
      */
-
     void create(Slide slide) throws DAOException, ValidationException;
 
     /**
@@ -25,15 +25,15 @@ public interface SlideDAO {
      * @throws DAOException
      * @throws ValidationException
      */
-
     void delete(Slide slide) throws DAOException, ValidationException;
+
+    List<Slide> getSlidesForSlideshow(int slideshowId) throws DAOException, ValidationException;
 
     /**
      * Retrieve a list of slides from a given slideshow
      * @return
      * @throws DAOException
      */
-
     List<Slide> readAll() throws DAOException;
 
 

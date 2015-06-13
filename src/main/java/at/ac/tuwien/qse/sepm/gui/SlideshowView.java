@@ -1,7 +1,10 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
+import at.ac.tuwien.qse.sepm.gui.grid.SlideshowGrid;
+import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
 import at.ac.tuwien.qse.sepm.service.SlideshowService;
@@ -18,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SlideshowView {
 
@@ -37,6 +41,7 @@ public class SlideshowView {
 
     @Autowired private SlideService slideService;
     @Autowired private SlideshowService slideShowService;
+    @Autowired private ImageCache imageCache;
 
 
     @FXML private ImageView imageView = new ImageView();
@@ -44,6 +49,8 @@ public class SlideshowView {
     @FXML private Button Btn_Add;
     @FXML private ComboBox cb_getSlideshows;
     @FXML private TextField tf_slideName;
+
+    private SlideshowGrid grid = null;
 
     public SlideshowView() {
         //getStyleClass().add("image-tile");
@@ -63,10 +70,18 @@ public class SlideshowView {
         //super.getChildren().add(container);
     }
 
+    @Autowired
+    public void setImageCache(ImageCache imageCache) {
+        this.imageCache = imageCache;
+
+        if (grid == null) {
+            this.grid = new SlideshowGrid(imageCache);
+        }
+    }
+
     @FXML
     private void initialize() {
-
-        //gridContainer.setContent(grid);
+       gridContainer.setContent(grid);
 
         Btn_Add.setOnAction(this::handlesetShowSlides);
 
@@ -129,6 +144,13 @@ public class SlideshowView {
         try {
             List<Slideshow> slideshows;
             slideshows= slideShowService.getAllSlideshows();
+
+            List<Photo> photos = slideshows.get(0).getSlides().stream()
+                    .map(Slide::getPhoto)
+                    .collect(Collectors.toList());
+
+            grid.setPhotos(photos);
+
 
 
             for (int i = 0; i < slideshows.size(); i++)
