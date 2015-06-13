@@ -5,8 +5,11 @@ import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideshowService;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -21,13 +24,19 @@ public class SlideshowOrganizer {
     @FXML
     private ListView<Slideshow> slideshowList;
 
-    @Autowired
-    private SlideshowService slideshowService;
+    private ObjectProperty<Slideshow> selectedSlideshowProperty = new SimpleObjectProperty<>(null);
 
-    private ObjectProperty<Slideshow> selectedSlideshowProperty = new SimpleObjectProperty<>();
 
     public ObjectProperty<Slideshow> getSelectedSlideshowProperty() {
         return selectedSlideshowProperty;
+    }
+
+    public Slideshow getSelected() {
+        return selectedSlideshowProperty.get();
+    }
+
+    public void setSlideshows(ObservableList<Slideshow> slideshows) {
+        slideshowList.setItems(slideshows);
     }
 
     @FXML
@@ -36,18 +45,6 @@ public class SlideshowOrganizer {
         slideshowList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             selectedSlideshowProperty.setValue(newValue);
         });
-
-        selectedSlideshowProperty.setValue(null);
-        loadSlideshows();
-    }
-
-    private void loadSlideshows() {
-        try {
-            List<Slideshow> slideshows = slideshowService.getAllSlideshows();
-            slideshowList.getItems().addAll(slideshows);
-        } catch (ServiceException ex) {
-            ErrorDialog.show(slideshowList, "Fehler beim Laden aller Slideshows", "Fehlermeldung: " + ex.getMessage());
-        }
     }
 
     private class SlideshowCellFactory implements Callback<ListView<Slideshow>, ListCell<Slideshow>> {

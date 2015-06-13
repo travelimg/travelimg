@@ -82,8 +82,6 @@ public class InspectorImpl implements Inspector {
     private TagService tagService;
     @Autowired
     private RatingPicker ratingPicker;
-    @Autowired
-    private SlideshowService slideshowService;
 
     @Override public Collection<Photo> getActivePhotos() {
         return new ArrayList<>(activePhotos);
@@ -123,10 +121,6 @@ public class InspectorImpl implements Inspector {
         if (tagSelector != null) {
             tagSelector.initializeTagList();
         }
-
-        if (slideshowsCombobox != null) {
-            loadSlideshows();
-        }
     }
 
     @FXML
@@ -142,7 +136,7 @@ public class InspectorImpl implements Inspector {
         tagSelectionContainer.getChildren().add(tagSelector);
 
         slideshowsCombobox.setConverter(new SlideshowStringConverter());
-        loadSlideshows();
+        slideshowsCombobox.setItems(slideshowView.getSlideshows());
     }
 
     private void handleDelete(Event event) {
@@ -306,17 +300,6 @@ public class InspectorImpl implements Inspector {
         setActivePhotos(null);
     }
 
-    private void loadSlideshows() {
-        slideshowsCombobox.getItems().clear();
-
-        try {
-            List<Slideshow> slideshows = slideshowService.getAllSlideshows();
-            slideshowsCombobox.getItems().addAll(slideshows);
-        } catch (ServiceException ex) {
-            ErrorDialog.show(root, "Fehler beim Laden aller Slideshows", "Fehlermeldung: " + ex.getMessage());
-        }
-    }
-
     private void handleAddToSlideshow(Event event) {
         Slideshow slideshow = slideshowsCombobox.getSelectionModel().getSelectedItem();
 
@@ -324,12 +307,7 @@ public class InspectorImpl implements Inspector {
             return;
         }
 
-        try {
-            List<Slide> slides = slideshowService.addPhotosToSlideshow(activePhotos, slideshow);
-            slideshowView.onSlidesAdded(slideshow, slides);
-        } catch (ServiceException ex) {
-            ErrorDialog.show(root, "Fehler beim Hinzufügen zur Slideshow", "Fehlermeldung: " + ex.getMessage());
-        }
+        slideshowView.addPhotosToSlideshow(activePhotos, slideshow);
     }
 
     private class TagListChangeListener implements ListChangeListener<Tag> {

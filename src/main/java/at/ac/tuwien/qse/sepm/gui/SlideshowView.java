@@ -9,6 +9,10 @@ import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
 import at.ac.tuwien.qse.sepm.service.SlideshowService;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -38,14 +42,35 @@ public class SlideshowView {
 
     @Autowired
     private SlideshowOrganizer slideshowOrganizer;
+    @Autowired
+    private SlideshowService slideshowService;
 
     private SlideshowGrid grid = null;
+
+    private ObservableList<Slideshow> slideshows = FXCollections.observableArrayList();
 
     @Autowired
     public void setImageCache(ImageCache imageCache) {
         if (grid == null) {
             this.grid = new SlideshowGrid(imageCache);
             this.grid.setSlideChangedCallback(this::handleSlideChanged);
+        }
+    }
+
+    public ObservableList<Slideshow> getSlideshows() {
+        return slideshows;
+    }
+
+    public void addPhotosToSlideshow(List<Photo> photos, Slideshow slideshow) {
+        try {
+            slideshowService.addPhotosToSlideshow(photos, slideshow);
+
+            Slideshow selected = slideshowOrganizer.getSelected();
+            if (selected.getId().equals(slideshow.getId())) {
+                grid.setSlideshow(slideshow);
+            }
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Hinzufügen zur Slideshow", "Fehlermeldung: " + ex.getMessage());
         }
     }
 
@@ -57,14 +82,16 @@ public class SlideshowView {
 
         getAllSlideshowsToComboBox();
 
+        slideshowOrganizer.setSlideshows(slideshows);
         slideshowOrganizer.getSelectedSlideshowProperty().addListener((observable, oldValue, newValue) -> {
             grid.setSlideshow(newValue);
         });
 
+        loadAllSlideshows();
     }
 
     private void getAllSlideshowsToComboBox() {
-        try {
+        /*try {
             List<Slideshow> slideshows;
             slideshows = slideShowService.getAllSlideshows();
 
@@ -73,7 +100,7 @@ public class SlideshowView {
 
         } catch (ServiceException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     private void createSlideshow() {
@@ -108,15 +135,20 @@ public class SlideshowView {
         createSlideshow();
     }
 
-    public void onSlidesAdded(Slideshow slideshow, List<Slide> slides) {
-        LOGGER.debug("Implement me");
-    }
-
     private void handleSlideChanged(Slide slide) {
         try {
             slideService.update(slide);
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Ändern der Slides", "Fehlermeldung: " + ex.getMessage());
+        }
+    }
+
+    private void loadAllSlideshows() {
+        try {
+            slideshows.clear();
+            slideshows.addAll(slideShowService.getAllSlideshows());
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Laden aller Slideshows", "Fehlermeldung: " + ex.getMessage());
         }
     }
     

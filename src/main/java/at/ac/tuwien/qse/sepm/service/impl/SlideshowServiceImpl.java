@@ -73,6 +73,7 @@ public class SlideshowServiceImpl implements SlideshowService {
                 slide = slideDAO.create(slide);
 
                 slides.add(slide);
+                slideshow.getSlides().add(slide);
                 order++;
             }
         } catch (DAOException | ValidationException ex) {
