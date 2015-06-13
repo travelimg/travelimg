@@ -46,10 +46,6 @@ public class PollingFileWatcher implements FileWatcher {
         return checkExtension(file) && checkDirectories(file);
     }
 
-    @Override public boolean watches(Path file) {
-        return watched.contains(file);
-    }
-
     @Override public Collection<Path> index() {
         return new HashSet<>(watched);
     }

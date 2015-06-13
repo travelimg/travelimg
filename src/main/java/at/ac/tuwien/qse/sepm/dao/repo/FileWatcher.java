@@ -22,14 +22,6 @@ public interface FileWatcher {
     boolean recognizes(Path file);
 
     /**
-     * Check whether the file is currently watched.
-     *
-     * @param file file to check
-     * @return true if the file is being watched, otherwise false
-     */
-    boolean watches(Path file);
-
-    /**
      * Get all files in the registered directories.
      *
      * @return set of files
