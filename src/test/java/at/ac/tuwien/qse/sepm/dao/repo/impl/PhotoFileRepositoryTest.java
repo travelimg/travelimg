@@ -3,7 +3,8 @@ package at.ac.tuwien.qse.sepm.dao.repo.impl;
 import at.ac.tuwien.qse.sepm.dao.repo.*;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
+import org.junit.*;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 import static org.junit.Assert.*;
 
@@ -28,7 +30,7 @@ public class PhotoFileRepositoryTest extends PhotoRepositoryTest {
     @Before
     public void setUp() {
         FileManager fileManager = new MockFileManager();
-        watcher = new PollingFileWatcher();
+        watcher = new PollingFileWatcher(fileManager);
         watcher.register(DATA_DIR);
         watcher.getExtensions().add("jpg");
         PhotoSerializer serializer = new JpegSerializer();
@@ -37,6 +39,62 @@ public class PhotoFileRepositoryTest extends PhotoRepositoryTest {
 
     @Override protected PhotoFileRepository getObject() {
         return object;
+    }
+
+    @Test
+    @Override public void create_valid_notifiesListener() throws PersistenceException {
+        Path file = getContext().getFile1();
+        MockListener listener = new MockListener();
+        object.addListener(listener);
+
+        object.create(file, getContext().getStream1());
+        watcher.refresh();
+
+        assertTrue(listener.getUpdateNotifications().isEmpty());
+        assertTrue(listener.getDeleteNotifications().isEmpty());
+        assertTrue(listener.getErrorNotifications().isEmpty());
+        assertEquals(1, listener.getCreateNotifications().size());
+        assertEquals(object, listener.getCreateNotifications().get(0).getRepository());
+        assertEquals(file, listener.getCreateNotifications().get(0).getFile());
+    }
+
+    @Test
+    @Override public void update_existing_notifiesListener() throws PersistenceException {
+        Path file = getContext().getFile1();
+        object.create(file, getContext().getStream1());
+        watcher.refresh();
+        MockListener listener = new MockListener();
+        object.addListener(listener);
+        Photo modified = getContext().getModified1();
+
+        object.update(modified);
+        watcher.refresh();
+
+        assertTrue(listener.getCreateNotifications().isEmpty());
+        assertTrue(listener.getDeleteNotifications().isEmpty());
+        assertTrue(listener.getErrorNotifications().isEmpty());
+        assertEquals(1, listener.getUpdateNotifications().size());
+        assertEquals(object, listener.getUpdateNotifications().get(0).getRepository());
+        assertEquals(file, listener.getUpdateNotifications().get(0).getFile());
+    }
+
+    @Test
+    @Override public void delete_existing_notifiesListener() throws PersistenceException {
+        Path file = getContext().getFile1();
+        object.create(file, getContext().getStream1());
+        watcher.refresh();
+        MockListener listener = new MockListener();
+        object.addListener(listener);
+
+        object.delete(file);
+        watcher.refresh();
+
+        assertTrue(listener.getCreateNotifications().isEmpty());
+        assertTrue(listener.getUpdateNotifications().isEmpty());
+        assertTrue(listener.getErrorNotifications().isEmpty());
+        assertEquals(1, listener.getDeleteNotifications().size());
+        assertEquals(object, listener.getDeleteNotifications().get(0).getRepository());
+        assertEquals(file, listener.getDeleteNotifications().get(0).getFile());
     }
 
     @Override protected Context getContext() {
@@ -91,14 +149,11 @@ public class PhotoFileRepositoryTest extends PhotoRepositoryTest {
 
             public PhotoMetadata getPhotoData2() {
                 PhotoMetadata data = new PhotoMetadata();
-                data.setDate(LocalDateTime.of(2014, 8, 14, 15, 36));
-                data.setLongitude(42.0);
-                data.setLatitude(43.0);
-                data.setRating(Rating.NEUTRAL);
-                data.setPhotographer("Lukas");
-                data.getTags().clear();
-                data.getTags().add("usa");
-                data.getTags().add("nature");
+                data.setDate(LocalDateTime.of(2005, 9, 11, 15, 44, 8));
+                data.setLongitude(-104.9916361111111);
+                data.setLatitude(39.739336111111116);
+                data.setRating(Rating.NONE);
+                data.setPhotographer(null);
                 return data;
             }
         };
