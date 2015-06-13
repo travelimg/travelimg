@@ -221,7 +221,7 @@ public class TagTest extends ServiceTestBase {
         Tag t5 = new Tag(5, "test2");
         Tag t6 = new Tag(6, "test3");
         Tag t7 = new Tag(7, "test4");
-        
+
         tagService.create(t4);
         tagService.create(t5);
         tagService.create(t6);
@@ -249,7 +249,7 @@ public class TagTest extends ServiceTestBase {
         Photo p1 = getPhoto(1);
         Photo p2 = getPhoto(2);
 
-        assertThat(tagService.getMostFrequentTags(toList(p0, p1, p2)), empty());
+        tagService.getMostFrequentTags(toList(p0, p1, p2));
     }
 
     @Test
