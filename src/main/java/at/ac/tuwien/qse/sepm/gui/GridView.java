@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public class GridView {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private final List<Photo> selection = new ArrayList<Photo>();
+    private final List<Photo> selection = new ArrayList<>();
     @Autowired
     private PhotoService photoService;
     @Autowired
@@ -52,10 +52,19 @@ public class GridView {
 
     @Autowired
     private ImageCache imageCache;
-    @Autowired
-    private PaginatedImageGrid grid = new PaginatedImageGrid();
+
+    private PaginatedImageGrid grid = null;
 
     private boolean disableReload = false;
+
+    @Autowired
+    public void setImageCache(ImageCache imageCache) {
+        this.imageCache = imageCache;
+
+        if (grid == null) {
+            this.grid = new PaginatedImageGrid(imageCache);
+        }
+    }
 
     @FXML
     private void initialize() {

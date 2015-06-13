@@ -22,7 +22,6 @@ public class PaginatedImageGrid extends Pagination {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired
     private ImageCache imageCache;
     private List<Photo> photos = new ArrayList<>();
 
@@ -32,8 +31,10 @@ public class PaginatedImageGrid extends Pagination {
     private int photosPerPage = 24;
     private ObjectProperty<ImageGridPage> activePageProperty = new SimpleObjectProperty<>(null);
 
-    public PaginatedImageGrid() {
+    public PaginatedImageGrid(ImageCache imageCache) {
         super(0, 0);
+
+        this.imageCache = imageCache;
 
         setPageFactory(this::getPage);
         getStyleClass().add(Pagination.STYLE_CLASS_BULLET);

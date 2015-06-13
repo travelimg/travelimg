@@ -60,7 +60,7 @@ public class InspectorImpl implements Inspector {
     @FXML
     private TableColumn<String, String> exifValue;
     @FXML
-    private ComboBox cb_getSlideshows;
+    private ComboBox<Slideshow> cb_getSlideshows;
     @FXML
     private TableView<Pair<String, String>> exifTable;
     private TagSelector tagSelector;
@@ -342,7 +342,7 @@ public class InspectorImpl implements Inspector {
 
 
             for (int i = 0; i < slideshows.size(); i++)
-                cb_getSlideshows.getItems().addAll(slideshows.get(i).getName());
+                cb_getSlideshows.getItems().addAll(slideshows.get(i));
 
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -359,9 +359,9 @@ public class InspectorImpl implements Inspector {
         Slide slide = new Slide();
 
         try {
-            slide.setPhoto_id(activePhotos.get(0).getId());
+            slide.setPhoto(activePhotos.get(0));
             slide.setOrder(1); //Todo: How to specify the order
-            slide.setSlideshow_id(cb_getSlideshows.getSelectionModel().getSelectedIndex()+1);
+            slide.setSlideshowId(cb_getSlideshows.getSelectionModel().getSelectedIndex() + 1);
             slideService.create(slide);
 
         } catch (ServiceException ex) {
