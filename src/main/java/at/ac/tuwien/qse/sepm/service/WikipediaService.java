@@ -1,6 +1,5 @@
 package at.ac.tuwien.qse.sepm.service;
 
-import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.WikiPlaceInfo;
 
@@ -13,7 +12,7 @@ public interface WikipediaService {
      *              <tt>place.country</tt>
      * @return a new WikiPlaceInfo object for the given Place. The fields may not all be
      *     initialized - sometimes not all information can be found
-     * @throws DAOException if an exception occurs on DAO level
+     * @throws ServiceException if an exception occurs on service layer level
      */
-    WikiPlaceInfo getWikiPlaceInfo(Place place) throws DAOException;
+    WikiPlaceInfo getWikiPlaceInfo(Place place) throws ServiceException;
 }
