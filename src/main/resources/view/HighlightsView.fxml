@@ -27,12 +27,25 @@
 
             </center>
             <bottom>
-                <Pane fx:id="tree">
-                    <children>
+                <BorderPane fx:id="timeline">
+                    <top>
+                        <Label prefHeight="20.0" prefWidth="259.0" style="-fx-background-color: #333333; -fx-font-size: 18; -fx-text-fill: white; -fx-padding: 5 0 5 10px;" text="Zeitlicher Verlauf der Reise" />
+                    </top>
+                    <center>
+                        <ScrollPane fx:id="treeScroll"  hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
+                            <VBox fx:id="tree" spacing="5.0" style="-fx-font-size: 16;">
+                                <children>
 
-                    </children>
+                                </children>
+                                <padding>
+                                    <Insets left="10.0" top="5.0" />
+                                </padding>
+                            </VBox>
+                        </ScrollPane>
+                    </center>
 
-                </Pane>
+
+                </BorderPane>
             </bottom>
          <padding>
             <Insets top="5.0" />

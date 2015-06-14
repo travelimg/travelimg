@@ -26,19 +26,19 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
-import javafx.scene.text.Text;
+import javafx.scene.text.*;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import javafx.scene.paint.Color;
+
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -50,12 +50,12 @@ import static java.util.Collections.*;
 
 public class HighlightsViewController {
 
-    @FXML private BorderPane borderPane,FotoContainer;
+    @FXML private BorderPane borderPane,FotoContainer,treeBoarder,timeLine;
     @FXML private GoogleMapsScene mapsScene;
-    @FXML private VBox journeys, mapContainer, photoView;
+    @FXML private VBox journeys, mapContainer, photoView,tree;
     @FXML private FilterList<Journey> journeyListView;
-    @FXML private ScrollPane scrollPhotoView;
-    @FXML private Pane tree;
+    @FXML private ScrollPane scrollPhotoView, treeScroll;
+
     @Autowired private ClusterService clusterService;
     @Autowired private PhotoService photoService;
     @Autowired private PhotoFilter filter;
@@ -76,6 +76,7 @@ public class HighlightsViewController {
     private static final Logger LOGGER = LogManager.getLogger();
     private ImageCache imageCache;
     private Line redLine;
+
     @FXML
     private StrokeLineCap lineCap;
 
@@ -104,11 +105,12 @@ public class HighlightsViewController {
         /**to remove - END**/
         redLine = new Line(100, 50, 100, 500);
         redLine.setStroke(Color.DARKGRAY);
-        redLine.setStrokeWidth(3);
+        redLine.setStrokeWidth(2);
         redLine.setStrokeLineCap(StrokeLineCap.ROUND);
 
         redLine.getStrokeDashArray().addAll(2D, 21D);
         redLine.setStrokeDashOffset(30);
+
 
 
 
@@ -130,6 +132,7 @@ public class HighlightsViewController {
         journeyRadioButtonsHashMap.clear();
         photoView.getChildren().clear();
         tree.getChildren().clear();
+
         Label lab2 = new Label();
         lab2.setText("Bitte eine Reise auswählen");
         photoView.getChildren().add(lab2);
@@ -305,17 +308,37 @@ public class HighlightsViewController {
                             overall.getChildren().add(tp);
                         }
                         treeView = new TreeView<>(rootItem);
-                        tree.getChildren().add(new Label("Zeitlicher Verlaufder Reise"));
-                        tree.getChildren().add(redLine);
+
+                       /* tree.getChildren().add(redLine);
 
                         double distance = redLine.getEndY()-redLine.getStartY();
 
                         int anz = places.size();
-                        int dist = 550 / anz;
-                        int counter =0;
-                        for(Place p : places.keySet()){
+                        double dist = (500 / anz)/2;
+                        int counter =1;
+                        Text start = new Text(82,50,"START");
+                        start.setStroke(javafx.scene.paint.Paint.valueOf("DARKGRAY"));
+                        tree.getChildren().add(start);
+                        Text end = new Text(88,545,"END");
+                        end.setStroke(javafx.scene.paint.Paint.valueOf("DARKGRAY"));
+                        tree.getChildren().add(end);*/
 
-                            Line l = new Line(100,50 + counter * dist,109,50 + counter * dist);
+                        String style =" -fx-font-size: 14; -fx-text-fill: #333333; -fx-padding: 5 0 5 10px;";
+
+
+                        for(Place p : places.keySet()){
+                            LocalDateTime pTime = places.get(p).get(0).getDatetime();
+                            String text = pTime.getYear()+"-"+pTime.getMonthValue()+"-"+pTime.getDayOfMonth()+"    -" +p.getCountry();
+
+                            Label lab = new Label();
+                            lab.setFont(new Font(18));
+                            lab.setStyle(style);
+                            lab.setText("-| " + text);
+
+                            tree.getChildren().add(lab);
+
+                            tree.getChildren().add(new Label());
+                           /* Line l = new Line(91,50 + counter * dist,109,50 + counter * dist);
                             l.setStroke(Color.DARKGRAY);
                             l.setStrokeWidth(4);
                             l.setStrokeLineCap(StrokeLineCap.ROUND);
@@ -323,7 +346,7 @@ public class HighlightsViewController {
                             LocalDateTime pTime = places.get(p).get(0).getDatetime();
                             Text text2 = new Text(4,53 + counter * dist,pTime.getYear()+"-"+pTime.getMonthValue()+"-"+pTime.getDayOfMonth());
                             tree.getChildren().addAll(l,text,text2);
-                            counter++;
+                            counter++;*/
                         }
 
                        // tree.getChildren().add(treeView);
