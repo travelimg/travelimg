@@ -115,7 +115,7 @@ public abstract class PhotoProviderTest {
 
         public PhotoMetadata getPhotoData1() {
             PhotoMetadata data = new PhotoMetadata();
-            data.setDate(LocalDateTime.of(1993, 3, 30, 7, 5));
+            data.setDatetime(LocalDateTime.of(1993, 3, 30, 7, 5));
             data.setLongitude(17.0);
             data.setLatitude(18.0);
             data.setRating(Rating.GOOD);
@@ -128,7 +128,7 @@ public abstract class PhotoProviderTest {
 
         public PhotoMetadata getPhotoData2() {
             PhotoMetadata data = new PhotoMetadata();
-            data.setDate(LocalDateTime.of(2014, 8, 14, 15, 36));
+            data.setDatetime(LocalDateTime.of(2014, 8, 14, 15, 36));
             data.setLongitude(42.0);
             data.setLatitude(43.0);
             data.setRating(Rating.NEUTRAL);

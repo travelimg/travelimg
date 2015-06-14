@@ -139,7 +139,7 @@ public class PhotoFileRepositoryTest extends PhotoRepositoryTest {
 
             @Override public PhotoMetadata getPhotoData1() {
                 PhotoMetadata data = new PhotoMetadata();
-                data.setDate(LocalDateTime.of(2005, 9, 11, 15, 43, 55));
+                data.setDatetime(LocalDateTime.of(2005, 9, 11, 15, 43, 55));
                 data.setLongitude(-104.99156111111111);
                 data.setLatitude(39.73934166666667);
                 data.setRating(Rating.NONE);
@@ -149,7 +149,7 @@ public class PhotoFileRepositoryTest extends PhotoRepositoryTest {
 
             public PhotoMetadata getPhotoData2() {
                 PhotoMetadata data = new PhotoMetadata();
-                data.setDate(LocalDateTime.of(2005, 9, 11, 15, 44, 8));
+                data.setDatetime(LocalDateTime.of(2005, 9, 11, 15, 44, 8));
                 data.setLongitude(-104.9916361111111);
                 data.setLatitude(39.739336111111116);
                 data.setRating(Rating.NONE);

@@ -93,7 +93,7 @@ public class PhotoFilter implements Predicate<Photo> {
     }
 
     private boolean testRating(Photo photo) {
-        return getIncludedRatings().contains(photo.getRating());
+        return getIncludedRatings().contains(photo.getData().getRating());
     }
 
     private boolean testPhotographer(Photo photo) {
@@ -101,7 +101,7 @@ public class PhotoFilter implements Predicate<Photo> {
     }
 
     private boolean testCategories(Photo photo) {
-        if (photo.getTags().isEmpty()) {
+        if (photo.getData().getTags().isEmpty()) {
             return isUntaggedIncluded();
         }
         return hasCategory(photo);
@@ -109,8 +109,8 @@ public class PhotoFilter implements Predicate<Photo> {
 
     private boolean testJourney(Photo photo) {
         Journey journey = null;
-        if (photo.getPlace() != null)
-            journey = photo.getPlace().getJourney();
+        if (photo.getData().getPlace() != null)
+            journey = photo.getData().getPlace().getJourney();
 
         for (Journey j : getIncludedJourneys()) {
             if (j == null) {
@@ -127,12 +127,12 @@ public class PhotoFilter implements Predicate<Photo> {
     }
 
     private boolean testPlace(Photo photo) {
-        return getIncludedPlaces().contains(photo.getPlace());
+        return getIncludedPlaces().contains(photo.getData().getPlace());
     }
 
     private boolean hasCategory(Photo photo) {
         for (Tag category : getIncludedCategories()) {
-            if (photo.getTags().contains(category)) {
+            if (photo.getData().getTags().contains(category)) {
                 return true;
             }
         }

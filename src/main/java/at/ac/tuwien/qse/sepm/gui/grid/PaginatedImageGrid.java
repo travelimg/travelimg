@@ -80,7 +80,7 @@ public class PaginatedImageGrid extends Pagination {
         photos.add(photo);
 
         photos = photos.stream()
-                .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
+                .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
                 .collect(Collectors.toList());
 
         pageCache.clear();

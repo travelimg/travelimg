@@ -55,13 +55,13 @@ public class WorldmapViewImpl implements WorldmapView {
     private boolean checkDouble(List<Photo> list, Photo p) {
 
         for (Photo photo : list) {
-            if (p.getLatitude() == photo.getLatitude() && p.getLongitude() == photo.getLongitude()) {
+            if (p.getData().getLatitude() == photo.getData().getLatitude() && p.getData().getLongitude() == photo.getData().getLongitude()) {
                 logger.debug("Marker already exists");
                 return true;
 
             }
 
-            if (Math.abs(p.getLatitude() - photo.getLatitude()) < 1 && Math.abs(p.getLongitude() - photo.getLongitude()) < 1) {
+            if (Math.abs(p.getData().getLatitude() - photo.getData().getLatitude()) < 1 && Math.abs(p.getData().getLongitude() - photo.getData().getLongitude()) < 1) {
                 logger.debug("Marker with similar coordinates already exists");
                 return true;
             }

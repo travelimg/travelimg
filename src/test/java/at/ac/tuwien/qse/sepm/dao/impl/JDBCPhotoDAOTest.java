@@ -144,7 +144,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     @Test(expected = DAOException.class)
     public void testCreateWithUnknownPhotographerThrows() throws DAOException, ValidationException {
         Photo photo = getInputPhoto(0);
-        photo.setPhotographer(new Photographer(-42, "does not exist"));
+        photo.getData().setPhotographer(new Photographer(-42, "does not exist"));
 
         photoDAO.create(photo);
     }

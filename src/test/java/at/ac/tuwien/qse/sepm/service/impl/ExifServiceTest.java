@@ -99,12 +99,12 @@ public class ExifServiceTest extends ServiceTestBase {
             e.printStackTrace();
         }
 
-        inputPhotos.get(2).getTags().add(inputTag);
+        inputPhotos.get(2).getData().getTags().add(inputTag);
         exifService.exportMetaToExif(inputPhotos.get(2));
         exifService.getTagsFromExif(expectedPhotos.get(2));
 
-        Tag expectedTag = expectedPhotos.get(2).getTags().iterator().next();
-        Tag actualTag = inputPhotos.get(2).getTags().iterator().next();
+        Tag expectedTag = expectedPhotos.get(2).getData().getTags().iterator().next();
+        Tag actualTag = inputPhotos.get(2).getData().getTags().iterator().next();
         assertEquals(expectedTag.getName(), actualTag.getName());
     }
 
@@ -122,10 +122,10 @@ public class ExifServiceTest extends ServiceTestBase {
             e.printStackTrace();
         }
 
-        inputPhotos.get(0).getPlace().setJourney(inputJourney);
+        inputPhotos.get(0).getData().getPlace().setJourney(inputJourney);
         exifService.exportMetaToExif(inputPhotos.get(0));
         exifService.getTagsFromExif(expectedPhotos.get(0));
-        assertEquals(inputPhotos.get(0).getPlace().getJourney(), expectedPhotos.get(0).getPlace().getJourney());
+        assertEquals(inputPhotos.get(0).getData().getPlace().getJourney(), expectedPhotos.get(0).getData().getPlace().getJourney());
         List<Journey> journeyList = journeyDAO.readAll();
         assertNotNull(journeyList);
     }
@@ -145,12 +145,12 @@ public class ExifServiceTest extends ServiceTestBase {
             e.printStackTrace();
         }
 
-        inputPhotos.get(1).setPlace(inputPlace);
+        inputPhotos.get(1).getData().setPlace(inputPlace);
         exifService.exportMetaToExif(inputPhotos.get(1));
         exifService.getTagsFromExif(expectedPhotos.get(1));
-        assertEquals(inputPhotos.get(1).getPlace().getCity(),
-                expectedPhotos.get(1).getPlace().getCity());
-        assertEquals(inputPhotos.get(1).getPlace().getCountry(), expectedPhotos.get(1).getPlace().getCountry());
+        assertEquals(inputPhotos.get(1).getData().getPlace().getCity(),
+                expectedPhotos.get(1).getData().getPlace().getCity());
+        assertEquals(inputPhotos.get(1).getData().getPlace().getCountry(), expectedPhotos.get(1).getData().getPlace().getCountry());
         List<Place> placeList = placeDAO.readAll();
         assertNotNull(placeList);
     }

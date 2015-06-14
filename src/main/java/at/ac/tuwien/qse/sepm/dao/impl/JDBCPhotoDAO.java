@@ -80,11 +80,11 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         Map<String, Object> parameters = new HashMap<String, Object>(1);
         parameters.put("photographer_id", photo.getData().getPhotographer().getId());
         parameters.put("path", photo.getPath());
-        parameters.put("rating", photo.getRating().ordinal());
-        parameters.put("datetime", Timestamp.valueOf(photo.getDatetime()));
-        parameters.put("latitude", photo.getLatitude());
-        parameters.put("longitude", photo.getLongitude());
-        parameters.put("place_id", photo.getPlace().getId());
+        parameters.put("rating", photo.getData().getRating().ordinal());
+        parameters.put("datetime", Timestamp.valueOf(photo.getData().getDatetime()));
+        parameters.put("latitude", photo.getData().getLatitude());
+        parameters.put("longitude", photo.getData().getLongitude());
+        parameters.put("place_id", photo.getData().getPlace().getId());
 
         try {
             Number newId = insertPhoto.executeAndReturnKey(parameters);
@@ -105,8 +105,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         try {
             jdbcTemplate.update(UPDATE_STATEMENT,
                     photo.getPath(),
-                    photo.getRating().ordinal(),
-                    photo.getPlace().getId(),
+                    photo.getData().getRating().ordinal(),
+                    photo.getData().getPlace().getId(),
                     photo.getId());
             logger.debug("Successfully update photo {}", photo);
         } catch (DataAccessException e) {
@@ -225,7 +225,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         }
 
         String filename = source.getName();
-        String date = dateFormatter.format(photo.getDatetime());
+        String date = dateFormatter.format(photo.getData().getDatetime());
 
         Path path = Paths.get(photoDirectory, date, filename);
         File dest = path.toFile();
@@ -248,15 +248,15 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             Photo photo = new Photo();
             photo.setId(rs.getInt(1));
             photo.setPath(rs.getString(3));
-            photo.setRating(Rating.from(rs.getInt(4)));
-            photo.setDatetime(rs.getTimestamp(5).toLocalDateTime());
-            photo.setLatitude(rs.getDouble(6));
-            photo.setLongitude(rs.getDouble(7));
+            photo.getData().setRating(Rating.from(rs.getInt(4)));
+            photo.getData().setDatetime(rs.getTimestamp(5).toLocalDateTime());
+            photo.getData().setLatitude(rs.getDouble(6));
+            photo.getData().setLongitude(rs.getDouble(7));
 
             try {
                 int placeId = rs.getInt(8);
                 Place place = placeDAO.getById(placeId);
-                photo.setPlace(place);
+                photo.getData().setPlace(place);
             } catch (DAOException ex) {
                 throw new DAOException.Unchecked(ex);
             } catch (ValidationException ex) {
@@ -266,14 +266,14 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             try {
                 int photographerId = rs.getInt(2);
                 Photographer photographer = photographerDAO.getById(photographerId);
-                photo.setPhotographer(photographer);
+                photo.getData().setPhotographer(photographer);
             } catch (DAOException ex) {
                 throw new DAOException.Unchecked(ex);
             }
 
             try {
                 List<Tag> tags = photoTagDAO.readTagsByPhoto(photo);
-                photo.getTags().addAll(tags);
+                photo.getData().getTags().addAll(tags);
             } catch (DAOException ex) {
                 throw new DAOException.Unchecked(ex);
             } catch (ValidationException ex) {

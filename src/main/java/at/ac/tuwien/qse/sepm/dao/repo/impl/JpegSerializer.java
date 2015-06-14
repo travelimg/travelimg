@@ -88,7 +88,7 @@ public class JpegSerializer implements PhotoSerializer {
             TiffOutputDirectory exifDirectory = outputSet.getOrCreateExifDirectory();
             outputSet.setGPSInDegrees(metadata.getLongitude(), metadata.getLatitude());
             exifDirectory.removeField(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
-            exifDirectory.add(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL, DATE_FORMATTER.format(metadata.getDate()));
+            exifDirectory.add(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL, DATE_FORMATTER.format(metadata.getDatetime()));
 
             is.reset();
             new ExifRewriter().updateExifMetadataLossless(is, os, outputSet);
@@ -110,8 +110,8 @@ public class JpegSerializer implements PhotoSerializer {
         }
         String dateString = field.getValueDescription();
         dateString = dateString.substring(1, dateString.length() - 1); // remove enclosing single quotes
-        output.setDate(DATE_FORMATTER.parse(dateString, LocalDateTime::from));
-        LOGGER.debug("read date as {}", output.getDate());
+        output.setDatetime(DATE_FORMATTER.parse(dateString, LocalDateTime::from));
+        LOGGER.debug("read date as {}", output.getDatetime());
     }
 
     private void readGps(JpegImageMetadata input, PhotoMetadata output) {

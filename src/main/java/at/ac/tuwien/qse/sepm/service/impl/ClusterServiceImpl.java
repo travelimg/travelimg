@@ -108,8 +108,8 @@ public class ClusterServiceImpl implements ClusterService {
 
         // attach a place to each photo
         for (Photo photo : photos) {
-            final double latitude = photo.getLatitude();
-            final double longitude = photo.getLongitude();
+            final double latitude = photo.getData().getLatitude();
+            final double longitude = photo.getData().getLongitude();
 
             double epsilon = 1.0;
             Optional<Place> place = places.stream()
@@ -123,14 +123,14 @@ public class ClusterServiceImpl implements ClusterService {
                 places.add(place.get());
             }
 
-            photo.setPlace(place.get());
+            photo.getData().setPlace(place.get());
             photoService.editPhoto(photo);
         }
         return places;
     }
 
     private Place lookupPlace(Photo photo, Journey journey) throws ServiceException {
-        Place place = geoService.getPlaceByGeoData(photo.getLatitude(), photo.getLongitude());
+        Place place = geoService.getPlaceByGeoData(photo.getData().getLatitude(), photo.getData().getLongitude());
         place.setJourney(journey);
 
         logger.debug("New unknown place cluster: {}", place);

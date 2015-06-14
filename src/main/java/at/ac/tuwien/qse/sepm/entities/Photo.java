@@ -37,12 +37,12 @@ public class Photo {
     public Photo(Integer id, Photographer photographer, String path, Rating rating, LocalDateTime datetime, double latitude, double longitude, Place place) {
         this(Paths.get(path));
         setId(id);
-        setPhotographer(photographer);
-        setRating(rating);
-        setDatetime(datetime);
-        setLatitude(latitude);
-        setLongitude(longitude);
-        setPlace(place);
+        getData().setPhotographer(photographer);
+        getData().setRating(rating);
+        getData().setDatetime(datetime);
+        getData().setLatitude(latitude);
+        getData().setLongitude(longitude);
+        getData().setPlace(place);
     }
 
     public Integer getId() {
@@ -61,74 +61,12 @@ public class Photo {
         return data;
     }
 
-    @Deprecated
-    public Place getPlace() {
-        return getData().getPlace();
-    }
-
-    @Deprecated
-    public void setPlace(Place place) {
-        getData().setPlace(place);
-    }
-
-    @Deprecated
     public String getPath() {
         return file.toString();
     }
 
-    @Deprecated
     public void setPath(String path) {
         this.file = Paths.get(path);
-    }
-
-    @Deprecated
-    public Rating getRating() {
-        return getData().getRating();
-    }
-
-    @Deprecated
-    public void setRating(Rating rating) {
-        getData().setRating(rating);
-    }
-
-    @Deprecated
-    public void setPhotographer(Photographer photographer) {
-        getData().setPhotographer(photographer);
-    }
-
-    @Deprecated
-    public LocalDateTime getDatetime() {
-        return getData().getDate();
-    }
-
-    @Deprecated
-    public void setDatetime(LocalDateTime datetime) {
-        getData().setDate(datetime);
-    }
-
-    @Deprecated
-    public double getLatitude() {
-        return getData().getLatitude();
-    }
-
-    @Deprecated
-    public void setLatitude(double latitude) {
-        getData().setLatitude(latitude);
-    }
-
-    @Deprecated
-    public double getLongitude() {
-        return getData().getLongitude();
-    }
-
-    @Deprecated
-    public void setLongitude(double longitude) {
-        getData().setLongitude(longitude);
-    }
-
-    @Deprecated
-    public Set<Tag> getTags() {
-        return getData().getTags();
     }
 
     @Override public boolean equals(Object o) {

@@ -67,8 +67,8 @@ public class JDBCPhotoTagDAOTest extends AbstractJDBCDAOTest {
 
         Photo p = new Photo();
         p.setId(1);
-        p.setLatitude(12);
-        p.setLongitude(12);
+        p.getData().setLatitude(12);
+        p.getData().setLongitude(12);
 
         photoTagDAO.deleteAllEntriesOfSpecificPhoto(p);
         assertTrue(true);

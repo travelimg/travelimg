@@ -78,7 +78,7 @@ public class TagServiceImpl implements TagService {
         for (Photo photo : photos) {
             try {
                 photoTagDAO.createPhotoTag(photo, tag);
-                photo.getTags().add(tag);
+                photo.getData().getTags().add(tag);
             } catch (DAOException ex) {
                 LOGGER.error("Photo-Tag-creation with {}, {} failed.", photo, tag);
                 throw new ServiceException("Creation of Photo-Tag failed.", ex);
@@ -98,7 +98,7 @@ public class TagServiceImpl implements TagService {
         for (Photo photo : photos) {
             try {
                 photoTagDAO.removeTagFromPhoto(photo, tag);
-                photo.getTags().remove(tag);
+                photo.getData().getTags().remove(tag);
             } catch (DAOException ex) {
                 LOGGER.error("Removal of Photo-Tag with {}, {} failed.", photo, tag);
                 throw new ServiceException("Photo-Tag removal failed.", ex);
@@ -134,7 +134,7 @@ public class TagServiceImpl implements TagService {
 
         // count the frequency of each tag
         for (Photo photo : photos) {
-            for (Tag tag : photo.getTags()) {
+            for (Tag tag : photo.getData().getTags()) {
                 if (counter.containsKey(tag)) {
                     counter.put(tag, counter.get(tag) + 1);
                 } else {

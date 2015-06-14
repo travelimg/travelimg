@@ -87,7 +87,7 @@ public class PhotoServiceImpl implements PhotoService {
             LOGGER.debug("Updating photo {}", p);
             try {
                 //TODO update all attributes
-                p.setPlace(photo.getPlace());
+                p.getData().setPlace(photo.getData().getPlace());
                 photoDAO.update(p);
             } catch (DAOException e) {
                 throw new ServiceException(e);
@@ -152,7 +152,7 @@ public class PhotoServiceImpl implements PhotoService {
         }
 
         for (Photo photo : photos) {
-            photo.getPlace().setJourney(journey);
+            photo.getData().getPlace().setJourney(journey);
 //            exifService.exportMetaToExif(photo);
             LOGGER.debug("Leaving addJourneyToPhotos");
         }
@@ -171,7 +171,7 @@ public class PhotoServiceImpl implements PhotoService {
 //            exifService.exportMetaToExif(photo);
         }
         Photo p = new Photo();
-        p.setPlace(place);
+        p.getData().setPlace(place);
         editPhotos(photos, p);
         LOGGER.debug("Leaving addPlaceToPhotos");
     }

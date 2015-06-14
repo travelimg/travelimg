@@ -110,7 +110,7 @@ public class ExifServiceImpl implements ExifService {
 
     @Override
     public void getTagsFromExif(Photo photo) throws ServiceException {
-        logger.debug("getTagsFromExif" + photo + ":" + photo.getTags());
+        logger.debug("getTagsFromExif" + photo + ":" + photo.getData().getTags());
         File file = new File(photo.getPath());
         String tags = "";
         Journey journey = null;
@@ -178,7 +178,7 @@ public class ExifServiceImpl implements ExifService {
 
     @Override
     public void exportMetaToExif(Photo photo) throws ServiceException {
-        logger.debug("exportMetaToExif" + photo + ":" + photo.getTags());
+        logger.debug("exportMetaToExif" + photo + ":" + photo.getData().getTags());
         File jpegImageFile = new File(photo.getPath());
         File tempFile = new File(photo.getPath() + "d");
         OutputStream os = null;
@@ -186,18 +186,17 @@ public class ExifServiceImpl implements ExifService {
 
         String tags = "travelimg";
 
-        for (Tag element : photo.getTags()) {
+        for (Tag element : photo.getData().getTags()) {
             tags += "/" + element.getName();
         }
 
-        if (photo.getPlace() != null) {
-            Journey journey = photo.getPlace().getJourney();
+        if (photo.getData().getPlace() != null) {
+            Journey journey = photo.getData().getPlace().getJourney();
             tags += "/journey." + journey.getName() + "." + journey.getStartDate()
                     .format(dateFormatter) + "." + journey.getEndDate().format(dateFormatter);
 
-            Place place = photo.getPlace();
-            tags += "/place|" + place.getCity() + "|" + place.getCountry() + "|" + place
-                    .getLatitude() + "|" + place.getLongitude();
+            Place place = photo.getData().getPlace();
+            tags += "/place|" + place.getCity() + "|" + place.getCountry() + "|" + place.getLatitude() + "|" + place.getLongitude();
         }
 
         try {
@@ -263,9 +262,9 @@ public class ExifServiceImpl implements ExifService {
     @Override
     public void attachDateAndGeoData(Photo photo) throws ServiceException {
         File file = new File(photo.getPath());
-        LocalDateTime datetime = photo.getDatetime();
-        double latitude = photo.getLatitude();
-        double longitude = photo.getLongitude();
+        LocalDateTime datetime = photo.getData().getDatetime();
+        double latitude = photo.getData().getLatitude();
+        double longitude = photo.getData().getLongitude();
 
         try {
             ImageMetadata metadata = Imaging.getMetadata(file);
@@ -289,9 +288,9 @@ public class ExifServiceImpl implements ExifService {
         if (datetime == null)
             datetime = LocalDateTime.MIN;
 
-        photo.setDatetime(datetime);
-        photo.setLatitude(latitude);
-        photo.setLongitude(longitude);
+        photo.getData().setDatetime(datetime);
+        photo.getData().setLatitude(latitude);
+        photo.getData().setLongitude(longitude);
     }
 
     private LocalDateTime getDateTime(ImageMetadata metadata) {

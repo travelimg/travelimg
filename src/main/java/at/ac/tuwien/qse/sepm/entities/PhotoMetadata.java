@@ -6,7 +6,7 @@ import java.util.Set;
 
 public class PhotoMetadata {
 
-    private LocalDateTime date = null;
+    private LocalDateTime datetime = null;
     private double longitude = 0.0;
     private double latitude = 0.0;
     private Rating rating = Rating.NONE;
@@ -19,8 +19,8 @@ public class PhotoMetadata {
 
     public PhotoMetadata(PhotoMetadata from) {
         if (from == null) throw new IllegalArgumentException();
-        if (from.date != null) {
-            this.date = LocalDateTime.from(from.date);
+        if (from.datetime != null) {
+            this.datetime = LocalDateTime.from(from.datetime);
         }
         this.longitude = from.longitude;
         this.latitude = from.latitude;
@@ -30,12 +30,12 @@ public class PhotoMetadata {
         this.tags.addAll(from.getTags());
     }
 
-    public LocalDateTime getDate() {
-        return date;
+    public LocalDateTime getDatetime() {
+        return datetime;
     }
 
-    public void setDate(LocalDateTime date) {
-        this.date = date;
+    public void setDatetime(LocalDateTime date) {
+        this.datetime = date;
     }
 
     public double getLongitude() {
@@ -95,7 +95,7 @@ public class PhotoMetadata {
             return false;
         if (Double.compare(that.longitude, longitude) != 0)
             return false;
-        if (date != null ? !date.equals(that.date) : that.date != null)
+        if (datetime != null ? !datetime.equals(that.datetime) : that.datetime != null)
             return false;
         if (photographer != null ?
                 !photographer.equals(that.photographer) :
@@ -114,7 +114,7 @@ public class PhotoMetadata {
     @Override public int hashCode() {
         int result;
         long temp;
-        result = date != null ? date.hashCode() : 0;
+        result = datetime != null ? datetime.hashCode() : 0;
         temp = Double.doubleToLongBits(longitude);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(latitude);
@@ -128,7 +128,7 @@ public class PhotoMetadata {
 
     @Override public String toString() {
         return "PhotoMetadata{" +
-                "date=" + date +
+                "datetime=" + datetime +
                 ", longitude=" + longitude +
                 ", latitude=" + latitude +
                 ", rating=" + rating +

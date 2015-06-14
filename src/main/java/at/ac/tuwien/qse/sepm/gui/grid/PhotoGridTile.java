@@ -59,9 +59,9 @@ public class PhotoGridTile extends ImageGridTile {
         super.setPhoto(photo, image);
         if (photo == null) return;
 
-        showRating(photo.getRating());
-        showTags(photo.getTags());
-        showDate(photo.getDatetime());
+        showRating(photo.getData().getRating());
+        showTags(photo.getData().getTags());
+        showDate(photo.getData().getDatetime());
     }
 
     private void showRating(Rating rating) {
