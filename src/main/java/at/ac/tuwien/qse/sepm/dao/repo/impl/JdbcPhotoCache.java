@@ -47,6 +47,7 @@ public class JdbcPhotoCache implements PhotoCache {
         // Save sub-entities.
         photo.getData().setPhotographer(save(photo.getData().getPhotographer()));
         photo.getData().setPlace(save(photo.getData().getPlace()));
+        photo.getData().setJourney(save(photo.getData().getJourney()));
         Set<Tag> tags = new HashSet<>(photo.getData().getTags());
         photo.getData().getTags().clear();
         for (Tag t : tags) {
@@ -247,9 +248,11 @@ public class JdbcPhotoCache implements PhotoCache {
                 }
             }
         }
+
+        // TODO: sense?
         try {
             LOGGER.debug("reading default tag");
-            tag = tagDAO.read(new Tag(1, ""));
+            tag = tagDAO.read(new Tag(1, "a"));
             LOGGER.debug("read default tag {}", tag);
             return tag;
         } catch (DAOException ex) {
