@@ -170,16 +170,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
         Photo photo = getExpectedPhoto(1);
         photo.setId(1337);
 
-        boolean didThrow = false;
-        try {
-            photoDAO.delete(photo);
-        } catch (DAOException ex) {
-            didThrow = true;
-        }
-
-        if (!didThrow) {
-            throw new AssertionError("Expected DAOException");
-        }
+        photoDAO.delete(photo);
 
         // ensure that the number of photos did not change
         assertThat(countRows(), is(initial));
