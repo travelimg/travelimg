@@ -3,6 +3,8 @@ package at.ac.tuwien.qse.sepm.service.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.JourneyDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
+import at.ac.tuwien.qse.sepm.dao.repo.impl.CachedPhotoRepository;
+import at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher;
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
@@ -13,9 +15,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -24,13 +28,30 @@ public class PhotoServiceImpl implements PhotoService {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
-    private ExecutorService executorService;
-    @Autowired
     private PhotoDAO photoDAO;
     @Autowired
     private JourneyDAO journeyDAO;
+    @Autowired
+    private CachedPhotoRepository photoRepository;
 
-    @Override
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+    @Autowired
+    private void initializeWatcher(PollingFileWatcher watcher) {
+        watcher.register(Paths.get("/home/kris/travelimg"));
+        watcher.getExtensions().add("jpeg");
+        watcher.getExtensions().add("jpg");
+        watcher.getExtensions().add("JPEG");
+        watcher.getExtensions().add("JPG");
+
+        int REFRESH_RATE = 5;
+        scheduler.scheduleAtFixedRate(watcher::refresh, REFRESH_RATE, REFRESH_RATE, TimeUnit.SECONDS);
+    }
+
+    public void close() {
+        scheduler.shutdown();
+    }
+
     public void deletePhotos(List<Photo> photos) throws ServiceException {
         if (photos == null) {
             throw new ServiceException("List<Photo> photos is null");
