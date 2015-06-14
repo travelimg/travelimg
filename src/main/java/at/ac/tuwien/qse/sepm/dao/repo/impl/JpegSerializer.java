@@ -1,7 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.repo.FormatException;
-import at.ac.tuwien.qse.sepm.dao.repo.PersistenceException;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoMetadata;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoSerializer;
 import org.apache.commons.imaging.ImageReadException;
@@ -18,21 +18,18 @@ import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 public class JpegSerializer implements PhotoSerializer {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
 
-    @Override public PhotoMetadata read(InputStream is) throws PersistenceException {
+    @Override public PhotoMetadata read(InputStream is) throws DAOException {
         if (is == null) throw new IllegalArgumentException();
         LOGGER.debug("reading metadata");
 
@@ -63,7 +60,7 @@ public class JpegSerializer implements PhotoSerializer {
         return result;
     }
 
-    @Override public void update(InputStream is, OutputStream os, PhotoMetadata metadata) throws PersistenceException {
+    @Override public void update(InputStream is, OutputStream os, PhotoMetadata metadata) throws DAOException {
         if (is == null) throw new IllegalArgumentException();
         if (os == null) throw new IllegalArgumentException();
         if (metadata == null) throw new IllegalArgumentException();
@@ -74,11 +71,11 @@ public class JpegSerializer implements PhotoSerializer {
             ImageMetadata imageData = Imaging.getMetadata(is, null);
             if (imageData == null) {
                 LOGGER.debug("could not find image metadata");
-                throw new PersistenceException("No metadata found.");
+                throw new DAOException("No metadata found.");
             }
             if (!(imageData instanceof JpegImageMetadata)) {
                 LOGGER.debug("metadata is of unknown type");
-                throw new PersistenceException("Metadata is of unknown type.");
+                throw new DAOException("Metadata is of unknown type.");
             }
 
             JpegImageMetadata jpegData = (JpegImageMetadata)imageData;
@@ -98,7 +95,7 @@ public class JpegSerializer implements PhotoSerializer {
 
         } catch (IOException | ImageReadException | ImageWriteException ex) {
             LOGGER.warn("failed updating metadata");
-            throw new PersistenceException(ex);
+            throw new DAOException(ex);
         }
 
         LOGGER.debug("updated photo metadata");

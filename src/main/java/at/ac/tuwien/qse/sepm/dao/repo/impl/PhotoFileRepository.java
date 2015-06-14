@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.repo.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -53,7 +54,7 @@ public class PhotoFileRepository implements PhotoRepository {
         return result;
     }
 
-    @Override public void create(Path file, InputStream source) throws PersistenceException {
+    @Override public void create(Path file, InputStream source) throws DAOException {
         if (file == null) throw new IllegalArgumentException();
         if (source == null) throw new IllegalArgumentException();
         LOGGER.debug("creating file {}", file);
@@ -75,11 +76,11 @@ public class PhotoFileRepository implements PhotoRepository {
             IOUtils.copy(source, destination);
             LOGGER.debug("created {}", file);
         } catch (IOException ex) {
-            throw new PersistenceException(ex);
+            throw new DAOException(ex);
         }
     }
 
-    @Override public void update(Photo photo) throws PersistenceException {
+    @Override public void update(Photo photo) throws DAOException {
         if (photo == null) throw new IllegalArgumentException();
         LOGGER.debug("updating {}", photo);
 
@@ -98,7 +99,7 @@ public class PhotoFileRepository implements PhotoRepository {
                     fileManager.createFile(temp);
                 } catch (IOException ex) {
                     LOGGER.warn("failed creating temp file at {}", temp);
-                    throw new PersistenceException(ex);
+                    throw new DAOException(ex);
                 }
             }
 
@@ -106,14 +107,14 @@ public class PhotoFileRepository implements PhotoRepository {
                 is = fileManager.newInputStream(file);
             } catch (IOException ex) {
                 LOGGER.warn("failed creating input stream for file {}", file);
-                throw new PersistenceException(ex);
+                throw new DAOException(ex);
             }
 
             try {
                 os = fileManager.newOutputStream(temp);
             } catch (IOException ex) {
                 LOGGER.warn("failed creating output stream for file {}", temp);
-                throw new PersistenceException();
+                throw new DAOException();
             }
 
             serializer.update(is, os, photo.getData());
@@ -122,7 +123,7 @@ public class PhotoFileRepository implements PhotoRepository {
                 fileManager.copy(temp, file);
             } catch (IOException ex) {
                 LOGGER.warn("failed copying {} -> {}", temp, file);
-                throw new PersistenceException(ex);
+                throw new DAOException(ex);
             }
 
         } finally {
@@ -153,7 +154,7 @@ public class PhotoFileRepository implements PhotoRepository {
         }
     }
 
-    @Override public void delete(Path file) throws PersistenceException {
+    @Override public void delete(Path file) throws DAOException {
         if (file == null) throw new IllegalArgumentException();
         LOGGER.debug("deleting {}", file);
 
@@ -166,7 +167,7 @@ public class PhotoFileRepository implements PhotoRepository {
             LOGGER.info("deleted {}", file);
         } catch (IOException ex) {
             LOGGER.debug("failed deleting file {}", file);
-            throw new PersistenceException(ex);
+            throw new DAOException(ex);
         }
     }
 
@@ -182,21 +183,21 @@ public class PhotoFileRepository implements PhotoRepository {
         LOGGER.debug("removed listener {}", listener);
     }
 
-    @Override public boolean contains(Path file) throws PersistenceException {
+    @Override public boolean contains(Path file) throws DAOException {
         LOGGER.debug("contains {}", file);
         boolean result = watcher.recognizes(file) && fileManager.exists(file);
         LOGGER.debug("contains is {} for {}", result, file);
         return result;
     }
 
-    @Override public Collection<Path> index() throws PersistenceException {
+    @Override public Collection<Path> index() throws DAOException {
         LOGGER.debug("indexing");
         Collection<Path> files = watcher.index();
         LOGGER.debug("indexed {}", files.size());
         return files;
     }
 
-    @Override public Photo read(Path file) throws PersistenceException {
+    @Override public Photo read(Path file) throws DAOException {
         if (file == null) throw new IllegalArgumentException();
         LOGGER.debug("reading {}", file);
 
@@ -210,7 +211,7 @@ public class PhotoFileRepository implements PhotoRepository {
             is = fileManager.newInputStream(file);
         } catch (IOException ex) {
             LOGGER.warn("failed opening file {}", file);
-            throw new PersistenceException(ex);
+            throw new DAOException(ex);
         }
 
         PhotoMetadata data = serializer.read(is);

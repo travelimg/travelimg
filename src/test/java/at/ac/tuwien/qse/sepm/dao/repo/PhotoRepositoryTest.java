@@ -1,14 +1,11 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.repo.impl.MockPhotoSerializer;
 import org.junit.Test;
 
 import java.io.*;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -17,24 +14,24 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
     protected abstract PhotoRepository getObject();
     protected abstract Context getContext();
 
-    @Override protected void add(PhotoProvider object, Photo photo) throws PersistenceException {
+    @Override protected void add(PhotoProvider object, Photo photo) throws DAOException {
         ((PhotoRepository)object).create(photo.getFile(), getContext().getStream(photo));
     }
 
     @Test
-    public void accept_accepted_returnsTrue() throws PersistenceException {
+    public void accept_accepted_returnsTrue() throws DAOException {
         PhotoRepository object = getObject();
         assertTrue(object.accepts(getContext().getFile1()));
     }
 
     @Test
-    public void accept_unaccepted_returnsFalse() throws PersistenceException {
+    public void accept_unaccepted_returnsFalse() throws DAOException {
         PhotoRepository object = getObject();
         assertFalse(object.accepts(getContext().getUnacceptedPath()));
     }
 
-    @Test(expected = PersistenceException.class)
-    public void create_unacceptedPath_throws() throws PersistenceException {
+    @Test(expected = DAOException.class)
+    public void create_unacceptedPath_throws() throws DAOException {
         PhotoRepository object = getObject();
         Path file = getContext().getUnacceptedPath();
         assertFalse(object.accepts(file));
@@ -42,7 +39,7 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
     }
 
     @Test(expected = PhotoAlreadyExistsException.class)
-    public void create_existing_throws() throws PersistenceException {
+    public void create_existing_throws() throws DAOException {
         PhotoRepository object = getObject();
         Path file = getContext().getFile1();
         object.create(file, getContext().getStream1());
@@ -51,7 +48,7 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
     }
 
     @Test
-    public void create_valid_persists() throws PersistenceException {
+    public void create_valid_persists() throws DAOException {
         PhotoRepository object = getObject();
         Path file = getContext().getFile1();
         object.create(file, getContext().getStream1());
@@ -61,7 +58,7 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
     }
 
     @Test
-    public void create_valid_notifiesListener() throws PersistenceException {
+    public void create_valid_notifiesListener() throws DAOException {
         PhotoRepository object = getObject();
         Path file = getContext().getFile1();
         MockListener listener = new MockListener();
@@ -78,7 +75,7 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
     }
 
     @Test(expected = PhotoNotFoundException.class)
-    public void update_nonExisting_throws() throws PersistenceException {
+    public void update_nonExisting_throws() throws DAOException {
         PhotoRepository object = getObject();
         Photo photo = getContext().getPhoto1();
 
@@ -86,7 +83,7 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
     }
 
     @Test
-    public void update_existing_persists() throws PersistenceException {
+    public void update_existing_persists() throws DAOException {
         PhotoRepository object = getObject();
         Path file = getContext().getFile1();
         object.create(file, getContext().getStream1());
@@ -97,7 +94,7 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
     }
 
     @Test
-    public void update_existing_notifiesListener() throws PersistenceException {
+    public void update_existing_notifiesListener() throws DAOException {
         PhotoRepository object = getObject();
         Path file = getContext().getFile1();
         object.create(file, getContext().getStream1());
@@ -116,7 +113,7 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
     }
 
     @Test(expected = PhotoNotFoundException.class)
-    public void delete_nonExisting_throws() throws PersistenceException {
+    public void delete_nonExisting_throws() throws DAOException {
         PhotoRepository object = getObject();
         Path file = getContext().getFile1();
 
@@ -124,7 +121,7 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
     }
 
     @Test
-    public void delete_existing_persists() throws PersistenceException {
+    public void delete_existing_persists() throws DAOException {
         PhotoRepository object = getObject();
         Path file = getContext().getFile1();
         object.create(file, getContext().getStream1());
@@ -134,7 +131,7 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
     }
 
     @Test
-    public void delete_existing_notifiesListener() throws PersistenceException {
+    public void delete_existing_notifiesListener() throws DAOException {
         PhotoRepository object = getObject();
         Path file = getContext().getFile1();
         object.create(file, getContext().getStream1());
@@ -152,7 +149,7 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
     }
 
     @Test
-    public void removeListener_removed_doesNotNotify() throws PersistenceException {
+    public void removeListener_removed_doesNotNotify() throws DAOException {
         PhotoRepository object = getObject();
         MockListener listener = new MockListener();
         object.addListener(listener);
@@ -179,7 +176,7 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
             return serializer;
         }
 
-        public InputStream getStream(Photo photo) throws PersistenceException {
+        public InputStream getStream(Photo photo) throws DAOException {
             ByteArrayInputStream is = new ByteArrayInputStream(new byte[0]);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             getSerializer().update(is, os, photo.getData());

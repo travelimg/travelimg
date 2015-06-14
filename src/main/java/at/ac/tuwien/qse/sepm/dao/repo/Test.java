@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.repo.impl.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,7 +59,7 @@ public class Test {
                 Collection<Photo> photos = repository.readAll();
                 LOGGER.info("repository contains {} photos", photos.size());
                 photos.forEach(p -> LOGGER.info(p));
-            } catch (PersistenceException ex) {
+            } catch (DAOException ex) {
                 LOGGER.warn("failed read all");
                 LOGGER.error(ex);
             }
@@ -70,7 +71,7 @@ public class Test {
                 Collection<Photo> photos = repository.readAll();
                 LOGGER.info("repository contains {} photos", photos.size());
                 photos.forEach(p -> LOGGER.info(p));
-            } catch (PersistenceException ex) {
+            } catch (DAOException ex) {
                 LOGGER.warn("failed read all");
                 LOGGER.error(ex);
             }
@@ -82,13 +83,13 @@ public class Test {
                 Collection<Photo> photos = repository.readAll();
                 LOGGER.info("repository contains {} photos", photos.size());
                 photos.forEach(p -> LOGGER.info(p));
-            } catch (PersistenceException ex) {
+            } catch (DAOException ex) {
                 LOGGER.warn("failed read all");
                 LOGGER.error(ex);
             }
         }
 
-        @Override public void onError(PhotoRepository repository, PersistenceException error) {
+        @Override public void onError(PhotoRepository repository, DAOException error) {
             LOGGER.error(error);
         }
 
@@ -104,7 +105,7 @@ public class Test {
             repository.getQueue().forEach(op -> LOGGER.info(op));
         }
 
-        @Override public void onError(AsyncPhotoRepository repository, Operation operation, PersistenceException error) {
+        @Override public void onError(AsyncPhotoRepository repository, Operation operation, DAOException error) {
             LOGGER.error("failed {}", operation);
             LOGGER.error(error);
             LOGGER.info("queue length {}", repository.getQueue().size());

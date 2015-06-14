@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.repo.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -35,7 +36,7 @@ public class MemoryPhotoRepository implements PhotoRepository {
         return prefix;
     }
 
-    @Override public boolean accepts(Path file) throws PersistenceException {
+    @Override public boolean accepts(Path file) throws DAOException {
         if (file == null) throw new IllegalArgumentException();
         LOGGER.debug("accepting {}", file);
         boolean result = file.startsWith(getPrefix());
@@ -43,13 +44,13 @@ public class MemoryPhotoRepository implements PhotoRepository {
         return result;
     }
 
-    @Override public void create(Path file, InputStream source) throws PersistenceException {
+    @Override public void create(Path file, InputStream source) throws DAOException {
         if (file == null) throw new IllegalArgumentException();
         if (source == null) throw new IllegalArgumentException();
         LOGGER.debug("creating {}", file);
 
         if (!accepts(file)) {
-            throw new PersistenceException("File is not accepted by this repository.");
+            throw new DAOException("File is not accepted by this repository.");
         }
         if (contains(file)) {
             throw new PhotoAlreadyExistsException(this, file);
@@ -61,11 +62,11 @@ public class MemoryPhotoRepository implements PhotoRepository {
             LOGGER.info("created {}", file);
             listeners.forEach(l -> l.onCreate(this, file));
         } catch (IOException ex) {
-            throw new PersistenceException(ex);
+            throw new DAOException(ex);
         }
     }
 
-    @Override public void update(Photo photo) throws PersistenceException {
+    @Override public void update(Photo photo) throws DAOException {
         if (photo == null) throw new IllegalArgumentException();
         LOGGER.debug("updating {}", photo);
 
@@ -82,7 +83,7 @@ public class MemoryPhotoRepository implements PhotoRepository {
         listeners.forEach(l -> l.onUpdate(this, file));
     }
 
-    @Override public void delete(Path file) throws PersistenceException {
+    @Override public void delete(Path file) throws DAOException {
         if (file == null) throw new IllegalArgumentException();
         LOGGER.debug("deleting {}", file);
 
@@ -107,18 +108,18 @@ public class MemoryPhotoRepository implements PhotoRepository {
         LOGGER.info("removed listener {}", listener);
     }
 
-    @Override public Collection<Path> index() throws PersistenceException {
+    @Override public Collection<Path> index() throws DAOException {
         LOGGER.debug("indexing");
         Collection<Path> result = files.keySet();
         LOGGER.info("indexed {}", result.size());
         return result;
     }
 
-    @Override public boolean contains(Path file) throws PersistenceException {
+    @Override public boolean contains(Path file) throws DAOException {
         return files.containsKey(file);
     }
 
-    @Override public Photo read(Path file) throws PersistenceException {
+    @Override public Photo read(Path file) throws DAOException {
         if (file == null) throw new IllegalArgumentException();
         LOGGER.debug("reading {}", file);
 

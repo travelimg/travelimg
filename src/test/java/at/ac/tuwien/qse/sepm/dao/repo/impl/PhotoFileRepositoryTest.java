@@ -1,19 +1,17 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.repo.*;
 import at.ac.tuwien.qse.sepm.entities.Rating;
-import org.apache.commons.io.FileUtils;
 import org.junit.*;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Collection;
 
 import static org.junit.Assert.*;
 
@@ -42,7 +40,7 @@ public class PhotoFileRepositoryTest extends PhotoRepositoryTest {
     }
 
     @Test
-    @Override public void create_valid_notifiesListener() throws PersistenceException {
+    @Override public void create_valid_notifiesListener() throws DAOException {
         Path file = getContext().getFile1();
         MockListener listener = new MockListener();
         object.addListener(listener);
@@ -59,7 +57,7 @@ public class PhotoFileRepositoryTest extends PhotoRepositoryTest {
     }
 
     @Test
-    @Override public void update_existing_notifiesListener() throws PersistenceException {
+    @Override public void update_existing_notifiesListener() throws DAOException {
         Path file = getContext().getFile1();
         object.create(file, getContext().getStream1());
         watcher.refresh();
@@ -79,7 +77,7 @@ public class PhotoFileRepositoryTest extends PhotoRepositoryTest {
     }
 
     @Test
-    @Override public void delete_existing_notifiesListener() throws PersistenceException {
+    @Override public void delete_existing_notifiesListener() throws DAOException {
         Path file = getContext().getFile1();
         object.create(file, getContext().getStream1());
         watcher.refresh();
@@ -127,14 +125,14 @@ public class PhotoFileRepositoryTest extends PhotoRepositoryTest {
                 }
             }
 
-            @Override public InputStream getStream(Photo photo) throws PersistenceException {
+            @Override public InputStream getStream(Photo photo) throws DAOException {
                 if (photo.equals(getPhoto1())) {
                     return getStream1();
                 }
                 if (photo.equals(getPhoto2())) {
                     return getStream2();
                 }
-                throw new PersistenceException();
+                throw new DAOException();
             }
 
             @Override public PhotoMetadata getPhotoData1() {

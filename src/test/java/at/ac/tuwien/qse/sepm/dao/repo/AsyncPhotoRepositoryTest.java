@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -13,14 +14,14 @@ public abstract class AsyncPhotoRepositoryTest extends PhotoRepositoryTest {
     }
 
     @Test
-    public void getQueue_nothingModified_returnsEmpty() throws PersistenceException {
+    public void getQueue_nothingModified_returnsEmpty() throws DAOException {
         AsyncPhotoRepository object = getObject();
 
         assertTrue(object.getQueue().isEmpty());
     }
 
     @Test
-    public void getQueue_updated_returnsUpdateOperation() throws PersistenceException {
+    public void getQueue_updated_returnsUpdateOperation() throws DAOException {
         AsyncPhotoRepository object = getObject();
         object.create(getContext().getFile1(), getContext().getStream1());
         object.completeNext();
@@ -33,7 +34,7 @@ public abstract class AsyncPhotoRepositoryTest extends PhotoRepositoryTest {
     }
 
     @Test
-    public void getQueue_deleted_returnsDeleteOperation() throws PersistenceException {
+    public void getQueue_deleted_returnsDeleteOperation() throws DAOException {
         AsyncPhotoRepository object = getObject();
         object.create(getContext().getFile1(), getContext().getStream1());
         object.completeNext();
@@ -46,7 +47,7 @@ public abstract class AsyncPhotoRepositoryTest extends PhotoRepositoryTest {
     }
 
     @Test
-    public void addAsyncListener_update_notifies() throws PersistenceException {
+    public void addAsyncListener_update_notifies() throws DAOException {
         AsyncPhotoRepository object = getObject();
         MockAsyncListener listener = new MockAsyncListener();
         object.addListener(listener);
@@ -63,7 +64,7 @@ public abstract class AsyncPhotoRepositoryTest extends PhotoRepositoryTest {
     }
 
     @Test
-    public void addAsyncListener_delete_notifies() throws PersistenceException {
+    public void addAsyncListener_delete_notifies() throws DAOException {
         AsyncPhotoRepository object = getObject();
         MockAsyncListener listener = new MockAsyncListener();
         object.addListener(listener);
@@ -80,7 +81,7 @@ public abstract class AsyncPhotoRepositoryTest extends PhotoRepositoryTest {
     }
 
     @Test
-    public void addAsyncListener_completeNext_notifies() throws PersistenceException {
+    public void addAsyncListener_completeNext_notifies() throws DAOException {
         AsyncPhotoRepository object = getObject();
         MockAsyncListener listener = new MockAsyncListener();
         object.addListener(listener);

@@ -16,17 +16,17 @@ public abstract class PhotoProviderTest {
 
     protected abstract PhotoProvider getObject();
     protected abstract Context getContext();
-    protected abstract void add(PhotoProvider object, Photo photo) throws PersistenceException;
+    protected abstract void add(PhotoProvider object, Photo photo) throws DAOException;
 
     @Test
-    public void index_nothingAdded_returnsEmpty() throws PersistenceException {
+    public void index_nothingAdded_returnsEmpty() throws DAOException {
         PhotoProvider object = getObject();
 
         assertTrue(object.index().isEmpty());
     }
 
     @Test
-    public void index_someExisting_returnPaths() throws PersistenceException {
+    public void index_someExisting_returnPaths() throws DAOException {
         PhotoProvider object = getObject();
         Photo photo1 = getContext().getPhoto1();
         Photo photo2 = getContext().getPhoto2();
@@ -40,7 +40,7 @@ public abstract class PhotoProviderTest {
     }
 
     @Test
-    public void contains_nonExisting_returnsFalse() throws PersistenceException {
+    public void contains_nonExisting_returnsFalse() throws DAOException {
         PhotoProvider object = getObject();
         Path file = getContext().getFile1();
 
@@ -48,7 +48,7 @@ public abstract class PhotoProviderTest {
     }
 
     @Test
-    public void contains_existing_returnsTrue() throws PersistenceException {
+    public void contains_existing_returnsTrue() throws DAOException {
         PhotoProvider object = getObject();
         Photo photo = getContext().getPhoto1();
         add(object, photo);
@@ -57,7 +57,7 @@ public abstract class PhotoProviderTest {
     }
 
     @Test(expected = PhotoNotFoundException.class)
-    public void read_nonExisting_throws() throws PersistenceException {
+    public void read_nonExisting_throws() throws DAOException {
         PhotoProvider object = getObject();
         Path file = getContext().getFile1();
 
@@ -65,7 +65,7 @@ public abstract class PhotoProviderTest {
     }
 
     @Test
-    public void read_existing_returnsPhoto() throws PersistenceException {
+    public void read_existing_returnsPhoto() throws DAOException {
         PhotoProvider object = getObject();
         Photo photo = getContext().getPhoto1();
         add(object, photo);
@@ -74,14 +74,14 @@ public abstract class PhotoProviderTest {
     }
 
     @Test
-    public void readAll_nothingAdded_empty() throws PersistenceException {
+    public void readAll_nothingAdded_empty() throws DAOException {
         PhotoProvider object = getObject();
 
         assertTrue(object.readAll().isEmpty());
     }
 
     @Test
-    public void readAll_someExisting_returnsPhotos() throws PersistenceException {
+    public void readAll_someExisting_returnsPhotos() throws DAOException {
         PhotoProvider object = getObject();
         Photo photo1 = getContext().getPhoto1();
         Photo photo2 = getContext().getPhoto2();

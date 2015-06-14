@@ -1,5 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
+
 import java.nio.file.Path;
 
 /**
@@ -13,9 +15,9 @@ public interface PhotoCache extends PhotoProvider {
      * The photo can be read immediately after the method returns.
      *
      * @param photo photo that should be put into the cache
-     * @throws PersistenceException failed to perform operation
+     * @throws DAOException failed to perform operation
      */
-    void put(Photo photo) throws PersistenceException;
+    void put(Photo photo) throws DAOException;
 
     /**
      * Removes a photo from the cache.
@@ -23,8 +25,8 @@ public interface PhotoCache extends PhotoProvider {
      * The photo can no longer be read after the method returns.
      *
      * @param file path of photo that should be removed from the cache
-     * @throws PersistenceException failed to perform operation
+     * @throws DAOException failed to perform operation
      * @throws PhotoNotFoundException photo does not exist in the cache
      */
-    void remove(Path file) throws PersistenceException;
+    void remove(Path file) throws DAOException;
 }

@@ -1,5 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,7 +32,7 @@ public class MockAsyncListener implements AsyncPhotoRepository.AsyncListener {
         completeNotifications.add(new OperationNotification(repository, operation));
     }
 
-    @Override public void onError(AsyncPhotoRepository repository, Operation operation, PersistenceException error) {
+    @Override public void onError(AsyncPhotoRepository repository, Operation operation, DAOException error) {
         errorNotifications.add(new ErrorNotification(repository, error));
     }
 
@@ -62,14 +64,14 @@ public class MockAsyncListener implements AsyncPhotoRepository.AsyncListener {
 
     public class ErrorNotification extends Notification {
 
-        private final PersistenceException error;
+        private final DAOException error;
 
-        public ErrorNotification(AsyncPhotoRepository repository, PersistenceException error) {
+        public ErrorNotification(AsyncPhotoRepository repository, DAOException error) {
             super(repository);
             this.error = error;
         }
 
-        public PersistenceException getError() {
+        public DAOException getError() {
             return error;
         }
     }

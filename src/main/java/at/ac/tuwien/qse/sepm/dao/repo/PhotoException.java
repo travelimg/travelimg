@@ -1,11 +1,13 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
+
 import java.nio.file.Path;
 
 /**
  * Exception that is thrown when an operation on a specific photo failed.
  */
-public abstract class PhotoException extends PersistenceException {
+public abstract class PhotoException extends DAOException {
 
     private final PhotoProvider photoProvider;
     private final Path photoFile;

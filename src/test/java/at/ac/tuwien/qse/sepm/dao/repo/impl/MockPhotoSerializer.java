@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.repo.*;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ public class MockPhotoSerializer implements PhotoSerializer {
         indicesByData.put(photo, index);
     }
 
-    @Override public PhotoMetadata read(InputStream is) throws PersistenceException {
+    @Override public PhotoMetadata read(InputStream is) throws DAOException {
         try {
             int index = is.read();
             if (!dataByIndex.containsKey(index)) {
@@ -26,11 +27,11 @@ public class MockPhotoSerializer implements PhotoSerializer {
             }
             return dataByIndex.get(index);
         } catch (IOException ex) {
-            throw new PersistenceException();
+            throw new DAOException();
         }
     }
 
-    @Override public void update(InputStream is, OutputStream os, PhotoMetadata metadata) throws PersistenceException {
+    @Override public void update(InputStream is, OutputStream os, PhotoMetadata metadata) throws DAOException {
         try {
             if (!indicesByData.containsKey(metadata)) {
                 throw new FormatException();
@@ -38,7 +39,7 @@ public class MockPhotoSerializer implements PhotoSerializer {
             int index = indicesByData.get(metadata);
             os.write(index);
         } catch (IOException ex) {
-            throw new PersistenceException();
+            throw new DAOException();
         }
     }
 }

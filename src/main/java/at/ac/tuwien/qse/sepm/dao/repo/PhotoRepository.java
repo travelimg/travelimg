@@ -1,5 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
+
 import java.io.InputStream;
 import java.nio.file.Path;
 
@@ -13,9 +15,9 @@ public interface PhotoRepository extends PhotoProvider {
      *
      * @param file path that should be checked
      * @return true if the path is valid, otherwise false
-     * @throws PersistenceException failed to perform operation
+     * @throws DAOException failed to perform operation
      */
-    boolean accepts(Path file) throws PersistenceException;
+    boolean accepts(Path file) throws DAOException;
 
     /**
      * Creates a photo in the repository under the specified file.
@@ -24,11 +26,11 @@ public interface PhotoRepository extends PhotoProvider {
      *
      * @param file path under which the photo should be added
      * @param source stream from which the photo data is read
-     * @throws PersistenceException failed to perform operation
-     * @throws PersistenceException path is not accepted by this repository
+     * @throws DAOException failed to perform operation
+     * @throws DAOException path is not accepted by this repository
      * @throws PhotoAlreadyExistsException path is already a photo in this repository
      */
-    void create(Path file, InputStream source) throws PersistenceException;
+    void create(Path file, InputStream source) throws DAOException;
 
     /**
      * Updates a photo.
@@ -36,10 +38,10 @@ public interface PhotoRepository extends PhotoProvider {
      * The changes can be read immediately after the method returns.
      *
      * @param photo photo that should be updated
-     * @throws PersistenceException failed to perform operation
+     * @throws DAOException failed to perform operation
      * @throws PhotoNotFoundException photo does not exist in the repository
      */
-    void update(Photo photo) throws PersistenceException;
+    void update(Photo photo) throws DAOException;
 
     /**
      * Deletes a photo from the repository.
@@ -47,10 +49,10 @@ public interface PhotoRepository extends PhotoProvider {
      * The photo can no longer be read as soon as the method returns.
      *
      * @param file path of photo that should be deleted
-     * @throws PersistenceException failed to perform operation
+     * @throws DAOException failed to perform operation
      * @throws PhotoNotFoundException photo does not exist in the repository
      */
-    void delete(Path file) throws PersistenceException;
+    void delete(Path file) throws DAOException;
 
     /**
      * Add a listener that is notified about changes to the repository.
@@ -101,6 +103,6 @@ public interface PhotoRepository extends PhotoProvider {
          * @param repository repository in which the error occurred
          * @param error the error that occurred
          */
-        void onError(PhotoRepository repository, PersistenceException error);
+        void onError(PhotoRepository repository, DAOException error);
     }
 }

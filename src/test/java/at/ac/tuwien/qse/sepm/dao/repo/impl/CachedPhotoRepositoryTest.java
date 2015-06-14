@@ -1,12 +1,10 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.repo.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -56,7 +54,7 @@ public class CachedPhotoRepositoryTest extends AsyncPhotoRepositoryTest {
     }
 
     @Test
-    public void synchronize_modifiedFiles_addedToQueue() throws PersistenceException {
+    public void synchronize_modifiedFiles_addedToQueue() throws DAOException {
         PhotoRepository repository = getRepository();
         Path file = getContext().getFile1();
         repository.create(file, getContext().getStream1());
@@ -72,7 +70,7 @@ public class CachedPhotoRepositoryTest extends AsyncPhotoRepositoryTest {
     }
 
     @Test
-    public void synchronize_modifiedFiles_updatedInCache() throws PersistenceException {
+    public void synchronize_modifiedFiles_updatedInCache() throws DAOException {
         PhotoRepository repository = getRepository();
         Path file = getContext().getFile1();
         repository.create(file, getContext().getStream1());
@@ -88,12 +86,12 @@ public class CachedPhotoRepositoryTest extends AsyncPhotoRepositoryTest {
     }
 
     @Test
-    public void synchronize_unmodifiedFiles_notUpdatedInCache() throws PersistenceException {
+    public void synchronize_unmodifiedFiles_notUpdatedInCache() throws DAOException {
         // TODO
     }
 
     @Test
-    public void synchronize_deletedFiles_removedFromCache() throws PersistenceException {
+    public void synchronize_deletedFiles_removedFromCache() throws DAOException {
         PhotoRepository repository = getRepository();
         Path file = getContext().getFile1();
         repository.create(file, getContext().getStream1());
@@ -107,12 +105,12 @@ public class CachedPhotoRepositoryTest extends AsyncPhotoRepositoryTest {
     }
 
     @Test
-    public void synchronize_presentFiles_stayInCache() throws PersistenceException {
+    public void synchronize_presentFiles_stayInCache() throws DAOException {
         // TODO
     }
 
     @Test
-    public void synchronize_createdFiles_addedToCache() throws PersistenceException {
+    public void synchronize_createdFiles_addedToCache() throws DAOException {
         PhotoRepository repository = getRepository();
         Path file = getContext().getFile1();
         repository.create(file, getContext().getStream1());
