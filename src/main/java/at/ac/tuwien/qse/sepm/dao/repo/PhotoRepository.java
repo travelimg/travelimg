@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.entities.Photo;
 
 import java.io.InputStream;
 import java.nio.file.Path;

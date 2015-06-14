@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.dao.repo;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.repo.impl.MockPhotoSerializer;
+import at.ac.tuwien.qse.sepm.entities.Photo;
 import org.junit.Test;
 
 import java.io.*;

@@ -111,6 +111,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     @WithData
     public void testCreateResultHasCorrectAttributes() throws DAOException, ValidationException {
         Photo photo = getInputPhoto(0);
+        System.out.println(photo);
         Photo expected = getExpectedPhoto(photo.getId());
 
         Photo value = photoDAO.create(photo);

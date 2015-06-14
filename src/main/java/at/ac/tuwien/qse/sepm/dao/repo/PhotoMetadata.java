@@ -24,7 +24,9 @@ public class PhotoMetadata {
 
     public PhotoMetadata(PhotoMetadata from) {
         if (from == null) throw new IllegalArgumentException();
-        this.date = LocalDateTime.from(from.date);
+        if (from.date != null) {
+            this.date = LocalDateTime.from(from.date);
+        }
         this.longitude = from.longitude;
         this.latitude = from.latitude;
         this.rating = from.rating;

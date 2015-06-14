@@ -14,6 +14,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.nio.file.Paths;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -60,7 +62,7 @@ public class FlickrServiceTest extends ServiceTestBase {
     public void testCreatePhotoWithGeoDataSuccess() throws ServiceException {
         Photo p = flickrService.createPhotoWithGeoData(existingId, "jpg");
         assertThat(p.getPhotographer().getId(), is(1));
-        assertThat(p.getPath(), equalTo(tmpDir + existingId + ".jpg"));
+        assertThat(p.getFile(), is(Paths.get(tmpDir + existingId + ".jpg")));
         assertThat(p.getRating(), is(Rating.NONE));
         assertNull(p.getDatetime());
         assertThat(p.getLatitude(), not(0.0));
