@@ -97,7 +97,7 @@ public class PhotoFilter implements Predicate<Photo> {
     }
 
     private boolean testPhotographer(Photo photo) {
-        return getIncludedPhotographers().contains(photo.getPhotographer());
+        return getIncludedPhotographers().contains(photo.getData().getPhotographer());
     }
 
     private boolean testCategories(Photo photo) {

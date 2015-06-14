@@ -61,7 +61,7 @@ public class FlickrServiceTest extends ServiceTestBase {
     @Test
     public void testCreatePhotoWithGeoDataSuccess() throws ServiceException {
         Photo p = flickrService.createPhotoWithGeoData(existingId, "jpg");
-        assertThat(p.getPhotographer().getId(), is(1));
+        assertThat(p.getData().getPhotographer().getId(), is(1));
         assertThat(p.getFile(), is(Paths.get(tmpDir + existingId + ".jpg")));
         assertThat(p.getRating(), is(Rating.NONE));
         assertNull(p.getDatetime());

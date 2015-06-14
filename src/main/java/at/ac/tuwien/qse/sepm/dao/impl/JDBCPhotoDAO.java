@@ -78,7 +78,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         PhotoValidator.validate(photo);
 
         Map<String, Object> parameters = new HashMap<String, Object>(1);
-        parameters.put("photographer_id", photo.getPhotographer().getId());
+        parameters.put("photographer_id", photo.getData().getPhotographer().getId());
         parameters.put("path", photo.getPath());
         parameters.put("rating", photo.getRating().ordinal());
         parameters.put("datetime", Timestamp.valueOf(photo.getDatetime()));

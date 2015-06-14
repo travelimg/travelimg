@@ -92,11 +92,6 @@ public class Photo {
     }
 
     @Deprecated
-    public Photographer getPhotographer() {
-        return getData().getPhotographer();
-    }
-
-    @Deprecated
     public void setPhotographer(Photographer photographer) {
         getData().setPhotographer(photographer);
     }

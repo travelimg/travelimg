@@ -8,7 +8,7 @@ public class PhotoValidator {
         if (entity == null)
             throw new ValidationException("Entity can not be null");
 
-        if (entity.getPhotographer() == null)
+        if (entity.getData().getPhotographer() == null)
             throw new ValidationException("Photographer can not be null");
 
         if (entity.getPath() == null)
