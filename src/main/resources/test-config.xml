@@ -35,6 +35,7 @@
     <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
         <constructor-arg value="${java.io.tmpdir}/travelimg"></constructor-arg>
     </bean>
+    <bean id="photoCache" class="at.ac.tuwien.qse.sepm.dao.repo.impl.JdbcPhotoCache"></bean>
 
     <!-- Service beans -->
     <bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"></bean>

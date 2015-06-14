@@ -1,16 +1,22 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoCache;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * Photo cache that stores photo instances in an SQLite database.
  */
 public class JdbcPhotoCache implements PhotoCache {
+
+    @Autowired
+    private PhotoDAO photoDAO;
 
     @Override public void put(Photo photo) throws DAOException {
         throw new UnsupportedOperationException();

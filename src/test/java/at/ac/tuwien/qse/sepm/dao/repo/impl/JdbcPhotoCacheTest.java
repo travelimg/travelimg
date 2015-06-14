@@ -2,14 +2,18 @@ package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoCache;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoCacheTest;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class JdbcPhotoCacheTest extends PhotoCacheTest {
 
+    @Autowired
+    private PhotoCache photoCache;
+
     @Override protected PhotoCache getObject() {
-        return new JdbcPhotoCache();
+        return photoCache;
     }
 
     @Override protected Context getContext() {
