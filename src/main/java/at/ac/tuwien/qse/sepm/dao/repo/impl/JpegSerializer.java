@@ -70,6 +70,7 @@ public class JpegSerializer implements PhotoSerializer {
         LOGGER.debug("updating photo metadata {}", metadata);
 
         try {
+            is.mark(Integer.MAX_VALUE);
             ImageMetadata imageData = Imaging.getMetadata(is, null);
             if (imageData == null) {
                 LOGGER.debug("could not find image metadata");
@@ -92,6 +93,7 @@ public class JpegSerializer implements PhotoSerializer {
             exifDirectory.removeField(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
             exifDirectory.add(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL, DATE_FORMATTER.format(metadata.getDate()));
 
+            is.reset();
             new ExifRewriter().updateExifMetadataLossless(is, os, outputSet);
 
         } catch (IOException | ImageReadException | ImageWriteException ex) {
