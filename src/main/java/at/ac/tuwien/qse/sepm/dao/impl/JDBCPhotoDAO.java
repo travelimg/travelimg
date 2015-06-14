@@ -47,8 +47,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private PlaceDAO placeDAO;
     @Autowired
     private JourneyDAO journeyDAO;
-    @Autowired
-    private IOHandler ioHandler;
 
     public JDBCPhotoDAO(String photoDirectory) {
         this.photoDirectory = photoDirectory;
@@ -66,16 +64,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     @Override
     public Photo create(Photo photo) throws DAOException, ValidationException {
         logger.debug("Creating photo {}", photo);
-
-        PhotoValidator.validate(photo);
-
-        try {
-            String dest = copyToPhotoDirectory(photo);
-            photo.setPath(dest);
-        } catch (IOException ex) {
-            logger.error("Failed to copy photo to destination directory", ex);
-            throw new DAOException("Failed to copy photo to destination directory", ex);
-        }
 
         PhotoValidator.validate(photo);
 
@@ -138,13 +126,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             }
         } catch (DataAccessException e) {
             throw new DAOException("Failed to delete photo", e);
-        }
-
-        try {
-            ioHandler.delete(Paths.get(photo.getPath()));
-        } catch (IOException ex) {
-            logger.error("Failed to delete photo", ex);
-            throw new DAOException("Failed to delete photo", ex);
         }
     }
 
@@ -210,37 +191,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             logger.error("Failed to read photos from given journey", ex);
             throw new DAOException("Failed to read photos from given journey", ex.getCause());
         }
-    }
-
-    /**
-     * Copy the photo to the travelimg photo directory. The structure created is Year/Month/Day.
-     *
-     * @param photo The photo to copy.
-     * @return The destination path of the copied photo.
-     * @throws IOException If an error occurs during copying.
-     */
-    private String copyToPhotoDirectory(Photo photo) throws IOException {
-        File source = new File(photo.getPath());
-
-        if (!source.exists()) {
-            throw new IOException("File " + source.getPath() + " does not exist");
-        }
-
-        String filename = source.getName();
-        String date = dateFormatter.format(photo.getData().getDatetime());
-
-        Path path = Paths.get(photoDirectory, date, filename);
-        File dest = path.toFile();
-
-        // create directory structure
-        Paths.get(photoDirectory, date).toFile().mkdirs();
-
-        if (source.getPath().equals(dest.getPath()))
-            return photo.getPath();
-
-        ioHandler.copyFromTo(source.toPath(), dest.toPath());
-
-        return dest.getPath();
     }
 
     private class PhotoRowMapper implements RowMapper<Photo> {

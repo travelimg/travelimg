@@ -12,13 +12,10 @@ public interface PhotoDAO {
 
     /**
      * Create the photo in the data store.
-     * <p>
-     * The given photo is copied to the image folder and the attributes are recorded in the data store. The exif data is
-     * additionally also parsed and stored.
      *
      * @param photo Photo which to create.
      * @return The created photo
-     * @throws DAOException If the photo can not be copied or the data store fails to create a record.
+     * @throws DAOException If the store fails to create a record.
      */
     Photo create(Photo photo) throws DAOException, ValidationException;
 
@@ -32,11 +29,9 @@ public interface PhotoDAO {
 
     /**
      * Delete an existing photo.
-     * <p>
-     * The corresponding image file is deleted from the image folder.
      *
      * @param photo Specifies which photo to delete by providing the id.
-     * @throws DAOException If the photo file can not be deleted or the data store fails to delete the record.
+     * @throws DAOException If the data store fails to delete the record.
      */
     void delete(Photo photo) throws DAOException, ValidationException;
 
@@ -51,12 +46,12 @@ public interface PhotoDAO {
     Photo getById(int id) throws DAOException, ValidationException;
 
     /**
-     +     * Get a photo by its path.
+     * Get a photo by its path.
      *
-     +     * @param file The file of the desired photo.
-     +     * @return The photo belonging to the given path.
-     +     * @throws DAOException If no photo exists under this path.
-     +     * @throws ValidationException If the given file is null.
+     * @param file The file of the desired photo.
+     * @return The photo belonging to the given path.
+     * @throws DAOException If no photo exists under this path.
+     * @throws ValidationException If the given file is null.
      */
     Photo getByFile(Path file) throws DAOException, ValidationException;
 

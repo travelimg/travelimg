@@ -27,31 +27,30 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     private static final Photographer defaultPhotographer = new Photographer(1, "Test Photographer");
     private static final Place defaultPlace = new Place(1, "Unkown place", "Unknown place", 0.0, 0.0);
     private static final Journey defaultJourney = new Journey(1, "United States", LocalDateTime.of(2000, 9, 11, 0, 0, 0), LocalDateTime.of(2006, 9, 11, 0, 0, 0));
-    private static final String dataDir = Paths.get(System.getProperty("java.io.tmpdir"), "travelimg").toString();
-    private static final String sourceDir = Paths.get(System.getProperty("os.name").contains("indow") ?
-            JDBCPhotoDAOTest.class.getClassLoader().getResource("db/testimages").getPath().substring(1) :
-            JDBCPhotoDAOTest.class.getClassLoader().getResource("db/testimages").getPath()).toString();
+    private static final String DIR = "some/path";
+
     @Autowired
     PhotoDAO photoDAO;
-    @Autowired
-    TestIOHandler ioHandler;
 
     private Photo expectedPhotos[] = new Photo[]{
-            new Photo(1, Paths.get(dataDir, "2015", "03", "06", "1.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 3, 6, 0, 0, 0), 41.5, 19.5)),
-            new Photo(2, Paths.get(dataDir, "2005", "09", "11", "2.jpg"), makeDefaultMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
-            new Photo(3, Paths.get(dataDir, "2005", "09", "11", "3.jpg"), makeDefaultMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
-            new Photo(4, Paths.get(dataDir, "2005", "09", "11", "4.jpg"), makeDefaultMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
-            new Photo(5, Paths.get(dataDir, "2015", "03", "04", "5.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 3, 4, 0, 0, 0), 12.0, 12.0)),
-            new Photo(6, Paths.get(dataDir, "2005", "09", "11", "4.jpg"), makeDefaultMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
-            new Photo(7, Paths.get(dataDir, "2015", "05", "17", "6.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
-            new Photo(8, Paths.get(dataDir, "2015", "05", "17", "7.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
-            new Photo(9, Paths.get(dataDir, "2015", "05", "17", "8.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
+            new Photo(1, Paths.get(DIR, "1.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 3, 6, 0, 0, 0), 41.5, 19.5)),
+            new Photo(2, Paths.get(DIR, "2.jpg"), makeDefaultMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
+            new Photo(3, Paths.get(DIR, "3.jpg"), makeDefaultMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
+            new Photo(4, Paths.get(DIR, "4.jpg"), makeDefaultMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
+            new Photo(5, Paths.get(DIR, "5.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 3, 4, 0, 0, 0), 12.0, 12.0)),
+            new Photo(6, Paths.get(DIR, "4.jpg"), makeDefaultMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
+            new Photo(7, Paths.get(DIR, "6.jpg"), makeDefaultMeta(
+                    LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
+            new Photo(8, Paths.get(DIR, "7.jpg"), makeDefaultMeta(
+                    LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
+            new Photo(9, Paths.get(DIR, "8.jpg"), makeDefaultMeta(
+                    LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
     };
 
     private Photo inputPhotos[] = new Photo[]{
-            new Photo(7, Paths.get(sourceDir, "6.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
-            new Photo(8, Paths.get(sourceDir, "7.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
-            new Photo(9, Paths.get(sourceDir, "8.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
+            new Photo(7, Paths.get(DIR, "6.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
+            new Photo(8, Paths.get(DIR, "7.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
+            new Photo(9, Paths.get(DIR, "8.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
     };
 
     private static PhotoMetadata makeMeta(Photographer photographer, Rating rating, LocalDateTime datetime, double lat, double lon, Place place, Journey journey) {
@@ -76,26 +75,6 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
     private Photo getExpectedPhoto(int id) {
         return new Photo(expectedPhotos[id - 1]);
-    }
-
-    private void setDataPrefixDir(Photo photo) {
-        String path = photo.getPath().replace("$DIR", dataDir);
-        photo.setPath(path);
-    }
-
-    private List<Photo> setPrefix(List<Photo> photos) {
-        for (Photo photo : photos) {
-            setDataPrefixDir(photo);
-        }
-
-        return photos;
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        ioHandler.reset();
-        FileUtils.deleteDirectory(new File(dataDir));
-        FileUtils.copyDirectory(new File(Paths.get(sourceDir, "prepared").toString()), new File(dataDir));
     }
 
     @Test
@@ -128,33 +107,6 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
         assertThat(expected, equalTo(value));
     }
 
-    @Test
-    @WithData
-    public void testCreateImageFileIsCopied() throws DAOException, ValidationException {
-        Photo photo = getInputPhoto(1);
-        Photo expected = getExpectedPhoto(photo.getId());
-
-        Photo value = photoDAO.create(photo);
-
-        assertThat(expected.getPath(), equalTo(value.getPath()));
-
-        Pair<Path, Path> copyOperation = ioHandler.copiedFiles.get(0);
-
-        // ensure that the files are copied correctly
-        assertThat(copyOperation.getKey().toString(), equalTo(getInputPhoto(1).getPath()));
-        assertThat(copyOperation.getValue().toString(), equalTo(expected.getPath()));
-
-    }
-
-    @Test(expected = DAOException.class)
-    @WithData
-    public void testCreateWithNonexistingPathThrows() throws DAOException, ValidationException {
-        Photo photo = getInputPhoto(2);
-        photo.setPath("/path/to/oblivion");
-
-        photoDAO.create(photo);
-    }
-
     @Test(expected = DAOException.class)
     public void testCreateWithUnknownPhotographerThrows() throws DAOException, ValidationException {
         Photo photo = getInputPhoto(0);
@@ -166,10 +118,9 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     @Test
     @WithData
     public void testReadAllRecordsExist() throws DAOException, ValidationException {
-        List<Photo> photos = setPrefix(photoDAO.readAll());
+        List<Photo> photos = photoDAO.readAll();
 
         for (Photo photo : photos) {
-            setDataPrefixDir(photo);
             Photo expected = getExpectedPhoto(photo.getId());
             assertThat(expected, equalTo(photo));
         }
@@ -182,13 +133,13 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
         Photo photo = getInputPhoto(0);
 
-        assertThat(setPrefix(photoDAO.readAll()), not(hasItem(photo)));
+        assertThat(photoDAO.readAll(), not(hasItem(photo)));
 
         int id = photoDAO.create(photo).getId();
         photo.setId(id);
 
         assertThat(countRows(), is(initial + 1));
-        assertThat(setPrefix(photoDAO.readAll()), hasItem(photo));
+        assertThat(photoDAO.readAll(), hasItem(photo));
     }
 
     @Test
@@ -197,12 +148,12 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
         Photo photo = getInputPhoto(1);
         Photo expected = getExpectedPhoto(photo.getId());
 
-        assertThat(setPrefix(photoDAO.readAll()), not(hasItem(expected)));
+        assertThat(photoDAO.readAll(), not(hasItem(expected)));
 
         int id = photoDAO.create(photo).getId();
         expected.setId(id);
 
-        assertThat(setPrefix(photoDAO.readAll()), hasItem(expected));
+        assertThat(photoDAO.readAll(), hasItem(expected));
     }
 
     @Test(expected = ValidationException.class)
@@ -230,9 +181,6 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
             throw new AssertionError("Expected DAOException");
         }
 
-        // ensure that no files were deleted
-        assertThat(ioHandler.deletedFiles, empty());
-
         // ensure that the number of photos did not change
         assertThat(countRows(), is(initial));
     }
@@ -252,16 +200,13 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
         int initial = countRows();
 
         Photo photo = getExpectedPhoto(3);
-        assertThat(setPrefix(photoDAO.readAll()), hasItem(photo));
+        assertThat(photoDAO.readAll(), hasItem(photo));
 
         photoDAO.delete(photo);
 
         // ensure that entry was deleted
         assertThat(countRows(), is(initial - 1));
-        assertThat(setPrefix(photoDAO.readAll()), not(hasItem(photo)));
-
-        // ensure that file was deleted
-        assertThat(ioHandler.deletedFiles, hasItem(Paths.get(getExpectedPhoto(3).getPath())));
+        assertThat(photoDAO.readAll(), not(hasItem(photo)));
     }
 
     @Test(expected = DAOException.class)
@@ -303,9 +248,8 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
         Photo expected = getExpectedPhoto(3);
 
         // set prefix before and after fetching
-        Path file = Paths.get(expected.getPath().replace(dataDir, "$DIR"));
+        Path file = Paths.get(expected.getPath());
         Photo actual = photoDAO.getByFile(file);
-        setDataPrefixDir(actual);
 
         assertThat(actual, equalTo(expected));
     }
