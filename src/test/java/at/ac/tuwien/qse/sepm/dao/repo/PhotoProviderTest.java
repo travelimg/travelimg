@@ -3,6 +3,10 @@ package at.ac.tuwien.qse.sepm.dao.repo;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.entities.*;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -10,6 +14,9 @@ import java.util.Collection;
 
 import static org.junit.Assert.*;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:test-config.xml")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public abstract class PhotoProviderTest {
 
     protected abstract PhotoProvider getObject();
