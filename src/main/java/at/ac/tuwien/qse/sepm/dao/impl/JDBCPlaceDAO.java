@@ -24,6 +24,7 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
     private static final String readAllStatement = "SELECT id, city, country, latitude, longitude, journey_id FROM PLACE;";
     private static final String updateStatement = "UPDATE PLACE SET city = ?, country = ?, latitude = ?, longitude = ?, journey_id = ? WHERE id = ?";
     private static final String readByJourneyStatement = "SELECT id, city, country, latitude, longitude, journey_id FROM PLACE WHERE journey_id=?;";
+    private static final String readByCountryCityStatement = "SELECT id, city, country, latitude, longitude, journey_id FROM PLACE WHERE country=? AND city=?;";
     @Autowired
     JourneyDAO journeyDAO;
     private SimpleJdbcInsert insertPlace;
@@ -114,6 +115,18 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
 
         try {
             return this.jdbcTemplate.query(readByJourneyStatement, new Object[]{journey.getId()}, new PlaceMapper());
+        } catch (DataAccessException | ValidationException.Unchecked | DAOException.Unchecked ex) {
+            logger.error("Failed to read a Place", ex);
+            throw new DAOException("Failed to read a Place", ex);
+        }
+    }
+
+    @Override public Place readByCountryCity(String country, String city) throws DAOException {
+        if (country == null) throw new IllegalArgumentException();
+        if (city == null) throw new IllegalArgumentException();
+
+        try {
+            return this.jdbcTemplate.queryForObject(readByCountryCityStatement, new Object[]{country, city}, new PlaceMapper());
         } catch (DataAccessException | ValidationException.Unchecked | DAOException.Unchecked ex) {
             logger.error("Failed to read a Place", ex);
             throw new DAOException("Failed to read a Place", ex);

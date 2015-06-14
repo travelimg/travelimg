@@ -54,4 +54,14 @@ public interface PlaceDAO {
      * @throws ValidationException If the id is invalid.
      */
     List<Place> readByJourney(Journey journey) throws DAOException, ValidationException;
+
+    /**
+     * Retrieves the first place with the given country and city.
+     *
+     * @param country name of the country
+     * @param city name of the city
+     * @return first place that matches it
+     * @throws DAOException If the data store fails to deliver the record.
+     */
+    Place readByCountryCity(String country, String city) throws DAOException;
 }
