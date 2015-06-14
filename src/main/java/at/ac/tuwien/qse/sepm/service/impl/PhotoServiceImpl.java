@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -180,6 +181,8 @@ public class PhotoServiceImpl implements PhotoService {
             AsyncPhotoRepository.AsyncListener,
             PhotoRepository.Listener {
 
+        private static final ExecutorService executor = Executors.newCachedThreadPool();
+
         @Override public void onCreate(PhotoRepository repository, Path file) {
             LOGGER.info("created {}", file);
             try {
@@ -224,6 +227,7 @@ public class PhotoServiceImpl implements PhotoService {
             LOGGER.info("queued {}", operation);
             LOGGER.info("queue length {}", repository.getQueue().size());
             repository.getQueue().forEach(op -> LOGGER.info(op));
+            executor.execute(repository::completeNext);
         }
 
         @Override public void onComplete(AsyncPhotoRepository repository, Operation operation) {
