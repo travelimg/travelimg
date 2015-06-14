@@ -3,11 +3,13 @@ package at.ac.tuwien.qse.sepm.entities;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Photo {
 
-    private final List<Tag> tags = new ArrayList<>();
+    private final Set<Tag> tags = new HashSet<>();
     private Integer id;
     private Photographer photographer;
     private String path;
@@ -106,7 +108,7 @@ public class Photo {
         this.longitude = longitude;
     }
 
-    public List<Tag> getTags() {
+    public Set<Tag> getTags() {
         return tags;
     }
 

@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -247,7 +248,7 @@ public class TagTest extends ServiceTestBase {
         Photo p0 = getPhoto(0);
         Photo p1 = getPhoto(1);
         Photo p2 = getPhoto(2);
-        List<Tag> toRemove = p0.getTags();
+        Collection<Tag> toRemove = p0.getTags();
         if (toRemove.size() != 0) {
             for (Tag t : toRemove) {
                 tagService.removeTagFromPhotos(toList(p0), t);

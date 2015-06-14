@@ -102,8 +102,10 @@ public class ExifServiceTest extends ServiceTestBase {
         inputPhotos.get(2).getTags().add(inputTag);
         exifService.exportMetaToExif(inputPhotos.get(2));
         exifService.getTagsFromExif(expectedPhotos.get(2));
-        assertEquals(inputPhotos.get(2).getTags().get(
-                0).getName(), expectedPhotos.get(2).getTags().get(0).getName());
+
+        Tag expectedTag = expectedPhotos.get(2).getTags().iterator().next();
+        Tag actualTag = inputPhotos.get(2).getTags().iterator().next();
+        assertEquals(expectedTag.getName(), actualTag.getName());
     }
 
     @WithData
