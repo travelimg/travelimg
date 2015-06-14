@@ -231,33 +231,21 @@ public class JdbcPhotoCache implements PhotoCache {
     }
 
     private Tag save(Tag tag) throws DAOException {
-        if (tag != null) {
-            try {
-                LOGGER.debug("reading tag {}", tag);
-                tag = tagDAO.readName(tag);
-                LOGGER.debug("read tag {}", tag);
-                return tag;
-            } catch (DAOException ex) {
-                try {
-                    LOGGER.debug("creating tag {}", tag);
-                    tag = tagDAO.create(tag);
-                    LOGGER.debug("created tag {}", tag);
-                    return tag;
-                } catch (DAOException | ValidationException exx) {
-                    LOGGER.warn("failed creating tag {}", tag);
-                }
-            }
-        }
-
-        // TODO: sense?
         try {
-            LOGGER.debug("reading default tag");
-            tag = tagDAO.read(new Tag(1, "a"));
-            LOGGER.debug("read default tag {}", tag);
+            LOGGER.debug("reading tag {}", tag);
+            tag = tagDAO.readName(tag);
+            LOGGER.debug("read tag {}", tag);
             return tag;
         } catch (DAOException ex) {
-            LOGGER.warn("failed reading default tag");
-            throw new DAOException(ex);
+            try {
+                LOGGER.debug("creating tag {}", tag);
+                tag = tagDAO.create(tag);
+                LOGGER.debug("created tag {}", tag);
+                return tag;
+            } catch (DAOException | ValidationException exx) {
+                LOGGER.warn("failed creating tag {}", tag);
+                throw new DAOException(exx);
+            }
         }
     }
 }
