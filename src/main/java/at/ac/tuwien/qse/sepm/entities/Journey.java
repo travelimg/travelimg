@@ -56,8 +56,6 @@ public class Journey {
 
         Journey journey = (Journey) o;
 
-        if (id != journey.id)
-            return false;
         if (!name.equals(journey.name))
             return false;
         if (!startDate.equals(journey.startDate))
@@ -68,8 +66,7 @@ public class Journey {
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + name.hashCode();
+        int result = name.hashCode();
         result = 31 * result + startDate.hashCode();
         result = 31 * result + endDate.hashCode();
         return result;

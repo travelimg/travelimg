@@ -75,8 +75,6 @@ public class Place {
 
         Place place = (Place) o;
 
-        if (id != place.id)
-            return false;
         if (!city.equals(place.city))
             return false;
         return country.equals(place.country);
@@ -85,8 +83,7 @@ public class Place {
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + city.hashCode();
+        int result = city.hashCode();
         result = 31 * result + country.hashCode();
         return result;
     }
