@@ -83,4 +83,10 @@ public class JDBCTagDAOTest extends AbstractJDBCDAOTest {
         List<Tag> tags = tagDAO.readAll();
         assertEquals(countRows(), tags.size());
     }
+
+    @Test(expected = ValidationException.class)
+    @WithData
+    public void testCreateDuplicateThrows() throws DAOException, ValidationException {
+        tagDAO.create(new Tag(1, "Essen"));
+    }
 }

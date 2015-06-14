@@ -168,4 +168,44 @@ public class PhotoFilterTest {
 
         assertTrue(filter.test(photo));
     }
+
+    @Test
+    public void filter_placeAndJourneyIsNull_isMatch() {
+        PhotoFilter filter = createFilter();
+        Photo photo = createMatchingPhoto();
+
+        photo.setPlace(null);
+        filter.getIncludedJourneys().clear();
+        filter.getIncludedJourneys().add(null);
+        filter.getIncludedPlaces().clear();
+        filter.getIncludedPlaces().add(null);
+
+        assertTrue(filter.test(photo));
+    }
+
+    @Test
+    public void filter_placePhotoHasDifferent_noMatch() {
+        PhotoFilter filter = createFilter();
+        Photo photo = createMatchingPhoto();
+
+        Place place = createPlace();
+        place.setCity("Mubai");
+        filter.getIncludedPlaces().clear();
+        filter.getIncludedPlaces().add(place);
+
+        assertFalse(filter.test(photo));
+    }
+
+    @Test
+    public void filter_journeyPhotoHasDifferent_noMatch() {
+        PhotoFilter filter = createFilter();
+        Photo photo = createMatchingPhoto();
+
+        Journey journey = createJourney();
+        journey.setName("White Lodge");
+        filter.getIncludedJourneys().clear();
+        filter.getIncludedJourneys().add(journey);
+
+        assertFalse(filter.test(photo));
+    }
 }
