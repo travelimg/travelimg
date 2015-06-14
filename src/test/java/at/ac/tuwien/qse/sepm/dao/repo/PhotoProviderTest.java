@@ -119,10 +119,13 @@ public abstract class PhotoProviderTest {
             data.setLongitude(17.0);
             data.setLatitude(18.0);
             data.setRating(Rating.GOOD);
-            data.setPhotographer(new Photographer(1, "Kris"));
+            data.setPhotographer(new Photographer(null, "Kris"));
             data.getTags().clear();
-            data.getTags().add(new Tag(1, "food"));
-            data.getTags().add(new Tag(2, "india"));
+            data.getTags().add(new Tag(null, "food"));
+            data.getTags().add(new Tag(null, "india"));
+            Journey journey = new Journey(null, "India 1993", LocalDateTime.of(1993, 1, 1, 0, 0), LocalDateTime.of(1993, 12, 31, 0, 0));
+            Place place = new Place(null, "Bombay", "Indien", 15.0, 16.0, journey);
+            data.setPlace(place);
             return data;
         }
 
@@ -132,10 +135,14 @@ public abstract class PhotoProviderTest {
             data.setLongitude(42.0);
             data.setLatitude(43.0);
             data.setRating(Rating.NEUTRAL);
-            data.setPhotographer(new Photographer(2, "Lukas"));
+            data.setPhotographer(new Photographer(null, "Lukas"));
             data.getTags().clear();
-            data.getTags().add(new Tag(3, "usa"));
-            data.getTags().add(new Tag(4, "nature"));
+            data.getTags().add(new Tag(null, "usa"));
+            data.getTags().add(new Tag(null, "nature"));
+            Journey journey = new Journey(null, "Austria 2014", LocalDateTime.of(2014, 1, 1, 0, 0), LocalDateTime.of(
+                    2014, 12, 31, 0, 0));
+            Place place = new Place(null, "Wien", "Österreich", 40.0, 41.0, journey);
+            data.setPlace(place);
             return data;
         }
 
