@@ -16,11 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.file.Paths;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.eq;
 
 public class FlickrServiceTest extends ServiceTestBase {
 
@@ -28,7 +28,11 @@ public class FlickrServiceTest extends ServiceTestBase {
     private static final String existingId = "18147940494";
     private static final String nonExistingId ="dieseidgibtsned";
     private static final GeoData geoData = new GeoData("16.35720443725586","48.210906982421875","1");
-    @Autowired  private FlickrServiceImpl flickrService;
+    private static final String existingUrl = "https://farm1.staticflickr.com/492/18795361622_70a4cc25c4_o.jpg";
+    private static final String nonExistingUrl = "https://unsinn";
+
+    @Autowired FlickrServiceImpl flickrService;
+
 
     @Before
     public void setUp() throws ServiceException, FlickrException {
@@ -41,6 +45,14 @@ public class FlickrServiceTest extends ServiceTestBase {
         Mockito.when(geoInterface.getLocation(existingId)).thenReturn(geoData);
         Mockito.when(geoInterface.getLocation(nonExistingId)).thenThrow(new FlickrException(""));
         Mockito.when(geoInterface.getLocation(null)).thenThrow(new FlickrException(""));
+
+        //spy the flickrService so that we can take control over single calls of methods without touching the rest
+        flickrService = Mockito.spy(flickrService);
+        Mockito.doNothing().when(flickrService).downloadPhotoFromFlickr(eq(existingUrl),
+                eq(existingId), eq("format"));
+        Mockito.doThrow(new ServiceException()).when(flickrService).downloadPhotoFromFlickr(
+                eq(nonExistingUrl), Mockito.anyString(), Mockito.anyString());
+
     }
 
     @Test(expected = ServiceException.class)
@@ -68,6 +80,26 @@ public class FlickrServiceTest extends ServiceTestBase {
         assertThat(p.getData().getLatitude(), not(0.0));
         assertThat(p.getData().getLongitude(), not(0.0));
         assertThat(p.getData().getPlace().getId(), is(1));
+    }
+
+    @Test(expected = ServiceException.class)
+     public void testDownloadPhotoFromFlickrIdIsNull() throws ServiceException {
+        flickrService.downloadPhotoFromFlickr(existingUrl,null,"jpg");
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testDownloadPhotoFromFlickrIdIsEmpty() throws ServiceException {
+        flickrService.downloadPhotoFromFlickr(existingUrl,"    ","jpg");
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testDownloadPhotoFromFlickrFormatIsNull() throws ServiceException {
+        flickrService.downloadPhotoFromFlickr(existingUrl,existingId,null);
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testDownloadPhotoFromFlickrFormatIsEmpty() throws ServiceException {
+        flickrService.downloadPhotoFromFlickr(existingUrl,existingId,"    ");
     }
 
 }
