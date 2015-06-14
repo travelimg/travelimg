@@ -23,7 +23,7 @@ public class JdbcPhotoCacheTest extends PhotoCacheTest {
             }
 
             @Override public Path getFile2() {
-                return Paths.get("test/1.jpg");
+                return Paths.get("test/2.jpg");
             }
         };
     }
