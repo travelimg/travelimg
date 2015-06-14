@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
+import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid;
 import at.ac.tuwien.qse.sepm.gui.grid.SlideshowGrid;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -35,11 +36,12 @@ public class SlideshowView {
 
     @Autowired private SlideService slideService;
     @Autowired private SlideshowService slideShowService;
+    @Autowired
+    private ImageCache imageCache;
 
     @FXML private BorderPane root;
     @FXML private ScrollPane gridContainer;
     @FXML private Button Btn_Add;
-    @FXML private Button Btn_StartSlideshow;
     @FXML private ComboBox cb_getSlideshows;
     @FXML private TextField tf_slideName;
 
@@ -85,7 +87,6 @@ public class SlideshowView {
 
         Btn_Add.setOnAction(this::handlesetShowSlides);
 
-        Btn_StartSlideshow.setOnAction(this::startSlideshow);
         getAllSlideshowsToComboBox();
 
         slideshowOrganizer.setSlideshows(slideshows);
