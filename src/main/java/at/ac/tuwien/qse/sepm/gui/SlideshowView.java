@@ -71,7 +71,7 @@ public class SlideshowView {
             slideshowService.addPhotosToSlideshow(photos, slideshow);
 
             Slideshow selected = slideshowOrganizer.getSelected();
-            if (selected.getId().equals(slideshow.getId())) {
+            if (selected != null && selected.getId().equals(slideshow.getId())) {
                 grid.setSlideshow(slideshow);
             }
         } catch (ServiceException ex) {
