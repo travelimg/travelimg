@@ -37,7 +37,21 @@ public class JdbcPhotoCache implements PhotoCache {
         if (!contains(file)) {
             throw new PhotoNotFoundException(this, file);
         }
-        // TODO
+
+        Photo photo;
+        try {
+            photo = photoDAO.getByFile(file);
+        } catch (DAOException | ValidationException ex) {
+            throw new PhotoNotFoundException(this, file);
+        }
+
+        try {
+            photoDAO.delete(photo);
+        } catch (ValidationException ex) {
+            LOGGER.error("Failed to validate {}", file, ex);
+            throw new DAOException("Failed to validate " + file, ex);
+        }
+
         LOGGER.debug("removed {}", file);
     }
 
