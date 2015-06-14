@@ -1,5 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

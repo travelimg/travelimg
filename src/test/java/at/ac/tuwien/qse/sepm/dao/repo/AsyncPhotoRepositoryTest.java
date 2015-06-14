@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
