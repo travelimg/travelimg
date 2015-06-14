@@ -1,6 +1,8 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
+import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.Rating;
+import at.ac.tuwien.qse.sepm.entities.Tag;
 import org.junit.Test;
 
 import java.nio.file.Path;
@@ -111,10 +113,10 @@ public abstract class PhotoProviderTest {
             data.setLongitude(17.0);
             data.setLatitude(18.0);
             data.setRating(Rating.GOOD);
-            data.setPhotographer("Kris");
+            data.setPhotographer(new Photographer(1, "Kris"));
             data.getTags().clear();
-            data.getTags().add("food");
-            data.getTags().add("india");
+            data.getTags().add(new Tag(1, "food"));
+            data.getTags().add(new Tag(2, "india"));
             return data;
         }
 
@@ -124,10 +126,10 @@ public abstract class PhotoProviderTest {
             data.setLongitude(42.0);
             data.setLatitude(43.0);
             data.setRating(Rating.NEUTRAL);
-            data.setPhotographer("Lukas");
+            data.setPhotographer(new Photographer(2, "Lukas"));
             data.getTags().clear();
-            data.getTags().add("usa");
-            data.getTags().add("nature");
+            data.getTags().add(new Tag(3, "usa"));
+            data.getTags().add(new Tag(4, "nature"));
             return data;
         }
 
