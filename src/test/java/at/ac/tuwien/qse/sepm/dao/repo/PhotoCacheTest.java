@@ -1,13 +1,9 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
-import at.ac.tuwien.qse.sepm.entities.Rating;
 import org.junit.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -27,12 +23,12 @@ public abstract class PhotoCacheTest extends PhotoProviderTest {
         };
     }
 
-    @Override protected void add(PhotoProvider object, Photo photo) throws PersistenceException {
+    @Override protected void add(PhotoProvider object, Photo photo) throws DAOException {
         ((PhotoCache)object).put(photo);
     }
 
     @Test
-    public void put_valid_persists() throws PersistenceException {
+    public void put_valid_persists() throws DAOException {
         PhotoCache object = getObject();
         Photo photo = getContext().getPhoto1();
 
@@ -41,7 +37,7 @@ public abstract class PhotoCacheTest extends PhotoProviderTest {
     }
 
     @Test(expected = PhotoNotFoundException.class)
-    public void remove_nonExisting_throws() throws PersistenceException {
+    public void remove_nonExisting_throws() throws DAOException {
         PhotoCache object = getObject();
         Path file = getContext().getFile1();
 
@@ -49,7 +45,7 @@ public abstract class PhotoCacheTest extends PhotoProviderTest {
     }
 
     @Test
-    public void remove_existing_persists() throws PersistenceException {
+    public void remove_existing_persists() throws DAOException {
         PhotoCache object = getObject();
         Photo photo = getContext().getPhoto1();
         object.put(photo);

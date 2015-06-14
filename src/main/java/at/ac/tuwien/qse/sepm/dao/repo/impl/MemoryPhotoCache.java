@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
 import at.ac.tuwien.qse.sepm.dao.repo.*;
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,7 +21,7 @@ public class MemoryPhotoCache implements PhotoCache {
     private final Map<Path, Photo> photos = new HashMap<>();
     private final Map<Path, LocalDateTime> modified = new HashMap<>();
 
-    @Override public void put(Photo photo) throws PersistenceException {
+    @Override public void put(Photo photo) throws DAOException {
         if (photo == null) throw new IllegalArgumentException();
         LOGGER.debug("putting {}", photo);
         photos.put(photo.getFile(), photo);
@@ -28,7 +29,7 @@ public class MemoryPhotoCache implements PhotoCache {
         LOGGER.debug("put {}", photo);
     }
 
-    @Override public void remove(Path file) throws PersistenceException {
+    @Override public void remove(Path file) throws DAOException {
         if (file == null) throw new IllegalArgumentException();
         LOGGER.debug("removing {}", file);
         if (!contains(file)) {
@@ -39,18 +40,18 @@ public class MemoryPhotoCache implements PhotoCache {
         LOGGER.debug("removed {}", file);
     }
 
-    @Override public Collection<Path> index() throws PersistenceException {
+    @Override public Collection<Path> index() throws DAOException {
         LOGGER.debug("indexing");
         Collection<Path> result = photos.keySet();
         LOGGER.debug("indexed {}", result.size());
         return result;
     }
 
-    @Override public boolean contains(Path file) throws PersistenceException {
+    @Override public boolean contains(Path file) throws DAOException {
         return photos.containsKey(file);
     }
 
-    @Override public Photo read(Path file) throws PersistenceException {
+    @Override public Photo read(Path file) throws DAOException {
         if (file == null) throw new IllegalArgumentException();
         LOGGER.debug("reading {}", file);
         if (!contains(file)) {

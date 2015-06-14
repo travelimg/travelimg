@@ -43,7 +43,7 @@ public class MockListener implements PhotoRepository.Listener {
         deleteNotifications.add(new PhotoNotification(repository, file));
     }
 
-    @Override public void onError(PhotoRepository repository, PersistenceException error) {
+    @Override public void onError(PhotoRepository repository, DAOException error) {
         errorNotifications.add(new ErrorNotification(repository, error));
     }
 
@@ -76,14 +76,14 @@ public class MockListener implements PhotoRepository.Listener {
 
     public class ErrorNotification extends Notification {
 
-        private final PersistenceException error;
+        private final DAOException error;
 
-        public ErrorNotification(PhotoRepository repository, PersistenceException error) {
+        public ErrorNotification(PhotoRepository repository, DAOException error) {
             super(repository);
             this.error = error;
         }
 
-        public PersistenceException getError() {
+        public DAOException getError() {
             return error;
         }
     }

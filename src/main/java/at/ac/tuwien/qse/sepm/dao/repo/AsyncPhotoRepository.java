@@ -1,5 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
+
 import java.util.Queue;
 
 /**
@@ -20,9 +22,9 @@ public interface AsyncPhotoRepository extends PhotoRepository {
      *
      * Every photo that is created, updated, or deleted from the intermediate
      *
-     * @throws PersistenceException failed to perform operation
+     * @throws DAOException failed to perform operation
      */
-    void synchronize() throws PersistenceException;
+    void synchronize() throws DAOException;
 
     /**
      * Completes the next operation in the queue. Does nothing if the queue is empty.
@@ -82,6 +84,6 @@ public interface AsyncPhotoRepository extends PhotoRepository {
          * @param operation operation that failed
          * @param error error that caused the failure
          */
-        void onError(AsyncPhotoRepository repository, Operation operation, PersistenceException error);
+        void onError(AsyncPhotoRepository repository, Operation operation, DAOException error);
     }
 }

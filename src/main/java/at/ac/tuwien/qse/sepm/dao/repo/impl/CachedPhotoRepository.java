@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
 import at.ac.tuwien.qse.sepm.dao.repo.*;
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -9,8 +10,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Async repository that uses a cache as intermediate storage.
@@ -51,7 +50,7 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
         return cache;
     }
 
-    @Override public void synchronize() throws PersistenceException {
+    @Override public void synchronize() throws DAOException {
         Collection<Path> cachedIndex = getCache().index();
         for (Path file : cachedIndex) {
             if (!getRepository().contains(file)) {
@@ -76,7 +75,7 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
 
         try {
             operation.perform();
-        } catch (PersistenceException ex) {
+        } catch (DAOException ex) {
             LOGGER.error("error while performing operation {}", operation);
             notifyOperationError(operation, ex);
         }
@@ -102,7 +101,7 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
         LOGGER.info("removed async listener {}", listener);
     }
 
-    @Override public boolean accepts(Path file) throws PersistenceException {
+    @Override public boolean accepts(Path file) throws DAOException {
         return getRepository().accepts(file);
     }
 
@@ -113,7 +112,7 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
      * created in the source repository. This is necessary, since we have to read the photo before
      * we can add it to the cache.
      */
-    @Override public void create(Path file, InputStream source) throws PersistenceException {
+    @Override public void create(Path file, InputStream source) throws DAOException {
         if (file == null) throw new IllegalArgumentException();
         if (source == null) throw new IllegalArgumentException();
         LOGGER.debug("creating {}", file);
@@ -124,7 +123,7 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
         LOGGER.info("created {}", file);
     }
 
-    @Override public void update(Photo photo) throws PersistenceException {
+    @Override public void update(Photo photo) throws DAOException {
         LOGGER.debug("updating {}", photo);
         if (!getCache().contains(photo.getFile())) {
             throw new PhotoNotFoundException(this, photo.getFile());
@@ -135,7 +134,7 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
         LOGGER.debug("updated {}", photo);
     }
 
-    @Override public void delete(Path file) throws PersistenceException {
+    @Override public void delete(Path file) throws DAOException {
         LOGGER.debug("deleting {}", file);
         getCache().remove(file);
         addOperation(new DeleteOperation(file));
@@ -155,11 +154,11 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
         LOGGER.info("removed listener {}", listener);
     }
 
-    @Override public Collection<Path> index() throws PersistenceException {
+    @Override public Collection<Path> index() throws DAOException {
         return getCache().index();
     }
 
-    @Override public Photo read(Path file) throws PersistenceException {
+    @Override public Photo read(Path file) throws DAOException {
         if (file == null) throw new IllegalArgumentException();
         LOGGER.debug("reading {}", file);
         Photo photo = getCache().read(file);
@@ -187,7 +186,7 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
         asyncListeners.forEach(l -> l.onComplete(this, operation));
     }
 
-    protected void notifyOperationError(Operation operation, PersistenceException ex) {
+    protected void notifyOperationError(Operation operation, DAOException ex) {
         asyncListeners.forEach(l -> l.onError(this, operation, ex));
     }
 
@@ -216,12 +215,12 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
             try {
                 getCache().remove(file);
                 notifyDelete(file);
-            } catch (PersistenceException ex) {
+            } catch (DAOException ex) {
                 LOGGER.warn("failed removing file from cache {}", file);
             }
         }
 
-        @Override public void onError(PhotoRepository repository, PersistenceException error) {
+        @Override public void onError(PhotoRepository repository, DAOException error) {
 
         }
     }
@@ -246,7 +245,7 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
             return kind;
         }
 
-        public abstract void perform() throws PersistenceException;
+        public abstract void perform() throws DAOException;
 
         @Override public String toString() {
             return "OperationBase{" +
@@ -262,7 +261,7 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
             super(file, Kind.READ);
         }
 
-        @Override public void perform() throws PersistenceException {
+        @Override public void perform() throws DAOException {
             boolean updated = cache.contains(file);
             Photo photo = repository.read(getFile());
             cache.put(photo);
@@ -283,7 +282,7 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
             this.photo = photo;
         }
 
-        @Override public void perform() throws PersistenceException {
+        @Override public void perform() throws DAOException {
             repository.update(photo);
             notifyUpdate(photo.getFile());
         }
@@ -295,7 +294,7 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
             super(file, Kind.DELETE);
         }
 
-        @Override public void perform() throws PersistenceException {
+        @Override public void perform() throws DAOException {
             repository.delete(file);
             notifyDelete(file);
         }
