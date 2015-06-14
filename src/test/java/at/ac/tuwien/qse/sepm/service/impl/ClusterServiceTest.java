@@ -77,17 +77,12 @@ public class ClusterServiceTest extends ServiceTestBase {
 
     @Test(expected = ServiceException.class)
     public void test_create_place_malformed_throws2() throws ServiceException {
-        clusterService.addPlace(new Place(1, null, "city", 0, 0, inputJourneys[0]));
+        clusterService.addPlace(new Place(1, null, "city", 0, 0));
     }
 
     @Test(expected = ServiceException.class)
     public void test_create_place_malformed_throws3() throws ServiceException {
-        clusterService.addPlace(new Place(1, "country", null, 0, 0, inputJourneys[0]));
-    }
-
-    @Test(expected = ServiceException.class)
-    public void test_create_place_malformed_throws4() throws ServiceException {
-        clusterService.addPlace(new Place(1, "country", "city", 0, 0, null));
+        clusterService.addPlace(new Place(1, "country", null, 0, 0));
     }
 
     @Test
@@ -95,7 +90,7 @@ public class ClusterServiceTest extends ServiceTestBase {
         assertThat(clusterService.getAllPlaces(), empty());
 
         // create a place
-        Place place = new Place(-1, "Amerika", "San Francisco", 0, 0, inputJourneys[1]);
+        Place place = new Place(-1, "Amerika", "San Francisco", 0, 0);
         Place created = clusterService.addPlace(place);
 
         // check that place was added correctly

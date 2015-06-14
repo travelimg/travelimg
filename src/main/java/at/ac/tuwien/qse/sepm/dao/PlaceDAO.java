@@ -46,16 +46,6 @@ public interface PlaceDAO {
     Place getById(int id) throws DAOException, ValidationException;
 
     /**
-     * Retrieve places of a journey
-     *
-     * @param journey The journey containing the id
-     * @return Returns the places
-     * @throws DAOException        If the data store fails to deliver the records.
-     * @throws ValidationException If the id is invalid.
-     */
-    List<Place> readByJourney(Journey journey) throws DAOException, ValidationException;
-
-    /**
      * Retrieves the first place with the given country and city.
      *
      * @param country name of the country

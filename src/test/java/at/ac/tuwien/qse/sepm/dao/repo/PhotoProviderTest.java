@@ -124,8 +124,9 @@ public abstract class PhotoProviderTest {
             data.getTags().add(new Tag(null, "food"));
             data.getTags().add(new Tag(null, "india"));
             Journey journey = new Journey(null, "India 1993", LocalDateTime.of(1993, 1, 1, 0, 0), LocalDateTime.of(1993, 12, 31, 0, 0));
-            Place place = new Place(null, "Bombay", "Indien", 15.0, 16.0, journey);
+            Place place = new Place(null, "Bombay", "Indien", 15.0, 16.0);
             data.setPlace(place);
+            data.setJourney(journey);
             return data;
         }
 
@@ -141,8 +142,9 @@ public abstract class PhotoProviderTest {
             data.getTags().add(new Tag(null, "nature"));
             Journey journey = new Journey(null, "Austria 2014", LocalDateTime.of(2014, 1, 1, 0, 0), LocalDateTime.of(
                     2014, 12, 31, 0, 0));
-            Place place = new Place(null, "Wien", "Österreich", 40.0, 41.0, journey);
+            Place place = new Place(null, "Wien", "Österreich", 40.0, 41.0);
             data.setPlace(place);
+            data.setJourney(journey);
             return data;
         }
 

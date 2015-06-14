@@ -7,15 +7,13 @@ public class Place {
     private String country;
     private double latitude;
     private double longitude;
-    private Journey journey;
 
-    public Place(Integer id, String city, String country, double latitude, double longitude, Journey journey) {
+    public Place(Integer id, String city, String country, double latitude, double longitude) {
         this.id = id;
         this.city = city;
         this.country = country;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.journey = journey;
     }
 
     public Integer getId() {
@@ -58,14 +56,6 @@ public class Place {
         this.longitude = longitude;
     }
 
-    public Journey getJourney() {
-        return journey;
-    }
-
-    public void setJourney(Journey journey) {
-        this.journey = journey;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -95,7 +85,6 @@ public class Place {
                 ", country='" + country + '\'' +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
-                ", journey=" + journey +
                 '}';
     }
 }

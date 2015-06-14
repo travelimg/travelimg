@@ -153,7 +153,7 @@ public class FlickrServiceImpl implements FlickrService {
                 .findFirst()
                 .orElse(new Photographer(1, null)); // default photographer
         created.getData().setPhotographer(photographer);
-        created.getData().setPlace(new Place(1, "Unknown city", "Unknown country", 0.0, 0.0, null));
+        created.getData().setPlace(new Place(1, "Unknown city", "Unknown country", 0.0, 0.0));
 
         return created;
     }

@@ -26,6 +26,15 @@ public class Photo {
         this.data = data;
     }
 
+    public Photo(Integer id, Path file, PhotoMetadata data) {
+        if (id == null) throw new IllegalArgumentException();
+        if (file == null) throw new IllegalArgumentException();
+        if (data == null) throw new IllegalArgumentException();
+        this.id = id;
+        this.file = file;
+        this.data = data;
+    }
+
     public Photo(Photo from) {
         if (from == null) throw new IllegalArgumentException();
         this.id = from.id;
@@ -94,7 +103,8 @@ public class Photo {
         return result;
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return "Photo{" +
                 "id=" + id +
                 ", file=" + file +

@@ -109,6 +109,7 @@ public class ExifServiceImpl implements ExifService {
     }
 
     @Override
+    @Deprecated
     public void getTagsFromExif(Photo photo) throws ServiceException {
         logger.debug("getTagsFromExif" + photo + ":" + photo.getData().getTags());
         File file = new File(photo.getPath());
@@ -149,13 +150,13 @@ public class ExifServiceImpl implements ExifService {
                 if (element.contains("place")) {
                     String[] tempPlace = element.split("\\|");
                     Place place = new Place(0, tempPlace[1], tempPlace[2],
-                            Double.parseDouble(tempPlace[3]), Double.parseDouble(tempPlace[4]),
-                            journey);
+                            Double.parseDouble(tempPlace[3]), Double.parseDouble(tempPlace[4])
+                    );
                     // TODO: only create records if they don't already exist for the photo
                     clusterService.addPlace(place);
-                    photoService.addPlaceToPhotos(Arrays.asList(photo), place);
-                    photoService.addJourneyToPhotos(Arrays.asList(photo),
-                            journey);
+                    //photoService.addPlaceToPhotos(Arrays.asList(photo), place);
+                    //photoService.addJourneyToPhotos(Arrays.asList(photo),
+                            //journey);
                     continue;
                 }
 
@@ -177,6 +178,7 @@ public class ExifServiceImpl implements ExifService {
     }
 
     @Override
+    @Deprecated
     public void exportMetaToExif(Photo photo) throws ServiceException {
         logger.debug("exportMetaToExif" + photo + ":" + photo.getData().getTags());
         File jpegImageFile = new File(photo.getPath());
@@ -191,7 +193,7 @@ public class ExifServiceImpl implements ExifService {
         }
 
         if (photo.getData().getPlace() != null) {
-            Journey journey = photo.getData().getPlace().getJourney();
+            Journey journey = photo.getData().getJourney();
             tags += "/journey." + journey.getName() + "." + journey.getStartDate()
                     .format(dateFormatter) + "." + journey.getEndDate().format(dateFormatter);
 

@@ -116,7 +116,7 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
         assert (directory.exists()); // import button should be disabled otherwise
 
         Photographer photographer = photographerBox.getSelectionModel().getSelectedItem();
-        Place place = new Place(1, "Unkown place", "Unknown place", 0.0, 0.0, null);
+        Place place = new Place(1, "Unkown place", "Unknown place", 0.0, 0.0);
 
         // Fetch all photos from the directory.
         ArrayList<Photo> photos = new ArrayList<>();

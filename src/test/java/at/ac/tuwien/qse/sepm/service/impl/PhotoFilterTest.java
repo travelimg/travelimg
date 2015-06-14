@@ -17,7 +17,7 @@ public class PhotoFilterTest {
     }
 
     private Place createPlace() {
-        return new Place(1, "Bombay", "India", 10, 20, createJourney());
+        return new Place(1, "Bombay", "India", 10, 20);
     }
 
     private Photo createMatchingPhoto() {
@@ -26,6 +26,7 @@ public class PhotoFilterTest {
         photo.getData().setPhotographer(new Photographer(1, "John"));
         photo.getData().setDatetime(LocalDateTime.of(2015, 12, 1, 0, 0));
         photo.getData().setPlace(createPlace());
+        photo.getData().setJourney(createJourney());
         return photo;
     }
 
@@ -36,6 +37,7 @@ public class PhotoFilterTest {
         filter.setUntaggedIncluded(true);
         filter.getIncludedJourneys().add(createJourney());
         filter.getIncludedPlaces().add(createPlace());
+        filter.getIncludedJourneys().add(createJourney());
         return filter;
     }
 
@@ -175,6 +177,7 @@ public class PhotoFilterTest {
         Photo photo = createMatchingPhoto();
 
         photo.getData().setPlace(null);
+        photo.getData().setJourney(null);
         filter.getIncludedJourneys().clear();
         filter.getIncludedJourneys().add(null);
         filter.getIncludedPlaces().clear();

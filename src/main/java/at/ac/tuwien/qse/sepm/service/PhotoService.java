@@ -51,9 +51,9 @@ public interface PhotoService {
      */
     void editPhoto(Photo photo) throws ServiceException;
 
-    @Deprecated
+    /*@Deprecated
     void addJourneyToPhotos(List<Photo> photos, Journey journey) throws ServiceException;
 
     @Deprecated
-    void addPlaceToPhotos(List<Photo> photos, Place place) throws ServiceException;
+    void addPlaceToPhotos(List<Photo> photos, Place place) throws ServiceException;*/
 }

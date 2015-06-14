@@ -134,7 +134,7 @@ public class PhotoServiceImpl implements PhotoService {
         LOGGER.debug("Leaving editPhoto with {}", photo);
     }
 
-    @Override
+    /*@Override
     @Deprecated
     public void addJourneyToPhotos(List<Photo> photos, Journey journey)
             throws ServiceException {
@@ -174,7 +174,7 @@ public class PhotoServiceImpl implements PhotoService {
         p.getData().setPlace(place);
         editPhotos(photos, p);
         LOGGER.debug("Leaving addPlaceToPhotos");
-    }
+    }*/
 
     private static class Listener implements
             AsyncPhotoRepository.AsyncListener,

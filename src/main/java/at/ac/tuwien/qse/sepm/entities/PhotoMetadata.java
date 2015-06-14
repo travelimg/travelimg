@@ -12,6 +12,7 @@ public class PhotoMetadata {
     private Rating rating = Rating.NONE;
     private Photographer photographer = null;
     private Place place = null;
+    private Journey journey = null;
     private Set<Tag> tags = new HashSet<>();
 
     public PhotoMetadata() {
@@ -27,6 +28,7 @@ public class PhotoMetadata {
         this.rating = from.rating;
         this.photographer = from.photographer;
         this.place = from.place;
+        this.journey = from.journey;
         this.tags.addAll(from.getTags());
     }
 
@@ -79,6 +81,14 @@ public class PhotoMetadata {
         this.place = place;
     }
 
+    public Journey getJourney() {
+        return journey;
+    }
+
+    public void setJourney(Journey journey) {
+        this.journey = journey;
+    }
+
     public Set<Tag> getTags() {
         return tags;
     }
@@ -111,7 +121,8 @@ public class PhotoMetadata {
         return true;
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         int result;
         long temp;
         result = datetime != null ? datetime.hashCode() : 0;
@@ -122,11 +133,13 @@ public class PhotoMetadata {
         result = 31 * result + (rating != null ? rating.hashCode() : 0);
         result = 31 * result + (photographer != null ? photographer.hashCode() : 0);
         result = 31 * result + (place != null ? place.hashCode() : 0);
+        result = 31 * result + (journey != null ? journey.hashCode() : 0);
         result = 31 * result + (tags != null ? tags.hashCode() : 0);
         return result;
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return "PhotoMetadata{" +
                 "datetime=" + datetime +
                 ", longitude=" + longitude +
@@ -134,6 +147,7 @@ public class PhotoMetadata {
                 ", rating=" + rating +
                 ", photographer=" + photographer +
                 ", place=" + place +
+                ", journey=" + journey +
                 ", tags=" + tags +
                 '}';
     }

@@ -57,13 +57,14 @@ public class ClusterServiceImpl implements ClusterService {
 
     @Override
     public List<Place> getPlacesByJourney(Journey journey) throws ServiceException {
-        try {
+        return null;
+        /*try {
             return placeDAO.readByJourney(journey);
         } catch (DAOException e) {
             throw new ServiceException("Failed to get places", e);
         } catch (ValidationException e) {
             throw new ServiceException("Failed to validate journey id", e);
-        }
+        }*/
     }
 
     @Override
@@ -119,19 +120,19 @@ public class ClusterServiceImpl implements ClusterService {
 
             if (!place.isPresent()) {
                 // if no we don't already know a place in close proximity look it up
-                place = Optional.of(lookupPlace(photo, journey));
+                place = Optional.of(lookupPlace(photo));
                 places.add(place.get());
             }
 
             photo.getData().setPlace(place.get());
+            photo.getData().setJourney(journey);
             photoService.editPhoto(photo);
         }
         return places;
     }
 
-    private Place lookupPlace(Photo photo, Journey journey) throws ServiceException {
+    private Place lookupPlace(Photo photo) throws ServiceException {
         Place place = geoService.getPlaceByGeoData(photo.getData().getLatitude(), photo.getData().getLongitude());
-        place.setJourney(journey);
 
         logger.debug("New unknown place cluster: {}", place);
 

@@ -108,17 +108,13 @@ public class PhotoFilter implements Predicate<Photo> {
     }
 
     private boolean testJourney(Photo photo) {
-        Journey journey = null;
-        if (photo.getData().getPlace() != null)
-            journey = photo.getData().getPlace().getJourney();
-
-        for (Journey j : getIncludedJourneys()) {
-            if (j == null) {
-                if (journey == null) {
+        for (Journey journey : getIncludedJourneys()) {
+            if (journey == null) {
+                if (photo.getData().getJourney() == null) {
                     return true; // belongs to no journey
                 }
             } else {
-                if (j.equals(journey))
+                if (journey.equals(photo.getData().getJourney()))
                     return true;
             }
         }
