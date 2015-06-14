@@ -18,7 +18,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -38,11 +37,6 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     PhotoDAO photoDAO;
     @Autowired
     TestIOHandler ioHandler;
-    private YearMonth expectedMonths[] = new YearMonth[]{
-            YearMonth.of(2005, 9),
-            YearMonth.of(2015, 3),
-            YearMonth.of(2015, 5)
-    };
 
     private Photo expectedPhotos[] = new Photo[]{
             new Photo(1, defaultPhotographer, Paths.get(dataDir, "2015", "03", "06", "1.jpg").toString(), Rating.NONE, LocalDateTime.of(2015, 3, 6, 0, 0, 0), 41.5, 19.5, defaultPlace),
@@ -197,56 +191,6 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
         assertThat(setPrefix(photoDAO.readAll()), hasItem(expected));
     }
 
-    @Test
-    public void testReadMonthsEmpty() throws DAOException {
-        assertThat(photoDAO.getMonthsWithPhotos().size(), is(0));
-    }
-
-    @Test
-    @WithData
-    public void testReadMonthsWithData() throws DAOException {
-        assertThat(photoDAO.getMonthsWithPhotos().size(), is(2));
-
-        for (YearMonth month : photoDAO.getMonthsWithPhotos()) {
-            assertThat(Arrays.asList(expectedMonths), hasItem(month));
-        }
-    }
-
-    @Test
-    @WithData
-    public void testCreateNewMonthsAffectsReadMonths() throws DAOException, ValidationException {
-        Photo photo = getInputPhoto(0);
-
-        int initial = photoDAO.getMonthsWithPhotos().size();
-        photoDAO.create(photo);
-        assertThat(photoDAO.getMonthsWithPhotos().size(), is(initial + 1));
-    }
-
-    @Test
-    public void testReadPhotosByMonthEmpty() throws DAOException {
-        for (YearMonth month : expectedMonths) {
-            assertThat(photoDAO.readPhotosByMonth(month).size(), is(0));
-        }
-    }
-
-    @Test
-    @WithData
-    public void testReadPhotosByMonthWithData() throws DAOException {
-        assertThat(photoDAO.readPhotosByMonth(expectedMonths[0]).size(), is(4));
-        assertThat(photoDAO.readPhotosByMonth(expectedMonths[1]).size(), is(2));
-    }
-
-    @Test
-    @WithData
-    public void testCreateAffectsReadPhotosByMonth() throws DAOException, ValidationException {
-        Photo photo = getInputPhoto(1);
-
-        int id = photoDAO.create(photo).getId();
-        photo.setId(id);
-
-        assertThat(photoDAO.readPhotosByMonth(expectedMonths[2]), hasItem(photo));
-    }
-
     @Test(expected = ValidationException.class)
     @WithData
     public void testDeleteWithNullThrows() throws DAOException, ValidationException {
@@ -304,5 +248,51 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
         // ensure that file was deleted
         assertThat(ioHandler.deletedFiles, hasItem(Paths.get(getExpectedPhoto(3).getPath())));
+    }
+
+    @Test(expected = DAOException.class)
+    @WithData
+    public void testGetByIdNonexistingThrows() throws DAOException, ValidationException {
+        photoDAO.getById(1000);
+    }
+
+    @Test(expected = ValidationException.class)
+    @WithData
+    public void testGetByIdNegativeIdThrows() throws DAOException, ValidationException {
+        photoDAO.getById(-42);
+    }
+
+    @Test
+    @WithData
+    public void testGetByIdExistingReturnsPhoto() throws DAOException, ValidationException {
+        Photo expected = getExpectedPhoto(4);
+        Photo actual = photoDAO.getById(expected.getId());
+
+        assertThat(actual, equalTo(actual));
+    }
+
+    @Test(expected = DAOException.class)
+    @WithData
+    public void testGetByFileNonexistingThrows() throws DAOException, ValidationException {
+        photoDAO.getByFile(Paths.get("/path/to/enlightenment.jpg"));
+    }
+
+    @Test(expected = ValidationException.class)
+    @WithData
+    public void testGetByFileNullFileThrows() throws DAOException, ValidationException {
+        photoDAO.getByFile(null);
+    }
+
+    @Test
+    @WithData
+    public void testGetByFileReturnsPhoto() throws DAOException, ValidationException {
+        Photo expected = getExpectedPhoto(3);
+
+        // set prefix before and after fetching
+        Path file = Paths.get(expected.getPath().replace(dataDir, "$DIR"));
+        Photo actual = photoDAO.getByFile(file);
+        setDataPrefixDir(actual);
+
+        assertThat(actual, equalTo(expected));
     }
 }

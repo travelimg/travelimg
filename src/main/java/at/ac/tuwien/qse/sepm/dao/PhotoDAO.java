@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 
+import java.nio.file.Path;
 import java.time.YearMonth;
 import java.util.List;
 
@@ -50,28 +51,22 @@ public interface PhotoDAO {
     Photo getById(int id) throws DAOException, ValidationException;
 
     /**
+     +     * Get a photo by its path.
+     *
+     +     * @param file The file of the desired photo.
+     +     * @return The photo belonging to the given path.
+     +     * @throws DAOException If no photo exists under this path.
+     +     * @throws ValidationException If the given file is null.
+     */
+    Photo getByFile(Path file) throws DAOException, ValidationException;
+
+    /**
      * Retrieve all existing photos.
      *
      * @return A List of all currently known photos.
      * @throws DAOException If the data store fails to retrieve the records.
      */
     List<Photo> readAll() throws DAOException;
-
-    /**
-     * Retrieve a list of photos from a given month
-     *
-     * @param month the month for which to retrieve the photos.
-     * @return the list with the photos
-     * @throws DAOException If the data store fails to retrieve the records.
-     */
-    List<Photo> readPhotosByMonth(YearMonth month) throws DAOException;
-
-    /**
-     * Retrieve a list of those months for which there are photos.
-     *
-     * @return a list of months with available photos
-     */
-    List<YearMonth> getMonthsWithPhotos() throws DAOException;
 
     /**
      * Retrieve a list of photos from a given journey

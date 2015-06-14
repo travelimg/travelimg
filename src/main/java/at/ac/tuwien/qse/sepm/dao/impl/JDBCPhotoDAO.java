@@ -30,9 +30,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     private static final String READ_ALL_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id FROM PHOTO;";
     private static final String DELETE_STATEMENT = "Delete from Photo where id =?";
-    private static final String READ_BY_YEAR_AND_MONTH_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id FROM PHOTO WHERE YEAR(datetime)=? AND MONTH(datetime)=?;";
-    private static final String READ_MONTH_STATEMENT = "SELECT YEAR(datetime), MONTH(datetime) from Photo;";
     private static final String GET_BY_ID_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id FROM Photo where id=?";
+    private static final String GET_BY_FILE_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id FROM Photo where path=?";
     private static final String UPDATE_STATEMENT = "UPDATE Photo SET path = ?, rating = ?, place_id = ? WHERE id = ?";
     private static final String READ_JOURNEY_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id FROM PHOTO WHERE datetime>=? AND datetime<=? ORDER BY datetime ASC";
 
@@ -160,6 +159,22 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     @Override
+    public Photo getByFile(Path file) throws DAOException, ValidationException {
+        logger.debug("Get photo with path {}", file);
+        if (file == null) {
+            throw new ValidationException("file can not be null");
+        }
+
+        try {
+            return jdbcTemplate.queryForObject(GET_BY_FILE_STATEMENT, new Object[]{file.toString()}, new PhotoRowMapper());
+        } catch (DataAccessException ex) {
+            logger.error("Failed to get photo", ex);
+            throw new DAOException("Failed to get photo", ex);
+        }
+    }
+
+
+    @Override
     public List<Photo> readAll() throws DAOException {
         logger.debug("retrieving all photos");
 
@@ -172,40 +187,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             throw new DAOException("Failed to read all photos", e);
         } catch (ValidationException.Unchecked | DAOException.Unchecked ex) {
             throw new DAOException(ex);
-        }
-    }
-
-    @Override
-    public List<Photo> readPhotosByMonth(YearMonth month) throws DAOException {
-        logger.debug("retrieving photos for monthh {}", month);
-
-        try {
-            List<Photo> photos = jdbcTemplate.query(READ_BY_YEAR_AND_MONTH_STATEMENT,
-                    new PhotoRowMapper(), month.getYear(), month.getMonth().getValue()
-            );
-
-            logger.debug("Successfully retrieved photos");
-            return photos;
-        } catch (DataAccessException ex) {
-            logger.error("Failed to read photos from given month", ex);
-            throw new DAOException("Failed to read photos from given month", ex);
-        } catch (DAOException.Unchecked | ValidationException.Unchecked ex) {
-            logger.error("Failed to read photos from given month", ex);
-            throw new DAOException("Failed to read photos from given month", ex.getCause());
-        }
-    }
-
-    @Override
-    public List<YearMonth> getMonthsWithPhotos() throws DAOException {
-
-        try {
-            return jdbcTemplate.query(READ_MONTH_STATEMENT, (rs, rowNum) -> {
-                return YearMonth.of(rs.getInt(1), rs.getInt(2));
-            }).stream()
-                    .distinct()
-                    .collect(Collectors.toList());
-        } catch (DataAccessException ex) {
-            throw new DAOException("Failed to retrieve all months", ex);
         }
     }
 
