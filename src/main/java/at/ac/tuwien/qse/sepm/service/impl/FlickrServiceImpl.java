@@ -28,7 +28,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public class FlickrServiceImpl implements FlickrService {
@@ -38,6 +37,7 @@ public class FlickrServiceImpl implements FlickrService {
     private static final String tmpDir = "src/main/resources/tmp/";
     private static final Logger logger = LogManager.getLogger();
     private static int nrOfPhotosToDownload = 10;
+    public static long oneMB = 1048576;
     private AsyncDownloader downloader;
     private Flickr flickr;
     private int i = 0;
@@ -85,42 +85,36 @@ public class FlickrServiceImpl implements FlickrService {
      * @param url                  the url of the photo
      * @param id                   the id of the photo
      * @param format               the format of the photo
-     * @param nrOfDownloadedPhotos the number of downloaded photos (used to indicate the overall download progress)
-     * @param progressCallback     callback object for the progress of the download
-     * @throws ServiceException
+     * @throws ServiceException    if the photo can't be downloaded.
      */
-    public void downloadPhotoFromFlickr(String url, String id, String format, int nrOfDownloadedPhotos, Consumer<Double> progressCallback) throws ServiceException {
-        BufferedInputStream in = null;
-        FileOutputStream fout = null;
+    public void downloadPhotoFromFlickr(String url, String id, String format) throws ServiceException {
+        if(id == null || id.trim().isEmpty() || format == null || format.trim().isEmpty()){
+            throw new ServiceException("Photo id or format invalid.");
+        }
+        HttpURLConnection httpConnection = null;
         try {
-            HttpURLConnection httpConnection = (HttpURLConnection) (new URL(url).openConnection());
-            long completeFileSize = httpConnection.getContentLength();
-            in = new BufferedInputStream((httpConnection.getInputStream()));
-            fout = new FileOutputStream(tmpDir + id + "." + format);
+            httpConnection = (HttpURLConnection) (new URL(url).openConnection());
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            throw new ServiceException(e.getMessage(), e);
+        }
 
-            final byte data[] = new byte[64];
+        try(BufferedInputStream in = new BufferedInputStream((httpConnection.getInputStream()));
+                FileOutputStream fout = new FileOutputStream(tmpDir + id + "." + format);)
+        {
+            long completeFileSize = httpConnection.getContentLength();
+            logger.debug("Size of the photo is {} MB", (double)completeFileSize/oneMB);
+            final byte data[] = new byte[1024];
             int count;
             long downloadedFileSize = 0;
-            while ((count = in.read(data, 0, 64)) != -1) {
+            while ((count = in.read(data, 0, 1024)) != -1) {
                 fout.write(data, 0, count);
                 downloadedFileSize = downloadedFileSize + count;
-                progressCallback.accept((nrOfDownloadedPhotos / (double) nrOfPhotosToDownload) + ((((double) downloadedFileSize) / ((double) completeFileSize)) / 100.0));
+                // maybe produces too much output
+                // logger.debug("Downloaded {} MB", (double)downloadedFileSize/oneMB);
             }
         } catch (IOException e) {
             throw new ServiceException(e.getMessage(), e);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                }
-            }
-            if (fout != null) {
-                try {
-                    fout.close();
-                } catch (IOException e) {
-                }
-            }
         }
     }
 
@@ -229,7 +223,7 @@ public class FlickrServiceImpl implements FlickrService {
                     String format = p.getOriginalFormat();
                     String url = "https://farm" + farmId + ".staticflickr.com/" + serverId + "/" + id + "_" + originalSecret + "_o." + format;
                     if (!originalSecret.isEmpty()) {
-                        downloadPhotoFromFlickr(url, id, format, nrOfDownloadedPhotos, progressCallback);
+                        downloadPhotoFromFlickr(url, id, format);
                         at.ac.tuwien.qse.sepm.entities.Photo downloaded = createPhotoWithGeoData(id, format);
                         logger.debug("Downloaded photo {}", downloaded);
                         callback.accept(downloaded);
