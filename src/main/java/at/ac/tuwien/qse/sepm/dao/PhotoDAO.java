@@ -48,7 +48,6 @@ public interface PhotoDAO {
      * @throws DAOException        If the photo can not be retrived.
      * @throws ValidationException If the id is invalid.
      */
-    @Deprecated
     Photo getById(int id) throws DAOException, ValidationException;
 
     /**

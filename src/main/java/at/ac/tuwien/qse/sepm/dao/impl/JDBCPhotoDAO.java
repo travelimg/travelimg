@@ -149,7 +149,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     @Override
-    @Deprecated
     public Photo getById(int id) throws DAOException, ValidationException {
         logger.debug("Get photo with id {}", id);
 
