@@ -2,8 +2,10 @@ package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
+import at.ac.tuwien.qse.sepm.dao.repo.PhotoNotFoundException;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoCache;
+import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.file.Path;
@@ -27,10 +29,16 @@ public class JdbcPhotoCache implements PhotoCache {
     }
 
     @Override public Collection<Path> index() throws DAOException {
-        throw new UnsupportedOperationException();
+        return photoDAO.readAll().stream()
+                .map(Photo::getFile)
+                .collect(Collectors.toList());
     }
 
     @Override public Photo read(Path file) throws DAOException {
-        throw new UnsupportedOperationException();
+        try {
+            return photoDAO.getByFile(file);
+        } catch (DAOException | ValidationException ex) {
+            throw new PhotoNotFoundException(this, file);
+        }
     }
 }
