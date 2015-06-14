@@ -74,4 +74,13 @@ public class Journey {
         result = 31 * result + endDate.hashCode();
         return result;
     }
+
+    @Override public String toString() {
+        return "Journey{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                '}';
+    }
 }
