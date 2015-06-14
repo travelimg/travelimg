@@ -1,9 +1,4 @@
-package at.ac.tuwien.qse.sepm.dao.repo;
-
-import at.ac.tuwien.qse.sepm.entities.Photographer;
-import at.ac.tuwien.qse.sepm.entities.Place;
-import at.ac.tuwien.qse.sepm.entities.Rating;
-import at.ac.tuwien.qse.sepm.entities.Tag;
+package at.ac.tuwien.qse.sepm.entities;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;

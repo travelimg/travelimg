@@ -1,7 +1,5 @@
 package at.ac.tuwien.qse.sepm.entities;
 
-import at.ac.tuwien.qse.sepm.dao.repo.PhotoMetadata;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;

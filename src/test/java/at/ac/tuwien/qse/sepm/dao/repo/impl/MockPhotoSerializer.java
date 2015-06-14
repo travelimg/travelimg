@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.repo.*;
+import at.ac.tuwien.qse.sepm.entities.PhotoMetadata;
 
 import java.io.IOException;
 import java.io.InputStream;

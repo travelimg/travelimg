@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.dao.repo.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.repo.*;
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.PhotoMetadata;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import org.junit.*;
 import org.junit.Test;

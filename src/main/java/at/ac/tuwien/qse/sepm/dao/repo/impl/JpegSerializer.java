@@ -2,7 +2,7 @@ package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.repo.FormatException;
-import at.ac.tuwien.qse.sepm.dao.repo.PhotoMetadata;
+import at.ac.tuwien.qse.sepm.entities.PhotoMetadata;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoSerializer;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.ImageWriteException;

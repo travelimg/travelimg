@@ -1,10 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.repo;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Photographer;
-import at.ac.tuwien.qse.sepm.entities.Rating;
-import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.*;
 import org.junit.Test;
 
 import java.nio.file.Path;
