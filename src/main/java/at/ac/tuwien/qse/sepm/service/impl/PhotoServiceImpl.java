@@ -3,6 +3,9 @@ package at.ac.tuwien.qse.sepm.service.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.JourneyDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
+import at.ac.tuwien.qse.sepm.dao.repo.AsyncPhotoRepository;
+import at.ac.tuwien.qse.sepm.dao.repo.Operation;
+import at.ac.tuwien.qse.sepm.dao.repo.PhotoRepository;
 import at.ac.tuwien.qse.sepm.dao.repo.impl.CachedPhotoRepository;
 import at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher;
 import at.ac.tuwien.qse.sepm.entities.Journey;
@@ -15,7 +18,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -43,6 +48,10 @@ public class PhotoServiceImpl implements PhotoService {
         watcher.getExtensions().add("jpg");
         watcher.getExtensions().add("JPEG");
         watcher.getExtensions().add("JPG");
+
+        Listener listener = new Listener();
+        photoRepository.addListener((AsyncPhotoRepository.AsyncListener)listener);
+        photoRepository.addListener((PhotoRepository.Listener)listener);
 
         int REFRESH_RATE = 5;
         scheduler.scheduleAtFixedRate(watcher::refresh, REFRESH_RATE, REFRESH_RATE, TimeUnit.SECONDS);
@@ -165,5 +174,69 @@ public class PhotoServiceImpl implements PhotoService {
         p.setPlace(place);
         editPhotos(photos, p);
         LOGGER.debug("Leaving addPlaceToPhotos");
+    }
+
+    private static class Listener implements
+            AsyncPhotoRepository.AsyncListener,
+            PhotoRepository.Listener {
+
+        @Override public void onCreate(PhotoRepository repository, Path file) {
+            LOGGER.info("created {}", file);
+            try {
+                Collection<Photo> photos = repository.readAll();
+                LOGGER.info("repository contains {} photos", photos.size());
+                photos.forEach(p -> LOGGER.info(p));
+            } catch (DAOException ex) {
+                LOGGER.warn("failed read all");
+                LOGGER.error(ex);
+            }
+        }
+
+        @Override public void onUpdate(PhotoRepository repository, Path file) {
+            LOGGER.info("updated {}", file);
+            try {
+                Collection<Photo> photos = repository.readAll();
+                LOGGER.info("repository contains {} photos", photos.size());
+                photos.forEach(p -> LOGGER.info(p));
+            } catch (DAOException ex) {
+                LOGGER.warn("failed read all");
+                LOGGER.error(ex);
+            }
+        }
+
+        @Override public void onDelete(PhotoRepository repository, Path file) {
+            LOGGER.info("deleted {}", file);
+            try {
+                Collection<Photo> photos = repository.readAll();
+                LOGGER.info("repository contains {} photos", photos.size());
+                photos.forEach(p -> LOGGER.info(p));
+            } catch (DAOException ex) {
+                LOGGER.warn("failed read all");
+                LOGGER.error(ex);
+            }
+        }
+
+        @Override public void onError(PhotoRepository repository, DAOException error) {
+            LOGGER.error(error);
+        }
+
+        @Override public void onQueue(AsyncPhotoRepository repository, Operation operation) {
+            LOGGER.info("queued {}", operation);
+            LOGGER.info("queue length {}", repository.getQueue().size());
+            repository.getQueue().forEach(op -> LOGGER.info(op));
+        }
+
+        @Override public void onComplete(AsyncPhotoRepository repository, Operation operation) {
+            LOGGER.info("completed {}", operation);
+            LOGGER.info("queue length {}", repository.getQueue().size());
+            repository.getQueue().forEach(op -> LOGGER.info(op));
+        }
+
+        @Override public void onError(AsyncPhotoRepository repository, Operation operation, DAOException error) {
+            LOGGER.error("failed {}", operation);
+            LOGGER.error(error);
+            LOGGER.info("queue length {}", repository.getQueue().size());
+            repository.getQueue().forEach(op -> LOGGER.info(op));
+        }
     }
 }
