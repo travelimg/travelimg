@@ -4,12 +4,12 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<Pane prefHeight="313.0" prefWidth="250.0"
-      styleClass="organizer" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.SlideshowView">
+<Pane prefHeight="405.0" prefWidth="250.0" styleClass="organizer" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.SlideshowView">
     <children>
         <Button fx:id="Btn_Add" layoutX="47.0" layoutY="137.0" mnemonicParsing="false" text="Create new Slideshow" BorderPane.alignment="CENTER" />
         <TextField fx:id="tf_slideName" layoutX="46.0" layoutY="80.0" BorderPane.alignment="CENTER" />
         <ComboBox fx:id="cb_getSlideshows" layoutX="46.0" layoutY="215.0" prefHeight="40.0" prefWidth="165.0" />
+      <Button fx:id="Btn_StartSlideshow" layoutX="71.0" layoutY="326.0" mnemonicParsing="false" text="Start Animation" />
     </children>
 
 </Pane>

@@ -41,6 +41,7 @@ public class SlideshowOrganizer {
 
     @FXML
     private void initialize() {
+
         slideshowList.setCellFactory(new SlideshowCellFactory());
         slideshowList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             selectedSlideshowProperty.setValue(newValue);
@@ -64,4 +65,7 @@ public class SlideshowOrganizer {
             }
         }
     }
+
+
+
 }

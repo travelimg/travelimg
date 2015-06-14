@@ -9,10 +9,12 @@ import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
 import at.ac.tuwien.qse.sepm.service.SlideshowService;
+import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -37,6 +39,7 @@ public class SlideshowView {
     @FXML private BorderPane root;
     @FXML private ScrollPane gridContainer;
     @FXML private Button Btn_Add;
+    @FXML private Button Btn_StartSlideshow;
     @FXML private ComboBox cb_getSlideshows;
     @FXML private TextField tf_slideName;
 
@@ -48,6 +51,8 @@ public class SlideshowView {
     private SlideshowGrid grid = null;
 
     private ObservableList<Slideshow> slideshows = FXCollections.observableArrayList();
+
+    private Integer slideshowCount=0;
 
     @Autowired
     public void setImageCache(ImageCache imageCache) {
@@ -80,6 +85,7 @@ public class SlideshowView {
 
         Btn_Add.setOnAction(this::handlesetShowSlides);
 
+        Btn_StartSlideshow.setOnAction(this::startSlideshow);
         getAllSlideshowsToComboBox();
 
         slideshowOrganizer.setSlideshows(slideshows);
@@ -150,6 +156,16 @@ public class SlideshowView {
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Laden aller Slideshows", "Fehlermeldung: " + ex.getMessage());
         }
+    }
+
+    private void startSlideshow(Event event) {
+
+
+
+
+
+
+
     }
     
 }
