@@ -55,16 +55,8 @@ public class JdbcPhotoCache implements PhotoCache {
             photo.getData().getTags().add(tag);
         }
 
-        // Save photo.
-        boolean isNew = photo.getId() == null;
-        if (!isNew) {
-            try {
-                photoDAO.getById(photo.getId());
-            } catch (DAOException | ValidationException ex) {
-                isNew = true;
-            }
-        }
-        if (isNew) {
+        // Save photo
+        if (isNew(photo)) {
             try {
                 LOGGER.debug("creating photo {}", photo);
                 photo = photoDAO.create(photo);
@@ -140,6 +132,15 @@ public class JdbcPhotoCache implements PhotoCache {
             return photo;
         } catch (DAOException | ValidationException ex) {
             throw new DAOException(ex);
+        }
+    }
+
+    private boolean isNew(Photo photo) {
+        try {
+            photoDAO.getByFile(photo.getFile());
+            return false;
+        } catch (DAOException | ValidationException ex) {
+            return true;
         }
     }
 

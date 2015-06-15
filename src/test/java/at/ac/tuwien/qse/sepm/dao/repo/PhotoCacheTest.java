@@ -7,6 +7,9 @@ import org.junit.Test;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.*;
 
 public abstract class PhotoCacheTest extends PhotoProviderTest {
