@@ -156,15 +156,7 @@ public class JdbcPhotoCache implements PhotoCache {
                 }
             }
         }
-        try {
-            LOGGER.debug("reading default photographer");
-            photographer = photographerDAO.getById(1);
-            LOGGER.debug("read default photographer {}", photographer);
-            return photographer;
-        } catch (DAOException ex) {
-            LOGGER.warn("failed reading default photographer");
-            throw new DAOException(ex);
-        }
+        return null;
     }
 
     private Journey save(Journey journey) throws DAOException {

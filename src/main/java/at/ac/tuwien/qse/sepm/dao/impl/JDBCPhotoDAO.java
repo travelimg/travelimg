@@ -54,7 +54,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         logger.debug("Creating photo {}", photo);
 
         Map<String, Object> parameters = new HashMap<String, Object>(1);
-        parameters.put("photographer_id", photo.getData().getPhotographer().getId());
         parameters.put("path", photo.getPath());
         parameters.put("rating", photo.getData().getRating().ordinal());
         parameters.put("datetime", Timestamp.valueOf(photo.getData().getDatetime()));
@@ -62,6 +61,12 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         parameters.put("longitude", photo.getData().getLongitude());
         parameters.put("place_id", photo.getData().getPlace().getId());
         parameters.put("journey_id", photo.getData().getJourney().getId());
+
+        Photographer photographer = photo.getData().getPhotographer();
+        parameters.put("photographer_id", null);
+        if (photographer != null) {
+            parameters.put("photographer_id", photographer.getId());
+        }
 
         try {
             Number newId = insertPhoto.executeAndReturnKey(parameters);
