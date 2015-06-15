@@ -38,11 +38,12 @@ public class PhotoServiceImpl implements PhotoService {
     @Autowired
     private CachedPhotoRepository photoRepository;
 
+    private Listener listener;
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     @Autowired
     private void initializeWatcher(PollingFileWatcher watcher) {
-        Listener listener = new Listener();
+        listener = new Listener();
         photoRepository.addListener((AsyncPhotoRepository.AsyncListener)listener);
         photoRepository.addListener((PhotoRepository.Listener)listener);
 
@@ -52,6 +53,7 @@ public class PhotoServiceImpl implements PhotoService {
 
     public void close() {
         scheduler.shutdown();
+        listener.close();
     }
 
     public void deletePhotos(List<Photo> photos) throws ServiceException {
@@ -131,7 +133,11 @@ public class PhotoServiceImpl implements PhotoService {
             AsyncPhotoRepository.AsyncListener,
             PhotoRepository.Listener {
 
-        private static final ExecutorService executor = Executors.newCachedThreadPool();
+        private final ExecutorService executor = Executors.newCachedThreadPool();
+
+        public void close() {
+            executor.shutdown();
+        }
 
         @Override public void onCreate(PhotoRepository repository, Path file) {
             LOGGER.info("created {}", file);
