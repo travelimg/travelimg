@@ -131,7 +131,8 @@ public class JdbcPhotoCache implements PhotoCache {
 
     private boolean isNew(Photo photo) {
         try {
-            photoDAO.getByFile(photo.getFile());
+            Photo cached = photoDAO.getByFile(photo.getFile());
+            photo.setId(cached.getId());
             return false;
         } catch (DAOException ex) {
             return true;
@@ -177,15 +178,7 @@ public class JdbcPhotoCache implements PhotoCache {
                 }
             }
         }
-        try {
-            LOGGER.debug("reading default journey");
-            journey = journeyDAO.getByID(1);
-            LOGGER.debug("read default journey {}", journey);
-            return journey;
-        } catch (DAOException | ValidationException ex) {
-            LOGGER.warn("failed reading default journey");
-            throw new DAOException(ex);
-        }
+        return null;
     }
 
     private Place save(Place place) throws DAOException {
@@ -206,15 +199,7 @@ public class JdbcPhotoCache implements PhotoCache {
                 }
             }
         }
-        try {
-            LOGGER.debug("reading default place");
-            place = placeDAO.getById(1);
-            LOGGER.debug("read default place {}", place);
-            return place;
-        } catch (DAOException | ValidationException ex) {
-            LOGGER.warn("failed reading default place");
-            throw new DAOException(ex);
-        }
+        return null;
     }
 
     private Tag save(Tag tag) throws DAOException {

@@ -105,14 +105,6 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
         assertThat(expected, equalTo(value));
     }
 
-    @Test(expected = DAOException.class)
-    public void testCreateWithUnknownPhotographerThrows() throws DAOException {
-        Photo photo = getInputPhoto(0);
-        photo.getData().setPhotographer(new Photographer(-42, "does not exist"));
-
-        photoDAO.create(photo);
-    }
-
     @Test
     @WithData
     public void testReadAllRecordsExist() throws DAOException {
