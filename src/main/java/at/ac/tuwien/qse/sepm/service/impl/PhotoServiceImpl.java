@@ -38,14 +38,10 @@ public class PhotoServiceImpl implements PhotoService {
     @Autowired
     private PhotoDAO photoDAO;
     @Autowired
-    private CachedPhotoRepository photoRepository;
+    private AsyncPhotoRepository photoRepository;
 
     private Listener listener;
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
-    private List<Consumer<Photo>> createListeners = new ArrayList<>();
-    private List<Consumer<Path>> deleteListeners = new ArrayList<>();
-    private List<Consumer<Photo>> updateListeners = new ArrayList<>();
 
     @Autowired
     private void initializeWatcher(PollingFileWatcher watcher) {
@@ -80,8 +76,6 @@ public class PhotoServiceImpl implements PhotoService {
                 photoDAO.delete(p);
             } catch (DAOException e) {
                 throw new ServiceException(e);
-            } catch (ValidationException e) {
-                throw new ServiceException("Failed to validate entity", e);
             }
         }
     }
@@ -100,8 +94,6 @@ public class PhotoServiceImpl implements PhotoService {
                 photoDAO.update(p);
             } catch (DAOException e) {
                 throw new ServiceException(e);
-            } catch (ValidationException e) {
-                throw new ServiceException("Failed to validate entity", e);
             }
         }
     }
@@ -135,9 +127,6 @@ public class PhotoServiceImpl implements PhotoService {
         } catch (DAOException ex) {
             LOGGER.error("Updating {} failed due to DAOException", photo);
             throw new ServiceException("Could update photo.", ex);
-        } catch (ValidationException ex) {
-            LOGGER.error("Updating {} failed due to ValidationException", photo);
-            throw new ServiceException("Could not update photo.", ex);
         }
 
         LOGGER.debug("Leaving editPhoto with {}", photo);
@@ -145,17 +134,42 @@ public class PhotoServiceImpl implements PhotoService {
 
     @Override
     public void subscribeCreate(Consumer<Photo> callback) {
-        createListeners.add(callback);
-    }
-
-    @Override
-    public void subscribeDelete(Consumer<Path> callback) {
-        deleteListeners.add(callback);
+        photoRepository.addListener(new PhotoRepository.Listener() {
+            @Override public void onCreate(PhotoRepository repository, Path file) {
+                LOGGER.info("created {}", file);
+                try {
+                    Photo photo = repository.read(file);
+                    callback.accept(photo);
+                } catch (DAOException ex) {
+                    LOGGER.error("Failed to read photo {}", file);
+                }
+            }
+        });
     }
 
     @Override
     public void subscribeUpdate(Consumer<Photo> callback) {
-        updateListeners.add(callback);
+        photoRepository.addListener(new PhotoRepository.Listener() {
+            @Override public void onUpdate(PhotoRepository repository, Path file) {
+                LOGGER.info("updated {}", file);
+                try {
+                    Photo photo = repository.read(file);
+                    callback.accept(photo);
+                } catch (DAOException ex) {
+                    LOGGER.error("Failed to read photo {}", file);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void subscribeDelete(Consumer<Path> callback) {
+        photoRepository.addListener(new PhotoRepository.Listener() {
+            @Override public void onDelete(PhotoRepository repository, Path file) {
+                LOGGER.info("deleted {}", file);
+                callback.accept(file);
+            }
+        });
     }
 
     private class Listener implements
@@ -168,34 +182,6 @@ public class PhotoServiceImpl implements PhotoService {
             executor.shutdown();
         }
 
-        @Override public void onCreate(PhotoRepository repository, Path file) {
-            LOGGER.info("created {}", file);
-
-            try {
-                Photo photo = repository.read(file);
-                createListeners.forEach(cb -> cb.accept(photo));
-            } catch (DAOException ex) {
-                LOGGER.error("Failed to read photo {}", file);
-            }
-        }
-
-        @Override public void onUpdate(PhotoRepository repository, Path file) {
-            LOGGER.info("updated {}", file);
-
-            try {
-                Photo photo = repository.read(file);
-                updateListeners.forEach(cb -> cb.accept(photo));
-            } catch (DAOException ex) {
-                LOGGER.error("Failed to read photo {}", file);
-            }
-        }
-
-        @Override public void onDelete(PhotoRepository repository, Path file) {
-            LOGGER.info("deleted {}", file);
-
-            deleteListeners.forEach(cb -> cb.accept(file));
-        }
-
         @Override public void onError(PhotoRepository repository, DAOException error) {
             LOGGER.error(error);
         }
@@ -203,21 +189,7 @@ public class PhotoServiceImpl implements PhotoService {
         @Override public void onQueue(AsyncPhotoRepository repository, Operation operation) {
             LOGGER.info("queued {}", operation);
             LOGGER.info("queue length {}", repository.getQueue().size());
-            repository.getQueue().forEach(op -> LOGGER.info(op));
             executor.execute(repository::completeNext);
-        }
-
-        @Override public void onComplete(AsyncPhotoRepository repository, Operation operation) {
-            LOGGER.info("completed {}", operation);
-            LOGGER.info("queue length {}", repository.getQueue().size());
-            repository.getQueue().forEach(op -> LOGGER.info(op));
-        }
-
-        @Override public void onError(AsyncPhotoRepository repository, Operation operation, DAOException error) {
-            LOGGER.error("failed {}", operation);
-            LOGGER.error(error);
-            LOGGER.info("queue length {}", repository.getQueue().size());
-            repository.getQueue().forEach(op -> LOGGER.info(op));
         }
     }
 }
