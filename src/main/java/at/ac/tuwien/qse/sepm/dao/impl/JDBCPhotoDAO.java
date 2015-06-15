@@ -150,7 +150,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         try {
             return jdbcTemplate.queryForObject(GET_BY_FILE_STATEMENT, new Object[]{file.toString()}, new PhotoRowMapper());
         } catch (DataAccessException ex) {
-            logger.error("Failed to get photo", ex);
+            logger.error("Failed to get photo");
             throw new DAOException("Failed to get photo", ex);
         }
     }
