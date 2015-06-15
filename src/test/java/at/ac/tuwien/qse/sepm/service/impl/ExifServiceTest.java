@@ -106,28 +106,6 @@ public class ExifServiceTest extends ServiceTestBase {
                 0).getName(), expectedPhotos.get(2).getTags().get(0).getName());
     }
 
-    @WithData
-    @Test
-    public void testJourneyExportToPhotoFile()
-            throws ServiceException, ValidationException, DAOException {
-        logger.debug("Entering testJourneyExportToPhotoFile()");
-
-        try {
-            Files.copy(new File(sourceDir + "6.jpg").toPath(),
-                    new File(sourceDir + "/exif/6.jpg").toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        inputPhotos.get(0).getPlace().setJourney(inputJourney);
-        exifService.exportMetaToExif(inputPhotos.get(0));
-        exifService.getTagsFromExif(expectedPhotos.get(0));
-        assertEquals(inputPhotos.get(0).getPlace().getJourney(), expectedPhotos.get(0).getPlace().getJourney());
-        List<Journey> journeyList = journeyDAO.readAll();
-        assertNotNull(journeyList);
-    }
-
 
     @WithData
     @Test
