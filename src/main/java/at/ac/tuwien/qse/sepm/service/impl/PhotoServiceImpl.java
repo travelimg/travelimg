@@ -183,7 +183,12 @@ public class PhotoServiceImpl implements PhotoService {
         }
 
         @Override public void onError(PhotoRepository repository, DAOException error) {
-            LOGGER.error(error);
+            LOGGER.error("repository error {}", error);
+        }
+
+        @Override public void onError(AsyncPhotoRepository repository, Operation operation, DAOException error) {
+            LOGGER.warn("failed operation {}", operation);
+            LOGGER.error("operation error {}", error);
         }
 
         @Override public void onQueue(AsyncPhotoRepository repository, Operation operation) {
