@@ -151,5 +151,31 @@ public abstract class PhotoProviderTest {
         public Photo getModified1() {
             return new Photo(getFile1(), getPhotoData2());
         }
+
+        public PhotoMetadata getMinimalData() {
+            PhotoMetadata data = new PhotoMetadata();
+            data.setDatetime(LocalDateTime.of(2000, 1, 2, 3, 4));
+            data.setLongitude(5.5);
+            data.setLatitude(7.8);
+            data.setRating(Rating.BAD);
+            return data;
+        }
+
+        public PhotoMetadata getMaximalData() {
+            PhotoMetadata data = new PhotoMetadata();
+            data.setDatetime(LocalDateTime.of(2000, 1, 2, 3, 4));
+            data.setLongitude(5.5);
+            data.setLatitude(7.8);
+            data.setRating(Rating.BAD);
+            data.setPhotographer(new Photographer(null, "David"));
+            data.getTags().add(new Tag(null, "food"));
+            data.getTags().add(new Tag(null, "people"));
+            Journey journey = new Journey(null, "Italien 2000", LocalDateTime.of(2000, 1, 1, 0, 0), LocalDateTime.of(
+                    2000, 12, 31, 0, 0));
+            Place place = new Place(null, "Rom", "Italien", 5, 8);
+            data.setPlace(place);
+            data.setJourney(journey);
+            return data;
+        }
     }
 }

@@ -2,11 +2,12 @@ package at.ac.tuwien.qse.sepm.dao.repo;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.repo.impl.MockPhotoSerializer;
-import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.*;
 import org.junit.Test;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 
 import static org.junit.Assert.*;
 
@@ -84,11 +85,22 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
     }
 
     @Test
-    public void update_existing_persists() throws DAOException {
+    public void update_minimalData_persists() throws DAOException {
         PhotoRepository object = getObject();
         Path file = getContext().getFile1();
         object.create(file, getContext().getStream1());
-        Photo modified = getContext().getModified1();
+        Photo modified = new Photo(file, getContext().getMinimalData());
+
+        object.update(modified);
+        assertEquals(modified, object.read(file));
+    }
+
+    @Test
+    public void update_maximalData_persists() throws DAOException {
+        PhotoRepository object = getObject();
+        Path file = getContext().getFile1();
+        object.create(file, getContext().getStream1());
+        Photo modified = new Photo(file, getContext().getMaximalData());
 
         object.update(modified);
         assertEquals(modified, object.read(file));
@@ -174,6 +186,8 @@ public abstract class PhotoRepositoryTest extends PhotoProviderTest {
             MockPhotoSerializer serializer = new MockPhotoSerializer();
             serializer.put(1, getPhotoData1());
             serializer.put(2, getPhotoData2());
+            serializer.put(3, getMinimalData());
+            serializer.put(4, getMaximalData());
             return serializer;
         }
 

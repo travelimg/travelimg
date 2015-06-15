@@ -33,9 +33,18 @@ public abstract class PhotoCacheTest extends PhotoProviderTest {
     }
 
     @Test
-    public void put_valid_persists() throws DAOException {
+    public void put_minimalData_persists() throws DAOException {
         PhotoCache object = getObject();
-        Photo photo = getContext().getPhoto1();
+        Photo photo = new Photo(getContext().getFile1(), getContext().getMinimalData());
+
+        object.put(photo);
+        assertEquals(photo, object.read(photo.getFile()));
+    }
+
+    @Test
+    public void put_maximalData_persists() throws DAOException {
+        PhotoCache object = getObject();
+        Photo photo = new Photo(getContext().getFile1(), getContext().getMaximalData());
 
         object.put(photo);
         assertEquals(photo, object.read(photo.getFile()));

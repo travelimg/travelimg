@@ -84,7 +84,7 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
         try {
             photographers.addAll(photographerService.readAll());
         } catch (ServiceException ex) {
-            ErrorDialog.show(getParent(), "Fehler beim Auslesen der Fotografen", "Fehlermeldung: " + ex.getMessage());
+            ErrorDialog.show(this, "Fehler beim Auslesen der Fotografen", "Fehlermeldung: " + ex.getMessage());
         }
 
         photographerBox.setItems(photographers);
@@ -179,7 +179,7 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
             photographers.add(photographer);
             photographerBox.getSelectionModel().select(photographer);
         } catch (ServiceException ex) {
-            ErrorDialog.show(getParent(), "Fehler beim Hinzufügen", "Fehlermeldung: " + ex.getMessage());
+            ErrorDialog.show(this, "Fehler beim Hinzufügen", "Fehlermeldung: " + ex.getMessage());
         }
     }
 
@@ -196,7 +196,7 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
             int index = photographerBox.getSelectionModel().getSelectedIndex();
             photographers.set(index, newValue);
         } catch (ServiceException ex) {
-            ErrorDialog.show(getParent(), "Fehler beim Ändern", "Fehlermeldung: " + ex.getMessage());
+            ErrorDialog.show(this, "Fehler beim Ändern", "Fehlermeldung: " + ex.getMessage());
         }
     }
 }

@@ -22,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -143,10 +144,17 @@ public class GridViewImpl implements GridView {
         });
     }
 
-    private void handlePhotoDeleted(Photo photo) {
+    private void handlePhotoDeleted(Path file) {
         Platform.runLater(() -> {
             // TODO: should we update filter
-            grid.removePhoto(photo);
+
+            // lookup photo by path
+            Optional<Photo> photo = grid.getPhotos().stream()
+                    .filter(p -> p.getFile().equals(file))
+                    .findFirst();
+
+            if (photo.isPresent())
+                grid.removePhoto(photo.get());
         });
     }
 
