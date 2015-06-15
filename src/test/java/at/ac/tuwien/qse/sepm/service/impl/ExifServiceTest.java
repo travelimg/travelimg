@@ -130,7 +130,6 @@ public class ExifServiceTest extends ServiceTestBase {
         assertNotNull(journeyList);
     }
 
-
     @WithData
     @Test
     public void testPlaceExportToPhotoFile()
