@@ -36,8 +36,6 @@ public class PhotoServiceImpl implements PhotoService {
     @Autowired
     private PhotoDAO photoDAO;
     @Autowired
-    private JourneyDAO journeyDAO;
-    @Autowired
     private CachedPhotoRepository photoRepository;
 
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
