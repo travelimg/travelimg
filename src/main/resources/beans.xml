@@ -42,7 +42,7 @@
 
     <!-- DAO repository beans -->
     <bean id="watcher" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher" factory-method="forImageDirectory">
-        <constructor-arg value="{user.home}/travelimg"></constructor-arg>
+        <constructor-arg value="${user.home}/travelimg"></constructor-arg>
     </bean>
     <bean id="serializer" class="at.ac.tuwien.qse.sepm.dao.repo.impl.JpegSerializer"></bean>
     <bean id="photoRepository" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PhotoFileRepository">
