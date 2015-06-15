@@ -60,7 +60,7 @@ public class JdbcPhotoCache implements PhotoCache {
             try {
                 LOGGER.debug("creating photo {}", photo);
                 photo = photoDAO.create(photo);
-            } catch (ValidationException | DAOException ex) {
+            } catch (DAOException ex) {
                 LOGGER.warn("failed creating photo {}", photo);
                 throw new DAOException(ex);
             }
@@ -68,7 +68,7 @@ public class JdbcPhotoCache implements PhotoCache {
             try {
                 LOGGER.debug("updating existing photo {}", photo);
                 photoDAO.update(photo);
-            } catch (DAOException | ValidationException ex) {
+            } catch (DAOException ex) {
                 LOGGER.warn("failed updating photo {}", photo);
                 throw new DAOException(ex);
             }
@@ -96,17 +96,11 @@ public class JdbcPhotoCache implements PhotoCache {
         Photo photo;
         try {
             photo = photoDAO.getByFile(file);
-        } catch (DAOException | ValidationException ex) {
+        } catch (DAOException ex) {
             throw new PhotoNotFoundException(this, file);
         }
 
-        try {
-            photoDAO.delete(photo);
-        } catch (ValidationException ex) {
-            LOGGER.error("Failed to validate {}", file, ex);
-            throw new DAOException("Failed to validate " + file, ex);
-        }
-
+        photoDAO.delete(photo);
         LOGGER.debug("removed {}", file);
     }
 
@@ -130,7 +124,7 @@ public class JdbcPhotoCache implements PhotoCache {
             Photo photo = photoDAO.getByFile(file);
             LOGGER.debug("read {}", photo);
             return photo;
-        } catch (DAOException | ValidationException ex) {
+        } catch (DAOException ex) {
             throw new DAOException(ex);
         }
     }
@@ -139,7 +133,7 @@ public class JdbcPhotoCache implements PhotoCache {
         try {
             photoDAO.getByFile(photo.getFile());
             return false;
-        } catch (DAOException | ValidationException ex) {
+        } catch (DAOException ex) {
             return true;
         }
     }

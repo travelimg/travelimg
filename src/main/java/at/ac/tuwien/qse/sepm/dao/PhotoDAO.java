@@ -2,11 +2,9 @@ package at.ac.tuwien.qse.sepm.dao;
 
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.time.YearMonth;
 import java.util.List;
 
 public interface PhotoDAO {
@@ -18,7 +16,7 @@ public interface PhotoDAO {
      * @return The created photo
      * @throws DAOException If the store fails to create a record.
      */
-    Photo create(Photo photo) throws DAOException, ValidationException;
+    Photo create(Photo photo) throws DAOException;
 
     /**
      * Update an existing photo.
@@ -26,7 +24,7 @@ public interface PhotoDAO {
      * @param photo Description of the photo to update together with the new values.
      * @throws DAOException If the photo does not exist or the data store fails to update the record.
      */
-    void update(Photo photo) throws DAOException, ValidationException;
+    void update(Photo photo) throws DAOException;
 
     /**
      * Delete an existing photo.
@@ -34,7 +32,7 @@ public interface PhotoDAO {
      * @param photo Specifies which photo to delete by providing the id.
      * @throws DAOException If the data store fails to delete the record.
      */
-    void delete(Photo photo) throws DAOException, ValidationException;
+    void delete(Photo photo) throws DAOException;
 
     /**
      * Get a photo by its id
@@ -42,9 +40,8 @@ public interface PhotoDAO {
      * @param id the id of the photo
      * @return The photo belonging to the id
      * @throws DAOException        If the photo can not be retrived.
-     * @throws ValidationException If the id is invalid.
      */
-    Photo getById(int id) throws DAOException, ValidationException;
+    Photo getById(int id) throws DAOException;
 
     /**
      * Get a photo by its path.
@@ -52,9 +49,8 @@ public interface PhotoDAO {
      * @param file The file of the desired photo.
      * @return The photo belonging to the given path.
      * @throws DAOException If no photo exists under this path.
-     * @throws ValidationException If the given file is null.
      */
-    Photo getByFile(Path file) throws DAOException, ValidationException;
+    Photo getByFile(Path file) throws DAOException;
 
     /**
      * Retrieve all existing photos.
@@ -79,8 +75,6 @@ public interface PhotoDAO {
      * @param end upper bound for photo time.
      * @return a list of photos falling into the time interval.
      * @throws DAOException if retrieval fails due to a datastore error.
-     * @throws ValidationException if either of the parameters is null
      */
-    List<Photo> readPhotosBetween(LocalDateTime start, LocalDateTime end) throws DAOException, ValidationException;
-
+    List<Photo> readPhotosBetween(LocalDateTime start, LocalDateTime end) throws DAOException;
 }

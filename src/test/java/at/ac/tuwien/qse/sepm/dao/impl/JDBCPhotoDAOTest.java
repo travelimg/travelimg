@@ -86,15 +86,15 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
         assertThat(countRows(), is(6));
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = IllegalArgumentException.class)
     @WithData
-    public void testCreateWithNullThrows() throws DAOException, ValidationException {
+    public void testCreateWithNullThrows() throws DAOException {
         photoDAO.create(null);
     }
 
     @Test
     @WithData
-    public void testCreateResultHasCorrectAttributes() throws DAOException, ValidationException {
+    public void testCreateResultHasCorrectAttributes() throws DAOException {
         Photo photo = getInputPhoto(0);
         System.out.println(photo);
         Photo expected = getExpectedPhoto(photo.getId());
@@ -106,7 +106,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     }
 
     @Test(expected = DAOException.class)
-    public void testCreateWithUnknownPhotographerThrows() throws DAOException, ValidationException {
+    public void testCreateWithUnknownPhotographerThrows() throws DAOException {
         Photo photo = getInputPhoto(0);
         photo.getData().setPhotographer(new Photographer(-42, "does not exist"));
 
@@ -115,7 +115,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
     @Test
     @WithData
-    public void testReadAllRecordsExist() throws DAOException, ValidationException {
+    public void testReadAllRecordsExist() throws DAOException {
         List<Photo> photos = photoDAO.readAll();
 
         for (Photo photo : photos) {
@@ -126,7 +126,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
     @Test
     @WithData
-    public void testCreateAddsEntry() throws DAOException, ValidationException {
+    public void testCreateAddsEntry() throws DAOException {
         int initial = countRows();
 
         Photo photo = getInputPhoto(0);
@@ -142,7 +142,7 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
     @Test
     @WithData
-    public void testReadAllReturnsCreated() throws DAOException, ValidationException {
+    public void testReadAllReturnsCreated() throws DAOException {
         Photo photo = getInputPhoto(1);
         Photo expected = getExpectedPhoto(photo.getId());
 
@@ -154,15 +154,15 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
         assertThat(photoDAO.readAll(), hasItem(expected));
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = IllegalArgumentException.class)
     @WithData
-    public void testDeleteWithNullThrows() throws DAOException, ValidationException {
+    public void testDeleteWithNullThrows() throws DAOException {
         photoDAO.delete(null);
     }
 
     @Test
     @WithData
-    public void testDeleteWithNonexistingPhotoIsNop() throws DAOException, ValidationException {
+    public void testDeleteWithNonexistingPhotoIsNop() throws DAOException {
         int initial = countRows();
 
         Photo photo = getExpectedPhoto(1);
@@ -174,18 +174,9 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
         assertThat(countRows(), is(initial));
     }
 
-    @Test(expected = ValidationException.class)
-    @WithData
-    public void testDeleteWithInvalidIdThrows() throws DAOException, ValidationException {
-        Photo photo = getExpectedPhoto(5);
-        photo.setId(-2);
-
-        photoDAO.delete(photo);
-    }
-
     @Test
     @WithData
-    public void testDeletePhotoRemovesEntry() throws DAOException, ValidationException {
+    public void testDeletePhotoRemovesEntry() throws DAOException {
         int initial = countRows();
 
         Photo photo = getExpectedPhoto(3);
@@ -200,19 +191,13 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
     @Test(expected = DAOException.class)
     @WithData
-    public void testGetByIdNonexistingThrows() throws DAOException, ValidationException {
+    public void testGetByIdNonexistingThrows() throws DAOException {
         photoDAO.getById(1000);
-    }
-
-    @Test(expected = ValidationException.class)
-    @WithData
-    public void testGetByIdNegativeIdThrows() throws DAOException, ValidationException {
-        photoDAO.getById(-42);
     }
 
     @Test
     @WithData
-    public void testGetByIdExistingReturnsPhoto() throws DAOException, ValidationException {
+    public void testGetByIdExistingReturnsPhoto() throws DAOException {
         Photo expected = getExpectedPhoto(4);
         Photo actual = photoDAO.getById(expected.getId());
 
@@ -221,19 +206,19 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
     @Test(expected = DAOException.class)
     @WithData
-    public void testGetByFileNonexistingThrows() throws DAOException, ValidationException {
+    public void testGetByFileNonexistingThrows() throws DAOException {
         photoDAO.getByFile(Paths.get("/path/to/enlightenment.jpg"));
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = IllegalArgumentException.class)
     @WithData
-    public void testGetByFileNullFileThrows() throws DAOException, ValidationException {
+    public void testGetByFileNullFileThrows() throws DAOException {
         photoDAO.getByFile(null);
     }
 
     @Test
     @WithData
-    public void testGetByFileReturnsPhoto() throws DAOException, ValidationException {
+    public void testGetByFileReturnsPhoto() throws DAOException {
         Photo expected = getExpectedPhoto(3);
 
         // set prefix before and after fetching

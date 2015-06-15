@@ -2,30 +2,21 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 
 import at.ac.tuwien.qse.sepm.dao.*;
 import at.ac.tuwien.qse.sepm.entities.*;
-import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
-import at.ac.tuwien.qse.sepm.util.IOHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 import javax.sql.DataSource;
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
@@ -58,10 +49,9 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     @Override
-    public Photo create(Photo photo) throws DAOException, ValidationException {
+    public Photo create(Photo photo) throws DAOException {
+        if (photo == null) throw new IllegalArgumentException();
         logger.debug("Creating photo {}", photo);
-
-        PhotoValidator.validate(photo);
 
         Map<String, Object> parameters = new HashMap<String, Object>(1);
         parameters.put("photographer_id", photo.getData().getPhotographer().getId());
@@ -84,10 +74,10 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     @Override
-    public void update(Photo photo) throws DAOException, ValidationException {
+    public void update(Photo photo) throws DAOException {
+        if (photo == null) throw new IllegalArgumentException();
+        if (photo.getId() == null) throw new IllegalArgumentException();
         logger.debug("Updating photo {}", photo);
-
-        PhotoValidator.validate(photo);
 
         try {
             jdbcTemplate.update(UPDATE_STATEMENT,
@@ -104,27 +94,23 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     @Override
-    public void delete(Photo photo) throws DAOException, ValidationException {
+    public void delete(Photo photo) throws DAOException {
+        if (photo == null) throw new IllegalArgumentException();
+        if (photo.getId() == null) throw new IllegalArgumentException();
         logger.debug("Deleting photo {}", photo);
 
-        PhotoValidator.validate(photo);
-        PhotoValidator.validateID(photo.getId());
-
-        int id = photo.getId();
-
         try {
+            int id = photo.getId();
             photoTagDAO.deleteAllEntriesOfSpecificPhoto(photo);
             jdbcTemplate.update(DELETE_STATEMENT, id);
-        } catch (DataAccessException e) {
+        } catch (DataAccessException | ValidationException e) {
             throw new DAOException("Failed to delete photo", e);
         }
     }
 
     @Override
-    public Photo getById(int id) throws DAOException, ValidationException {
+    public Photo getById(int id) throws DAOException {
         logger.debug("Get photo with id {}", id);
-
-        PhotoValidator.validateID(id);
 
         try {
             return this.jdbcTemplate.queryForObject(GET_BY_ID_STATEMENT, new Object[]{id}, new PhotoRowMapper());
@@ -135,11 +121,9 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     @Override
-    public Photo getByFile(Path file) throws DAOException, ValidationException {
+    public Photo getByFile(Path file) throws DAOException {
+        if (file == null) throw new IllegalArgumentException();
         logger.debug("Get photo with path {}", file);
-        if (file == null) {
-            throw new ValidationException("file can not be null");
-        }
 
         try {
             return jdbcTemplate.queryForObject(GET_BY_FILE_STATEMENT, new Object[]{file.toString()}, new PhotoRowMapper());
@@ -156,7 +140,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
         try {
             List<Photo> photos = jdbcTemplate.query(READ_ALL_STATEMENT, new PhotoRowMapper());
-
             logger.debug("Successfully read all photos: " + photos.size());
             return photos;
         } catch (DataAccessException e) {
@@ -168,11 +151,12 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     @Override
     public List<Photo> readPhotosByJourney(Journey journey) throws DAOException {
+        if (journey == null) throw new IllegalArgumentException();
+        if (journey.getId() == null) throw new IllegalArgumentException();
         logger.debug("retrieving photos for journey {}", journey);
 
         try {
             List<Photo> photos = jdbcTemplate.query(READ_JOURNEY_STATEMENT, new PhotoRowMapper(), journey.getId());
-
             logger.debug("Successfully retrieved photos");
             return photos;
         } catch (DataAccessException ex) {
@@ -185,16 +169,13 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     }
 
     @Override
-    public List<Photo> readPhotosBetween(LocalDateTime start, LocalDateTime end) throws DAOException, ValidationException {
+    public List<Photo> readPhotosBetween(LocalDateTime start, LocalDateTime end) throws DAOException {
+        if (start == null) throw new IllegalArgumentException();
+        if (end == null) throw new IllegalArgumentException();
         logger.debug("retrieving photos between {} and {}", start, end);
-
-        if (start == null || end == null) {
-            throw new ValidationException("start or end can not be null");
-        }
 
         try {
             List<Photo> photos = jdbcTemplate.query(READ_INTERVAL_STATEMENT, new PhotoRowMapper(), start, end);
-
             logger.debug("Successfully retrieved photos");
             return photos;
         } catch (DataAccessException ex) {
