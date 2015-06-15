@@ -50,10 +50,4 @@ public interface PhotoService {
      * @throws ServiceException failed to perform operation
      */
     void editPhoto(Photo photo) throws ServiceException;
-
-    /*@Deprecated
-    void addJourneyToPhotos(List<Photo> photos, Journey journey) throws ServiceException;
-
-    @Deprecated
-    void addPlaceToPhotos(List<Photo> photos, Place place) throws ServiceException;*/
 }

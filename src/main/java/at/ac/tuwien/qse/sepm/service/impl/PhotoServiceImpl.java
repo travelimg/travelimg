@@ -129,48 +129,6 @@ public class PhotoServiceImpl implements PhotoService {
         LOGGER.debug("Leaving editPhoto with {}", photo);
     }
 
-    /*@Override
-    @Deprecated
-    public void addJourneyToPhotos(List<Photo> photos, Journey journey)
-            throws ServiceException {
-        LOGGER.debug("Entering addJourneyToPhotos with {}, {}", photos, journey);
-        if (photos == null) {
-            throw new ServiceException("List<Photo> photos is null");
-        }
-        try {
-            journeyDAO.create(journey);
-        } catch (DAOException ex) {
-            LOGGER.error("Journey-creation with {}, {} failed.", journey);
-            throw new ServiceException("Creation of Journey failed.", ex);
-        } catch (ValidationException e) {
-            throw new ServiceException("Failed to validate entity", e);
-        }
-
-        for (Photo photo : photos) {
-            photo.getData().getPlace().setJourney(journey);
-//            exifService.exportMetaToExif(photo);
-            LOGGER.debug("Leaving addJourneyToPhotos");
-        }
-    }
-
-    @Override
-    @Deprecated
-    public void addPlaceToPhotos(List<Photo> photos, Place place)
-            throws ServiceException {
-        LOGGER.debug("Entering addPlaceToPhotos with {}, {}", photos, place);
-        if (photos == null) {
-            throw new ServiceException("List<Photo> photos is null");
-        }
-
-        for (Photo photo : photos) {
-//            exifService.exportMetaToExif(photo);
-        }
-        Photo p = new Photo();
-        p.getData().setPlace(place);
-        editPhotos(photos, p);
-        LOGGER.debug("Leaving addPlaceToPhotos");
-    }*/
-
     private static class Listener implements
             AsyncPhotoRepository.AsyncListener,
             PhotoRepository.Listener {

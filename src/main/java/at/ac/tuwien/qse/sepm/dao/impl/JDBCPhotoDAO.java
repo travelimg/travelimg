@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private static final String GET_BY_FILE_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id, journey_id FROM Photo where path=?";
     private static final String UPDATE_STATEMENT = "UPDATE Photo SET path = ?, rating = ?, place_id = ?, journey_id WHERE id = ?";
     private static final String READ_JOURNEY_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id, journey_id FROM PHOTO WHERE journey_id=? ORDER BY datetime ASC";
+    private static final String READ_INTERVAL_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id, journey_id FROM PHOTO WHERE datetime>=? AND datetime<=? ORDER BY datetime ASC";
 
     private SimpleJdbcInsert insertPhoto;
 
@@ -166,7 +168,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     @Override
     public List<Photo> readPhotosByJourney(Journey journey) throws DAOException {
-        logger.debug("retrieving photos for monthh {}", journey);
+        logger.debug("retrieving photos for journey {}", journey);
 
         try {
             List<Photo> photos = jdbcTemplate.query(READ_JOURNEY_STATEMENT, new PhotoRowMapper(), journey.getId());
@@ -179,6 +181,28 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         } catch (ValidationException.Unchecked | DAOException.Unchecked ex) {
             logger.error("Failed to read photos from given journey", ex);
             throw new DAOException("Failed to read photos from given journey", ex.getCause());
+        }
+    }
+
+    @Override
+    public List<Photo> readPhotosBetween(LocalDateTime start, LocalDateTime end) throws DAOException, ValidationException {
+        logger.debug("retrieving photos between {} and {}", start, end);
+
+        if (start == null || end == null) {
+            throw new ValidationException("start or end can not be null");
+        }
+
+        try {
+            List<Photo> photos = jdbcTemplate.query(READ_INTERVAL_STATEMENT, new PhotoRowMapper(), start, end);
+
+            logger.debug("Successfully retrieved photos");
+            return photos;
+        } catch (DataAccessException ex) {
+            logger.error("Failed to read photos from given interval", ex);
+            throw new DAOException("Failed to read photos from given interval", ex);
+        } catch (ValidationException.Unchecked | DAOException.Unchecked ex) {
+            logger.error("Failed to read photos from given interval", ex);
+            throw new DAOException("Failed to read photos from given interval", ex.getCause());
         }
     }
 

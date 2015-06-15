@@ -101,8 +101,8 @@ public class ClusterServiceImpl implements ClusterService {
         addJourney(journey);
 
         try {
-            photos = photoDAO.readPhotosByJourney(journey);
-        } catch (DAOException e) {
+            photos = photoDAO.readPhotosBetween(journey.getStartDate(), journey.getEndDate());
+        } catch (DAOException | ValidationException e) {
             logger.error("Failed to read photos of journey", e);
             throw new ServiceException("Failed to read photos of journey", e);
         }

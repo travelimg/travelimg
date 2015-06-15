@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 
@@ -70,5 +71,16 @@ public interface PhotoDAO {
      * @return the list with the photos
      */
     List<Photo> readPhotosByJourney(Journey journey) throws DAOException;
+
+    /**
+     * Retrieve a list of photos from a given time interval.
+     *
+     * @param start lower bound for photo time.
+     * @param end upper bound for photo time.
+     * @return a list of photos falling into the time interval.
+     * @throws DAOException if retrieval fails due to a datastore error.
+     * @throws ValidationException if either of the parameters is null
+     */
+    List<Photo> readPhotosBetween(LocalDateTime start, LocalDateTime end) throws DAOException, ValidationException;
 
 }
