@@ -26,30 +26,29 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
     private static final Photographer defaultPhotographer = new Photographer(1, "Test Photographer");
     private static final Place defaultPlace = new Place(1, "Unkown place", "Unknown place", 0.0, 0.0);
     private static final Journey defaultJourney = new Journey(1, "United States", LocalDateTime.of(2000, 9, 11, 0, 0, 0), LocalDateTime.of(2006, 9, 11, 0, 0, 0));
-    private static final String DIR = "some/path";
 
     @Autowired
     PhotoDAO photoDAO;
 
     private Photo expectedPhotos[] = new Photo[]{
-            new Photo(1, Paths.get(DIR, "1.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 3, 6, 0, 0, 0), 41.5, 19.5)),
-            new Photo(2, Paths.get(DIR, "2.jpg"), makeDefaultMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
-            new Photo(3, Paths.get(DIR, "3.jpg"), makeDefaultMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
-            new Photo(4, Paths.get(DIR, "4.jpg"), makeDefaultMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
-            new Photo(5, Paths.get(DIR, "5.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 3, 4, 0, 0, 0), 12.0, 12.0)),
-            new Photo(6, Paths.get(DIR, "4.jpg"), makeDefaultMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
-            new Photo(7, Paths.get(DIR, "6.jpg"), makeDefaultMeta(
+            new Photo(1, Paths.get("1.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 3, 6, 0, 0, 0), 41.5, 19.5)),
+            new Photo(2, Paths.get("2.jpg"), makeDefaultMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
+            new Photo(3, Paths.get("3.jpg"), makeDefaultMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
+            new Photo(4, Paths.get("4.jpg"), makeDefaultMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
+            new Photo(5, Paths.get("5.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 3, 4, 0, 0, 0), 12.0, 12.0)),
+            new Photo(6, Paths.get("4.jpg"), makeDefaultMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
+            new Photo(7, Paths.get("6.jpg"), makeDefaultMeta(
                     LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
-            new Photo(8, Paths.get(DIR, "7.jpg"), makeDefaultMeta(
+            new Photo(8, Paths.get("7.jpg"), makeDefaultMeta(
                     LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
-            new Photo(9, Paths.get(DIR, "8.jpg"), makeDefaultMeta(
+            new Photo(9, Paths.get("8.jpg"), makeDefaultMeta(
                     LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
     };
 
     private Photo inputPhotos[] = new Photo[]{
-            new Photo(7, Paths.get(DIR, "6.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
-            new Photo(8, Paths.get(DIR, "7.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
-            new Photo(9, Paths.get(DIR, "8.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
+            new Photo(7, Paths.get("6.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
+            new Photo(8, Paths.get("7.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
+            new Photo(9, Paths.get("8.jpg"), makeDefaultMeta(LocalDateTime.of(2015, 5, 17, 0, 0, 0), 41.5042718, 19.5180115)),
     };
 
     private static PhotoMetadata makeMeta(Photographer photographer, Rating rating, LocalDateTime datetime, double lat, double lon, Place place, Journey journey) {
