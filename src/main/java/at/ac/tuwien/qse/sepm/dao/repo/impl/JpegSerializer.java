@@ -2,8 +2,8 @@ package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.repo.FormatException;
-import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoSerializer;
+import at.ac.tuwien.qse.sepm.entities.*;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.ImageWriteException;
 import org.apache.commons.imaging.Imaging;
@@ -13,7 +13,6 @@ import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
 import org.apache.commons.imaging.formats.tiff.TiffField;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
-import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputDirectory;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
 import org.apache.logging.log4j.LogManager;
@@ -58,7 +57,6 @@ public class JpegSerializer implements PhotoSerializer {
         JpegImageMetadata jpegData = (JpegImageMetadata) imageData;
         readDate(jpegData, result);
         readGps(jpegData, result);
-        // TODO: read rest of data
         readMetaData(jpegData, result);
         return result;
     }
@@ -79,17 +77,24 @@ public class JpegSerializer implements PhotoSerializer {
             tags += "/" + element.getName();
         }
 
-        if (metadata.getPlace() != null) {
-            Journey journey = metadata.getJourney();
-            tags += "/journey|" + journey.getName() + "." + journey.getStartDate()
-                    .format(DATE_FORMATTER) + "." + journey.getEndDate().format(DATE_FORMATTER);
+        Rating rating = metadata.getRating();
+        tags += "/rating|" + rating;
 
-            Place place = metadata.getPlace();
+        Place place = metadata.getPlace();
+        if (place != null) {
             tags += "/place|" + place.getCity() + "|" + place.getCountry() + "|" + place
                     .getLatitude() + "|" + place.getLongitude();
+        }
 
-            Rating rating = metadata.getRating();
-            tags += "/rating|" + rating;
+        Journey journey = metadata.getJourney();
+        if (journey != null) {
+            tags += "/journey|" + journey.getName() + "|" + journey.getStartDate()
+                    .format(DATE_FORMATTER) + "|" + journey.getEndDate().format(DATE_FORMATTER);
+        }
+
+        Photographer photographer = metadata.getPhotographer();
+        if (photographer != null) {
+            tags += "/photographer|" + photographer.getName();
         }
 
         try {
@@ -120,10 +125,6 @@ public class JpegSerializer implements PhotoSerializer {
 
             exifDirectory.removeField(ExifTagConstants.EXIF_TAG_USER_COMMENT);
             exifDirectory.add(ExifTagConstants.EXIF_TAG_USER_COMMENT, tags);
-
-            exifDirectory.removeField(TiffTagConstants.TIFF_TAG_ARTIST);
-            exifDirectory
-                    .add(TiffTagConstants.TIFF_TAG_ARTIST, metadata.getPhotographer().getName());
 
             is.reset();
             new ExifRewriter().updateExifMetadataLossless(is, os, outputSet);
@@ -172,19 +173,6 @@ public class JpegSerializer implements PhotoSerializer {
         }
     }
 
-    private void readPhotographer(JpegImageMetadata input, PhotoMetadata output) {
-        LOGGER.debug("reading photographer from metadata");
-        TiffField field = input.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_ARTIST);
-        if (field == null) {
-            LOGGER.debug("metadata contains no photographer");
-            return;
-        }
-        String photographerString = field.getValueDescription();
-        photographerString = photographerString.replace("'", ""); // remove enclosing single quotes
-        output.setPhotographer(new Photographer(null, photographerString));
-        LOGGER.debug("read photographer as {}", output.getDatetime());
-    }
-
     private void readMetaData(JpegImageMetadata input, PhotoMetadata result) {
         String tags = "";
         if (input.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_USER_COMMENT) != null) {
@@ -204,12 +192,9 @@ public class JpegSerializer implements PhotoSerializer {
             // journeys
             if (element.contains("journey")) {
                 String[] tempJourney = element.split("\\|");
-
                 LocalDateTime startDate = LocalDateTime.parse(tempJourney[2], DATE_FORMATTER);
-
                 LocalDateTime endDate = LocalDateTime.parse(tempJourney[3], DATE_FORMATTER);
-
-                result.setJourney(new Journey(0, tempJourney[1], startDate, endDate));
+                result.setJourney(new Journey(null, tempJourney[1], startDate, endDate));
                 continue;
             }
 
@@ -222,10 +207,17 @@ public class JpegSerializer implements PhotoSerializer {
                 continue;
             }
 
-            // journeys
+            // rating
             if (element.contains("rating")) {
                 String[] tempRating = element.split("\\|");
                 result.setRating(Rating.valueOf(tempRating[1]));
+                continue;
+            }
+
+            // photographer
+            if (element.contains("photographer")) {
+                String[] tempPhotographer = element.split("\\|");
+                result.setPhotographer(new Photographer(null, tempPhotographer[1]));
                 continue;
             }
 

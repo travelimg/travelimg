@@ -67,7 +67,7 @@ public interface AsyncPhotoRepository extends PhotoRepository {
          * @param repository repository in which the operation will be performed
          * @param operation operation that was added
          */
-        void onQueue(AsyncPhotoRepository repository, Operation operation);
+        default void onQueue(AsyncPhotoRepository repository, Operation operation) { }
 
         /**
          * Notifies the listener that an operation was completed.
@@ -75,7 +75,7 @@ public interface AsyncPhotoRepository extends PhotoRepository {
          * @param repository repository in which the operation was performed
          * @param operation operation that was completed
          */
-        void onComplete(AsyncPhotoRepository repository, Operation operation);
+        default void onComplete(AsyncPhotoRepository repository, Operation operation) { }
 
         /**
          * Notifies the listener that an operation failed.
@@ -84,6 +84,6 @@ public interface AsyncPhotoRepository extends PhotoRepository {
          * @param operation operation that failed
          * @param error error that caused the failure
          */
-        void onError(AsyncPhotoRepository repository, Operation operation, DAOException error);
+        default void onError(AsyncPhotoRepository repository, Operation operation, DAOException error) { }
     }
 }
