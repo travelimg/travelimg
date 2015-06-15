@@ -49,17 +49,17 @@ public class PhotoServiceImpl implements PhotoService {
 
     @Autowired
     private void initializeWatcher(PollingFileWatcher watcher) {
-        watcher.refresh();
+        listener = new Listener();
+        photoRepository.addListener((AsyncPhotoRepository.AsyncListener)listener);
+        photoRepository.addListener((PhotoRepository.Listener)listener);
 
+        // update the repository
+        watcher.refresh();
         try {
             photoRepository.synchronize();
         } catch (DAOException ex) {
             LOGGER.error("Failed to synchronize files", ex);
         }
-
-        listener = new Listener();
-        photoRepository.addListener((AsyncPhotoRepository.AsyncListener)listener);
-        photoRepository.addListener((PhotoRepository.Listener)listener);
 
         int REFRESH_RATE = 5;
         scheduler.scheduleAtFixedRate(watcher::refresh, REFRESH_RATE, REFRESH_RATE, TimeUnit.SECONDS);
@@ -162,7 +162,7 @@ public class PhotoServiceImpl implements PhotoService {
             AsyncPhotoRepository.AsyncListener,
             PhotoRepository.Listener {
 
-        private final ExecutorService executor = Executors.newCachedThreadPool();
+        private final ExecutorService executor = Executors.newFixedThreadPool(1);
 
         public void close() {
             executor.shutdown();
