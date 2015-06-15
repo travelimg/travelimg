@@ -64,12 +64,7 @@ public class PhotoMetadata {
         if (rating == null) throw new IllegalArgumentException();
         this.rating = rating;
     }
-
-    /**
-     * Get the photographer, which may be null if no photographer is defined.
-     *
-     * @return photographer or null
-     */
+    
     public Photographer getPhotographer() {
         return photographer;
     }
