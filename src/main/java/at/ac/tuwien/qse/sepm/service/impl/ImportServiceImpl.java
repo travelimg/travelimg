@@ -63,7 +63,6 @@ public class ImportServiceImpl implements ImportService {
                 try {
                     exifService.attachDateAndGeoData(p);
                     Photo imported = photoDAO.create(p);
-//                    exifService.getData().getTagsFromExif(p);
                     callback.accept(imported);
                 } catch (DAOException ex) {
                     logger.error("Failed to import photo", ex);
