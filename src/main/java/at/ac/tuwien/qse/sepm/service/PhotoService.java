@@ -6,6 +6,7 @@ import at.ac.tuwien.qse.sepm.entities.Place;
 
 import java.time.YearMonth;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -50,4 +51,10 @@ public interface PhotoService {
      * @throws ServiceException failed to perform operation
      */
     void editPhoto(Photo photo) throws ServiceException;
+
+    void subscribeCreate(Consumer<Photo> callback);
+
+    void subscribeDelete(Consumer<Photo> callback);
+
+    void subscribeUpdate(Consumer<Photo> callback);
 }

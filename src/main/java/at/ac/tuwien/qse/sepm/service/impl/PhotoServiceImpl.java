@@ -20,12 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -40,6 +42,10 @@ public class PhotoServiceImpl implements PhotoService {
 
     private Listener listener;
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+    private List<Consumer<Photo>> createListeners = new ArrayList<>();
+    private List<Consumer<Photo>> deleteListeners = new ArrayList<>();
+    private List<Consumer<Photo>> updateListeners = new ArrayList<>();
 
     @Autowired
     private void initializeWatcher(PollingFileWatcher watcher) {
@@ -129,7 +135,22 @@ public class PhotoServiceImpl implements PhotoService {
         LOGGER.debug("Leaving editPhoto with {}", photo);
     }
 
-    private static class Listener implements
+    @Override
+    public void subscribeCreate(Consumer<Photo> callback) {
+        createListeners.add(callback);
+    }
+
+    @Override
+    public void subscribeDelete(Consumer<Photo> callback) {
+        deleteListeners.add(callback);
+    }
+
+    @Override
+    public void subscribeUpdate(Consumer<Photo> callback) {
+        updateListeners.add(callback);
+    }
+
+    private class Listener implements
             AsyncPhotoRepository.AsyncListener,
             PhotoRepository.Listener {
 
@@ -141,37 +162,34 @@ public class PhotoServiceImpl implements PhotoService {
 
         @Override public void onCreate(PhotoRepository repository, Path file) {
             LOGGER.info("created {}", file);
+
             try {
-                Collection<Photo> photos = repository.readAll();
-                LOGGER.info("repository contains {} photos", photos.size());
-                photos.forEach(p -> LOGGER.info(p));
+                Photo photo = repository.read(file);
+                createListeners.forEach(cb -> cb.accept(photo));
             } catch (DAOException ex) {
-                LOGGER.warn("failed read all");
-                LOGGER.error(ex);
+                LOGGER.error("Failed to read photo {}", file);
             }
         }
 
         @Override public void onUpdate(PhotoRepository repository, Path file) {
             LOGGER.info("updated {}", file);
+
             try {
-                Collection<Photo> photos = repository.readAll();
-                LOGGER.info("repository contains {} photos", photos.size());
-                photos.forEach(p -> LOGGER.info(p));
+                Photo photo = repository.read(file);
+                updateListeners.forEach(cb -> cb.accept(photo));
             } catch (DAOException ex) {
-                LOGGER.warn("failed read all");
-                LOGGER.error(ex);
+                LOGGER.error("Failed to read photo {}", file);
             }
         }
 
         @Override public void onDelete(PhotoRepository repository, Path file) {
             LOGGER.info("deleted {}", file);
+
             try {
-                Collection<Photo> photos = repository.readAll();
-                LOGGER.info("repository contains {} photos", photos.size());
-                photos.forEach(p -> LOGGER.info(p));
+                Photo photo = repository.read(file);
+                deleteListeners.forEach(cb -> cb.accept(photo));
             } catch (DAOException ex) {
-                LOGGER.warn("failed read all");
-                LOGGER.error(ex);
+                LOGGER.error("Failed to read photo {}", file);
             }
         }
 

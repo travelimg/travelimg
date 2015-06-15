@@ -115,6 +115,11 @@ public class GridViewImpl implements GridView {
 
         // Apply the initial filter.
         handleFilterChange();
+
+        // subscribe to photo events
+        photoService.subscribeCreate(this::handlePhotoCreated);
+        photoService.subscribeUpdate(this::handlePhotoUpdated);
+        photoService.subscribeDelete(this::handlePhotoDeleted);
     }
 
     private void handleImportError(Throwable error) {
@@ -123,6 +128,28 @@ public class GridViewImpl implements GridView {
         // queue an update in the main gui
         Platform.runLater(() -> ErrorDialog.show(root, "Import fehlgeschlagen", "Fehlermeldung: " + error.getMessage()));
     }
+
+    private void handlePhotoCreated(Photo photo) {
+        Platform.runLater(() -> {
+            // TODO: should we update filter
+            grid.addPhoto(photo);
+        });
+    }
+
+    private void handlePhotoUpdated(Photo photo) {
+        Platform.runLater(() -> {
+            // TODO: should we update filter
+            grid.updatePhoto(photo);
+        });
+    }
+
+    private void handlePhotoDeleted(Photo photo) {
+        Platform.runLater(() -> {
+            // TODO: should we update filter
+            grid.removePhoto(photo);
+        });
+    }
+
 
     /**
      * Called whenever a new photo is imported
