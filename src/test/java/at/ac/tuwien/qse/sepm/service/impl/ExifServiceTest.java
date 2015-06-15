@@ -1,34 +1,20 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
-import at.ac.tuwien.qse.sepm.dao.*;
-import at.ac.tuwien.qse.sepm.entities.*;
-import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+import at.ac.tuwien.qse.sepm.entities.Exif;
+import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ExifServiceTest extends ServiceTestBase {
-    private static final Logger logger = LogManager.getLogger(ClusterServiceTest.class);
-
-    private static final Photographer defaultPhotographer = new Photographer(1,
-            "Test Photographer");
 
     private static final String sourceDir = Paths.get(
             System.getProperty("os.name").contains("indow") ?
@@ -37,53 +23,19 @@ public class ExifServiceTest extends ServiceTestBase {
                     ImportTest.class.getClassLoader().getResource("db/testimages").getPath())
             .toString() + "/";
 
-    Journey inputJourney = new Journey(1, "TestJourney", LocalDateTime.of(2005, 9, 10, 15, 44, 8),
-            LocalDateTime.of(2005, 9, 12, 15, 44, 8));
+    private Exif expected = new Exif(6, "1/410", 2.8, 5.7, 125, true, "'RICOH'", "'Caplio Pro G3'", 1577.0);
+    private Photo photo = new Photo(6, null, Paths.get(sourceDir, "6.jpg").toString(), Rating.NONE, null, 0, 0, null);
 
-    Tag inputTag = new Tag(3, "Testtag");
-
-    Place inputPlace = new Place(2, "Vienna", "Austria", 48.20, 16.37);
-
-    private List<Photo> inputPhotos = new ArrayList<Photo>() {{
-        add(new Photo(7, defaultPhotographer, sourceDir + "/exif/6.jpg", Rating.NONE,
-                LocalDateTime.of(2005, 9, 11, 15, 43, 55), 39.73934166666667, -104.99156111111111,
-                new Place(1, "Vienna", "Austria", 48.20, 16.37)));
-        add(new Photo(8, defaultPhotographer, sourceDir + "/exif/7.jpg", Rating.NONE,
-                LocalDateTime.of(2005, 9, 11, 15, 44, 8), 39.739336111111115, -104.9916361111111,
-                null));
-        add(new Photo(6, defaultPhotographer, sourceDir + "/exif/8.jpg", Rating.NONE,
-                LocalDateTime.of(2005, 9, 11, 15, 48, 7), 39.73994444444445, -104.98952777777778,
-                new Place(1, "Vienna", "Austria", 48.20, 16.37)));
-    }};
-
-    private List<Photo> expectedPhotos = new ArrayList<Photo>() {{
-        add(new Photo(7, defaultPhotographer, sourceDir + "/exif/6.jpg", Rating.NONE,
-                LocalDateTime.of(2005, 9, 11, 15, 43, 55), 39.73934166666667, -104.99156111111111,
-                null));
-        add(new Photo(8, defaultPhotographer, sourceDir + "/exif/7.jpg", Rating.NONE,
-                LocalDateTime.of(2005, 9, 11, 15, 44, 8), 39.739336111111115, -104.9916361111111,
-                null));
-        add(new Photo(6, defaultPhotographer, sourceDir + "/exif/8.jpg", Rating.NONE,
-                LocalDateTime.of(2005, 9, 11, 15, 48, 7), 39.73994444444445, -104.98952777777778,
-                new Place(1, "Vienna", "Austria", 48.20, 16.37)));
-    }};
 
     @Autowired
     private ExifService exifService;
-    @Autowired
-    private JourneyDAO journeyDAO;
-    @Autowired
-    private PlaceDAO placeDAO;
-    @Autowired
-    private TagDAO tagDA0;
-    @Autowired
-    private PhotoDAO photoDAO;
 
-    @BeforeClass
-    public static void init() {
-        new File(sourceDir + "/exif/").mkdirs();
+    @Test
+    public void testReadExif() throws ServiceException {
+        Exif actual = exifService.getExif(photo);
+
+        assertThat(actual, equalTo(expected));
     }
-
 }
 
 
