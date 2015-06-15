@@ -109,4 +109,42 @@ public class Exif {
                 ", altitude=" + altitude +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Exif exif = (Exif) o;
+
+        if (id != exif.id) return false;
+        if (Double.compare(exif.aperture, aperture) != 0) return false;
+        if (Double.compare(exif.focalLength, focalLength) != 0) return false;
+        if (iso != exif.iso) return false;
+        if (flash != exif.flash) return false;
+        if (Double.compare(exif.altitude, altitude) != 0) return false;
+        if (exposure != null ? !exposure.equals(exif.exposure) : exif.exposure != null) return false;
+        if (make != null ? !make.equals(exif.make) : exif.make != null) return false;
+        return !(model != null ? !model.equals(exif.model) : exif.model != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = id;
+        result = 31 * result + (exposure != null ? exposure.hashCode() : 0);
+        temp = Double.doubleToLongBits(aperture);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(focalLength);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + iso;
+        result = 31 * result + (flash ? 1 : 0);
+        result = 31 * result + (make != null ? make.hashCode() : 0);
+        result = 31 * result + (model != null ? model.hashCode() : 0);
+        temp = Double.doubleToLongBits(altitude);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
 }
