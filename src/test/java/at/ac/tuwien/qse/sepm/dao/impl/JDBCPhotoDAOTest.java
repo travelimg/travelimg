@@ -4,7 +4,6 @@ import at.ac.tuwien.qse.sepm.dao.*;
 import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.util.TestIOHandler;
-import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
