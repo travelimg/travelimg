@@ -2,7 +2,7 @@ package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.repo.FormatException;
-import at.ac.tuwien.qse.sepm.entities.PhotoMetadata;
+import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoSerializer;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.ImageWriteException;
@@ -13,6 +13,7 @@ import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
 import org.apache.commons.imaging.formats.tiff.TiffField;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
+import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputDirectory;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
 import org.apache.logging.log4j.LogManager;
@@ -27,10 +28,12 @@ import java.time.format.DateTimeFormatter;
 public class JpegSerializer implements PhotoSerializer {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter
+            .ofPattern("yyyy:MM:dd HH:mm:ss");
 
     @Override public PhotoMetadata read(InputStream is) throws DAOException {
-        if (is == null) throw new IllegalArgumentException();
+        if (is == null)
+            throw new IllegalArgumentException();
         LOGGER.debug("reading metadata");
 
         ImageMetadata imageData;
@@ -52,19 +55,42 @@ public class JpegSerializer implements PhotoSerializer {
             return result;
         }
 
-        JpegImageMetadata jpegData = (JpegImageMetadata)imageData;
+        JpegImageMetadata jpegData = (JpegImageMetadata) imageData;
         readDate(jpegData, result);
         readGps(jpegData, result);
         // TODO: read rest of data
-
+        readMetaData(jpegData, result);
         return result;
     }
 
-    @Override public void update(InputStream is, OutputStream os, PhotoMetadata metadata) throws DAOException {
-        if (is == null) throw new IllegalArgumentException();
-        if (os == null) throw new IllegalArgumentException();
-        if (metadata == null) throw new IllegalArgumentException();
+    @Override public void update(InputStream is, OutputStream os, PhotoMetadata metadata)
+            throws DAOException {
+        if (is == null)
+            throw new IllegalArgumentException();
+        if (os == null)
+            throw new IllegalArgumentException();
+        if (metadata == null)
+            throw new IllegalArgumentException();
         LOGGER.debug("updating photo metadata {}", metadata);
+
+        String tags = "travelimg";
+
+        for (Tag element : metadata.getTags()) {
+            tags += "/" + element.getName();
+        }
+
+        if (metadata.getPlace() != null) {
+            Journey journey = metadata.getJourney();
+            tags += "/journey|" + journey.getName() + "." + journey.getStartDate()
+                    .format(DATE_FORMATTER) + "." + journey.getEndDate().format(DATE_FORMATTER);
+
+            Place place = metadata.getPlace();
+            tags += "/place|" + place.getCity() + "|" + place.getCountry() + "|" + place
+                    .getLatitude() + "|" + place.getLongitude();
+
+            Rating rating = metadata.getRating();
+            tags += "/rating|" + rating;
+        }
 
         try {
             is.mark(Integer.MAX_VALUE);
@@ -78,7 +104,7 @@ public class JpegSerializer implements PhotoSerializer {
                 throw new DAOException("Metadata is of unknown type.");
             }
 
-            JpegImageMetadata jpegData = (JpegImageMetadata)imageData;
+            JpegImageMetadata jpegData = (JpegImageMetadata) imageData;
             TiffOutputSet outputSet = new TiffOutputSet();
             TiffImageMetadata exifData = jpegData.getExif();
             if (exifData != null) {
@@ -87,8 +113,17 @@ public class JpegSerializer implements PhotoSerializer {
 
             TiffOutputDirectory exifDirectory = outputSet.getOrCreateExifDirectory();
             outputSet.setGPSInDegrees(metadata.getLongitude(), metadata.getLatitude());
+
             exifDirectory.removeField(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
-            exifDirectory.add(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL, DATE_FORMATTER.format(metadata.getDatetime()));
+            exifDirectory.add(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL,
+                    DATE_FORMATTER.format(metadata.getDatetime()));
+
+            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_USER_COMMENT);
+            exifDirectory.add(ExifTagConstants.EXIF_TAG_USER_COMMENT, tags);
+
+            exifDirectory.removeField(TiffTagConstants.TIFF_TAG_ARTIST);
+            exifDirectory
+                    .add(TiffTagConstants.TIFF_TAG_ARTIST, metadata.getPhotographer().getName());
 
             is.reset();
             new ExifRewriter().updateExifMetadataLossless(is, os, outputSet);
@@ -103,13 +138,15 @@ public class JpegSerializer implements PhotoSerializer {
 
     private void readDate(JpegImageMetadata input, PhotoMetadata output) {
         LOGGER.debug("reading date from metadata");
-        TiffField field = input.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
+        TiffField field = input
+                .findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
         if (field == null) {
             LOGGER.debug("metadata contains no date");
             return;
         }
         String dateString = field.getValueDescription();
-        dateString = dateString.substring(1, dateString.length() - 1); // remove enclosing single quotes
+        dateString = dateString
+                .substring(1, dateString.length() - 1); // remove enclosing single quotes
         output.setDatetime(DATE_FORMATTER.parse(dateString, LocalDateTime::from));
         LOGGER.debug("read date as {}", output.getDatetime());
     }
@@ -128,9 +165,73 @@ public class JpegSerializer implements PhotoSerializer {
             }
             output.setLatitude(gps.getLatitudeAsDegreesNorth());
             output.setLongitude(gps.getLongitudeAsDegreesEast());
-            LOGGER.debug("read GPS as longitude {} and latitude {}", output.getLongitude(), output.getLatitude());
+            LOGGER.debug("read GPS as longitude {} and latitude {}", output.getLongitude(),
+                    output.getLatitude());
         } catch (ImageReadException ex) {
             LOGGER.warn("failed reading GPS data");
         }
+    }
+
+    private void readPhotographer(JpegImageMetadata input, PhotoMetadata output) {
+        LOGGER.debug("reading photographer from metadata");
+        TiffField field = input.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_ARTIST);
+        if (field == null) {
+            LOGGER.debug("metadata contains no photographer");
+            return;
+        }
+        String photographerString = field.getValueDescription();
+        photographerString = photographerString.replace("'", ""); // remove enclosing single quotes
+        output.setPhotographer(new Photographer(null, photographerString));
+        LOGGER.debug("read photographer as {}", output.getDatetime());
+    }
+
+    private void readMetaData(JpegImageMetadata input, PhotoMetadata result) {
+        String tags = "";
+        if (input.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_USER_COMMENT) != null) {
+            tags = input.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_USER_COMMENT)
+                    .getValueDescription();
+            // no tags from our programm
+            if (!tags.contains("travelimg"))
+                return;
+            LOGGER.debug("Tags in exif found: " + tags);
+            tags = tags.replace("'", "");
+        }
+        String[] tagArray = tags.split("/");
+        for (String element : tagArray) {
+            if (element.equals("travelimg"))
+                continue;
+
+            // journeys
+            if (element.contains("journey")) {
+                String[] tempJourney = element.split("\\|");
+
+                LocalDateTime startDate = LocalDateTime.parse(tempJourney[2], DATE_FORMATTER);
+
+                LocalDateTime endDate = LocalDateTime.parse(tempJourney[3], DATE_FORMATTER);
+
+                result.setJourney(new Journey(0, tempJourney[1], startDate, endDate));
+                continue;
+            }
+
+            // places
+            if (element.contains("place")) {
+                String[] tempPlace = element.split("\\|");
+                result.setPlace(
+                        new Place(0, tempPlace[1], tempPlace[2], Double.parseDouble(tempPlace[3]),
+                                Double.parseDouble(tempPlace[4])));
+                continue;
+            }
+
+            // journeys
+            if (element.contains("rating")) {
+                String[] tempRating = element.split("\\|");
+                result.setRating(Rating.valueOf(tempRating[1]));
+                continue;
+            }
+
+            // tags
+            result.getTags().add(new Tag(null, element));
+        }
+
     }
 }

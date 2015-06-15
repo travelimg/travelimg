@@ -32,15 +32,11 @@ public class ExifServiceImpl implements ExifService {
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter
             .ofPattern("yyyy:MM:dd HH:mm:ss");
 
-    @Autowired
-    private PhotoService photoService;
-    @Autowired
-    private TagService tagService;
-    @Autowired
-    private ClusterService clusterService;
+    @Autowired private PhotoService photoService;
+    @Autowired private TagService tagService;
+    @Autowired private ClusterService clusterService;
 
-    @Override
-    public Exif getExif(Photo photo) throws ServiceException {
+    @Override public Exif getExif(Photo photo) throws ServiceException {
         File file = new File(photo.getPath());
         String exposure = "not available";
         double aperture = 0.0;
@@ -54,7 +50,6 @@ public class ExifServiceImpl implements ExifService {
         try {
             final ImageMetadata metadata = Imaging.getMetadata(file);
             final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
-            final TiffImageMetadata exifMetadata = jpegMetadata.getExif();
 
             if (jpegMetadata.findEXIFValueWithExactMatch(ExifTagConstants.EXIF_TAG_EXPOSURE_TIME)
                     != null) {
@@ -108,9 +103,7 @@ public class ExifServiceImpl implements ExifService {
         }
     }
 
-    @Override
-    @Deprecated
-    public void getTagsFromExif(Photo photo) throws ServiceException {
+    @Override @Deprecated public void getTagsFromExif(Photo photo) throws ServiceException {
         logger.debug("getTagsFromExif" + photo + ":" + photo.getData().getTags());
         File file = new File(photo.getPath());
         String tags = "";
@@ -150,13 +143,12 @@ public class ExifServiceImpl implements ExifService {
                 if (element.contains("place")) {
                     String[] tempPlace = element.split("\\|");
                     Place place = new Place(0, tempPlace[1], tempPlace[2],
-                            Double.parseDouble(tempPlace[3]), Double.parseDouble(tempPlace[4])
-                    );
+                            Double.parseDouble(tempPlace[3]), Double.parseDouble(tempPlace[4]));
                     // TODO: only create records if they don't already exist for the photo
                     clusterService.addPlace(place);
                     //photoService.addPlaceToPhotos(Arrays.asList(photo), place);
                     //photoService.addJourneyToPhotos(Arrays.asList(photo),
-                            //journey);
+                    //journey);
                     continue;
                 }
 
@@ -177,9 +169,7 @@ public class ExifServiceImpl implements ExifService {
         }
     }
 
-    @Override
-    @Deprecated
-    public void exportMetaToExif(Photo photo) throws ServiceException {
+    @Override @Deprecated public void exportMetaToExif(Photo photo) throws ServiceException {
         logger.debug("exportMetaToExif" + photo + ":" + photo.getData().getTags());
         File jpegImageFile = new File(photo.getPath());
         File tempFile = new File(photo.getPath() + "d");
@@ -198,7 +188,8 @@ public class ExifServiceImpl implements ExifService {
                     .format(dateFormatter) + "." + journey.getEndDate().format(dateFormatter);
 
             Place place = photo.getData().getPlace();
-            tags += "/place|" + place.getCity() + "|" + place.getCountry() + "|" + place.getLatitude() + "|" + place.getLongitude();
+            tags += "/place|" + place.getCity() + "|" + place.getCountry() + "|" + place
+                    .getLatitude() + "|" + place.getLongitude();
         }
 
         try {
@@ -261,8 +252,7 @@ public class ExifServiceImpl implements ExifService {
         }
     }
 
-    @Override
-    public void attachDateAndGeoData(Photo photo) throws ServiceException {
+    @Override public void attachDateAndGeoData(Photo photo) throws ServiceException {
         File file = new File(photo.getPath());
         LocalDateTime datetime = photo.getData().getDatetime();
         double latitude = photo.getData().getLatitude();
