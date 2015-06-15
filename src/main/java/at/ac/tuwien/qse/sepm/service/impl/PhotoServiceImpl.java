@@ -44,12 +44,6 @@ public class PhotoServiceImpl implements PhotoService {
 
     @Autowired
     private void initializeWatcher(PollingFileWatcher watcher) {
-        watcher.register(Paths.get(System.getProperty("user.home"), "travelimg"));
-        watcher.getExtensions().add("jpeg");
-        watcher.getExtensions().add("jpg");
-        watcher.getExtensions().add("JPEG");
-        watcher.getExtensions().add("JPG");
-
         Listener listener = new Listener();
         photoRepository.addListener((AsyncPhotoRepository.AsyncListener)listener);
         photoRepository.addListener((PhotoRepository.Listener)listener);

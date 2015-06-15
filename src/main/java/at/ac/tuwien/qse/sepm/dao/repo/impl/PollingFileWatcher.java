@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -30,6 +31,18 @@ public class PollingFileWatcher implements FileWatcher {
     public PollingFileWatcher(FileManager fileManager) {
         if (fileManager == null) throw new IllegalArgumentException();
         this.fileManager = fileManager;
+    }
+
+    public static PollingFileWatcher forImageDirectory(String directory) {
+        PollingFileWatcher watcher = new PollingFileWatcher();
+
+        watcher.register(Paths.get(directory));
+        watcher.getExtensions().add("jpeg");
+        watcher.getExtensions().add("jpg");
+        watcher.getExtensions().add("JPEG");
+        watcher.getExtensions().add("JPG");
+
+        return watcher;
     }
 
     /**
