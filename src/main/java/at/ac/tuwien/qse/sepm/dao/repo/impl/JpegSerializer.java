@@ -222,7 +222,9 @@ public class JpegSerializer implements PhotoSerializer {
             }
 
             // tags
-            result.getTags().add(new Tag(null, element));
+            if (!element.trim().isEmpty()) {
+                result.getTags().add(new Tag(null, element));
+            }
         }
 
     }
