@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
 
+import java.nio.file.Path;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.function.Consumer;
@@ -54,7 +55,7 @@ public interface PhotoService {
 
     void subscribeCreate(Consumer<Photo> callback);
 
-    void subscribeDelete(Consumer<Photo> callback);
+    void subscribeDelete(Consumer<Path> callback);
 
     void subscribeUpdate(Consumer<Photo> callback);
 }

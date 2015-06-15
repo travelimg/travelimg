@@ -44,7 +44,7 @@ public class PhotoServiceImpl implements PhotoService {
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     private List<Consumer<Photo>> createListeners = new ArrayList<>();
-    private List<Consumer<Photo>> deleteListeners = new ArrayList<>();
+    private List<Consumer<Path>> deleteListeners = new ArrayList<>();
     private List<Consumer<Photo>> updateListeners = new ArrayList<>();
 
     @Autowired
@@ -141,7 +141,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public void subscribeDelete(Consumer<Photo> callback) {
+    public void subscribeDelete(Consumer<Path> callback) {
         deleteListeners.add(callback);
     }
 
@@ -185,12 +185,7 @@ public class PhotoServiceImpl implements PhotoService {
         @Override public void onDelete(PhotoRepository repository, Path file) {
             LOGGER.info("deleted {}", file);
 
-            try {
-                Photo photo = repository.read(file);
-                deleteListeners.forEach(cb -> cb.accept(photo));
-            } catch (DAOException ex) {
-                LOGGER.error("Failed to read photo {}", file);
-            }
+            deleteListeners.forEach(cb -> cb.accept(file));
         }
 
         @Override public void onError(PhotoRepository repository, DAOException error) {
