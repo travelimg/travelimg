@@ -33,7 +33,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private static final String DELETE_STATEMENT = "Delete from Photo where id =?";
     private static final String GET_BY_ID_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id, journey_id FROM Photo where id=?";
     private static final String GET_BY_FILE_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id, journey_id FROM Photo where path=?";
-    private static final String UPDATE_STATEMENT = "UPDATE Photo SET path = ?, rating = ?, place_id = ?, journey_id WHERE id = ?";
+    private static final String UPDATE_STATEMENT = "UPDATE Photo SET path = ?, rating = ?, place_id = ?, journey_id = ? WHERE id = ?";
     private static final String READ_JOURNEY_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id, journey_id FROM PHOTO WHERE journey_id=? ORDER BY datetime ASC";
     private static final String READ_INTERVAL_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id, journey_id FROM PHOTO WHERE datetime>=? AND datetime<=? ORDER BY datetime ASC";
 
