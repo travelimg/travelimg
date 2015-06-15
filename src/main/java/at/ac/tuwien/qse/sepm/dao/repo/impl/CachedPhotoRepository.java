@@ -77,13 +77,12 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
 
         try {
             operation.perform();
+            LOGGER.debug("successfully performed operation {}", operation);
+            notifyOperationComplete(operation);
         } catch (DAOException ex) {
             LOGGER.error("error while performing operation {}", operation);
             notifyOperationError(operation, ex);
         }
-
-        LOGGER.debug("successfully performed operation {}", operation);
-        notifyOperationComplete(operation);
         return !queue.isEmpty();
     }
 
