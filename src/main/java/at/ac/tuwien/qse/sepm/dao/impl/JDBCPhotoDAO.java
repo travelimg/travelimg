@@ -35,8 +35,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private static final String UPDATE_STATEMENT = "UPDATE Photo SET path = ?, rating = ?, place_id = ?, journey_id WHERE id = ?";
     private static final String READ_JOURNEY_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id, journey_id FROM PHOTO WHERE journey_id=? ORDER BY datetime ASC";
 
-    private final String photoDirectory;
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd", Locale.ENGLISH);
     private SimpleJdbcInsert insertPhoto;
 
     @Autowired
@@ -47,10 +45,6 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private PlaceDAO placeDAO;
     @Autowired
     private JourneyDAO journeyDAO;
-
-    public JDBCPhotoDAO(String photoDirectory) {
-        this.photoDirectory = photoDirectory;
-    }
 
     @Override
     @Autowired
