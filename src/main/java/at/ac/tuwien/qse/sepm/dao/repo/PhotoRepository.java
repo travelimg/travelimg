@@ -80,7 +80,7 @@ public interface PhotoRepository extends PhotoProvider {
          * @param repository repository in which the photo was created
          * @param file path of photo that was created
          */
-        void onCreate(PhotoRepository repository, Path file);
+        default void onCreate(PhotoRepository repository, Path file) { }
 
         /**
          * Notifies the listener that a photo was updated in a repository.
@@ -88,7 +88,7 @@ public interface PhotoRepository extends PhotoProvider {
          * @param repository repository in which the photo was updated
          * @param file path of photo that was updated
          */
-        void onUpdate(PhotoRepository repository, Path file);
+        default void onUpdate(PhotoRepository repository, Path file) { }
 
         /**
          * Notifies the listener that a photo was deleted from a repository.
@@ -96,7 +96,7 @@ public interface PhotoRepository extends PhotoProvider {
          * @param repository repository from which the photo was deleted
          * @param file path of photo that was deleted
          */
-        void onDelete(PhotoRepository repository, Path file);
+        default void onDelete(PhotoRepository repository, Path file) { }
 
         /**
          * Notifies the listener that an error occurred.
@@ -104,6 +104,6 @@ public interface PhotoRepository extends PhotoProvider {
          * @param repository repository in which the error occurred
          * @param error the error that occurred
          */
-        void onError(PhotoRepository repository, DAOException error);
+        default void onError(PhotoRepository repository, DAOException error) { }
     }
 }
