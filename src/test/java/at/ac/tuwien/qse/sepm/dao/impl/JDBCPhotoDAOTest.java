@@ -7,14 +7,12 @@ import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.util.TestIOHandler;
-import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -129,11 +127,11 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
 
         assertThat(expected.getPath(), equalTo(value.getPath()));
 
-        Pair<Path, Path> copyOperation = ioHandler.copiedFiles.get(0);
+        TestIOHandler.CopyOperation copyOperation = ioHandler.copiedFiles.get(0);
 
         // ensure that the files are copied correctly
-        assertThat(copyOperation.getKey().toString(), equalTo(getInputPhoto(1).getPath()));
-        assertThat(copyOperation.getValue().toString(), equalTo(expected.getPath()));
+        assertThat(copyOperation.source.toString(), equalTo(getInputPhoto(1).getPath()));
+        assertThat(copyOperation.dest.toString(), equalTo(expected.getPath()));
 
     }
 
