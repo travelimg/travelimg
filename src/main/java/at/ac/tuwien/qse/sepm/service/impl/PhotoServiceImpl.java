@@ -49,6 +49,14 @@ public class PhotoServiceImpl implements PhotoService {
 
     @Autowired
     private void initializeWatcher(PollingFileWatcher watcher) {
+        watcher.refresh();
+
+        try {
+            photoRepository.synchronize();
+        } catch (DAOException ex) {
+            LOGGER.error("Failed to synchronize files", ex);
+        }
+
         listener = new Listener();
         photoRepository.addListener((AsyncPhotoRepository.AsyncListener)listener);
         photoRepository.addListener((PhotoRepository.Listener)listener);
