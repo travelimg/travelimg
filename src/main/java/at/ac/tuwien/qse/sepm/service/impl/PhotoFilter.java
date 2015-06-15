@@ -97,6 +97,10 @@ public class PhotoFilter implements Predicate<Photo> {
     }
 
     private boolean testPhotographer(Photo photo) {
+        // TODO: implement correct filter for null
+        if (photo.getData().getPhotographer() == null) {
+            return true;
+        }
         return getIncludedPhotographers().contains(photo.getData().getPhotographer());
     }
 
@@ -108,6 +112,10 @@ public class PhotoFilter implements Predicate<Photo> {
     }
 
     private boolean testJourney(Photo photo) {
+        // TODO: implement correct filter for null
+        if (photo.getData().getJourney() == null) {
+            return true;
+        }
         for (Journey journey : getIncludedJourneys()) {
             if (journey == null) {
                 if (photo.getData().getJourney() == null) {
@@ -123,6 +131,10 @@ public class PhotoFilter implements Predicate<Photo> {
     }
 
     private boolean testPlace(Photo photo) {
+        // TODO: implement correct filter for null
+        if (photo.getData().getJourney() == null) {
+            return true;
+        }
         return getIncludedPlaces().contains(photo.getData().getPlace());
     }
 
