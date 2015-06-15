@@ -53,9 +53,24 @@ public interface PhotoService {
      */
     void editPhoto(Photo photo) throws ServiceException;
 
+    /**
+     * Listen for photos that have been newly added.
+     *
+     * @param callback callback that receives the added photos
+     */
     void subscribeCreate(Consumer<Photo> callback);
 
-    void subscribeDelete(Consumer<Path> callback);
-
+    /**
+     * Listen for photos that have been updated.
+     *
+     * @param callback callback that receives the updated photos
+     */
     void subscribeUpdate(Consumer<Photo> callback);
+
+    /**
+     * Listen for photos that have been deleted.
+     *
+     * @param callback callback that receives the deleted photos
+     */
+    void subscribeDelete(Consumer<Path> callback);
 }
