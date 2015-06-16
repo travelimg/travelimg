@@ -122,7 +122,7 @@ public class PhotoServiceImpl implements PhotoService {
         LOGGER.debug("Entering editPhoto with {}", photo);
 
         try {
-            photoDAO.update(photo);
+            photoRepository.update(photo);
             LOGGER.info("Successfully updated {}", photo);
         } catch (DAOException ex) {
             LOGGER.error("Updating {} failed due to DAOException", photo);
