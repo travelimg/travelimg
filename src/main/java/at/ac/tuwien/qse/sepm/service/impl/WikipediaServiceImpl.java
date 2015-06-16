@@ -28,11 +28,6 @@ public class WikipediaServiceImpl implements WikipediaService {
     @Override
     public WikiPlaceInfo getWikiPlaceInfo(Place place) throws ServiceException {
 
-        if (place.getWikiPlaceInfo() != null) {
-            LOGGER.info("{} already owns a WikiPlaceInfo: {}", place, place.getWikiPlaceInfo());
-            return place.getWikiPlaceInfo();
-        }
-
         try {
             PlaceValidator.validate(place);
         } catch (ValidationException ex) {
@@ -40,36 +35,41 @@ public class WikipediaServiceImpl implements WikipediaService {
             throw new ServiceException("Invalid Place entity", ex);
         }
 
+        //does this place already have a WikiPlaceInfo?
+        if (place.getWikiPlaceInfo() != null) {
+            LOGGER.info("{} already owns a WikiPlaceInfo: {}", place, place.getWikiPlaceInfo());
+            return place.getWikiPlaceInfo();
+        }
+
         String placeLabel = place.getCity();
-        String countryLabel = place.getCountry();
 
         String queryString = "PREFIX dbpedia: <http://dbpedia.org/resource/>\n"
                 + "PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>\n"
                 + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
+                + "PREFIX dbo: <http://dbpedia.org/ontology/>\n"
                 + "PREFIX dbpprop: <http://dbpedia.org/property/>\n"
-                + "select ?label ?countryLabel ?currency ?comment ?area "
-                + "?elevation ?population ?utcOffsetC ?utcOffset ?language where {\n"
-                + "?place a dbpedia-owl:PopulatedPlace ;\n"
-                + "rdfs:comment ?comment ;\n"
-                + "dbpedia-owl:country ?country ;\n"
-                + "rdfs:label ?label .\n"
-                + "?country rdfs:label ?countryLabel ;\n"
-                + "dbpedia-owl:currency ?currencyResource.\n"
-                + "?currencyResource rdfs:label ?currency.\n"
+                + "SELECT DISTINCT ?label ?countryLabel ?currency ?comment\n"
+                + "?area ?elevation ?population ?utcOffsetC ?utcOffset ?language where {\n"
+                + "?place a dbpedia-owl:PopulatedPlace .\n"
+                + "{ ?place rdfs:label \"" + placeLabel + "\"@de }\n"
+                + "UNION { ?place rdfs:label \"" + placeLabel + "\"@en }\n"
+                + "?place rdfs:label ?label ;\n"
+                + " rdfs:comment ?comment .\n"
                 + "OPTIONAL { ?place dbpprop:utcOffset ?utcOffset }\n"
                 + "OPTIONAL { ?place dbpedia-owl:elevation ?elevation }\n"
                 + "OPTIONAL { ?place dbpedia-owl:areaTotal ?area }\n"
                 + "OPTIONAL { ?place dbpedia-owl:populationTotal ?population }\n"
-                + "OPTIONAL { ?country dbpprop:utcOffset ?utcOffsetC }\n"
-                + "OPTIONAL { ?country dbpedia-owl:language ?lang. ?lang rdfs:label ?language}\n"
-                + "FILTER (str(?countryLabel) = '" + countryLabel + "' && lang(?countryLabel) "
-                + "= 'de' && lang(?currency) = 'de')\n"
-                + "FILTER (lang(?comment) = 'de' && str(?label) = '" + placeLabel + "' && "
-                + "lang(?label) = 'de')\n"
-                + "FILTER (lang(?language) = 'de')\n"
-                + "}\n";
-
-        System.out.println(queryString);
+                + "OPTIONAL { ?place dbpedia-owl:country ?country .\n"
+                + "  OPTIONAL { ?country rdfs:label ?countryLabel .\n"
+                + "  FILTER (lang(?countryLabel) = 'de') }\n"
+                + "  OPTIONAL { ?country dbpedia-owl:currency ?currencyResource.\n"
+                + "    ?currencyResource rdfs:label ?currency.\n"
+                + "    FILTER (lang(?currency) = 'de') }\n"
+                + "  OPTIONAL { ?country dbpprop:utcOffset ?utcOffsetC }\n"
+                + "  OPTIONAL { ?country dbpedia-owl:language ?lang.\n"
+                + "    ?lang rdfs:label ?language.\n"
+                + "    FILTER (lang(?language) = 'de') } }\n"
+                + "FILTER (lang(?comment) = 'de' && lang(?label) = 'de') }\n";
 
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory
@@ -80,7 +80,10 @@ public class WikipediaServiceImpl implements WikipediaService {
 
         if (solutions.isEmpty()) {
             LOGGER.warn("Query returned no results for {}", place);
-            return null;
+
+            place.setWikiPlaceInfo(new WikiPlaceInfo(placeLabel, place.getCountry(),
+                    "Keine Information verfügbar.", null, null, null, null, null, null));
+            return place.getWikiPlaceInfo();
         }
 
         String placeName = null;
@@ -96,18 +99,24 @@ public class WikipediaServiceImpl implements WikipediaService {
         for (QuerySolution solution : solutions) {
             if (placeName == null) {
                 placeName = solution.getLiteral("label").getString();
-                countryName = solution.getLiteral("countryLabel").getString();
                 description = solution.getLiteral("comment").getString();
-                currency = solution.getLiteral("currency").getString();
 
+                if (solution.getLiteral("countryLabel") != null) {
+                    countryName = solution.getLiteral("countryLabel").getString();
+
+                    if (solution.getLiteral("currency") != null) {
+                        currency = solution.getLiteral("currency").getString();
+                    }
+                    if (solution.getLiteral("language") != null) {
+                        languages = solution.getLiteral("language").getString();
+                    }
+                }
                 if (solution.getLiteral("utcOffset") != null) {
-                    utcOffset = "GMT" + solution.getLiteral("utcOffset");
+                    utcOffset = "GMT" + solution.getLiteral("utcOffset").getString();
                 } else if (solution.getLiteral("utcOffsetC") != null) {
-                    utcOffset = "GMT" + solution.getLiteral("utcOffsetC");
+                    utcOffset = "GMT" + solution.getLiteral("utcOffsetC").getString();
                 }
-                if (solution.getLiteral("language") != null) {
-                    languages = solution.getLiteral("language").getString();
-                }
+
 
                 if (solution.getLiteral("elevation") != null) {
                     elevation = solution.getLiteral("elevation").getDouble();
@@ -119,8 +128,10 @@ public class WikipediaServiceImpl implements WikipediaService {
                     population = solution.getLiteral("population").getInt();
                 }
             } else {
-                if (solution.getLiteral("languages") != null) {
-                    languages += ", " + solution.getLiteral("languages").getString();
+                if (solution.getLiteral("language") != null) {
+                    if (!languages.contains(solution.getLiteral("language").getString())) {
+                        languages += ", " + solution.getLiteral("language").getString();
+                    }
                 }
             }
         }
