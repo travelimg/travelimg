@@ -27,17 +27,12 @@ public class WikipediaServiceTest extends ServiceTestBase {
      * Call 'getWikiPlaceInfo' with a custom Place, i.e. the city Gleisdorf in Austria.
      * Test general functionality of the method.
      */
-    @Test public void testGetWikiPlaceInfo_ForGleisdorfAustria() {
+    @Test public void testGetWikiPlaceInfo_ForGleisdorfAustria() throws ServiceException {
         Place gleisdorf = new Place(null, "Gleisdorf", "Österreich", 0.0, 0.0,
                 new Journey(null, null, null, null));
         WikiPlaceInfo gleisdorfInfo = null;
 
-        try {
             gleisdorfInfo = wikipediaService.getWikiPlaceInfo(gleisdorf);
-        } catch (ServiceException ex) {
-            LOGGER.error("ServiceException in 'getWikiPlaceInfo(gleisdorf)' was thrown.");
-            ex.printStackTrace();
-        }
 
         assertNotNull(gleisdorfInfo);
         assertEquals(gleisdorfInfo, gleisdorf.getWikiPlaceInfo());
@@ -67,17 +62,12 @@ public class WikipediaServiceTest extends ServiceTestBase {
      * Test whether result is returned even if no country can be found.
      * Test whether UtcOffset is initialized if there is an entry for city, but not for country.
      */
-    @Test public void testGetWikiPlaceInfo_ForBostonUSA() {
+    @Test public void testGetWikiPlaceInfo_ForBostonUSA() throws ServiceException {
         Place boston = new Place(null, "Boston", "USA", 0.0, 0.0,
                 new Journey(null, null, null, null));
         WikiPlaceInfo bostonInfo = null;
 
-        try {
-            bostonInfo = wikipediaService.getWikiPlaceInfo(boston);
-        } catch (ServiceException ex) {
-            LOGGER.error("ServiceException in 'getWikiPlaceInfo(boston)' was thrown.");
-            ex.printStackTrace();
-        }
+        bostonInfo = wikipediaService.getWikiPlaceInfo(boston);
 
         assertNotNull(bostonInfo);
 
@@ -90,7 +80,7 @@ public class WikipediaServiceTest extends ServiceTestBase {
      * Call 'getWikiPlaceInfo' with a custom Place, i.e. the city Brighton in the UK.
      * Test whether multiple languages are properly saved in <tt>wikiPlaceInfo.language</tt>
      */
-    @Test public void testGetWikiPlaceInfo_ForBrightonUK() {
+    @Test public void testGetWikiPlaceInfo_ForBrightonUK() throws ServiceException {
         Place brighton = new Place(null, "Brighton", "UK", 0.0, 0.0,
                 new Journey(null, null, null, null));
         WikiPlaceInfo brightonInfo = null;
@@ -141,12 +131,7 @@ public class WikipediaServiceTest extends ServiceTestBase {
                 new Journey(null, null, null, null));
         WikiPlaceInfo noRealPlaceInfo = null;
 
-        try {
-            noRealPlaceInfo = wikipediaService.getWikiPlaceInfo(noRealPlace);
-        } catch (ServiceException ex) {
-            LOGGER.error("ServiceException in 'getWikiPlaceInfo(brighton)' was thrown.");
-            ex.printStackTrace();
-        }
+        noRealPlaceInfo = wikipediaService.getWikiPlaceInfo(noRealPlace);
 
         assertNotNull(noRealPlaceInfo);
         assertEquals(noRealPlaceInfo, noRealPlace.getWikiPlaceInfo());

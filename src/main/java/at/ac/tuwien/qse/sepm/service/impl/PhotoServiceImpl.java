@@ -12,7 +12,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.YearMonth;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,8 +27,9 @@ public class PhotoServiceImpl implements PhotoService {
     @Autowired private PhotoTagDAO photoTagDAO;
 
     @Autowired private PlaceDAO placeDAO;
-
-    ExecutorService executorService = Executors.newFixedThreadPool(1);
+    
+    @Autowired
+    private ExecutorService executorService;
     @Autowired
     private PhotoDAO photoDAO;
     @Autowired
@@ -98,24 +98,27 @@ public class PhotoServiceImpl implements PhotoService {
                 .collect(Collectors.toList());
     }
 
-    @Override public void savePhotoRating(Photo photo) throws ServiceException {
-        if (photo == null)
-            throw new IllegalArgumentException();
-        LOGGER.debug("Entering savePhotoRating with {}", photo);
+    @Override
+    public void editPhoto(Photo photo) throws ServiceException {
+        LOGGER.debug("Entering editPhoto with {}", photo);
+
         try {
             photoDAO.update(photo);
-            LOGGER.info("Successfully saved rating for {}", photo);
+            LOGGER.info("Successfully updated {}", photo);
         } catch (DAOException ex) {
-            LOGGER.error("Saving rating for {} failed to to DAOException", photo);
-            throw new ServiceException("Could not store rating of photo.", ex);
+            LOGGER.error("Updating {} failed due to DAOException", photo);
+            throw new ServiceException("Could update photo.", ex);
         } catch (ValidationException ex) {
-            LOGGER.error("Saving rating for {} failed to to ValidationException", photo);
-            throw new ServiceException("Could not store rating of photo.", ex);
+            LOGGER.error("Updating {} failed due to ValidationException", photo);
+            throw new ServiceException("Could not update photo.", ex);
         }
-        LOGGER.debug("Leaving savePhotoRating with {}", photo);
+
+        LOGGER.debug("Leaving editPhoto with {}", photo);
     }
 
-    @Override public void addJourneyToPhotos(List<Photo> photos, Journey journey)
+    @Override
+    @Deprecated
+    public void addJourneyToPhotos(List<Photo> photos, Journey journey)
             throws ServiceException {
         LOGGER.debug("Entering addJourneyToPhotos with {}, {}", photos, journey);
         if (photos == null) {
@@ -137,7 +140,9 @@ public class PhotoServiceImpl implements PhotoService {
         }
     }
 
-    @Override public void addPlaceToPhotos(List<Photo> photos, Place place)
+    @Override
+    @Deprecated
+    public void addPlaceToPhotos(List<Photo> photos, Place place)
             throws ServiceException {
         LOGGER.debug("Entering addPlaceToPhotos with {}, {}", photos, place);
         if (photos == null) {
@@ -151,9 +156,5 @@ public class PhotoServiceImpl implements PhotoService {
         p.setPlace(place);
         editPhotos(photos, p);
         LOGGER.debug("Leaving addPlaceToPhotos");
-    }
-
-    @Override public void close() {
-        executorService.shutdown();
     }
 }

@@ -36,9 +36,19 @@ public interface ClusterService {
      * Adds a new place to the datastore.
      *
      * @param place Place to be created in the datastore.
+     * @return the newly created place
      * @throws ServiceException If creation of record fails.
      */
-    void addPlace(Place place) throws ServiceException;
+    Place addPlace(Place place) throws ServiceException;
+
+    /**
+     * Adds a new journey to the datastore.
+     *
+     * @param journey Journey to be created in the datastore.
+     * @return the newly created journey
+     * @throws ServiceException If creation of record fails.
+     */
+    Journey addJourney(Journey journey) throws ServiceException;
 
     /**
      * Creates a journey and clusters this journey in places.

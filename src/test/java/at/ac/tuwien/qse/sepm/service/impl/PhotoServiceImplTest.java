@@ -70,7 +70,7 @@ public class PhotoServiceImplTest extends ServiceTestBase {
     public List<Photo> duplicateList(List<Photo> photos) {
         return photos
                 .stream()
-                .map(p -> new Photo(p))
+                .map(Photo::new)
                 .collect(Collectors.toList());
     }
 

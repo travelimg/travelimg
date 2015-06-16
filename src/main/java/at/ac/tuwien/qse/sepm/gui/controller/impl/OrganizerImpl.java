@@ -1,19 +1,17 @@
-package at.ac.tuwien.qse.sepm.gui.impl;
+package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 import at.ac.tuwien.qse.sepm.entities.*;
-import at.ac.tuwien.qse.sepm.gui.FilterList;
 import at.ac.tuwien.qse.sepm.gui.HighlightsViewController;
-import at.ac.tuwien.qse.sepm.gui.Inspector;
-import at.ac.tuwien.qse.sepm.gui.Organizer;
+import at.ac.tuwien.qse.sepm.gui.control.FilterList;
+import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
+import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
-import at.ac.tuwien.qse.sepm.gui.dialogs.JourneyDialog;
 import at.ac.tuwien.qse.sepm.service.ClusterService;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.TagService;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
@@ -26,7 +24,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * Controller for organizer view which is used for browsing photos by month.
@@ -43,8 +40,7 @@ public class OrganizerImpl implements Organizer {
     private Inspector inspectorController;
     @Autowired
     private TagService tagService;
-    @Autowired
-    private PhotoFilter filter;
+
     @FXML
     private BorderPane root;
     @FXML
@@ -69,6 +65,8 @@ public class OrganizerImpl implements Organizer {
     private FilterList<Place> placeListView;
     @FXML
     private Button resetButton;
+
+    private PhotoFilter filter = new PhotoFilter();
     private Runnable filterChangeCallback;
 
     @Override public void setPresentAction(Runnable callback) {

@@ -1,6 +1,10 @@
-package at.ac.tuwien.qse.sepm.gui;
+package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.gui.FullscreenWindow;
+import at.ac.tuwien.qse.sepm.gui.controller.GridView;
+import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
+import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.FlickrDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
@@ -8,9 +12,7 @@ import at.ac.tuwien.qse.sepm.gui.dialogs.JourneyDialog;
 import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
-import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import javafx.application.Platform;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
@@ -20,16 +22,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class GridView {
+public class GridViewImpl implements GridView {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private final List<Photo> selection = new ArrayList<Photo>();
+
     @Autowired
     private PhotoService photoService;
     @Autowired
@@ -44,23 +44,22 @@ public class GridView {
     private Organizer organizer;
     @Autowired
     private Inspector inspector;
+    @Autowired
+    private ImageCache imageCache;
+
     @FXML
     private BorderPane root;
     @FXML
     private ScrollPane gridContainer;
-    private Predicate<Photo> filter = new PhotoFilter();
 
-    @Autowired
-    private ImageCache imageCache;
-    @Autowired
-    private PaginatedImageGrid grid = new PaginatedImageGrid();
-
+    private PaginatedImageGrid grid;
     private boolean disableReload = false;
 
     @FXML
     private void initialize() {
         LOGGER.debug("initializing");
 
+        this.grid = new PaginatedImageGrid(imageCache);
         gridContainer.setContent(grid);
 
         organizer.setImportAction(() -> {
@@ -102,16 +101,16 @@ public class GridView {
         // Updated photos that no longer match the filter are removed from the grid.
         inspector.setUpdateHandler(() -> {
             inspector.getActivePhotos().stream()
-                    .filter(filter.negate())
+                    .filter(organizer.getFilter().negate())
                     .forEach(grid::removePhoto);
             inspector.getActivePhotos().stream()
-                    .filter(filter)
+                    .filter(organizer.getFilter())
                     .forEach(grid::updatePhoto);
         });
 
         // Deleted photos are removed from the grid.
         inspector.setDeleteHandler(() -> {
-            inspector.getActivePhotos().forEach(grid::removePhoto);
+            inspector.  getActivePhotos().forEach(grid::removePhoto);
         });
 
         // Apply the initial filter.
@@ -125,13 +124,6 @@ public class GridView {
         Platform.runLater(() -> ErrorDialog.show(root, "Import fehlgeschlagen", "Fehlermeldung: " + error.getMessage()));
     }
 
-    public void deletePhotos() {
-        for (Photo photo : selection) {
-            grid.removePhoto(photo);
-        }
-        selection.clear();
-    }
-
     /**
      * Called whenever a new photo is imported
      *
@@ -143,7 +135,7 @@ public class GridView {
             disableReload = true;
 
             // Ignore photos that are not part of the current filter.
-            if (!filter.test(photo)) {
+            if (!organizer.getFilter().test(photo)) {
                 disableReload = false;
                 return;
             }
@@ -154,17 +146,15 @@ public class GridView {
     }
 
     private void handleFilterChange() {
-        this.filter = organizer.getFilter();
-
         if (!disableReload)
             reloadImages();
     }
 
     private void reloadImages() {
         try {
-            grid.setPhotos(photoService.getAllPhotos(filter).stream()
-                    .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
-                    .collect(Collectors.toList()));
+            grid.setPhotos(photoService.getAllPhotos(organizer.getFilter()).stream()
+                            .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
+                            .collect(Collectors.toList()));
         } catch (ServiceException ex) {
             LOGGER.error("failed loading fotos", ex);
             ErrorDialog.show(root, "Laden von Fotos fehlgeschlagen",

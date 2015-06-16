@@ -174,6 +174,7 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      * @throws ValidationException: if parameter validation fails
      */
     @Override
+    @Deprecated
     public List<Photo> readPhotosByTag(Tag tag) throws DAOException, ValidationException {
         LOGGER.debug("Entering readPhotosByTag with {}", tag);
 

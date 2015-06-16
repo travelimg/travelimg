@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 /**
  * Service for accessing and downloading photos from flickr.
  */
-public interface FlickrService extends Service {
+public interface FlickrService {
 
     /**
      * Downloads (if possible) 10 new photos every time it is called. This is a non-blocking operation
@@ -29,4 +29,9 @@ public interface FlickrService extends Service {
      * After calling this method, the service will be ready to load photos again from the beginning.
      */
     void reset();
+
+    /**
+     * Cleanup used resources.
+     */
+    void close();
 }

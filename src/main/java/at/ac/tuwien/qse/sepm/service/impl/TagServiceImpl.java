@@ -33,7 +33,8 @@ public class TagServiceImpl implements TagService {
         try {
             return tagDAO.create(tag);
         } catch (DAOException | ValidationException ex) {
-            throw new ServiceException(ex);
+            LOGGER.error("Failed to create tag", ex);
+            throw new ServiceException("Failed to create tag", ex);
         }
     }
 
@@ -42,7 +43,8 @@ public class TagServiceImpl implements TagService {
         try {
             tagDAO.delete(tag);
         } catch (DAOException ex) {
-            throw new ServiceException(ex);
+            LOGGER.error("Failed to delete tag", ex);
+            throw new ServiceException("Failed to delete tag", ex);
         }
     }
 
@@ -51,8 +53,8 @@ public class TagServiceImpl implements TagService {
         try {
             return tagDAO.readName(tag);
         } catch (DAOException e) {
-            e.printStackTrace();
-            throw new ServiceException(e);
+            LOGGER.error("Failed to read tag by name", e);
+            throw new ServiceException("Failed to read tag by name", e);
         }
     }
 
@@ -62,7 +64,8 @@ public class TagServiceImpl implements TagService {
         try {
             return tagDAO.readAll();
         } catch (DAOException e) {
-            throw new ServiceException(e);
+            LOGGER.error("Failed to retrieve all tags", e);
+            throw new ServiceException("Failed to retrieve all tags", e);
         }
     }
 

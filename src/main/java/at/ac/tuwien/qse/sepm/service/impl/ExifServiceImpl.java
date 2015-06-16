@@ -33,11 +33,11 @@ public class ExifServiceImpl implements ExifService {
             .ofPattern("yyyy:MM:dd HH:mm:ss");
 
     @Autowired
-    PhotoService photoService;
+    private PhotoService photoService;
     @Autowired
-    TagService tagService;
+    private TagService tagService;
     @Autowired
-    ClusterService clusterService;
+    private ClusterService clusterService;
 
     @Override
     public Exif getExif(Photo photo) throws ServiceException {
@@ -151,6 +151,7 @@ public class ExifServiceImpl implements ExifService {
                     Place place = new Place(0, tempPlace[1], tempPlace[2],
                             Double.parseDouble(tempPlace[3]), Double.parseDouble(tempPlace[4]),
                             journey);
+                    // TODO: only create records if they don't already exist for the photo
                     clusterService.addPlace(place);
                     photoService.addPlaceToPhotos(Arrays.asList(photo), place);
                     photoService.addJourneyToPhotos(Arrays.asList(photo),

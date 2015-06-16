@@ -22,7 +22,9 @@ import java.util.function.Consumer;
 public class ImportServiceImpl implements ImportService {
 
     private static final Logger logger = LogManager.getLogger();
-    ExecutorService executorService = Executors.newFixedThreadPool(1);
+
+    @Autowired
+    private ExecutorService executorService;
     @Autowired
     private PhotoDAO photoDAO;
     @Autowired
@@ -38,11 +40,6 @@ public class ImportServiceImpl implements ImportService {
         executorService.submit(importer);
 
         return importer;
-    }
-
-    @Override
-    public void close() {
-        executorService.shutdown();
     }
 
     private class AsyncImporter extends CancelableTask {
@@ -66,7 +63,6 @@ public class ImportServiceImpl implements ImportService {
                 try {
                     exifService.attachDateAndGeoData(p);
                     Photo imported = photoDAO.create(p);
-//                    exifService.getTagsFromExif(p);
                     callback.accept(imported);
                 } catch (DAOException ex) {
                     logger.error("Failed to import photo", ex);

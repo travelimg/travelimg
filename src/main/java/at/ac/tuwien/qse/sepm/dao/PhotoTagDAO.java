@@ -66,5 +66,6 @@ public interface PhotoTagDAO {
      * @throws DAOException         if an exception occurs on persistence layer
      * @throws ValidationException: if parameter validation fails
      */
+    @Deprecated
     List<Photo> readPhotosByTag(Tag tag) throws DAOException, ValidationException;
 }
