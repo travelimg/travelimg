@@ -11,6 +11,8 @@ import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PollingFileWatcher implements FileWatcher {
 
@@ -154,13 +156,19 @@ public class PollingFileWatcher implements FileWatcher {
     // Recursively collects all files in a directory into a set.
     private void collectFiles(Path directory, Set<Path> result) {
         try {
-            fileManager.list(directory)
-                    .filter(fileManager::isDirectory)
-                    .forEach(dir -> collectFiles(dir, result));
-            fileManager.list(directory)
-                    .filter(fileManager::isFile)
-                    .filter(this::checkExtension)
-                    .forEach(result::add);
+            // NOTE: Stream must always be closed.
+            // Otherwise the directory remains open in the application.
+            Stream<Path> stream = fileManager.list(directory);
+            Collection<Path> paths = stream.collect(Collectors.toList());
+            stream.close();
+            for (Path path : paths) {
+                if (fileManager.isDirectory(path)) {
+                    collectFiles(path, result);
+                }
+                if (fileManager.isFile(path) && checkExtension(path)) {
+                    result.add(path);
+                }
+            }
         } catch (IOException ex) {
             // NOTE: The path may not exist, or it may be a file, or something else. There is a lot
             // that can happen from outside the application, so we just have to ignore such errors.
