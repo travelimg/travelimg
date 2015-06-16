@@ -24,14 +24,6 @@ public interface PhotoService {
     void deletePhotos(List<Photo> photos) throws ServiceException;
 
     /**
-     * edit the delivered List of Photos
-     *
-     * @param photos the list of photos
-     * @throws ServiceException
-     */
-    void editPhotos(List<Photo> photos, Photo p) throws ServiceException;
-
-    /**
      * @return the list of all available photos
      * @throws ServiceException
      */

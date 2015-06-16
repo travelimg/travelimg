@@ -80,24 +80,6 @@ public class PhotoServiceImpl implements PhotoService {
         }
     }
 
-
-    @Override
-    public void editPhotos(List<Photo> photos, Photo photo) throws ServiceException {
-        if (photos == null) {
-            throw new ServiceException("List<Photo> photos is null");
-        }
-        for (Photo p : photos) {
-            LOGGER.debug("Updating photo {}", p);
-            try {
-                //TODO update all attributes
-                p.getData().setPlace(photo.getData().getPlace());
-                photoDAO.update(p);
-            } catch (DAOException e) {
-                throw new ServiceException(e);
-            }
-        }
-    }
-
     @Override
     public List<Photo> getAllPhotos() throws ServiceException {
         LOGGER.debug("Retrieving all photos...");
