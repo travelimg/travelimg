@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.dao.JourneyDAO;
 import at.ac.tuwien.qse.sepm.dao.PlaceDAO;
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Place;
+import at.ac.tuwien.qse.sepm.entities.WikiPlaceInfo;
 import at.ac.tuwien.qse.sepm.entities.validators.PlaceValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,7 +114,8 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
         logger.debug("readByJourney ", journey.getId());
 
         try {
-            return this.jdbcTemplate.query(readByJourneyStatement, new Object[]{journey.getId()}, new PlaceMapper());
+            return this.jdbcTemplate.query(readByJourneyStatement, new Object[] { journey.getId() },
+                    new PlaceMapper());
         } catch (DataAccessException | ValidationException.Unchecked | DAOException.Unchecked ex) {
             logger.error("Failed to read a Place", ex);
             throw new DAOException("Failed to read a Place", ex);

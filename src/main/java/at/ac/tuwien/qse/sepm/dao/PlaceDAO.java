@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.dao;
 
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Place;
+import at.ac.tuwien.qse.sepm.entities.WikiPlaceInfo;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 
 import java.util.List;
