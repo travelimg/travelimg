@@ -3,7 +3,10 @@ package at.ac.tuwien.qse.sepm.gui.controller;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 
 /**
- * Created by christoph on 11.06.15.
+ * View for browsing and filtering photos by various criteria.
+ *
+ * This view also lets the user invoke several global actions.
+ *
  */
 public interface Organizer {
 

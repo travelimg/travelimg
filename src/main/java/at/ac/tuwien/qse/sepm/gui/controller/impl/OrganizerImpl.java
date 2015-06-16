@@ -1,7 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 import at.ac.tuwien.qse.sepm.entities.*;
-import at.ac.tuwien.qse.sepm.gui.HighlightsViewController;
 import at.ac.tuwien.qse.sepm.gui.control.FilterList;
 import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
@@ -285,5 +284,4 @@ public class OrganizerImpl implements Organizer {
         // restore the callback and handle the change
         filterChangeCallback = savedCallback;
     }
-
 }

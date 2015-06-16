@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.gui;
 
 
 import at.ac.tuwien.qse.sepm.entities.*;
+import at.ac.tuwien.qse.sepm.gui.control.FilterList;
 import at.ac.tuwien.qse.sepm.gui.grid.ImageGrid;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.ClusterService;
@@ -58,8 +59,8 @@ public class HighlightsViewController {
 
     @Autowired private ClusterService clusterService;
     @Autowired private PhotoService photoService;
-    @Autowired private PhotoFilter filter;
     @Autowired private TagService tagService;
+    private PhotoFilter filter = new PhotoFilter();
     private Journey selectedJourney;
     private GoogleMapView mapView;
     private GoogleMap googleMap;

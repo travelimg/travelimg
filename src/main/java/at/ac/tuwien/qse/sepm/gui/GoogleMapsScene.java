@@ -2,14 +2,13 @@ package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
+import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
 import at.ac.tuwien.qse.sepm.service.GeoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.event.UIEventType;
 import com.lynden.gmapsfx.javascript.object.*;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
 import org.apache.logging.log4j.LogManager;

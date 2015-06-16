@@ -5,15 +5,10 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
 import at.ac.tuwien.qse.sepm.service.TagService;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,11 +22,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:test-config.xml")
-@Transactional(propagation = Propagation.NESTED)
-@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = true)
-public class TagTest {
+public class TagTest extends ServiceTestBase {
 
     @Autowired private TagService tagService;
     @Autowired private PhotoService photoService;
@@ -104,7 +95,8 @@ public class TagTest {
     }
 
     @Test
-    @WithData public void test_get_all_tags() throws ServiceException {
+    @WithData
+    public void test_get_all_tags() throws ServiceException {
         assertThat(tagService.getAllTags(), containsInAnyOrder(new Tag(1, "Person"),
                 new Tag(2, "Essen"), new Tag(3, "Natur")));
     }
