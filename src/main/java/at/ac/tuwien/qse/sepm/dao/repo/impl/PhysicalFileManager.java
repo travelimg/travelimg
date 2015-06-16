@@ -1,8 +1,6 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -36,11 +34,11 @@ public class PhysicalFileManager implements FileManager {
     }
 
     @Override public OutputStream newOutputStream(Path file) throws IOException {
-        return Files.newOutputStream(file);
+        return new BufferedOutputStream(Files.newOutputStream(file));
     }
 
     @Override public InputStream newInputStream(Path file) throws IOException {
-        return Files.newInputStream(file);
+        return new BufferedInputStream(Files.newInputStream(file));
     }
 
     @Override public boolean exists(Path path) {
