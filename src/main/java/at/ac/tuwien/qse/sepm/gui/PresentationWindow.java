@@ -75,10 +75,10 @@ public class PresentationWindow extends AnchorPane{
                 }
             }
         });
-        animateImage();
+
     }
 
-    public void present(List<Photo> photos, Photo initial) {
+    public void present(List<Photo> photos, Photo initial, Double duration) {
         this.photos = photos;
 
         activeIndex = photos.indexOf(initial);
@@ -88,6 +88,7 @@ public class PresentationWindow extends AnchorPane{
         }
 
         loadImage();
+        animateImage(photos,initial,duration);
 
         stage.setFullScreen(true);
         stage.show();
@@ -127,7 +128,8 @@ public class PresentationWindow extends AnchorPane{
         // handling of images in original size can consume a lot of memory so collect it here
         System.gc();
     }
-    private void animateImage() {
+    private void animateImage(List<Photo> photos,Photo initial,Double duration) {
+        long time = (new Double(duration).longValue());
         Task task = new Task<Void>() {
             @Override public Void call() throws Exception {
                 for (int i = 0; i < photos.size(); i++) {
@@ -142,7 +144,7 @@ public class PresentationWindow extends AnchorPane{
                         }
                     });
 
-                    Thread.sleep(3000);
+                    Thread.sleep(time);
 
                 }
                 return null;
