@@ -66,6 +66,7 @@ public class PhotoServiceImpl implements PhotoService {
         listener.close();
     }
 
+    @Override
     public void deletePhotos(List<Photo> photos) throws ServiceException {
         if (photos == null) {
             throw new ServiceException("List<Photo> photos is null");
