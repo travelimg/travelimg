@@ -23,11 +23,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SlideshowViewImpl implements SlideshowView {
 
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final String NEW_SLIDESHOW_PROMPT = "Zu neuer Präsentation hinzufügen";
+    private static final String NEW_SLIDESHOW_NAME = "Neue Präsentation";
+    private static final int NEW_SLIDESHOW_MARKER_ID = -1;
 
     @Autowired private SlideService slideService;
     @Autowired private SlideshowService slideShowService;
@@ -59,32 +63,11 @@ public class SlideshowViewImpl implements SlideshowView {
         }
     }
 
-    @Override
-    public ObservableList<Slideshow> getSlideshows() {
-        return slideshows;
-    }
-
-    @Override
-    public void addPhotosToSlideshow(List<Photo> photos, Slideshow slideshow) {
-        try {
-            slideshowService.addPhotosToSlideshow(photos, slideshow);
-
-            Slideshow selected = slideshowOrganizer.getSelected();
-            if (selected != null && selected.getId().equals(slideshow.getId())) {
-                grid.setSlideshow(slideshow);
-            }
-        } catch (ServiceException ex) {
-            ErrorDialog.show(root, "Fehler beim Hinzufügen zur Slideshow", "Fehlermeldung: " + ex.getMessage());
-        }
-    }
-
     @FXML
     private void initialize() {
         gridContainer.setContent(grid);
 
         Btn_Add.setOnAction(this::handlesetShowSlides);
-
-        getAllSlideshowsToComboBox();
 
         slideshowOrganizer.setSlideshows(slideshows);
         slideshowOrganizer.getSelectedSlideshowProperty().addListener((observable, oldValue, newValue) -> {
@@ -94,17 +77,35 @@ public class SlideshowViewImpl implements SlideshowView {
         loadAllSlideshows();
     }
 
-    private void getAllSlideshowsToComboBox() {
-        /*try {
-            List<Slideshow> slideshows;
-            slideshows = slideShowService.getAllSlideshows();
+    @Override
+    public ObservableList<Slideshow> getSlideshows() {
+        return slideshows;
+    }
 
-            for (int i = 0; i < slideshows.size(); i++)
-                cb_getSlideshows.getItems().addAll(slideshows.get(i).getName());
+    @Override
+    public void addPhotosToSlideshow(List<Photo> photos, Slideshow slideshow) {
+        try {
+            if (slideshow.getId() == NEW_SLIDESHOW_MARKER_ID) {
+                // user added photos to new slideshow which does not exist yet. create it
+                slideshow.setName(NEW_SLIDESHOW_NAME);
+                slideshow = slideshowService.create(slideshow);
 
-        } catch (ServiceException e) {
-            e.printStackTrace();
-        }*/
+                // remove placeholder, add new slideshow and add new placeholder
+                Slideshow placeholder = slideshows.remove(slideshows.size() - 1);
+                slideshows.add(slideshow);
+                slideshows.add(createNewSlideshowPlaceholder());
+            }
+
+            slideshowService.addPhotosToSlideshow(photos, slideshow);
+
+            // add the photos to the grid if the slideshow is currently being displayed
+            Slideshow selected = slideshowOrganizer.getSelected();
+            if (selected != null && selected.getId().equals(slideshow.getId())) {
+                grid.setSlideshow(slideshow);
+            }
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Hinzufügen zur Slideshow", "Fehlermeldung: " + ex.getMessage());
+        }
     }
 
     private void createSlideshow() {
@@ -150,6 +151,7 @@ public class SlideshowViewImpl implements SlideshowView {
         try {
             slideshows.clear();
             slideshows.addAll(slideShowService.getAllSlideshows());
+            slideshows.add(createNewSlideshowPlaceholder()); // represents a new slideshow which will be created if the user makes use of it
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Laden aller Slideshows", "Fehlermeldung: " + ex.getMessage());
         }
@@ -160,4 +162,10 @@ public class SlideshowViewImpl implements SlideshowView {
 
     }
 
+    private Slideshow createNewSlideshowPlaceholder() {
+        double durationBetweenPhotos = 5; // TODO
+        List<Slide> slides = new ArrayList<>();
+
+        return new Slideshow(NEW_SLIDESHOW_MARKER_ID, NEW_SLIDESHOW_PROMPT, durationBetweenPhotos, slides);
+    }
 }

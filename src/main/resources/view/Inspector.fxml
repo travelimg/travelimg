@@ -41,7 +41,7 @@
 
                         <VBox>
                             <children>
-                                <Label text="Add to slideshow:"></Label>
+                                <Label text="Zu Präsentation hinzufügen:"></Label>
                                 <HBox>
                                     <children>
                                         <ComboBox fx:id="slideshowsCombobox" />

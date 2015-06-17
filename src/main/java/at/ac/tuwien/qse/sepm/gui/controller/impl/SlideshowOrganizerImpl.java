@@ -1,11 +1,14 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 
+import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.gui.controller.SlideshowOrganizer;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
@@ -13,6 +16,10 @@ import javafx.scene.control.ListView;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class SlideshowOrganizerImpl implements SlideshowOrganizer {
@@ -38,7 +45,9 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     }
 
     public void setSlideshows(ObservableList<Slideshow> slideshows) {
-        slideshowList.setItems(slideshows);
+        // only display real slideshows (no placeholder)
+        FilteredList<Slideshow> filtered = slideshows.filtered(s -> s.getId() >= 0);
+        slideshowList.setItems(filtered);
     }
 
     @Override
