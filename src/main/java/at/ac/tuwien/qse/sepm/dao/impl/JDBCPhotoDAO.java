@@ -196,7 +196,9 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         logger.debug("retrieving photos between {} and {}", start, end);
 
         try {
-            List<Photo> photos = jdbcTemplate.query(READ_INTERVAL_STATEMENT, new PhotoRowMapper(), start, end);
+            List<Photo> photos = jdbcTemplate.query(READ_INTERVAL_STATEMENT,
+                    new PhotoRowMapper(), Timestamp.valueOf(start), Timestamp.valueOf(end)
+            );
             logger.debug("Successfully retrieved photos");
             return photos;
         } catch (DataAccessException ex) {
