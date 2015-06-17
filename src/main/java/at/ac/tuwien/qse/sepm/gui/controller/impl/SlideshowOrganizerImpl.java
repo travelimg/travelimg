@@ -26,7 +26,6 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     private Button presentButton;
 
 
-
     private ObjectProperty<Slideshow> selectedSlideshowProperty = new SimpleObjectProperty<>(null);
 
 
@@ -75,7 +74,6 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
             }
         }
     }
-
 
 
 }

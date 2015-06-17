@@ -4,7 +4,6 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.gui.controller.SlideshowView;
-import at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowOrganizerImpl;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.grid.SlideshowGrid;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
@@ -20,7 +19,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +49,7 @@ public class SlideshowViewImpl implements SlideshowView {
 
     private ObservableList<Slideshow> slideshows = FXCollections.observableArrayList();
 
-    private Integer slideshowCount=0;
+    private Integer slideshowCount = 0;
 
     @Autowired
     public void setImageCache(ImageCache imageCache) {
@@ -130,7 +128,6 @@ public class SlideshowViewImpl implements SlideshowView {
             }
 
 
-
         } catch (ServiceException e) {
             e.printStackTrace();
         }
@@ -161,11 +158,6 @@ public class SlideshowViewImpl implements SlideshowView {
     private void startSlideshow(Event event) {
 
 
-
-
-
-
-
     }
-    
+
 }
