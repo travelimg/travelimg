@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * Service for importing external photos into the users library.
  */
-public interface ImportService extends Service {
+public interface ImportService {
 
     /**
      * Import a list of photos into the application.

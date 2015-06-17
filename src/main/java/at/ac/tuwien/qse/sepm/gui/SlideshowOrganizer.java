@@ -2,13 +2,7 @@ package at.ac.tuwien.qse.sepm.gui;
 
 
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
-import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
-import at.ac.tuwien.qse.sepm.gui.impl.OrganizerImpl;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.service.SlideshowService;
-import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -18,14 +12,11 @@ import javafx.scene.control.ListView;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 
 public class SlideshowOrganizer {
 
-    private static final Logger LOGGER = LogManager.getLogger(OrganizerImpl.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @FXML
     private ListView<Slideshow> slideshowList;

@@ -52,7 +52,11 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
     public Tag create(Tag t) throws DAOException, ValidationException {
         logger.debug("Creating Tag {}", t);
         TagValidator.validate(t);
-        if (this.readName(t) != null) throw new ValidationException("Tag already exists");
+
+        if (exists(t)) {
+            throw new ValidationException("Tag already exists");
+        }
+
         try {
             Map<String, Object> parameters = new HashMap<String, Object>(1);
             parameters.put("name", t.getName());
@@ -109,11 +113,25 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
                             return t;
                         }
                     });
-        } catch (EmptyResultDataAccessException e) {
-            logger.debug("Tagname not found: " + t.getName());
-            return null;
         } catch (DataAccessException e) {
+            logger.error("Failed to read a tag", e);
             throw new DAOException("Failed to read a Tag", e);
+        }
+    }
+
+    @Override
+    public boolean exists(Tag tag) throws DAOException {
+        logger.debug("exists for {}", tag);
+
+        try {
+            return this.jdbcTemplate.queryForObject(readNameStatement, new Object[]{tag.getName()},
+                    (rs, rowNum) -> true
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            return false;
+        } catch (DataAccessException ex) {
+            logger.error("Failed to retrieve tag", ex);
+            throw new DAOException("Failed to retrieve tag", ex);
         }
     }
 

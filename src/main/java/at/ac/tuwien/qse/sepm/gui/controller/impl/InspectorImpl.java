@@ -1,7 +1,10 @@
-package at.ac.tuwien.qse.sepm.gui.impl;
+package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.*;
+import at.ac.tuwien.qse.sepm.gui.control.RatingPicker;
+import at.ac.tuwien.qse.sepm.gui.control.TagSelector;
+import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.dialogs.DeleteDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ExportDialog;
@@ -53,7 +56,7 @@ public class InspectorImpl implements Inspector {
     @FXML
     private VBox placeholder;
     @FXML
-    private HBox ratingPickerContainer;
+    private VBox ratingPickerContainer;
     @FXML
     private TableColumn<String, String> exifName;
     @FXML
@@ -80,8 +83,8 @@ public class InspectorImpl implements Inspector {
     private ExifService exifService;
     @Autowired
     private TagService tagService;
-    @Autowired
-    private RatingPicker ratingPicker;
+
+    private RatingPicker ratingPicker = new RatingPicker();
 
     @Override public Collection<Photo> getActivePhotos() {
         return new ArrayList<>(activePhotos);
@@ -125,10 +128,10 @@ public class InspectorImpl implements Inspector {
 
     @FXML
     private void initialize() {
-
         mapsScene = new GoogleMapsScene();
         tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService, root);
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
+        ratingPickerContainer.getChildren().add(ratingPicker);
         deleteButton.setOnAction(this::handleDelete);
         addToSlideshowButton.setOnAction(this::handleAddToSlideshow);
         dropboxButton.setOnAction(this::handleDropbox);
@@ -171,9 +174,9 @@ public class InspectorImpl implements Inspector {
         if (!destinationPath.isPresent()) return;
 
         dropboxService.uploadPhotos(activePhotos, destinationPath.get(), photo -> {
-                    // TODO: progressbar
-                }, exception -> ErrorDialog.show(root, "Fehler beim Export",
-                        "Fehlermeldung: " + exception.getMessage()));
+            // TODO: progressbar
+        }, exception -> ErrorDialog.show(root, "Fehler beim Export",
+                "Fehlermeldung: " + exception.getMessage()));
     }
 
     private void handleRatingChange(Rating newRating) {
@@ -186,14 +189,14 @@ public class InspectorImpl implements Inspector {
 
         for (Photo photo : activePhotos) {
 
-            if (photo.getRating() == newRating) {
+            if (photo.getData().getRating() == newRating) {
                 LOGGER.debug("photo already has rating of {}", newRating);
                 continue;
             }
 
-            Rating oldRating = photo.getRating();
+            Rating oldRating = photo.getData().getRating();
             LOGGER.debug("setting photo rating from {} to {}", oldRating, newRating);
-            photo.setRating(newRating);
+            photo.getData().setRating(newRating);
 
             try {
                 photoservice.editPhoto(photo);
@@ -202,9 +205,9 @@ public class InspectorImpl implements Inspector {
                 LOGGER.debug("Resetting rating from {} to {}.", newRating, oldRating);
 
                 // Undo changes.
-                photo.setRating(oldRating);
+                photo.getData().setRating(oldRating);
                 // FIXME: Reset the RatingPicker.
-                // This is not as simple as expected. Calling ratingPicker.setRating(oldValue) here
+                // This is not as simple as expected. Calling ratingPicker.getData().setRating(oldValue) here
                 // will complete and finish. But once the below dialog is closed ANOTHER selection-
                 // change will occur in RatingPicker that is the same as the once that caused the error.
                 // That causes an infinite loop of error dialogs.
@@ -244,7 +247,7 @@ public class InspectorImpl implements Inspector {
         // Otherwise the rating picker should be indetermined.
         ratingPicker.setRating(null);
         List<Rating> ratings = photos.stream()
-                .map(photo -> photo.getRating())
+                .map(photo -> photo.getData().getRating())
                 .distinct()
                 .collect(Collectors.toList());
         if (ratings.size() == 1) {
@@ -265,7 +268,7 @@ public class InspectorImpl implements Inspector {
                 Exif exif = exifService.getExif(photo);
 
                 List<Pair<String, String>> exifList = new ArrayList<Pair<String, String>>() {{
-                    add(new Pair<>("Aufnahmedatum", photo.getDatetime().toString().replace("T", " ")));
+                    add(new Pair<>("Aufnahmedatum", photo.getData().getDatetime().toString().replace("T", " ")));
                     add(new Pair<>("Kamerahersteller", exif.getMake()));
                     add(new Pair<>("Kameramodell", exif.getModel()));
                     add(new Pair<>("Belichtungszeit", exif.getExposure() + " Sek."));

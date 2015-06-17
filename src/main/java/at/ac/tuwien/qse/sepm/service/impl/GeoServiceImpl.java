@@ -20,7 +20,7 @@ public class GeoServiceImpl implements GeoService {
 
     public Place getPlaceByGeoData(double latitude, double longitude) throws ServiceException {
         logger.debug("getPlaceByGeoData() Latitude: " + latitude + " Longitude: " + longitude);
-        Place p = new Place(1, "Unknown city", "Unknown country", latitude, longitude, null);
+        Place p = new Place(1, "Unknown city", "Unknown country", latitude, longitude);
         String json = readUrl(
                 "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + ","
                         + longitude);
@@ -49,17 +49,23 @@ public class GeoServiceImpl implements GeoService {
                     //stop here, as we found the city and country
                     break;
                 }
-                if (p.getCountry().equals("Unknown country") && addressComponentsArray.getJSONObject(j).getJSONArray("types").get(0).equals(
+                if (p.getCountry().equals("Unknown country")
+                        && addressComponentsArray.getJSONObject(j).getJSONArray("types").length() > 0
+                        && addressComponentsArray.getJSONObject(j).getJSONArray("types").get(0).equals(
                         "country")){
                     logger.debug("Found country {} at address_component[{}]",addressComponentsArray.getJSONObject(j).getString("long_name"),i);
                     p.setCountry(addressComponentsArray.getJSONObject(j).getString("long_name"));
                 }
-                if (p.getCity().equals("Unknown city") && addressComponentsArray.getJSONObject(j).getJSONArray("types").get(0).equals(
+                if (p.getCity().equals("Unknown city")
+                        && addressComponentsArray.getJSONObject(j).getJSONArray("types").length() > 0
+                        && addressComponentsArray.getJSONObject(j).getJSONArray("types").get(0).equals(
                         "locality")) {
                     logger.debug("Found city {} at address_component[{}]",addressComponentsArray.getJSONObject(j).getString("long_name"),i);
                     p.setCity(addressComponentsArray.getJSONObject(j).getString("long_name"));
                 }
-                else if (p.getCity().equals("Unknown city") && addressComponentsArray.getJSONObject(j).getJSONArray("types").get(0).equals(
+                else if (p.getCity().equals("Unknown city") &&
+                        addressComponentsArray.getJSONObject(j).getJSONArray("types").length() > 0
+                        && addressComponentsArray.getJSONObject(j).getJSONArray("types").get(0).equals(
                         "administrative_area_level_1")) {
                     logger.debug("Found administrative level area {} at address_component[{}]",addressComponentsArray.getJSONObject(j).getString("long_name"),i);
                     p.setCity(addressComponentsArray.getJSONObject(j).getString("long_name"));

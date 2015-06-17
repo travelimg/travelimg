@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,9 +59,9 @@ public class PhotoGridTile extends ImageGridTile {
         super.setPhoto(photo, image);
         if (photo == null) return;
 
-        showRating(photo.getRating());
-        showTags(photo.getTags());
-        showDate(photo.getDatetime());
+        showRating(photo.getData().getRating());
+        showTags(photo.getData().getTags());
+        showDate(photo.getData().getDatetime());
     }
 
     private void showRating(Rating rating) {
@@ -89,7 +90,7 @@ public class PhotoGridTile extends ImageGridTile {
         ratingIndicatorTooltip.setText(text);
     }
 
-    private void showTags(List<Tag> tags) {
+    private void showTags(Collection<Tag> tags) {
         if (tags.isEmpty()) {
             taggingIndicator.setVisible(false);
             return;

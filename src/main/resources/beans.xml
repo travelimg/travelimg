@@ -25,57 +25,55 @@
         <jdbc:script location="classpath:db/insert.sql"/>
     </jdbc:initialize-database>
 
+    <bean id="executor" class="java.util.concurrent.Executors" factory-method="newFixedThreadPool"
+            destroy-method="shutdown">
+        <constructor-arg value="1"></constructor-arg>
+    </bean>
+
     <bean id="ioHandler" class="at.ac.tuwien.qse.sepm.util.DefaultIOHandler"></bean>
 
-    <bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"
-          destroy-method="close">
-    </bean>
-
-    <bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl"></bean>
-
-    <bean id="dropboxService" class="at.ac.tuwien.qse.sepm.service.impl.DropboxServiceImpl"
-          destroy-method="close">
-    </bean>
-
-    <bean id="photographerService" class="at.ac.tuwien.qse.sepm.service.impl.PhotographerServiceImpl"></bean>
-
-    <bean id="tagService" class="at.ac.tuwien.qse.sepm.service.impl.TagServiceImpl"></bean>
-
-    <bean id="exifService" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
-    <bean id="geoService" class="at.ac.tuwien.qse.sepm.service.impl.GeoServiceImpl"></bean>
-
-    <bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
-
-	<bean id="slideService" class="at.ac.tuwien.qse.sepm.service.impl.SlideServiceImpl"></bean>
-	<bean id="slideshowService" class="at.ac.tuwien.qse.sepm.service.impl.SlideshowServiceImpl"></bean>
-
-    <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl"
-          destroy-method="close">
-    </bean>
-
-    <bean id="filter" class="at.ac.tuwien.qse.sepm.service.impl.PhotoFilter"></bean>
-
-    <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
-        <constructor-arg value="${user.home}/travelimg"></constructor-arg>
-    </bean>
-
+    <!-- DAO beans -->
     <bean id="photoTagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoTagDAO"></bean>
     <bean id="photographerDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotographerDAO"></bean>
     <bean id="tagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTagDAO"></bean>
     <bean id="journeyDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCJourneyDAO"></bean>
     <bean id="placeDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPlaceDAO"></bean>
-    <bean id="slideDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCSlideDAO"></bean>
-    <bean id="slideshowDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCSlideshowDAO"></bean>
+    <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO"></bean>
 
+    <!-- DAO repository beans -->
+    <bean id="watcher" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher" factory-method="forImageDirectory">
+        <constructor-arg value="${user.home}/travelimg"></constructor-arg>
+    </bean>
+    <bean id="serializer" class="at.ac.tuwien.qse.sepm.dao.repo.impl.JpegSerializer"></bean>
+    <bean id="photoRepository" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PhotoFileRepository">
+        <constructor-arg ref="watcher"></constructor-arg>
+        <constructor-arg ref="serializer"></constructor-arg>
+    </bean>
+    <bean id="photoCache" class="at.ac.tuwien.qse.sepm.dao.repo.impl.JdbcPhotoCache"></bean>
+    <bean id="asyncPhotoRepository" class="at.ac.tuwien.qse.sepm.dao.repo.impl.CachedPhotoRepository">
+        <constructor-arg ref="photoRepository"></constructor-arg>
+        <constructor-arg ref="photoCache"></constructor-arg>
+    </bean>
 
+    <!-- Service beans -->
+    <bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"></bean>
+    <bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl" destroy-method="close"></bean>
+    <bean id="dropboxService" class="at.ac.tuwien.qse.sepm.service.impl.DropboxServiceImpl"></bean>
+    <bean id="photographerService" class="at.ac.tuwien.qse.sepm.service.impl.PhotographerServiceImpl"></bean>
+    <bean id="tagService" class="at.ac.tuwien.qse.sepm.service.impl.TagServiceImpl"></bean>
+    <bean id="exifService" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
+    <bean id="geoService" class="at.ac.tuwien.qse.sepm.service.impl.GeoServiceImpl"></bean>
+    <bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
+    <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl" destroy-method="close"></bean>
+    <bean id="slideService" class="at.ac.tuwien.qse.sepm.service.impl.SlideServiceImpl"></bean>
+    <bean id="slideshowService" class="at.ac.tuwien.qse.sepm.service.impl.SlideshowServiceImpl"></bean>
+
+    <!-- GUI controller beans -->
     <bean id="mainController" class="at.ac.tuwien.qse.sepm.gui.MainController"></bean>
-    <bean id="gridViewController" class="at.ac.tuwien.qse.sepm.gui.GridView"></bean>
+    <bean id="gridViewController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.GridViewImpl"></bean>
+    <bean id="worldmapViewController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.WorldmapViewImpl"></bean>
+    <bean id="organizerController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.OrganizerImpl"></bean>
+    <bean id="inspectorController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.InspectorImpl"></bean>
     <bean id="slideshowViewController" class="at.ac.tuwien.qse.sepm.gui.SlideshowView"></bean>
-    <bean id="worldmapViewController" class="at.ac.tuwien.qse.sepm.gui.WorldmapView"></bean>
-    <bean id="organizerController" class="at.ac.tuwien.qse.sepm.gui.impl.OrganizerImpl"></bean>
-    <bean id="inspectorController" class="at.ac.tuwien.qse.sepm.gui.impl.InspectorImpl"></bean>
-    <bean id="ratingPicker" class="at.ac.tuwien.qse.sepm.gui.RatingPicker"></bean>
-	<bean id="imageCache" class="at.ac.tuwien.qse.sepm.gui.util.ImageCache"></bean>
-    <bean id="slideshowOrganizer" class="at.ac.tuwien.qse.sepm.gui.SlideshowOrganizer"></bean>
-
+    <bean id="imageCache" class="at.ac.tuwien.qse.sepm.gui.util.ImageCacheImpl"></bean>
 </beans>

@@ -129,7 +129,7 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
 
             try {
                 photo = photoDAO.getById(photoId);
-            } catch (DAOException | ValidationException ex) {
+            } catch (DAOException ex) {
                 throw new DAOException.Unchecked("Failed to retrieve photo with id " + photoId, ex);
             }
 

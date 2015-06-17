@@ -35,6 +35,14 @@ public interface TagDAO {
     Tag readName(Tag t) throws DAOException;
 
     /**
+     * Check if a tag already exists.
+     * @param tag The tag to be checked.
+     * @return true if a tag with the same name already exists else false.
+     * @throws DAOException If the data store fails to select the record.
+     */
+    boolean exists(Tag tag) throws DAOException;
+
+    /**
      * Delete an existing Tag.
      *
      * @param t Specifies which Tag to delete by providing the id.

@@ -5,7 +5,7 @@ import at.ac.tuwien.qse.sepm.entities.Tag;
 
 import java.util.List;
 
-public interface TagService extends Service {
+public interface TagService {
 
     /**
      * Create a Tag in the data store.

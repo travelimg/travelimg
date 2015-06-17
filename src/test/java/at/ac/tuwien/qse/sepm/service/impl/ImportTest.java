@@ -11,7 +11,6 @@ import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import at.ac.tuwien.qse.sepm.util.TestIOHandler;
-import javafx.util.Pair;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,7 +30,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class ImportTest extends ServiceTestBase {
 
     private static final Photographer defaultPhotographer = new Photographer(1, "Test Photographer");
-    private static final Place defaultPlace = new Place(1, "Unkown place", "Unknown place", 0.0, 0.0, null);
+    private static final Place defaultPlace = new Place(1, "Unkown place", "Unknown place", 0.0, 0.0);
 
     private static final String dataDir = Paths.get(System.getProperty("java.io.tmpdir"), "travelimg").toString();
     private static final String sourceDir = Paths.get(System.getProperty("os.name").contains("indow") ?
@@ -128,7 +127,7 @@ public class ImportTest extends ServiceTestBase {
         assertThat(acceptor.getAccepted(), hasItem(expectedPhotos.get(2)));
 
         // test that the files have been copied correctly
-        List<Pair<Path, Path>> copiedFiles = ioHandler.copiedFiles;
+        List<TestIOHandler.CopyOperation> copiedFiles = ioHandler.copiedFiles;
 
         List<Path> expectedSourcePaths = inputPhotos.stream()
                 .map(p -> Paths.get(p.getPath()))
@@ -137,13 +136,10 @@ public class ImportTest extends ServiceTestBase {
                 .map(p -> Paths.get(p.getPath()))
                 .collect(Collectors.toList());
 
-        for (Pair<Path, Path> copyOp : copiedFiles) {
-            Path source = copyOp.getKey();
-            Path dest = copyOp.getValue();
-
+        for (TestIOHandler.CopyOperation op : copiedFiles) {
             // check that the copy operation is expected
-            assertThat(expectedSourcePaths, hasItem(source));
-            assertThat(expectedDestPaths, hasItem(dest));
+            assertThat(expectedSourcePaths, hasItem(op.source));
+            assertThat(expectedDestPaths, hasItem(op.dest));
         }
     }
 

@@ -10,7 +10,6 @@ import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import at.ac.tuwien.qse.sepm.util.TestIOHandler;
-import javafx.util.Pair;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -126,18 +125,15 @@ public class DropboxExportTest extends ServiceTestBase {
                 .map(filename -> Paths.get(root, destination, filename))
                 .collect(Collectors.toList());
 
-        List<Pair<Path, Path>> copyOperations = ioHandler.copiedFiles;
+        List<TestIOHandler.CopyOperation> copyOperations = ioHandler.copiedFiles;
 
         // ensure photos were copied to dropbox folder
         assertThat(photos.size(), is(copyOperations.size()));
 
-        for (Pair<Path, Path> copyOp : copyOperations) {
-            Path source = copyOp.getKey();
-            Path dest = copyOp.getValue();
-
+        for (TestIOHandler.CopyOperation op : copyOperations) {
             // check that the copy operation is expected
-            assertThat(expectedSourcePaths, hasItem(source));
-            assertThat(expectedDestPaths, hasItem(dest));
+            assertThat(expectedSourcePaths, hasItem(op.source));
+            assertThat(expectedDestPaths, hasItem(op.dest));
         }
     }
 

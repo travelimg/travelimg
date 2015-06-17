@@ -7,15 +7,18 @@ import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
 import at.ac.tuwien.qse.sepm.service.TagService;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
@@ -207,53 +210,47 @@ public class TagTest extends ServiceTestBase {
 
     @Test
     @WithData
-    public void test_getMostWantet() throws ServiceException {
+    public void test_get_most_frequent() throws ServiceException {
         Photo p0 = getPhoto(0);
         Photo p1 = getPhoto(1);
         Photo p2 = getPhoto(2);
 
-        Tag t0 = tagService.getAllTags().get(0);
-        Tag t1 = tagService.getAllTags().get(1);
-        Tag t2 = tagService.getAllTags().get(2);
+        Tag t1 = tagService.getAllTags().get(0);
+        Tag t2 = tagService.getAllTags().get(1);
+        Tag t3 = tagService.getAllTags().get(2);
         Tag t4 = new Tag(4, "Test");
         Tag t5 = new Tag(5, "test2");
         Tag t6 = new Tag(6, "test3");
         Tag t7 = new Tag(7, "test4");
+
         tagService.create(t4);
         tagService.create(t5);
         tagService.create(t6);
         tagService.create(t7);
-        tagService.addTagToPhotos(toList(p0, p1), t0);
-        tagService.addTagToPhotos(toList(p1, p0), t1);
-        tagService.addTagToPhotos(toList(p2, p1), t2);
+        tagService.addTagToPhotos(toList(p0, p1), t1);
+        tagService.addTagToPhotos(toList(p1, p0), t2);
+        tagService.addTagToPhotos(toList(p2, p1), t3);
         tagService.addTagToPhotos(toList(p0, p2), t4);
         tagService.addTagToPhotos(toList(p0, p1, p2), t5);
         tagService.addTagToPhotos(toList(p1), t6);
-        List<Tag> liste = tagService.getMostFrequentTags(toList(p0, p1, p2));
-        assertTrue(liste.size() < 6);
 
-        assertTrue(liste.contains(t0));
-        assertTrue(liste.contains(t1));
-        assertTrue(liste.contains(t2));
-        assertTrue(liste.contains(t4));
-        assertTrue(liste.contains(t5));
-        assertFalse(liste.contains(t6));
+        List<Tag> frequent = tagService.getMostFrequentTags(toList(p0, p1, p2));
+        assertThat(frequent.size(), is(5));
 
+        assertThat(frequent, containsInAnyOrder(t1, t2, t3, t4, t5));
+        assertThat(frequent, not(contains(t6)));
+        assertThat(frequent, not(contains(t7)));
     }
 
     @Test(expected = ServiceException.class)
     @WithData
-    public void test_getMostWantetWithNoTags() throws ServiceException {
+    public void test_get_most_frequent_with_no_tags() throws ServiceException {
+        // photos have no tags
         Photo p0 = getPhoto(0);
         Photo p1 = getPhoto(1);
         Photo p2 = getPhoto(2);
-        List<Tag> toRemove = p0.getTags();
-        if (toRemove.size() != 0) {
-            for (Tag t : toRemove) {
-                tagService.removeTagFromPhotos(toList(p0), t);
-            }
-        }
-        List<Tag> liste = tagService.getMostFrequentTags(toList(p0));
+
+        tagService.getMostFrequentTags(toList(p0, p1, p2));
     }
 
     @Test
@@ -262,5 +259,11 @@ public class TagTest extends ServiceTestBase {
         for (Photo photo : photoService.getAllPhotos()) {
             assertThat(getTags(photo), empty());
         }
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithData
+    public void test_create_duplicate_throws() throws ServiceException {
+        tagService.create(new Tag(1, "Person"));
     }
 }

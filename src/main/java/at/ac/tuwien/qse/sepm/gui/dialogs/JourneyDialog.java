@@ -54,7 +54,7 @@ public class JourneyDialog extends ResultDialog<Journey> {
             clusterService.clusterJourney(journey);
         } catch (ServiceException ex) {
             logger.error("Failed to cluster journey", ex);
-            ErrorDialog.show(getParent(), "Fehler beim Erstellen der Reise", "Fehlermeldung: " + ex.getMessage());
+            ErrorDialog.show(this, "Fehler beim Erstellen der Reise", "Fehlermeldung: " + ex.getMessage());
         }
 
         setResult(journey);

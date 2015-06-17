@@ -57,14 +57,4 @@ public interface PhotoTagDAO {
      * @throws ValidationException: if parameter validation fails
      */
     List<Tag> readTagsByPhoto(Photo photo) throws DAOException, ValidationException;
-
-    /**
-     * Return list of all photos which are currently tagged with Tag <tt>tag</tt>.
-     *
-     * @param tag must not be null; tag.id must not be null
-     * @return List with all Photos, which are linked to <tt>tag</tt> as a PhotoTag;
-     * @throws DAOException         if an exception occurs on persistence layer
-     * @throws ValidationException: if parameter validation fails
-     */
-    List<Photo> readPhotosByTag(Tag tag) throws DAOException, ValidationException;
 }

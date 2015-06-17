@@ -19,32 +19,42 @@
         <jdbc:script location="classpath:db/create.sql"/>
     </jdbc:embedded-database>
 
+    <bean id="executor" class="java.util.concurrent.Executors" factory-method="newFixedThreadPool"
+          destroy-method="shutdown">
+        <constructor-arg value="1"></constructor-arg>
+    </bean>
+
     <bean id="ioHandler" class="at.ac.tuwien.qse.sepm.util.TestIOHandler"></bean>
-    <bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"
-          destroy-method="close">
-    </bean>
 
-    <bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl"></bean>
-
-    <bean id="tagService" class="at.ac.tuwien.qse.sepm.service.impl.TagServiceImpl"></bean>
-
-    <bean id="dropboxService" class="at.ac.tuwien.qse.sepm.service.impl.DropboxServiceImpl"
-          destroy-method="close">
-    </bean>
-
-    <bean id="exifService" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
-    <bean id="geoService" class="at.ac.tuwien.qse.sepm.service.impl.GeoServiceImpl"></bean>
-
-    <bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
-    <bean id="photographerService" class="at.ac.tuwien.qse.sepm.service.impl.PhotographerServiceImpl"></bean>
-
-    <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
-        <constructor-arg value="${java.io.tmpdir}/travelimg"></constructor-arg>
-    </bean>
-
-    <bean id="tagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTagDAO"></bean>
+    <!-- DAO beans -->
     <bean id="photoTagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoTagDAO"></bean>
     <bean id="photographerDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotographerDAO"></bean>
+    <bean id="tagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTagDAO"></bean>
     <bean id="journeyDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCJourneyDAO"></bean>
     <bean id="placeDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPlaceDAO"></bean>
+    <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO"></bean>
+
+    <!-- DAO repo beans -->
+    <bean id="watcher" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher"></bean>
+    <bean id="serializer" class="at.ac.tuwien.qse.sepm.dao.repo.impl.MockPhotoSerializer"></bean>
+    <bean id="photoRepository" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PhotoFileRepository">
+        <constructor-arg ref="watcher"></constructor-arg>
+        <constructor-arg ref="serializer"></constructor-arg>
+    </bean>
+    <bean id="photoCache" class="at.ac.tuwien.qse.sepm.dao.repo.impl.JdbcPhotoCache"></bean>
+    <bean id="asyncPhotoRepository" class="at.ac.tuwien.qse.sepm.dao.repo.impl.CachedPhotoRepository">
+        <constructor-arg ref="photoRepository"></constructor-arg>
+        <constructor-arg ref="photoCache"></constructor-arg>
+    </bean>
+
+    <!-- Service beans -->
+    <bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"></bean>
+    <bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl"></bean>
+    <bean id="dropboxService" class="at.ac.tuwien.qse.sepm.service.impl.DropboxServiceImpl"></bean>
+    <bean id="photographerService" class="at.ac.tuwien.qse.sepm.service.impl.PhotographerServiceImpl"></bean>
+    <bean id="tagService" class="at.ac.tuwien.qse.sepm.service.impl.TagServiceImpl"></bean>
+    <bean id="exifService" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
+    <bean id="geoService" class="at.ac.tuwien.qse.sepm.service.impl.GeoServiceImpl"></bean>
+    <bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
+    <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl" destroy-method="close"></bean>
 </beans>

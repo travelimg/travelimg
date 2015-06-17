@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.service.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.dao.TagDAO;
+import at.ac.tuwien.qse.sepm.dao.repo.AsyncPhotoRepository;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
@@ -26,14 +27,16 @@ public class TagServiceImpl implements TagService {
     private TagDAO tagDAO;
     @Autowired
     private PhotoTagDAO photoTagDAO;
-
+    @Autowired
+    private AsyncPhotoRepository photoRepository;
 
     @Override
     public Tag create(Tag tag) throws ServiceException {
         try {
             return tagDAO.create(tag);
         } catch (DAOException | ValidationException ex) {
-            throw new ServiceException(ex);
+            LOGGER.error("Failed to create tag", ex);
+            throw new ServiceException("Failed to create tag", ex);
         }
     }
 
@@ -42,7 +45,8 @@ public class TagServiceImpl implements TagService {
         try {
             tagDAO.delete(tag);
         } catch (DAOException ex) {
-            throw new ServiceException(ex);
+            LOGGER.error("Failed to delete tag", ex);
+            throw new ServiceException("Failed to delete tag", ex);
         }
     }
 
@@ -51,8 +55,8 @@ public class TagServiceImpl implements TagService {
         try {
             return tagDAO.readName(tag);
         } catch (DAOException e) {
-            e.printStackTrace();
-            throw new ServiceException(e);
+            LOGGER.error("Failed to read tag by name", e);
+            throw new ServiceException("Failed to read tag by name", e);
         }
     }
 
@@ -62,7 +66,8 @@ public class TagServiceImpl implements TagService {
         try {
             return tagDAO.readAll();
         } catch (DAOException e) {
-            throw new ServiceException(e);
+            LOGGER.error("Failed to retrieve all tags", e);
+            throw new ServiceException("Failed to retrieve all tags", e);
         }
     }
 
@@ -75,7 +80,8 @@ public class TagServiceImpl implements TagService {
         for (Photo photo : photos) {
             try {
                 photoTagDAO.createPhotoTag(photo, tag);
-                photo.getTags().add(tag);
+                photo.getData().getTags().add(tag);
+                photoRepository.update(photo);
             } catch (DAOException ex) {
                 LOGGER.error("Photo-Tag-creation with {}, {} failed.", photo, tag);
                 throw new ServiceException("Creation of Photo-Tag failed.", ex);
@@ -95,7 +101,8 @@ public class TagServiceImpl implements TagService {
         for (Photo photo : photos) {
             try {
                 photoTagDAO.removeTagFromPhoto(photo, tag);
-                photo.getTags().remove(tag);
+                photo.getData().getTags().remove(tag);
+                photoRepository.update(photo);
             } catch (DAOException ex) {
                 LOGGER.error("Removal of Photo-Tag with {}, {} failed.", photo, tag);
                 throw new ServiceException("Photo-Tag removal failed.", ex);
@@ -131,7 +138,7 @@ public class TagServiceImpl implements TagService {
 
         // count the frequency of each tag
         for (Photo photo : photos) {
-            for (Tag tag : photo.getTags()) {
+            for (Tag tag : photo.getData().getTags()) {
                 if (counter.containsKey(tag)) {
                     counter.put(tag, counter.get(tag) + 1);
                 } else {

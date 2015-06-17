@@ -3,9 +3,8 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.HBox?>
-<HBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" styleClass="rating-picker"
-      stylesheets="@style.css"
-      fx:controller="at.ac.tuwien.qse.sepm.gui.RatingPicker" xmlns="http://javafx.com/javafx/8" maxWidth="Infinity">
+<fx:root xmlns:fx="http://javafx.com/fxml/1" fx:id="root" styleClass="rating-picker"
+      type="javafx.scene.layout.HBox" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" maxWidth="Infinity">
     <children>
         <Button fx:id="badButton" styleClass="bad" HBox.hgrow="SOMETIMES" maxWidth="Infinity">
             <tooltip>
@@ -32,4 +31,4 @@
             </graphic>
         </Button>
     </children>
-</HBox>
+</fx:root>

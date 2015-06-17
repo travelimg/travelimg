@@ -61,13 +61,13 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
         if (markers != null) {
             for (Photo photo : markers) {
                 Marker m = new Marker(new MarkerOptions()
-                        .position(new LatLong(photo.getLatitude(), photo.getLongitude()))
+                        .position(new LatLong(photo.getData().getLatitude(), photo.getData().getLongitude()))
                         .visible(Boolean.TRUE).animation(Animation.BOUNCE));
                 m.setTitle("Marker");
 
                 aktivMarker.add(m);
                 displayedMarker.put(m.getVariableName(),
-                        new LatLong(photo.getLatitude(), photo.getLongitude()));
+                        new LatLong(photo.getData().getLatitude(), photo.getData().getLongitude()));
                 map.addUIEventHandler(m, UIEventType.dblclick, (JSObject obj) -> {
                     //TODO //TODO Markerhandling
                 });
@@ -133,17 +133,17 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
                 displayedMarker = new HashMap<>();
             }
             Marker m = new Marker(new MarkerOptions()
-                    .position(new LatLong(photo.getLatitude(), photo.getLongitude()))
+                    .position(new LatLong(photo.getData().getLatitude(), photo.getData().getLongitude()))
                     .visible(Boolean.TRUE).animation(Animation.BOUNCE));
             m.setTitle("Marker");
             aktivMarker.add(m);
-            displayedMarker.put(m.getVariableName(), new LatLong(photo.getLatitude(), photo.getLongitude()));
+            displayedMarker.put(m.getVariableName(), new LatLong(photo.getData().getLatitude(), photo.getData().getLongitude()));
 
             map.addUIEventHandler(m, UIEventType.click, (JSObject obj) -> {
                 //TODO Markerhandler
 
             });
-            mapView.setCenter(photo.getLatitude(), photo.getLongitude());
+            mapView.setCenter(photo.getData().getLatitude(), photo.getData().getLongitude());
             mapView.setZoom(12);
             map.addMarker(m);
         } catch (JSException ex) {
@@ -168,12 +168,12 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
             map.setZoom(13);
             for (Photo photo : list) {
                 Marker m = new Marker(new MarkerOptions()
-                        .position(new LatLong(photo.getLatitude(), photo.getLongitude()))
+                        .position(new LatLong(photo.getData().getLatitude(), photo.getData().getLongitude()))
                         .visible(Boolean.TRUE).animation(Animation.BOUNCE));
                 m.setTitle("Marker");
                 aktivMarker.add(m);
                 displayedMarker.put(m.getVariableName(),
-                        new LatLong(photo.getLatitude(), photo.getLongitude()));
+                        new LatLong(photo.getData().getLatitude(), photo.getData().getLongitude()));
                 map.addUIEventHandler(m, UIEventType.click, (JSObject obj) -> {
                     //TODO Markerhandler
                 });
