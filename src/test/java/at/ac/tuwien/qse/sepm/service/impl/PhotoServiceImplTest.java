@@ -1,10 +1,9 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.WithData;
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Photographer;
-import at.ac.tuwien.qse.sepm.entities.Place;
-import at.ac.tuwien.qse.sepm.entities.Rating;
+import at.ac.tuwien.qse.sepm.dao.repo.AsyncPhotoRepository;
+import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.service.ImportService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -19,17 +18,59 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 public class PhotoServiceImplTest extends ServiceTestBase {
+
+    @Autowired
+    private PhotoService photoService;
+    @Autowired
+    private AsyncPhotoRepository photoRepository;
+
+    private Photographer defaultPhotographer = new Photographer(1, "Test Photographer");
+    private static final Place defaultPlace = new Place(1, "Unkown place", "Unknown place", 0.0, 0.0);
+
+    private List<Photo> photos = Arrays.asList(
+            new Photo(1, Paths.get("1.jpg"),
+                    new PhotoMetadata(LocalDateTime.of(2015, 3, 6, 0, 0, 0), 41.5, 19.5, Rating.NONE, defaultPhotographer, defaultPlace, null)),
+            new Photo(2, Paths.get("2.jpg"),
+                    new PhotoMetadata(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9, Rating.NONE, defaultPhotographer, defaultPlace, null)),
+            new Photo(3, Paths.get("3.jpg"),
+                    new PhotoMetadata(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9, Rating.NONE, defaultPhotographer, defaultPlace, null)),
+            new Photo(4, Paths.get("4.jpg"),
+                new PhotoMetadata(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9, Rating.NONE, defaultPhotographer, defaultPlace, null)),
+            new Photo(5, Paths.get("5.jpg"),
+                new PhotoMetadata(LocalDateTime.of(2015, 3, 4, 0, 0, 0), 12.0, 12.0, Rating.NONE, defaultPhotographer, defaultPlace, null))
+    );
 
     @Test
     public void todo() {
         assertThat(true, is(false));
+    }
+
+    @Test
+    @WithData
+    public void test_deletePhotos_persists() throws ServiceException, DAOException {
+        assertThat(photoService.getAllPhotos(), containsInAnyOrder(photos.toArray()));
+        assertThat(photoRepository.readAll(), containsInAnyOrder(photos.toArray()));
+
+        photoService.deletePhotos(photos.subList(0, 2));
+
+        assertThat(photoService.getAllPhotos(), containsInAnyOrder(photos.subList(2, 5).toArray()));
+        assertThat(photoService.getAllPhotos(), not(contains(photos.get(0))));
+        assertThat(photoService.getAllPhotos(), not(contains(photos.get(1))));
+
+        assertThat(photoRepository.readAll(), containsInAnyOrder(photos.subList(2, 5).toArray()));
+        assertThat(photoRepository.readAll(), not(contains(photos.get(0))));
+        assertThat(photoRepository.readAll(), not(contains(photos.get(1))));
     }
 }

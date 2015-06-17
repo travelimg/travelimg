@@ -74,7 +74,7 @@ public class PhotoServiceImpl implements PhotoService {
         for (Photo p : photos) {
             LOGGER.debug("Deleting photo {}", p);
             try {
-                photoDAO.delete(p);
+                photoRepository.delete(p.getFile());
             } catch (DAOException e) {
                 throw new ServiceException(e);
             }
