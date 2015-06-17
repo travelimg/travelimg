@@ -1,21 +1,18 @@
-package at.ac.tuwien.qse.sepm.gui;
+package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
+import at.ac.tuwien.qse.sepm.gui.controller.SlideshowView;
+import at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowOrganizerImpl;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
-import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid;
 import at.ac.tuwien.qse.sepm.gui.grid.SlideshowGrid;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
 import at.ac.tuwien.qse.sepm.service.SlideshowService;
-import javafx.application.Platform;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -29,9 +26,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class SlideshowView {
+public class SlideshowViewImpl implements SlideshowView {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -47,7 +43,7 @@ public class SlideshowView {
     @FXML private TextField tf_slideName;
 
     @Autowired
-    private SlideshowOrganizer slideshowOrganizer;
+    private SlideshowOrganizerImpl slideshowOrganizer;
     @Autowired
     private SlideshowService slideshowService;
 
@@ -65,10 +61,12 @@ public class SlideshowView {
         }
     }
 
+    @Override
     public ObservableList<Slideshow> getSlideshows() {
         return slideshows;
     }
 
+    @Override
     public void addPhotosToSlideshow(List<Photo> photos, Slideshow slideshow) {
         try {
             slideshowService.addPhotosToSlideshow(photos, slideshow);

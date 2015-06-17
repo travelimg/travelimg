@@ -1,7 +1,8 @@
-package at.ac.tuwien.qse.sepm.gui;
+package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
+import at.ac.tuwien.qse.sepm.gui.controller.SlideshowOrganizer;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -14,7 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-public class SlideshowOrganizer {
+public class SlideshowOrganizerImpl implements SlideshowOrganizer {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -41,7 +42,8 @@ public class SlideshowOrganizer {
         slideshowList.setItems(slideshows);
     }
 
-   public void setPresentAction(Runnable callback) {
+    @Override
+    public void setPresentAction(Runnable callback) {
         LOGGER.debug("setting present action");
         presentButton.setOnAction(event -> callback.run());
     }

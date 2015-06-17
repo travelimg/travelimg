@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="240.0" styleClass="organizer"
             stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
-            fx:controller="at.ac.tuwien.qse.sepm.gui.SlideshowOrganizer">
+            fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowOrganizerImpl">
     <center>
         <ScrollPane hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
             <ListView fx:id="slideshowList">

@@ -2,8 +2,7 @@ package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowViewImpl;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Tab;
@@ -28,7 +27,7 @@ public class MainController {
     @Autowired
     private Inspector inspector;
     @Autowired
-    private SlideshowView slideshowView;
+    private SlideshowViewImpl slideshowView;
     private EventHandler<javafx.scene.input.MouseEvent> ehandl;
     private GoogleMapsScene map;
 
