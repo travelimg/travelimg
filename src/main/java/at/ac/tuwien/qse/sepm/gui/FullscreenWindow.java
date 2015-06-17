@@ -2,8 +2,14 @@ package at.ac.tuwien.qse.sepm.gui;
 
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Rating;
+import at.ac.tuwien.qse.sepm.gui.control.RatingPicker;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
+import at.ac.tuwien.qse.sepm.service.PhotoService;
+import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -14,10 +20,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -34,11 +44,13 @@ public class FullscreenWindow extends AnchorPane {
     private ImageView imageView;
     @FXML
     private Button bt_previous, bt_next;
-
-
+    @Autowired private RatingPicker ratingPicker = new RatingPicker();
+    @Autowired private PhotoService photoService = new PhotoServiceImpl();
+    @FXML
+    private HBox raitingContainer;
     private List<Photo> photos;
     private Image image;
-
+    private Photo aktivePhoto = new Photo();
     private int activeIndex = 0;
 
     private ImageCache imageCache;
@@ -70,6 +82,47 @@ public class FullscreenWindow extends AnchorPane {
                 }
             }
         });
+
+        ratingPicker.setRatingChangeHandler(this::handleRatingChange);
+        raitingContainer.getChildren().add(ratingPicker);
+    }
+
+    private void handleRatingChange(Rating newRating) {
+        logger.debug("rating picker changed to {}", newRating);
+
+
+        aktivePhoto = photos.get(activeIndex);
+            if (aktivePhoto.getRating() == newRating) {
+                logger.debug("photo already has rating of {}", newRating);
+
+            }else {
+
+                Rating oldRating = aktivePhoto.getRating();
+                logger.debug("setting photo rating from {} to {}", oldRating, newRating);
+                aktivePhoto.setRating(newRating);
+
+                try {
+                    System.out.println(aktivePhoto.toString());
+                    photoService.editPhoto(aktivePhoto);
+
+                } catch (ServiceException ex) {
+                    logger.error("Failed saving photo rating.", ex);
+                    logger.debug("Resetting rating from {} to {}.", newRating, oldRating);
+
+                    // Undo changes.
+                    aktivePhoto.setRating(oldRating);
+                    // FIXME: Reset the RatingPicker.
+                    // This is not as simple as expected. Calling ratingPicker.setRating(oldValue) here
+                    // will complete and finish. But once the below dialog is closed ANOTHER selection-
+                    // change will occur in RatingPicker that is the same as the once that caused the error.
+                    // That causes an infinite loop of error dialogs.
+
+                    ErrorDialog.show(root, "Bewertung fehlgeschlagen",
+                            "Die Bewertung für das Foto konnte nicht gespeichert werden.");
+                }
+            }
+
+       // onUpdate();
     }
 
     public void present(List<Photo> photos, Photo initial) {
