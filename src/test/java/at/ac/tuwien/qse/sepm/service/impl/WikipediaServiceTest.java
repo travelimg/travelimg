@@ -28,8 +28,7 @@ public class WikipediaServiceTest extends ServiceTestBase {
      * Test general functionality of the method.
      */
     @Test public void testGetWikiPlaceInfo_ForGleisdorfAustria() throws ServiceException {
-        Place gleisdorf = new Place(null, "Gleisdorf", "Österreich", 0.0, 0.0,
-                new Journey(null, null, null, null));
+        Place gleisdorf = new Place(null, "Gleisdorf", "Österreich", 0.0, 0.0);
         WikiPlaceInfo gleisdorfInfo = null;
 
             gleisdorfInfo = wikipediaService.getWikiPlaceInfo(gleisdorf);
@@ -63,8 +62,7 @@ public class WikipediaServiceTest extends ServiceTestBase {
      * Test whether UtcOffset is initialized if there is an entry for city, but not for country.
      */
     @Test public void testGetWikiPlaceInfo_ForBostonUSA() throws ServiceException {
-        Place boston = new Place(null, "Boston", "USA", 0.0, 0.0,
-                new Journey(null, null, null, null));
+        Place boston = new Place(null, "Boston", "USA", 0.0, 0.0);
         WikiPlaceInfo bostonInfo = null;
 
         bostonInfo = wikipediaService.getWikiPlaceInfo(boston);
@@ -81,8 +79,7 @@ public class WikipediaServiceTest extends ServiceTestBase {
      * Test whether multiple languages are properly saved in <tt>wikiPlaceInfo.language</tt>
      */
     @Test public void testGetWikiPlaceInfo_ForBrightonUK() throws ServiceException {
-        Place brighton = new Place(null, "Brighton", "UK", 0.0, 0.0,
-                new Journey(null, null, null, null));
+        Place brighton = new Place(null, "Brighton", "UK", 0.0, 0.0);
         WikiPlaceInfo brightonInfo = null;
 
         try {
@@ -117,7 +114,7 @@ public class WikipediaServiceTest extends ServiceTestBase {
 
     @Test(expected = ServiceException.class) public void testGetWikiPlaceInfo_withInvalidParameter()
             throws ServiceException {
-        Place invalidPlace = new Place(null, null, null, 0.0, 0.0, null);
+        Place invalidPlace = new Place(null, null, null, 0.0, 0.0);
         wikipediaService.getWikiPlaceInfo(invalidPlace);
     }
 
@@ -127,8 +124,7 @@ public class WikipediaServiceTest extends ServiceTestBase {
      */
     @Test
     public void testGetWikiPlaceInfo_withNonExistingCityName() throws ServiceException {
-        Place noRealPlace = new Place(null, "asdfagasdd", "UK", 0.0, 0.0,
-                new Journey(null, null, null, null));
+        Place noRealPlace = new Place(null, "asdfagasdd", "UK", 0.0, 0.0);
         WikiPlaceInfo noRealPlaceInfo = null;
 
         noRealPlaceInfo = wikipediaService.getWikiPlaceInfo(noRealPlace);

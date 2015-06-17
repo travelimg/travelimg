@@ -30,7 +30,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class ImportTest extends ServiceTestBase {
 
     private static final Photographer defaultPhotographer = new Photographer(1, "Test Photographer");
-    private static final Place defaultPlace = new Place(1, "Unkown place", "Unknown place", 0.0, 0.0, null);
+    private static final Place defaultPlace = new Place(1, "Unkown place", "Unknown place", 0.0, 0.0);
 
     private static final String dataDir = Paths.get(System.getProperty("java.io.tmpdir"), "travelimg").toString();
     private static final String sourceDir = Paths.get(System.getProperty("os.name").contains("indow") ?

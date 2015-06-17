@@ -14,7 +14,10 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.hamcrest.CoreMatchers.*;
+import java.nio.file.Paths;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.eq;
@@ -70,13 +73,13 @@ public class FlickrServiceTest extends ServiceTestBase {
     @Test
     public void testCreatePhotoWithGeoDataSuccess() throws ServiceException {
         Photo p = flickrService.createPhotoWithGeoData(existingId, "jpg");
-        assertThat(p.getPhotographer().getId(), is(1));
-        assertThat(p.getPath(), equalTo(tmpDir + existingId + ".jpg"));
-        assertThat(p.getRating(), is(Rating.NONE));
-        assertNull(p.getDatetime());
-        assertThat(p.getLatitude(), not(0.0));
-        assertThat(p.getLongitude(), not(0.0));
-        assertThat(p.getPlace().getId(), is(1));
+        assertThat(p.getData().getPhotographer().getId(), is(1));
+        assertThat(p.getFile(), is(Paths.get(tmpDir + existingId + ".jpg")));
+        assertThat(p.getData().getRating(), is(Rating.NONE));
+        assertNull(p.getData().getDatetime());
+        assertThat(p.getData().getLatitude(), not(0.0));
+        assertThat(p.getData().getLongitude(), not(0.0));
+        assertThat(p.getData().getPlace().getId(), is(1));
     }
 
     @Test(expected = ServiceException.class)

@@ -1,9 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui.dialogs;
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Photographer;
-import at.ac.tuwien.qse.sepm.entities.Place;
-import at.ac.tuwien.qse.sepm.entities.Rating;
+import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -87,7 +84,7 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
         try {
             photographers.addAll(photographerService.readAll());
         } catch (ServiceException ex) {
-            ErrorDialog.show(getParent(), "Fehler beim Auslesen der Fotografen", "Fehlermeldung: " + ex.getMessage());
+            ErrorDialog.show(this, "Fehler beim Auslesen der Fotografen", "Fehlermeldung: " + ex.getMessage());
         }
 
         photographerBox.setItems(photographers);
@@ -119,13 +116,16 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
         assert (directory.exists()); // import button should be disabled otherwise
 
         Photographer photographer = photographerBox.getSelectionModel().getSelectedItem();
-        Place place = new Place(1, "Unkown place", "Unknown place", 0.0, 0.0, null);
+        Place place = new Place(1, "Unkown place", "Unknown place", 0.0, 0.0);
 
         // Fetch all photos from the directory.
         ArrayList<Photo> photos = new ArrayList<>();
         for (final File file : directory.listFiles(new ImageFileFilter())) {
             if (!file.isDirectory()) {
-                photos.add(new Photo(null, photographer, file.getPath(), Rating.NONE, null, 0.0, 0.0, place));
+                PhotoMetadata data = new PhotoMetadata();
+                data.setPhotographer(photographer);
+                data.setPlace(place);
+                photos.add(new Photo(file.toPath(), data));
             }
         }
 
@@ -179,7 +179,7 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
             photographers.add(photographer);
             photographerBox.getSelectionModel().select(photographer);
         } catch (ServiceException ex) {
-            ErrorDialog.show(getParent(), "Fehler beim Hinzufügen", "Fehlermeldung: " + ex.getMessage());
+            ErrorDialog.show(this, "Fehler beim Hinzufügen", "Fehlermeldung: " + ex.getMessage());
         }
     }
 
@@ -196,7 +196,7 @@ public class ImportDialog extends ResultDialog<List<Photo>> {
             int index = photographerBox.getSelectionModel().getSelectedIndex();
             photographers.set(index, newValue);
         } catch (ServiceException ex) {
-            ErrorDialog.show(getParent(), "Fehler beim Ändern", "Fehlermeldung: " + ex.getMessage());
+            ErrorDialog.show(this, "Fehler beim Ändern", "Fehlermeldung: " + ex.getMessage());
         }
     }
 }

@@ -37,20 +37,23 @@ public class Tag {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Tag))
+            return false;
 
         Tag tag = (Tag) o;
 
-        if (id != null ? !id.equals(tag.id) : tag.id != null) return false;
-        return !(name != null ? !name.equals(tag.name) : tag.name != null);
+        if (id != null ? !id.equals(tag.id) : tag.id != null)
+            return false;
+        if (name != null ? !name.equals(tag.name) : tag.name != null)
+            return false;
 
+        return true;
     }
 
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;

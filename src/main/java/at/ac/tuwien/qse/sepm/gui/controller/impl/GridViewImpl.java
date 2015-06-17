@@ -22,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -115,6 +116,11 @@ public class GridViewImpl implements GridView {
 
         // Apply the initial filter.
         handleFilterChange();
+
+        // subscribe to photo events
+        photoService.subscribeCreate(this::handlePhotoCreated);
+        photoService.subscribeUpdate(this::handlePhotoUpdated);
+        photoService.subscribeDelete(this::handlePhotoDeleted);
     }
 
     private void handleImportError(Throwable error) {
@@ -123,6 +129,35 @@ public class GridViewImpl implements GridView {
         // queue an update in the main gui
         Platform.runLater(() -> ErrorDialog.show(root, "Import fehlgeschlagen", "Fehlermeldung: " + error.getMessage()));
     }
+
+    private void handlePhotoCreated(Photo photo) {
+        Platform.runLater(() -> {
+            // TODO: should we update filter
+            grid.addPhoto(photo);
+        });
+    }
+
+    private void handlePhotoUpdated(Photo photo) {
+        Platform.runLater(() -> {
+            // TODO: should we update filter
+            grid.updatePhoto(photo);
+        });
+    }
+
+    private void handlePhotoDeleted(Path file) {
+        Platform.runLater(() -> {
+            // TODO: should we update filter
+
+            // lookup photo by path
+            Optional<Photo> photo = grid.getPhotos().stream()
+                    .filter(p -> p.getFile().equals(file))
+                    .findFirst();
+
+            if (photo.isPresent())
+                grid.removePhoto(photo.get());
+        });
+    }
+
 
     /**
      * Called whenever a new photo is imported
@@ -153,7 +188,7 @@ public class GridViewImpl implements GridView {
     private void reloadImages() {
         try {
             grid.setPhotos(photoService.getAllPhotos(organizer.getFilter()).stream()
-                            .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
+                            .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
                             .collect(Collectors.toList()));
         } catch (ServiceException ex) {
             LOGGER.error("failed loading fotos", ex);

@@ -17,15 +17,16 @@ public class PhotoFilterTest {
     }
 
     private Place createPlace() {
-        return new Place(1, "Bombay", "India", 10, 20, createJourney());
+        return new Place(1, "Bombay", "India", 10, 20);
     }
 
     private Photo createMatchingPhoto() {
         Photo photo = new Photo();
-        photo.setRating(Rating.NONE);
-        photo.setPhotographer(new Photographer(1, "John"));
-        photo.setDatetime(LocalDateTime.of(2015, 12, 1, 0, 0));
-        photo.setPlace(createPlace());
+        photo.getData().setRating(Rating.NONE);
+        photo.getData().setPhotographer(new Photographer(1, "John"));
+        photo.getData().setDatetime(LocalDateTime.of(2015, 12, 1, 0, 0));
+        photo.getData().setPlace(createPlace());
+        photo.getData().setJourney(createJourney());
         return photo;
     }
 
@@ -36,6 +37,7 @@ public class PhotoFilterTest {
         filter.setUntaggedIncluded(true);
         filter.getIncludedJourneys().add(createJourney());
         filter.getIncludedPlaces().add(createPlace());
+        filter.getIncludedJourneys().add(createJourney());
         return filter;
     }
 
@@ -44,7 +46,7 @@ public class PhotoFilterTest {
         PhotoFilter filter = createFilter();
         Photo photo = createMatchingPhoto();
 
-        photo.getTags().clear();
+        photo.getData().getTags().clear();
         filter.setUntaggedIncluded(true);
         assertTrue(filter.test(photo));
     }
@@ -54,7 +56,7 @@ public class PhotoFilterTest {
         PhotoFilter filter = createFilter();
         Photo photo = createMatchingPhoto();
 
-        photo.getTags().add(new Tag(1, "blue"));
+        photo.getData().getTags().add(new Tag(1, "blue"));
         filter.setUntaggedIncluded(true);
         filter.getIncludedCategories().clear();
 
@@ -66,7 +68,7 @@ public class PhotoFilterTest {
         PhotoFilter filter = createFilter();
         Photo photo = createMatchingPhoto();
 
-        photo.getTags().clear();
+        photo.getData().getTags().clear();
         filter.setUntaggedIncluded(false);
 
         assertFalse(filter.test(photo));
@@ -80,9 +82,9 @@ public class PhotoFilterTest {
         filter.getIncludedCategories().clear();
         filter.getIncludedCategories().add(new Tag(1, "blue"));
         filter.getIncludedCategories().add(new Tag(2, "red"));
-        photo.getTags().clear();
-        photo.getTags().add(new Tag(3, "green"));
-        photo.getTags().add(new Tag(3, "pink"));
+        photo.getData().getTags().clear();
+        photo.getData().getTags().add(new Tag(3, "green"));
+        photo.getData().getTags().add(new Tag(3, "pink"));
 
         assertFalse(filter.test(photo));
     }
@@ -95,9 +97,9 @@ public class PhotoFilterTest {
         filter.getIncludedCategories().clear();
         filter.getIncludedCategories().add(new Tag(1, "blue"));
         filter.getIncludedCategories().add(new Tag(2, "red"));
-        photo.getTags().clear();
-        photo.getTags().add(new Tag(1, "blue"));
-        photo.getTags().add(new Tag(2, "red"));
+        photo.getData().getTags().clear();
+        photo.getData().getTags().add(new Tag(1, "blue"));
+        photo.getData().getTags().add(new Tag(2, "red"));
 
         assertTrue(filter.test(photo));
     }
@@ -110,9 +112,9 @@ public class PhotoFilterTest {
         filter.getIncludedCategories().clear();
         filter.getIncludedCategories().add(new Tag(1, "blue"));
         filter.getIncludedCategories().add(new Tag(2, "red"));
-        photo.getTags().clear();
-        photo.getTags().add(new Tag(2, "red"));
-        photo.getTags().add(new Tag(3, "green"));
+        photo.getData().getTags().clear();
+        photo.getData().getTags().add(new Tag(2, "red"));
+        photo.getData().getTags().add(new Tag(3, "green"));
 
         assertTrue(filter.test(photo));
     }
@@ -125,7 +127,7 @@ public class PhotoFilterTest {
         filter.getIncludedRatings().clear();
         filter.getIncludedRatings().add(Rating.GOOD);
         filter.getIncludedRatings().add(Rating.NEUTRAL);
-        photo.setRating(Rating.NONE);
+        photo.getData().setRating(Rating.NONE);
 
         assertFalse(filter.test(photo));
     }
@@ -138,7 +140,7 @@ public class PhotoFilterTest {
         filter.getIncludedRatings().clear();
         filter.getIncludedRatings().add(Rating.GOOD);
         filter.getIncludedRatings().add(Rating.NEUTRAL);
-        photo.setRating(Rating.GOOD);
+        photo.getData().setRating(Rating.GOOD);
 
         assertTrue(filter.test(photo));
     }
@@ -151,7 +153,7 @@ public class PhotoFilterTest {
         filter.getIncludedPhotographers().clear();
         filter.getIncludedPhotographers().add(new Photographer(1, "John"));
         filter.getIncludedPhotographers().add(new Photographer(2, "Bill"));
-        photo.setPhotographer(new Photographer(3, "Tina"));
+        photo.getData().setPhotographer(new Photographer(3, "Tina"));
 
         assertFalse(filter.test(photo));
     }
@@ -164,7 +166,7 @@ public class PhotoFilterTest {
         filter.getIncludedPhotographers().clear();
         filter.getIncludedPhotographers().add(new Photographer(1, "John"));
         filter.getIncludedPhotographers().add(new Photographer(2, "Bill"));
-        photo.setPhotographer(new Photographer(2, "Bill"));
+        photo.getData().setPhotographer(new Photographer(2, "Bill"));
 
         assertTrue(filter.test(photo));
     }
@@ -174,7 +176,8 @@ public class PhotoFilterTest {
         PhotoFilter filter = createFilter();
         Photo photo = createMatchingPhoto();
 
-        photo.setPlace(null);
+        photo.getData().setPlace(null);
+        photo.getData().setJourney(null);
         filter.getIncludedJourneys().clear();
         filter.getIncludedJourneys().add(null);
         filter.getIncludedPlaces().clear();

@@ -214,11 +214,11 @@ public class HighlightsViewController {
             try {
 
                 List<Photo> allPhotos = photoService.getAllPhotos(filter).stream()
-                        .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
+                        .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
                         .collect(Collectors.toList());
                 List<Photo> goodPhotos = new ArrayList<>();
                 for (Photo p : allPhotos) {
-                    if (p.getRating() == (Rating.GOOD)) {
+                    if (p.getData().getRating() == (Rating.GOOD)) {
                         goodPhotos.add(p);
                     }
                 }
@@ -240,18 +240,18 @@ public class HighlightsViewController {
                                 ArrayList<Photo> list = new ArrayList<>();
                                 list.add(ph);
 
-                                places.put(ph.getPlace(),list);
+                                places.put(ph.getData().getPlace(),list);
                             }else{
-                                if(places.containsKey(ph.getPlace())){
-                                    List<Photo> list2 = places.get(ph.getPlace());
+                                if(places.containsKey(ph.getData().getPlace())){
+                                    List<Photo> list2 = places.get(ph.getData().getPlace());
                                     list2.add(ph);
 
-                                    places.put(ph.getPlace(),list2);
+                                    places.put(ph.getData().getPlace(),list2);
                                 }else{
                                     ArrayList<Photo> list = new ArrayList<>();
                                     list.add(ph);
 
-                                    places.put(ph.getPlace(),list);
+                                    places.put(ph.getData().getPlace(),list);
                                 }
                             }
                         }
@@ -261,8 +261,8 @@ public class HighlightsViewController {
 
                             LocalDateTime min = LocalDateTime.MAX;
                             for(Photo p: places.get(ple)){
-                                if(p.getDatetime().compareTo(min)<0){
-                                    min = p.getDatetime();
+                                if(p.getData().getDatetime().compareTo(min)<0){
+                                    min = p.getData().getDatetime();
                                 }
                             }
                             orderedPlaces.put(min,ple);
@@ -288,7 +288,7 @@ public class HighlightsViewController {
                                 List<Photo> name = new ArrayList<>();
                                 int counter = 0;
                                 for (Photo ph : places.get(p)) {
-                                    for (Tag t2 : ph.getTags()) {
+                                    for (Tag t2 : ph.getData().getTags()) {
                                         if (t.getId() == t2.getId() && counter < 5) {
                                             name.add(ph);
                                             counter++;
@@ -328,7 +328,7 @@ public class HighlightsViewController {
 
 
                         for(Place p : places.keySet()){
-                            LocalDateTime pTime = places.get(p).get(0).getDatetime();
+                            LocalDateTime pTime = places.get(p).get(0).getData().getDatetime();
                             String text = pTime.getYear()+"-"+pTime.getMonthValue()+"-"+pTime.getDayOfMonth()+"    -" +p.getCountry();
 
                             Label lab = new Label();

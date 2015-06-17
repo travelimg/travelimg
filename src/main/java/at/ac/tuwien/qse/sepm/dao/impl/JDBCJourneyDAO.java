@@ -23,6 +23,7 @@ import java.util.Map;
 public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
     private static final Logger logger = LogManager.getLogger(JDBCJourneyDAO.class);
 
+    private static final String readByNameStatement = "SELECT id, name, start, end FROM JOURNEY WHERE name=?;";
     private static final String readStatement = "SELECT id, name, start, end FROM JOURNEY WHERE id=?;";
     private static final String readAllStatement = "SELECT id, name, start, end FROM JOURNEY;";
     private static final String deleteStatement = "DELETE FROM JOURNEY WHERE id=?;";
@@ -123,6 +124,19 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
             return null;
         }
     }
+
+    @Override
+    public Journey getByName(String name) throws DAOException {
+        if (name == null) throw new IllegalArgumentException();
+        logger.debug("getByName({})", name);
+        try {
+            return this.jdbcTemplate.queryForObject(readByNameStatement, new Object[]{name}, new JourneyMapper());
+        } catch (DataAccessException ex) {
+            logger.debug("Failed to read a Journey");
+            throw new DAOException(ex);
+        }
+    }
+
 
     private class JourneyMapper implements RowMapper<Journey> {
         @Override

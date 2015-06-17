@@ -80,7 +80,7 @@ public class PaginatedImageGrid extends Pagination {
         photos.add(photo);
 
         photos = photos.stream()
-                .sorted((p1, p2) -> p2.getDatetime().compareTo(p1.getDatetime()))
+                .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
                 .collect(Collectors.toList());
 
         pageCache.clear();
@@ -105,6 +105,15 @@ public class PaginatedImageGrid extends Pagination {
         }
 
         return activePageProperty.get().getActivePhoto();
+    }
+
+    public boolean containsPhoto(Photo photo) {
+        for (Photo p : photos) {
+            if (photo.getPath().equals(p.getPath())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -143,6 +152,11 @@ public class PaginatedImageGrid extends Pagination {
      * @param photo The photo to be updated.
      */
     public void updatePhoto(Photo photo) {
+        if (!containsPhoto(photo)) {
+            LOGGER.debug("photo not in grid {}", photo);
+            addPhoto(photo);
+            return;
+        }
         ImageGridPage page = getPageForPhoto(photo);
         page.updatePhoto(photo);
 
@@ -190,10 +204,23 @@ public class PaginatedImageGrid extends Pagination {
         return page;
     }
 
-    private int getPageIndexForPhoto(Photo photo) {
-        int index = photos.indexOf(photo);
+    private int getIndexForPhoto(Photo photo) {
+        int i = 0;
+        for (Photo p : photos) {
+            i++;
+            if (photo.getPath().equals(p.getPath())) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
-        return (int) Math.floor(index / (double) photosPerPage);
+    private int getPageIndexForPhoto(Photo photo) {
+        int index = getIndexForPhoto(photo);
+        LOGGER.debug("index of photo is {}", index);
+        int result = (int) Math.floor(index / (double) photosPerPage);
+        LOGGER.debug("page index for photo is {}", result);
+        return result;
     }
 
     private ImageGridPage getPageForPhoto(Photo photo) {
