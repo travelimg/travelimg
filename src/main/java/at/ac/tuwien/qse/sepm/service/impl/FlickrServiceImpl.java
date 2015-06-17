@@ -142,9 +142,9 @@ public class FlickrServiceImpl implements FlickrService {
         }
         at.ac.tuwien.qse.sepm.entities.Photo created = new at.ac.tuwien.qse.sepm.entities.Photo();
         created.setPath(tmpDir + id + "." + format);
-        created.setLatitude(geoData.getLatitude());
-        created.setLongitude(geoData.getLongitude());
-        created.setRating(Rating.NONE);
+        created.getData().setLatitude(geoData.getLatitude());
+        created.getData().setLongitude(geoData.getLongitude());
+        created.getData().setRating(Rating.NONE);
 
         // attach flickr photographer
         Photographer photographer = photographerService.readAll()
@@ -152,8 +152,8 @@ public class FlickrServiceImpl implements FlickrService {
                 .filter(p -> p.getId() == 2)
                 .findFirst()
                 .orElse(new Photographer(1, null)); // default photographer
-        created.setPhotographer(photographer);
-        created.setPlace(new Place(1, "Unknown city", "Unknown country", 0.0, 0.0, null));
+        created.getData().setPhotographer(photographer);
+        created.getData().setPlace(new Place(1, "Unknown city", "Unknown country", 0.0, 0.0));
 
         return created;
     }

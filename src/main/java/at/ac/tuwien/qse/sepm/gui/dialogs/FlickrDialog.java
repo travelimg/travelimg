@@ -200,7 +200,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
         ArrayList<Photo> photos = new ArrayList<Photo>();
         for (ImageTile i : selectedImages) {
             Photo p = i.getPhoto();
-            p.setDatetime(datePicker.getValue().atStartOfDay());
+            p.getData().setDatetime(datePicker.getValue().atStartOfDay());
             photos.add(p);
             logger.debug("Added photo for import {}", p);
         }

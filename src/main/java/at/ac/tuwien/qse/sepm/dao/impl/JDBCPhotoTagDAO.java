@@ -5,7 +5,6 @@ import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
-import at.ac.tuwien.qse.sepm.entities.validators.PhotoValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.TagValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.apache.logging.log4j.LogManager;
@@ -44,9 +43,10 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      */
     @Override
     public void createPhotoTag(Photo photo, Tag tag) throws DAOException, ValidationException {
+        if (photo == null) throw new IllegalArgumentException();
+        if (photo.getId() == null) throw new IllegalArgumentException();
         LOGGER.debug("Entering createPhotoTag with {} {}", photo, tag);
 
-        PhotoValidator.validateID(photo.getId());
         TagValidator.validateID(tag);
 
         if (!readTagsByPhoto(photo).contains(tag)) {
@@ -74,9 +74,9 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      */
     @Override
     public void removeTagFromPhoto(Photo photo, Tag tag) throws DAOException, ValidationException {
+        if (photo == null) throw new IllegalArgumentException();
+        if (photo.getId() == null) throw new IllegalArgumentException();
         LOGGER.debug("Entering removeTagFromPhoto with {} {}", photo, tag);
-
-        PhotoValidator.validateID(photo.getId());
         TagValidator.validateID(tag);
 
         try {
@@ -122,9 +122,9 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
     @Override
     public void deleteAllEntriesOfSpecificPhoto(Photo photo)
             throws DAOException, ValidationException {
+        if (photo == null) throw new IllegalArgumentException();
+        if (photo.getId() == null) throw new IllegalArgumentException();
         LOGGER.debug("Entering deleteAllEntriesOfSpecificPhoto with {}", photo);
-
-        PhotoValidator.validateID(photo.getId());
 
         try {
             jdbcTemplate.update(DELETE_BY_PHOTO_STRING, photo.getId());
@@ -147,9 +147,9 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      */
     @Override
     public List<Tag> readTagsByPhoto(Photo photo) throws DAOException, ValidationException {
+        if (photo == null) throw new IllegalArgumentException();
+        if (photo.getId() == null) throw new IllegalArgumentException();
         LOGGER.debug("Entering readTagsByPhoto with {}", photo);
-
-        PhotoValidator.validateID(photo.getId());
 
         List<Tag> tagList;
         try {

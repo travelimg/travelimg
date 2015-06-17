@@ -20,7 +20,7 @@ public class GeoServiceImpl implements GeoService {
 
     public Place getPlaceByGeoData(double latitude, double longitude) throws ServiceException {
         logger.debug("getPlaceByGeoData() Latitude: " + latitude + " Longitude: " + longitude);
-        Place p = new Place(1, "Unknown city", "Unknown country", latitude, longitude, null);
+        Place p = new Place(1, "Unknown city", "Unknown country", latitude, longitude);
         String json = readUrl(
                 "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + ","
                         + longitude);

@@ -36,6 +36,15 @@ public interface PhotographerDAO {
     Photographer getById(int id) throws DAOException;
 
     /**
+     * Reads a single photographer by its name.
+     *
+     * @param name The name of the desired photographer
+     * @return the read photographer
+     * @throws DAOException If the data store fails to retrieve the record or if the photographer doesn't exist.
+     */
+    Photographer getByName(String name) throws DAOException;
+
+    /**
      * Retrieve all existing photographers.
      *
      * @return A List of all currently known photographers.

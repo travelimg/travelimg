@@ -180,14 +180,14 @@ public class InspectorImpl implements Inspector {
 
         for (Photo photo : activePhotos) {
 
-            if (photo.getRating() == newRating) {
+            if (photo.getData().getRating() == newRating) {
                 LOGGER.debug("photo already has rating of {}", newRating);
                 continue;
             }
 
-            Rating oldRating = photo.getRating();
+            Rating oldRating = photo.getData().getRating();
             LOGGER.debug("setting photo rating from {} to {}", oldRating, newRating);
-            photo.setRating(newRating);
+            photo.getData().setRating(newRating);
 
             try {
                 photoservice.editPhoto(photo);
@@ -196,9 +196,9 @@ public class InspectorImpl implements Inspector {
                 LOGGER.debug("Resetting rating from {} to {}.", newRating, oldRating);
 
                 // Undo changes.
-                photo.setRating(oldRating);
+                photo.getData().setRating(oldRating);
                 // FIXME: Reset the RatingPicker.
-                // This is not as simple as expected. Calling ratingPicker.setRating(oldValue) here
+                // This is not as simple as expected. Calling ratingPicker.getData().setRating(oldValue) here
                 // will complete and finish. But once the below dialog is closed ANOTHER selection-
                 // change will occur in RatingPicker that is the same as the once that caused the error.
                 // That causes an infinite loop of error dialogs.
@@ -238,7 +238,7 @@ public class InspectorImpl implements Inspector {
         // Otherwise the rating picker should be indetermined.
         ratingPicker.setRating(null);
         List<Rating> ratings = photos.stream()
-                .map(photo -> photo.getRating())
+                .map(photo -> photo.getData().getRating())
                 .distinct()
                 .collect(Collectors.toList());
         if (ratings.size() == 1) {
@@ -259,7 +259,7 @@ public class InspectorImpl implements Inspector {
                 Exif exif = exifService.getExif(photo);
 
                 List<Pair<String, String>> exifList = new ArrayList<Pair<String, String>>() {{
-                    add(new Pair<>("Aufnahmedatum", photo.getDatetime().toString().replace("T", " ")));
+                    add(new Pair<>("Aufnahmedatum", photo.getData().getDatetime().toString().replace("T", " ")));
                     add(new Pair<>("Kamerahersteller", exif.getMake()));
                     add(new Pair<>("Kameramodell", exif.getModel()));
                     add(new Pair<>("Belichtungszeit", exif.getExposure() + " Sek."));

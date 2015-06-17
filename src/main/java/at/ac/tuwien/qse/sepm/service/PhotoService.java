@@ -4,8 +4,10 @@ import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
 
+import java.nio.file.Path;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -20,14 +22,6 @@ public interface PhotoService {
      * @throws ServiceException
      */
     void deletePhotos(List<Photo> photos) throws ServiceException;
-
-    /**
-     * edit the delivered List of Photos
-     *
-     * @param photos the list of photos
-     * @throws ServiceException
-     */
-    void editPhotos(List<Photo> photos, Photo p) throws ServiceException;
 
     /**
      * @return the list of all available photos
@@ -51,9 +45,24 @@ public interface PhotoService {
      */
     void editPhoto(Photo photo) throws ServiceException;
 
-    @Deprecated
-    void addJourneyToPhotos(List<Photo> photos, Journey journey) throws ServiceException;
+    /**
+     * Listen for photos that have been newly added.
+     *
+     * @param callback callback that receives the added photos
+     */
+    void subscribeCreate(Consumer<Photo> callback);
 
-    @Deprecated
-    void addPlaceToPhotos(List<Photo> photos, Place place) throws ServiceException;
+    /**
+     * Listen for photos that have been updated.
+     *
+     * @param callback callback that receives the updated photos
+     */
+    void subscribeUpdate(Consumer<Photo> callback);
+
+    /**
+     * Listen for photos that have been deleted.
+     *
+     * @param callback callback that receives the deleted photos
+     */
+    void subscribeDelete(Consumer<Path> callback);
 }

@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.service.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.dao.TagDAO;
+import at.ac.tuwien.qse.sepm.dao.repo.AsyncPhotoRepository;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
@@ -26,7 +27,8 @@ public class TagServiceImpl implements TagService {
     private TagDAO tagDAO;
     @Autowired
     private PhotoTagDAO photoTagDAO;
-
+    @Autowired
+    private AsyncPhotoRepository photoRepository;
 
     @Override
     public Tag create(Tag tag) throws ServiceException {
@@ -78,7 +80,8 @@ public class TagServiceImpl implements TagService {
         for (Photo photo : photos) {
             try {
                 photoTagDAO.createPhotoTag(photo, tag);
-                photo.getTags().add(tag);
+                photo.getData().getTags().add(tag);
+                photoRepository.update(photo);
             } catch (DAOException ex) {
                 LOGGER.error("Photo-Tag-creation with {}, {} failed.", photo, tag);
                 throw new ServiceException("Creation of Photo-Tag failed.", ex);
@@ -98,7 +101,8 @@ public class TagServiceImpl implements TagService {
         for (Photo photo : photos) {
             try {
                 photoTagDAO.removeTagFromPhoto(photo, tag);
-                photo.getTags().remove(tag);
+                photo.getData().getTags().remove(tag);
+                photoRepository.update(photo);
             } catch (DAOException ex) {
                 LOGGER.error("Removal of Photo-Tag with {}, {} failed.", photo, tag);
                 throw new ServiceException("Photo-Tag removal failed.", ex);
@@ -134,7 +138,7 @@ public class TagServiceImpl implements TagService {
 
         // count the frequency of each tag
         for (Photo photo : photos) {
-            for (Tag tag : photo.getTags()) {
+            for (Tag tag : photo.getData().getTags()) {
                 if (counter.containsKey(tag)) {
                     counter.put(tag, counter.get(tag) + 1);
                 } else {
