@@ -75,17 +75,6 @@ public class JDBCPhotoDAOTest extends AbstractJDBCDAOTest {
         return new Photo(expectedPhotos[id - 1]);
     }
 
-    @Test
-    public void testEmpty() throws DAOException {
-        assertThat(countRows(), is(0));
-    }
-
-    @Test
-    @WithData
-    public void testWithData() throws DAOException {
-        assertThat(countRows(), is(6));
-    }
-
     @Test(expected = IllegalArgumentException.class)
     @WithData
     public void testCreateWithNullThrows() throws DAOException {

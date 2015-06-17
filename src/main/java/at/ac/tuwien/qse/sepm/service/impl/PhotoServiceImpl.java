@@ -58,6 +58,7 @@ public class PhotoServiceImpl implements PhotoService {
         listener.close();
     }
 
+    @Override
     public void deletePhotos(List<Photo> photos) throws ServiceException {
         if (photos == null) {
             throw new ServiceException("List<Photo> photos is null");
@@ -65,7 +66,7 @@ public class PhotoServiceImpl implements PhotoService {
         for (Photo p : photos) {
             LOGGER.debug("Deleting photo {}", p);
             try {
-                photoDAO.delete(p);
+                photoRepository.delete(p.getFile());
             } catch (DAOException e) {
                 throw new ServiceException(e);
             }
