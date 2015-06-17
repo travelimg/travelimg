@@ -164,39 +164,4 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
         LOGGER.debug("Leaving readTagsByPhoto with {}", photo);
         return tagList;
     }
-
-    /**
-     * Return list of all photos which are currently tagged with Tag <tt>tag</tt>.
-     *
-     * @param tag must not be null; tag.id must not be null
-     * @return List with all Photos, which are linked to <tt>tag</tt> as a PhotoTag;
-     * @throws DAOException         if an exception occurs on persistence layer
-     * @throws ValidationException: if parameter validation fails
-     */
-    @Override
-    @Deprecated
-    public List<Photo> readPhotosByTag(Tag tag) throws DAOException, ValidationException {
-        LOGGER.debug("Entering readPhotosByTag with {}", tag);
-
-        TagValidator.validateID(tag);
-
-        List<Photo> photoList = new ArrayList<>();
-        try {
-            List<Integer> photoIds = jdbcTemplate.query(READ_PHOTOS_BY_TAG_STRING, (rs, rowNum) -> {
-                return rs.getInt(1);
-            });
-
-            for (Integer id : photoIds) {
-                photoList.add(photoDAO.getById(id));
-            }
-
-            LOGGER.info("Successfully read photos for {}", tag);
-        } catch (DataAccessException ex) {
-            LOGGER.error("Reading photos failed due to DataAccessException");
-            throw new DAOException("Could not read photos.", ex);
-        }
-
-        LOGGER.debug("Leaving readPhotosByTag with {}", tag);
-        return photoList;
-    }
 }
