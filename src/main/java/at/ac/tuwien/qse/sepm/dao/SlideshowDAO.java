@@ -17,7 +17,7 @@ public interface SlideshowDAO {
      * @throws DAOException if the slideshow cannot be created or the data store fails to create a record
      * @throws ValidationException if the diashow is invalid
      */
-    void create(Slideshow slideshow) throws DAOException, ValidationException;
+    Slideshow create(Slideshow slideshow) throws DAOException, ValidationException;
 
     /**
      * Update given slideshow

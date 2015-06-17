@@ -31,10 +31,10 @@ public class SlideshowServiceImpl implements SlideshowService {
     private SlideDAO slideDAO;
 
     @Override
-    public void create(Slideshow slideshow) throws ServiceException {
+    public Slideshow create(Slideshow slideshow) throws ServiceException {
 
         try {
-            slideshowDAO.create(slideshow);
+            return slideshowDAO.create(slideshow);
         } catch (DAOException | ValidationException ex) {
             throw new ServiceException("Failed to create slideshow",ex);
         }

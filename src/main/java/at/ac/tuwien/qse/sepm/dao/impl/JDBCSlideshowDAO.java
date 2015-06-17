@@ -45,7 +45,7 @@ public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
 
 
     @Override
-    public void create(Slideshow slideshow) throws DAOException, ValidationException {
+    public Slideshow create(Slideshow slideshow) throws DAOException, ValidationException {
         logger.debug("Creating slideshow {}", slideshow);
 
         SlideshowValidator.validate(slideshow);
@@ -58,6 +58,7 @@ public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
             parameters.put("durationbetweenphotos", slideshow.getDurationBetweenPhotos());
             Number newId = insertSlideshow.executeAndReturnKey(parameters);
             slideshow.setId((int) newId.longValue());
+            return slideshow;
         } catch (DataAccessException ex) {
             logger.error("Failed to create slideshow", ex);
             throw new DAOException("Failed to create slideshow", ex);

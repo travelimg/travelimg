@@ -19,7 +19,7 @@ public interface SlideshowService {
      * @throws ServiceException If the Slideshow can not be created or the data store fails to
      *      create a record.
      */
-    void create(Slideshow slideshow) throws ServiceException;
+    Slideshow create(Slideshow slideshow) throws ServiceException;
 
     /**
      * Delete an existing Slideshow.
