@@ -9,11 +9,11 @@
         <Root level="error">
             <AppenderRef ref="Console"/>
         </Root>
-        <!--Root level="info">
+        <Root level="info">
             <AppenderRef ref="Console"/>
-        </Root-->
-        <!--Root level="debug">
+        </Root>
+        <Root level="debug">
             <AppenderRef ref="Console"/>
-        </Root-->
+        </Root>
     </Loggers>
 </Configuration>

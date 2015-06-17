@@ -36,7 +36,8 @@ public class SlideshowServiceImpl implements SlideshowService {
         try {
             return slideshowDAO.create(slideshow);
         } catch (DAOException | ValidationException ex) {
-            throw new ServiceException("Failed to create slideshow",ex);
+            LOGGER.error("Failed to create slideshow", ex);
+            throw new ServiceException("Failed to create slideshow", ex);
         }
 
 

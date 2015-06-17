@@ -49,15 +49,15 @@ public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
         logger.debug("Creating slideshow {}", slideshow);
 
         SlideshowValidator.validate(slideshow);
-        SlideshowValidator.validateID(slideshow.getId());
 
         try {
             Map<String, Object> parameters = new HashMap<>();
-            parameters.put("id", slideshow.getId());
             parameters.put("name", slideshow.getName());
             parameters.put("durationbetweenphotos", slideshow.getDurationBetweenPhotos());
             Number newId = insertSlideshow.executeAndReturnKey(parameters);
             slideshow.setId((int) newId.longValue());
+
+            logger.debug("Created slideshow {}", slideshow);
             return slideshow;
         } catch (DataAccessException ex) {
             logger.error("Failed to create slideshow", ex);
