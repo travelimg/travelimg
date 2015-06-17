@@ -39,6 +39,8 @@
     <bean id="journeyDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCJourneyDAO"></bean>
     <bean id="placeDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPlaceDAO"></bean>
     <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO"></bean>
+    <bean id="slideDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCSlideDAO"></bean>
+    <bean id="slideshowDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCSlideshowDAO"></bean>
 
     <!-- DAO repository beans -->
     <bean id="watcher" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher" factory-method="forImageDirectory">
@@ -75,5 +77,6 @@
     <bean id="organizerController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.OrganizerImpl"></bean>
     <bean id="inspectorController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.InspectorImpl"></bean>
     <bean id="slideshowViewController" class="at.ac.tuwien.qse.sepm.gui.SlideshowView"></bean>
+    <bean id="slideshowOrganizer" class="at.ac.tuwien.qse.sepm.gui.SlideshowOrganizer"></bean>
     <bean id="imageCache" class="at.ac.tuwien.qse.sepm.gui.util.ImageCacheImpl"></bean>
 </beans>
