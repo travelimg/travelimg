@@ -391,6 +391,31 @@
     -fx-font-size: 10px;
 }
 
+.slide-tile .overlay {
+    -fx-max-height: 20px;
+}
+
+.slide-tile .overlay .left,
+.slide-tile .overlay .right {
+    -fx-max-height: 20px;
+    -fx-padding: 8px;
+    -fx-background-color: rgba(0, 0, 0, 0.3);
+}
+
+.slide-tile:hover .overlay .left,
+.slide-tile:hover .overlay .right {
+    -fx-background-color: rgba(0, 0, 0, 0.6);
+}
+
+.slide-tile .overlay .glyph-icon {
+    -fx-fill: #eeeeee;
+    -glypy-size: 12;
+}
+
+.slide-tile .overlay .glyph-icon:hover {
+    -fx-fill: white;
+}
+
 .tooltip {
     -fx-effect: -fx-dropshadow-3;
     -fx-background-color: white;

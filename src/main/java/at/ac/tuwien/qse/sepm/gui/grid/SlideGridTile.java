@@ -5,15 +5,16 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.function.Consumer;
-
 public class SlideGridTile extends ImageGridTile {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private final BorderPane overlay = new BorderPane();
     private final Label left = new Label();
     private final Label right = new Label();
 
@@ -21,7 +22,11 @@ public class SlideGridTile extends ImageGridTile {
     private Consumer<SlideGridTile> rightClickedCallback = null;
 
     public SlideGridTile() {
-        getStyleClass().add("photo-tile");
+        getStyleClass().add("slide-tile");
+        overlay.getStyleClass().add("overlay");
+
+        left.getStyleClass().add("left");
+        right.getStyleClass().add("right");
 
         FontAwesomeIconView leftIconView = new FontAwesomeIconView();
         leftIconView.setGlyphName("ARROW_LEFT");
@@ -31,11 +36,13 @@ public class SlideGridTile extends ImageGridTile {
         rightIconView.setGlyphName("ARROW_RIGHT");
         right.setGraphic(rightIconView);
 
+        overlay.setLeft(left);
+        overlay.setRight(right);
+
         setAlignment(left, Pos.CENTER_LEFT);
         setAlignment(right, Pos.CENTER_RIGHT);
 
-        getChildren().add(left);
-        getChildren().add(right);
+        getChildren().add(overlay);
 
         left.setOnMouseClicked(event -> {
             if (leftClickedCallback != null)
