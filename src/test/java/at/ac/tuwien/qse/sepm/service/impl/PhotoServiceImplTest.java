@@ -91,62 +91,6 @@ public class PhotoServiceImplTest extends ServiceTestBase {
         }
     }
 
-    private void importPhotos() {
-        List<Photo> toBeImported = duplicateList(inputPhotos);
-        TestPhotoAcceptor acceptor = new TestPhotoAcceptor();
-        TestErrorHandler errorHandler = new TestErrorHandler();
-        Cancelable task = importService.importPhotos(toBeImported, acceptor, errorHandler);
-
-        awaitCompletion(task);
-    }
-
-    //List<YearMonth> getMonthsWithPhotos() throws ServiceException;
-    @WithData
-    @Test
-    public void testGetMonthsWithPhotos() throws ServiceException {
-
-    }
-
-    public void testDeletePhotos() throws ServiceException {
-
-    }
-
-    // void editPhotos(List<Photo> photos, Photo p) throws ServiceException;
-    public void testEditPhotos() throws ServiceException {
-
-    }
-
-    //void deletePhotos(List<Photo> photos) throws ServiceException;
-
-    //List<Photo> getAllPhotos() throws ServiceException;
-    public void testGetAllPhotos() throws ServiceException {
-
-    }
-
-    /**
-     * Get all photos that match the specified filter.
-     *
-     * @param filter filter the photos are tested against
-     * @return list of all available photos that match the filter
-     */
-
-    //List<Photo> getAllPhotos(Predicate<Photo> filter) throws ServiceException;
-    public void testGetAllPhotosFilter() throws ServiceException {
-
-    }
-
-    /**
-     * Persists the rating of the specified photo.
-     *
-     * @param photo photo for which the rating should be stored
-     * @throws ServiceException failed to perform operation
-     */
-    //void savePhotoRating(Photo photo) throws ServiceException;
-    @Test
-    public void testSavePhotoRating() throws ServiceException {
-        // TODO
-    }
-
     private class TestPhotoAcceptor implements Consumer<Photo> {
         List<Photo> accepted = new ArrayList<>();
 
