@@ -80,6 +80,7 @@ public class PresentationWindow extends AnchorPane{
         loadImage();
 
         stage.setFullScreen(true);
+        stage.setFullScreenExitHint("");
         stage.show();
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), this::showNextSlide));
