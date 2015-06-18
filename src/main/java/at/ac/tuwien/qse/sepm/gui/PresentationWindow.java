@@ -83,7 +83,7 @@ public class PresentationWindow extends AnchorPane{
         stage.setFullScreenExitHint("");
         stage.show();
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), this::showNextSlide));
+        timeline = new Timeline(new KeyFrame(Duration.seconds(slideshow.getDurationBetweenPhotos()), this::showNextSlide));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
