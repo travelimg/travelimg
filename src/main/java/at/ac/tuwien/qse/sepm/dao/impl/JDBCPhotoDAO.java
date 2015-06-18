@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 import javax.sql.DataSource;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -21,6 +22,7 @@ import java.util.Map;
 public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
 
     private static final String READ_ALL_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id, journey_id FROM PHOTO;";
+    private static final String READ_ALL_PATHS_STATEMENT = "SELECT path FROM PHOTO;";
     private static final String DELETE_STATEMENT = "Delete from Photo where id =?";
     private static final String GET_BY_ID_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id, journey_id FROM Photo where id=?";
     private static final String GET_BY_FILE_STATEMENT = "SELECT id, photographer_id, path, rating, datetime, latitude, longitude, place_id, journey_id FROM Photo where path=?";
@@ -167,6 +169,21 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             throw new DAOException("Failed to read all photos", e);
         } catch (ValidationException.Unchecked | DAOException.Unchecked ex) {
             throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public List<Path> readAllPaths() throws DAOException {
+        logger.debug("retrieving all paths");
+
+        try {
+            List<Path> paths = jdbcTemplate.query(READ_ALL_PATHS_STATEMENT, (rs, rowNum) -> {
+                return Paths.get(rs.getString(1));
+            });
+            logger.debug("Successfully read all paths: " + paths.size());
+            return paths;
+        } catch (DataAccessException ex) {
+            throw new DAOException("Failed to read all paths");
         }
     }
 
