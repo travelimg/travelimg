@@ -5,10 +5,7 @@ import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.control.FilterList;
 import at.ac.tuwien.qse.sepm.gui.grid.ImageGrid;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
-import at.ac.tuwien.qse.sepm.service.ClusterService;
-import at.ac.tuwien.qse.sepm.service.PhotoService;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.service.TagService;
+import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
@@ -53,13 +50,15 @@ public class HighlightsViewController {
 
     @FXML private BorderPane borderPane,FotoContainer,treeBoarder,timeLine;
     @FXML private GoogleMapsScene mapsScene;
-    @FXML private VBox journeys, mapContainer, photoView,tree;
+    @FXML private VBox journeys, mapContainer, photoView,tree, wikipediaInfoPaneContainer;
     @FXML private FilterList<Journey> journeyListView;
     @FXML private ScrollPane scrollPhotoView, treeScroll;
 
     @Autowired private ClusterService clusterService;
     @Autowired private PhotoService photoService;
     @Autowired private TagService tagService;
+    @Autowired private WikipediaService wikipediaService;
+    private WikipediaInfoPane wikipediaInfoPane;
     private PhotoFilter filter = new PhotoFilter();
     private Journey selectedJourney;
     private GoogleMapView mapView;
@@ -87,6 +86,7 @@ public class HighlightsViewController {
         this.grid = new ImageGrid(imageCache);
     }
 
+
     public void initialize(){
         /**to remove - BEGIN**/
         HBox vBox = new HBox();
@@ -112,9 +112,8 @@ public class HighlightsViewController {
         redLine.getStrokeDashArray().addAll(2D, 21D);
         redLine.setStrokeDashOffset(30);
 
-
-
-
+        wikipediaInfoPane = new WikipediaInfoPane(wikipediaService);
+        wikipediaInfoPaneContainer.getChildren().add(wikipediaInfoPane);
     }
 
     public void setMap(GoogleMapsScene map) {

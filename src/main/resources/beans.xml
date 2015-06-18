@@ -65,6 +65,7 @@
     <bean id="geoService" class="at.ac.tuwien.qse.sepm.service.impl.GeoServiceImpl"></bean>
     <bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
     <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl" destroy-method="close"></bean>
+    <bean id="wikipediaService" class="at.ac.tuwien.qse.sepm.service.impl.WikipediaServiceImpl"></bean>
 
     <!-- GUI controller beans -->
     <bean id="mainController" class="at.ac.tuwien.qse.sepm.gui.MainController"></bean>

@@ -55,7 +55,10 @@
     <center>
         <BorderPane>
             <top>
-                <VBox fx:id="mapContainer" maxHeight="300.0" />
+                <HBox>
+                    <VBox fx:id="mapContainer" maxHeight="300.0"/>
+                    <VBox fx:id="wikipediaInfoPaneContainer" maxHeight="300.0"/>
+                </HBox>
             </top>
             <center>
                 <BorderPane fx:id="FotoContainer" prefWidth="30" >
