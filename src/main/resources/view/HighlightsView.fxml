@@ -11,9 +11,11 @@
 
 <BorderPane fx:id="borderPane" stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.HighlightsViewController">
     <left>
-        <BorderPane prefWidth="240.0">
+        <BorderPane fx:id="left" prefWidth="240.0">
             <top>
-                <Label prefHeight="20.0" prefWidth="259.0" style="-fx-background-color: #333333; -fx-font-size: 18; -fx-text-fill: white; -fx-padding: 5 0 5 10px;" text="Reisen" />
+                <HBox fx:id="titleHBox">
+                    <Label fx:id="titleLabel" prefHeight="20.0" prefWidth="259.0" style="-fx-background-color: #333333; -fx-font-size: 18; -fx-text-fill: white; -fx-padding: 5 0 5 10px;" text="Reisen" />
+                </HBox>
             </top>
             <center>
                 <VBox fx:id="journeys" spacing="5.0" style="-fx-font-size: 16;">

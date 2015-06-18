@@ -1,6 +1,5 @@
 package at.ac.tuwien.qse.sepm.gui;
 
-
 import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.control.FilterList;
 import at.ac.tuwien.qse.sepm.gui.grid.ImageGrid;
@@ -12,47 +11,43 @@ import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.Polyline;
 import com.lynden.gmapsfx.shapes.PolylineOptions;
-import com.sun.javafx.scene.text.TextLine;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
-import javafx.scene.paint.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
-import javafx.scene.text.*;
 import javafx.scene.text.Font;
-import javafx.util.Duration;
+import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.awt.*;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.*;
-
 public class HighlightsViewController {
 
-    @FXML private BorderPane borderPane,FotoContainer,treeBoarder,timeLine;
+    @FXML private BorderPane borderPane,left,FotoContainer,treeBoarder,timeLine;
     @FXML private GoogleMapsScene mapsScene;
     @FXML private VBox journeys, mapContainer, photoView,tree, wikipediaInfoPaneContainer;
+    @FXML private HBox titleHBox;
     @FXML private FilterList<Journey> journeyListView;
     @FXML private ScrollPane scrollPhotoView, treeScroll;
+    @FXML private Label titleLabel;
 
     @Autowired private ClusterService clusterService;
     @Autowired private PhotoService photoService;
@@ -63,10 +58,10 @@ public class HighlightsViewController {
     private Journey selectedJourney;
     private GoogleMapView mapView;
     private GoogleMap googleMap;
-    private ArrayList<Marker> markers = new ArrayList<Marker>();
-    private ArrayList<Polyline> polylines = new ArrayList<Polyline>();
+    private ArrayList<Marker> markers = new ArrayList<>();
+    private ArrayList<Polyline> polylines = new ArrayList<>();
     private List<Place> places;
-    private HashMap<RadioButton,Journey> journeyRadioButtonsHashMap = new HashMap<>();
+    private ListView<Journey> list = new ListView<>();
     private Marker actualMarker;
     private boolean disableReload = false;
     private Consumer<PhotoFilter> filterChangeCallback;
@@ -114,6 +109,29 @@ public class HighlightsViewController {
 
         wikipediaInfoPane = new WikipediaInfoPane(wikipediaService);
         wikipediaInfoPaneContainer.getChildren().add(wikipediaInfoPane);
+
+        list.setCellFactory(new Callback<ListView<Journey>, ListCell<Journey>>() {
+
+            public ListCell<Journey> call(ListView<Journey> param) {
+                final ListCell<Journey> cell = new ListCell<Journey>() {
+                    @Override public void updateItem(Journey item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getName());
+                        }
+                    }
+                }; // ListCell
+                return cell;
+            }
+        }); // setCellFactory
+
+        list.getSelectionModel().selectedItemProperty()
+                .addListener(new ChangeListener<Journey>() {
+                    public void changed(ObservableValue<? extends Journey> observable,
+                            Journey oldValue, Journey newValue) {
+                        handleJourneySelected(newValue);
+                    }
+                });
     }
 
     public void setMap(GoogleMapsScene map) {
@@ -129,10 +147,8 @@ public class HighlightsViewController {
     }
 
     public void reloadJourneys(){
-        journeyRadioButtonsHashMap.clear();
         photoView.getChildren().clear();
         tree.getChildren().clear();
-
         Label lab2 = new Label();
         lab2.setText("Bitte eine Reise auswählen");
         photoView.getChildren().add(lab2);
@@ -141,15 +157,14 @@ public class HighlightsViewController {
             List<Journey> listOfJourneys = clusterService.getAllJourneys();
             if(listOfJourneys.size()>0){
                 journeys.getChildren().clear();
+                list.getItems().clear();
             }
             final ToggleGroup group = new ToggleGroup();
             for(Journey j: listOfJourneys){
-                RadioButton rb = new RadioButton(j.getName());
-                rb.setOnAction(this::handleSelectionChange);
-                rb.setToggleGroup(group);
-                journeys.getChildren().add(rb);
-                journeyRadioButtonsHashMap.put(rb,j);
+                list.getItems().add(j);
             }
+
+            journeys.getChildren().add(list);
         } catch (ServiceException e) {
             Label lab = new Label();
             lab.setText("keine Reisen vorhanden");
@@ -157,23 +172,43 @@ public class HighlightsViewController {
         }
     }
 
-    private void handleSelectionChange(ActionEvent e) {
-        clearMap();
-        Journey j = journeyRadioButtonsHashMap.get((RadioButton) e.getSource());
-        selectedJourney = j;
-        LOGGER.debug("Selected journey {}",j.getName());
+    private void handleJourneySelected(Journey journey){
         try {
-            places = clusterService.getPlacesByJourney(j);
-            if(places.size()>0){
-                drawDestinationsAsPolyline(toLatLong(places));
+            Button back = new Button("<");
+            back.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override public void handle(MouseEvent event) {
+                    left.setCenter(journeys);
+                    titleLabel.setText("Reisen");
+                    titleHBox.getChildren().remove(0);
+                }
+            });
+            titleHBox.getChildren().add(0,back);
+            titleLabel.setText(journey.getName()+" - Orte");
+            //TODO this should return the places. List<Place> places = clusterService.getPlacesByJourney(journey);
+            List<Place> places = clusterService.getAllPlaces();
+            VBox v = new VBox();
+            v.setSpacing(5.0);
+            v.setStyle("-fx-font-size: 16;");
+            v.setPadding(new Insets(5.0, 0.0, 0.0, 10.0));
+            final ToggleGroup group = new ToggleGroup();
+            for(Place p : places){
+                RadioButton rb = new RadioButton(p.getCity());
+                rb.setToggleGroup(group);
+                rb.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override public void handle(ActionEvent event) {
+                        handlePlaceSelected(p);
+                    }
+                });
+                v.getChildren().add(rb);
             }
-
-        } catch (ServiceException e1) {
-
+            left.setCenter(v);
+        } catch (ServiceException e) {
+            e.printStackTrace();
         }
-        filter.getIncludedJourneys().clear();
-        filter.getIncludedJourneys().add(j);
-        handleFilterChange(filter);
+    }
+
+    private void handlePlaceSelected(Place place) {
+        clearMap();
     }
 
     public PhotoFilter getFilter(){
@@ -203,12 +238,12 @@ public class HighlightsViewController {
      */
     public void reloadImages(){
         boolean rbIsSet =false;
-        for(RadioButton r:journeyRadioButtonsHashMap.keySet()){
+        /*for(RadioButton r:journeyRadioButtonsHashMap.keySet()){
             if(r.isSelected()){
                 System.out.println(journeyRadioButtonsHashMap.get(r).getName());
                 rbIsSet=true;
             }
-        }
+        }*/
         if(rbIsSet=true) {
             try {
 
