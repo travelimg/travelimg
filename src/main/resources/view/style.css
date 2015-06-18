@@ -308,37 +308,39 @@
     -fx-fill: white;
 }
 
+.menu, .menu * {
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+}
 .menu {
     -fx-background-color: -fx-primary;
 }
-
 .menu .button {
-    -fx-background-color: -fx-primary;
     -fx-border-radius: 0;
     -fx-padding: 10px 20px;
 }
-
 .menu .button:hover {
     -fx-background-color: -fx-primary-hover;
 }
-
+.menu .button:focused {
+    -fx-background-color: -fx-primary-focus;
+}
 .menu .button:pressed {
     -fx-background-color: -fx-primary-press;
 }
-
 .menu .button .glyph-icon {
     -fx-fill: rgba(255, 255, 255, 0.5);
     -glyph-size: 20;
 }
-
+.menu .button:focused .glyph-icon {
+    -fx-fill: white;
+}
 .menu .button:pressed .glyph-icon {
     -fx-fill: white;
 }
-
 .menu .button:disabled {
     -fx-background-color: #1E88E5;
 }
-
 .menu .button:disabled .glyph-icon {
     -fx-opacity: 0.3;
 }
@@ -621,4 +623,29 @@
 
 .pagination .button {
 
+}
+
+.status {
+    -fx-background-color: transparent;
+}
+.status.error {
+    -fx-background-color: -fx-danger;
+}
+.status.progress {
+    -fx-background-color: -fx-indetermined;
+}
+.status .glyph-icon {
+    -glyph-size: 20;
+    -fx-fill: white;
+}
+.status .progress {
+    -fx-max-width: 20px;
+    -fx-max-height: 20px;
+    -fx-progress-color: white;
+}
+.status .error .glyph-icon {
+    -fx-fill: -fx-danger;
+}
+.status .success .glyph-icon {
+    -fx-fill: -fx-accent;
 }

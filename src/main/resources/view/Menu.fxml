@@ -3,11 +3,12 @@
 <?import de.jensd.fx.glyphs.fontawesome.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane styleClass="menu" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.controller.Menu">
+<BorderPane styleClass="menu" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" prefHeight="45"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.controller.Menu">
    <left>
         <HBox styleClass="left" BorderPane.alignment="CENTER">
             <children>
-                <Button fx:id="importButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                <Button fx:id="importButton" maxHeight="Infinity" HBox.hgrow="ALWAYS">
                     <graphic>
                         <FontAwesomeIconView glyphName="FOLDER" />
                     </graphic>
@@ -15,7 +16,7 @@
                         <Tooltip text="Von Speichermedium importieren" />
                     </tooltip>
                 </Button>
-                <Button fx:id="flickrButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                <Button fx:id="flickrButton" maxHeight="Infinity" HBox.hgrow="ALWAYS">
                     <graphic>
                         <FontAwesomeIconView glyphName="FLICKR" />
                     </graphic>
@@ -23,7 +24,7 @@
                         <Tooltip text="Von Flickr importieren" />
                     </tooltip>
                 </Button>
-                <Button fx:id="journeyButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                <Button fx:id="journeyButton" maxHeight="Infinity" HBox.hgrow="ALWAYS">
                     <graphic>
                         <FontAwesomeIconView glyphName="PLUS" />
                     </graphic>
@@ -31,7 +32,7 @@
                         <Tooltip text="Reise hinzufügen" />
                     </tooltip>
                 </Button>
-                <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                <Button fx:id="presentButton" maxHeight="Infinity" HBox.hgrow="ALWAYS">
                     <graphic>
                         <FontAwesomeIconView glyphName="EXPAND" />
                     </graphic>
@@ -45,7 +46,7 @@
    <right>
         <HBox styleClass="right" BorderPane.alignment="CENTER">
            <children>
-               <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity" styleClass="delete" HBox.hgrow="ALWAYS">
+               <Button fx:id="deleteButton" maxHeight="Infinity" styleClass="delete" HBox.hgrow="ALWAYS">
                    <graphic>
                        <FontAwesomeIconView glyphName="TRASH" />
                    </graphic>
@@ -53,7 +54,7 @@
                        <Tooltip text="Ausgewählte löschen" />
                    </tooltip>
                </Button>
-               <Button fx:id="exportButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+               <Button fx:id="exportButton" maxHeight="Infinity" HBox.hgrow="ALWAYS">
                    <graphic>
                        <FontAwesomeIconView glyphName="DROPBOX" />
                    </graphic>
@@ -61,6 +62,7 @@
                        <Tooltip text="Export" />
                    </tooltip>
                </Button>
+               <fx:include source="/view/StatusIndicator.fxml" HBox.hgrow="ALWAYS"/>
            </children>
         </HBox>
    </right>
