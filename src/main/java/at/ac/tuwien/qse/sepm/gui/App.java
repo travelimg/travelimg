@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui;
 
+import at.ac.tuwien.qse.sepm.service.PhotoService;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -9,8 +10,6 @@ import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.io.IOException;
 
 public class App extends Application {
     private static final Logger logger = LogManager.getLogger();
@@ -46,6 +45,9 @@ public class App extends Application {
         stage.setMaximized(true);
         stage.setTitle("travelimg");
         stage.show();
+
+        PhotoService photoService = (PhotoService)context.getBean("photoService");
+        photoService.synchronize();
     }
 
     @Override
