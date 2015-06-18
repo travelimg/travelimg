@@ -186,6 +186,8 @@ public class HighlightsViewController {
             titleLabel.setText(journey.getName()+" - Orte");
             //TODO this should return the places. List<Place> places = clusterService.getPlacesByJourney(journey);
             List<Place> places = clusterService.getAllPlaces();
+            clearMap();
+            drawDestinationsAsPolyline(toLatLong(places));
             VBox v = new VBox();
             v.setSpacing(5.0);
             v.setStyle("-fx-font-size: 16;");
@@ -208,8 +210,8 @@ public class HighlightsViewController {
     }
 
     private void handlePlaceSelected(Place place) {
-        clearMap();
         wikipediaInfoPane.showDefaultWikiInfo(place);
+        //TODO much more stuff ;)
     }
 
     public PhotoFilter getFilter(){
