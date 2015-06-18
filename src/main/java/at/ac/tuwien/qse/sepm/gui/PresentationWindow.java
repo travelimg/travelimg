@@ -17,6 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -42,6 +43,7 @@ public class PresentationWindow extends AnchorPane{
     private ImageView imageView;
 
     private int activeIndex = 0;
+    private Timeline timeline = null;
 
     private Slideshow slideshow;
     private ImageCache imageCache;
@@ -69,7 +71,7 @@ public class PresentationWindow extends AnchorPane{
                 showPrevSlide(null);
             }
             if (keyEvent.getCode() == KeyCode.ESCAPE) {
-                stage.close();
+                close();
             }
         });
     }
@@ -83,6 +85,14 @@ public class PresentationWindow extends AnchorPane{
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), this::showNextSlide));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
+    }
+
+    private void close() {
+        if (timeline != null) {
+            timeline.stop();
+        }
+
+        stage.close();
     }
 
     private void showPrevSlide(ActionEvent event) {
