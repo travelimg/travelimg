@@ -53,8 +53,6 @@ public class SlideshowViewImpl implements SlideshowView {
     @FXML private RadioButton rb_10sec;
     @FXML private RadioButton rb_15sec;
 
-
-
     @Autowired
     private SlideshowOrganizerImpl slideshowOrganizer;
     @Autowired
@@ -63,10 +61,6 @@ public class SlideshowViewImpl implements SlideshowView {
     private SlideshowGrid grid = null;
 
     private ObservableList<Slideshow> slideshows = FXCollections.observableArrayList();
-
-    private List<Photo> photosToPresent = new ArrayList<>();
-
-    private Integer slideshowCount = 0;
 
     private ToggleGroup radioButtons = new ToggleGroup();
 
@@ -78,8 +72,6 @@ public class SlideshowViewImpl implements SlideshowView {
 
         }
     }
-
-
 
     @FXML
     private void initialize() {
@@ -100,16 +92,12 @@ public class SlideshowViewImpl implements SlideshowView {
         rb_10sec.setToggleGroup(radioButtons);
         rb_15sec.setToggleGroup(radioButtons);
 
-        //slideshowOrganizer.getSelectedSlideshowProperty().
-
         slideshowOrganizer.setPresentAction(() -> {
             Slideshow selected = slideshowOrganizer.getSelected();
             PresentationWindow presentationWindow = new PresentationWindow(selected, imageCache);
 
             presentationWindow.present();
         });
-
-
     }
 
     @Override
@@ -133,11 +121,6 @@ public class SlideshowViewImpl implements SlideshowView {
 
             slideshowService.addPhotosToSlideshow(photos, slideshow);
 
-            //photosToPresent = slideshow.getSlides().stream().map(s ->s.getPhoto()).collect(Collectors.toList());
-
-            //LOGGER.debug(photosToPresent.size()+"Gebe mit dir Listengröße aus");
-
-
             // add the photos to the grid if the slideshow is currently being displayed
             Slideshow selected = slideshowOrganizer.getSelected();
             if (selected != null && selected.getId().equals(slideshow.getId())) {
@@ -151,9 +134,6 @@ public class SlideshowViewImpl implements SlideshowView {
     private void createSlideshow() {
         try {
             Slideshow slideshow = new Slideshow();
-
-            List<Slideshow> slideshows;
-            //slideshows= slideShowService.getAllSlideshows();
 
             if (tf_slideName.getText().isEmpty()) {
                 LOGGER.debug("Bitte geben Sie einen Namen für die Slideshow ein!");//TODO: Show an InfoBox
@@ -204,19 +184,9 @@ public class SlideshowViewImpl implements SlideshowView {
             slideshows.clear();
             slideshows.addAll(slideShowService.getAllSlideshows());
             slideshows.add(createNewSlideshowPlaceholder()); // represents a new slideshow which will be created if the user makes use of it
-            //photosToPresent = slideshows.get(slideshowOrganizer.getSelectedSlideshowProperty().get().getId()).getSlides().;
-
-
-
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Laden aller Slideshows", "Fehlermeldung: " + ex.getMessage());
         }
-    }
-
-    private void startSlideshow(Event event) {
-
-
-
     }
 
     private Slideshow createNewSlideshowPlaceholder() {
@@ -238,33 +208,4 @@ public class SlideshowViewImpl implements SlideshowView {
 
         return selectedValue;
     }
-
-    /*private void animateImage() {
-        Task task = new Task<Void>() {
-            @Override public Void call() throws Exception {
-                for (int i = 0; i < photosToPresent.size(); i++) {
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            image = imageCache.get(photosToPresent.get(slideshowCount), ImageSize.ORIGINAL);
-                            imageView.setImage(image);
-                            slideshowCount++;
-                            if (slideshowCount >= photos.size()) {
-                                slideshowCount = 0;
-                            }
-                        }
-                    });
-
-                    Thread.sleep(3000);
-
-                }
-                return null;
-            }
-        };
-        Thread th = new Thread(task);
-        th.setDaemon(true);
-        th.start();
-
-        //});
-    }*/
 }
