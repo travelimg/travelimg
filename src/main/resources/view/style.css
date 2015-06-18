@@ -308,37 +308,38 @@
     -fx-fill: white;
 }
 
-.navbar {
+.menu {
     -fx-background-color: -fx-primary;
 }
 
-.navbar .button {
+.menu .button {
     -fx-background-color: -fx-primary;
     -fx-border-radius: 0;
+    -fx-padding: 10px 20px;
 }
 
-.navbar .button:hover {
+.menu .button:hover {
     -fx-background-color: -fx-primary-hover;
 }
 
-.navbar .button:pressed {
+.menu .button:pressed {
     -fx-background-color: -fx-primary-press;
 }
 
-.navbar .button .glyph-icon {
+.menu .button .glyph-icon {
     -fx-fill: rgba(255, 255, 255, 0.5);
     -glyph-size: 20;
 }
 
-.navbar .button:pressed .glyph-icon {
+.menu .button:pressed .glyph-icon {
     -fx-fill: white;
 }
 
-.navbar .button:disabled {
+.menu .button:disabled {
     -fx-background-color: #1E88E5;
 }
 
-.navbar .button:disabled .glyph-icon {
+.menu .button:disabled .glyph-icon {
     -fx-opacity: 0.3;
 }
 

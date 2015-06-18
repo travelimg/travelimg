@@ -16,4 +16,7 @@
     <right>
         <fx:include source="/view/Inspector.fxml"></fx:include>
     </right>
+    <bottom>
+        <fx:include source="/view/Menu.fxml"/>
+    </bottom>
 </BorderPane>
