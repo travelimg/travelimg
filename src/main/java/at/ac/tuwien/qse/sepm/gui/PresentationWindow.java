@@ -5,6 +5,8 @@ import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -18,6 +20,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,17 +40,11 @@ public class PresentationWindow extends AnchorPane{
     private AnchorPane root;
     @FXML
     private ImageView imageView;
-    @FXML
-    private Button bt_previous, bt_next;
-
-    private Slideshow slideshow;
-    private Image image;
 
     private int activeIndex = 0;
 
+    private Slideshow slideshow;
     private ImageCache imageCache;
-
-    private Integer slideshowCount=0;
 
     public PresentationWindow(Slideshow slideshow, ImageCache imageCache) {
         FXMLLoadHelper.load(this, this, PresentationWindow.class, "view/PresentationWindow.fxml");
@@ -64,51 +61,37 @@ public class PresentationWindow extends AnchorPane{
         stage.setScene(scene);
         imageView.fitWidthProperty().bind(root.widthProperty());
         imageView.fitHeightProperty().bind(root.heightProperty());
-        root.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            public void handle(final KeyEvent keyEvent) {
-                if (keyEvent.getCode() == KeyCode.RIGHT) {
-                    bt_nextPressed(null);
-                }
-                if (keyEvent.getCode() == KeyCode.LEFT) {
-                    bt_previousPressed(null);
-                }
-                if (keyEvent.getCode() == KeyCode.ESCAPE) {
-                    stage.close();
-                }
+        root.setOnKeyPressed((keyEvent) -> {
+            if (keyEvent.getCode() == KeyCode.RIGHT) {
+                showNextSlide(null);
+            }
+            if (keyEvent.getCode() == KeyCode.LEFT) {
+                showPrevSlide(null);
+            }
+            if (keyEvent.getCode() == KeyCode.ESCAPE) {
+                stage.close();
             }
         });
-
     }
 
     public void present() {
-        activeIndex = 0;
-
         loadImage();
-        //animateImage(photos,initial,duration);
 
         stage.setFullScreen(true);
         stage.show();
+
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), this::showNextSlide));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
     }
 
-    @FXML
-    private void bt_nextPressed(ActionEvent event) {
-        logger.info("Button next pressed!");
-
-        activeIndex++;
-        //activeIndex = activeIndex % photos.size();
-
+    private void showPrevSlide(ActionEvent event) {
+        activeIndex = Math.max(0, activeIndex - 1);
         loadImage();
     }
 
-    @FXML
-    private void bt_previousPressed(ActionEvent event) {
-        logger.info("Button previous pressed!");
-
-        activeIndex--;
-        /*if (activeIndex < 0)
-            activeIndex += photos.size();
-        activeIndex = activeIndex % photos.size();*/
-
+    private void showNextSlide(ActionEvent event) {
+        activeIndex = Math.min(slideshow.getSlides().size() - 1, activeIndex + 1);
         loadImage();
     }
 
@@ -119,41 +102,10 @@ public class PresentationWindow extends AnchorPane{
             return;
         }
 
-        image = imageCache.get(slides.get(activeIndex).getPhoto(), ImageSize.ORIGINAL);
+        Image image = imageCache.get(slides.get(activeIndex).getPhoto(), ImageSize.ORIGINAL);
         imageView.setImage(image);
 
         // handling of images in original size can consume a lot of memory so collect it here
         System.gc();
     }
-    private void animateImage(List<Photo> photos,Photo initial,Double duration) {
-        long time = (new Double(duration).longValue());
-        Task task = new Task<Void>() {
-            @Override public Void call() throws Exception {
-                for (int i = 0; i < photos.size(); i++) {
-                    Platform.runLater(new Runnable() {
-                        @Override public void run() {
-                            image = imageCache.get(photos.get(slideshowCount), ImageSize.ORIGINAL);
-                            imageView.setImage(image);
-                            slideshowCount++;
-                            if (slideshowCount >= photos.size()) {
-                                slideshowCount = 0;
-                            }
-                        }
-                    });
-
-                    Thread.sleep(time);
-
-                }
-                return null;
-            }
-        };
-        Thread th = new Thread(task);
-        th.setDaemon(true);
-        th.start();
-
-        //});
-    }
-
-
-
 }
