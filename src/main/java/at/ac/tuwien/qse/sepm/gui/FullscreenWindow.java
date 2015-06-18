@@ -74,7 +74,6 @@ public class FullscreenWindow extends AnchorPane {
                 }
             }
         });
-        animateImage();
     }
 
     public void present(List<Photo> photos, Photo initial) {
@@ -126,34 +125,4 @@ public class FullscreenWindow extends AnchorPane {
         // handling of images in original size can consume a lot of memory so collect it here
         System.gc();
     }
-    private void animateImage() {
-        Task task = new Task<Void>() {
-            @Override public Void call() throws Exception {
-                for (int i = 0; i < photos.size(); i++) {
-                    Platform.runLater(new Runnable() {
-                        @Override public void run() {
-                            image = imageCache.get(photos.get(slideshowCount), ImageSize.ORIGINAL);
-                            imageView.setImage(image);
-                            slideshowCount++;
-                            if (slideshowCount >= photos.size()) {
-                                slideshowCount = 0;
-                            }
-                        }
-                    });
-
-                    Thread.sleep(3000);
-
-                }
-                return null;
-            }
-        };
-        Thread th = new Thread(task);
-        th.setDaemon(true);
-        th.start();
-
-        //});
-    }
-
-
-
 }
