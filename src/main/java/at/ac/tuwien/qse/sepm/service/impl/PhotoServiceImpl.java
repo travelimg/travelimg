@@ -1,17 +1,12 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
-import at.ac.tuwien.qse.sepm.dao.JourneyDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.dao.repo.AsyncPhotoRepository;
 import at.ac.tuwien.qse.sepm.dao.repo.Operation;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoRepository;
-import at.ac.tuwien.qse.sepm.dao.repo.impl.CachedPhotoRepository;
 import at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher;
-import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Place;
-import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
@@ -19,9 +14,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
