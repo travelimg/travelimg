@@ -145,8 +145,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
             Marker m = new Marker(new MarkerOptions()
                     .position(new LatLong(photo.getData().getLatitude(), photo.getData().getLongitude()))
                     .visible(Boolean.TRUE).animation(Animation.BOUNCE));
-
-            m.setTitle(photo.getData().getPlace().getCountry());
+            m.setTitle(photo.getPath());
             aktivMarker.add(m);
             displayedMarker.put(m.getVariableName(), new LatLong(photo.getData().getLatitude(), photo.getData().getLongitude()));
 
@@ -187,7 +186,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
                         .visible(Boolean.TRUE).animation(Animation.BOUNCE));
 
 
-                m.setTitle(photo.getData().getPlace().getCountry());
+                m.setTitle(photo.getPath());
                 aktivMarker.add(m);
                 displayedMarker.put(m.getVariableName(),
                         new LatLong(photo.getData().getLatitude(), photo.getData().getLongitude()));

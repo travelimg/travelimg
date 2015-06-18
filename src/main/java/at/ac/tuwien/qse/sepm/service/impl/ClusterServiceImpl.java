@@ -57,7 +57,13 @@ public class ClusterServiceImpl implements ClusterService {
 
     @Override
     public List<Place> getPlacesByJourney(Journey journey) throws ServiceException {
-        return null;
+        List<Place> places= new ArrayList<>();
+        for(Photo p: photoService.getAllPhotos()){
+            if(p.getData().getJourney().getId() == journey.getId()){
+                if(!places.contains(p.getData().getPlace()))
+                places.add(p.getData().getPlace());
+            }
+        }
         /*try {
             return placeDAO.readByJourney(journey);
         } catch (DAOException e) {
@@ -65,6 +71,7 @@ public class ClusterServiceImpl implements ClusterService {
         } catch (ValidationException e) {
             throw new ServiceException("Failed to validate journey id", e);
         }*/
+        return places;
     }
 
     @Override
