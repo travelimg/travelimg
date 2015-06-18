@@ -59,7 +59,7 @@ public class ClusterServiceImpl implements ClusterService {
     public List<Place> getPlacesByJourney(Journey journey) throws ServiceException {
         List<Place> places= new ArrayList<>();
         for(Photo p: photoService.getAllPhotos()){
-            if(p.getData().getJourney().getId() == journey.getId()){
+            if(p.getData().getJourney().getId().equals(journey.getId())) {
                 if(!places.contains(p.getData().getPlace()))
                 places.add(p.getData().getPlace());
             }
