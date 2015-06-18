@@ -3,7 +3,6 @@ package at.ac.tuwien.qse.sepm.entities;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 public class Photo {
 
