@@ -102,11 +102,10 @@ public class SlideshowViewImpl implements SlideshowView {
         //slideshowOrganizer.getSelectedSlideshowProperty().
 
         slideshowOrganizer.setPresentAction(() -> {
-            PresentationWindow presentationWindow = new PresentationWindow(imageCache);
             Slideshow selected = slideshowOrganizer.getSelected();
-            photosToPresent = selected.getSlides().stream().map(s ->s.getPhoto()).collect(Collectors.toList());
-            presentationWindow.present(photosToPresent, photosToPresent.get(0),getSelectedRadioButton());
+            PresentationWindow presentationWindow = new PresentationWindow(selected, imageCache);
 
+            presentationWindow.present();
         });
 
 

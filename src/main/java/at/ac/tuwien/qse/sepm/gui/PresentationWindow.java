@@ -1,6 +1,8 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Slide;
+import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import javafx.application.Platform;
@@ -38,8 +40,7 @@ public class PresentationWindow extends AnchorPane{
     @FXML
     private Button bt_previous, bt_next;
 
-
-    private List<Photo> photos;
+    private Slideshow slideshow;
     private Image image;
 
     private int activeIndex = 0;
@@ -48,9 +49,10 @@ public class PresentationWindow extends AnchorPane{
 
     private Integer slideshowCount=0;
 
-    public PresentationWindow(ImageCache imageCache) {
+    public PresentationWindow(Slideshow slideshow, ImageCache imageCache) {
         FXMLLoadHelper.load(this, this, PresentationWindow.class, "view/PresentationWindow.fxml");
 
+        this.slideshow = slideshow;
         this.imageCache = imageCache;
     }
 
@@ -78,17 +80,11 @@ public class PresentationWindow extends AnchorPane{
 
     }
 
-    public void present(List<Photo> photos, Photo initial, Double duration) {
-        this.photos = photos;
-
-        activeIndex = photos.indexOf(initial);
-
-        if (activeIndex < 0) {
-            activeIndex = 0;
-        }
+    public void present() {
+        activeIndex = 0;
 
         loadImage();
-        animateImage(photos,initial,duration);
+        //animateImage(photos,initial,duration);
 
         stage.setFullScreen(true);
         stage.show();
@@ -99,7 +95,7 @@ public class PresentationWindow extends AnchorPane{
         logger.info("Button next pressed!");
 
         activeIndex++;
-        activeIndex = activeIndex % photos.size();
+        //activeIndex = activeIndex % photos.size();
 
         loadImage();
     }
@@ -109,20 +105,21 @@ public class PresentationWindow extends AnchorPane{
         logger.info("Button previous pressed!");
 
         activeIndex--;
-        if (activeIndex < 0)
+        /*if (activeIndex < 0)
             activeIndex += photos.size();
-        activeIndex = activeIndex % photos.size();
+        activeIndex = activeIndex % photos.size();*/
 
         loadImage();
     }
 
     private void loadImage() {
-        if (photos.size() == 0 || photos.size() <= activeIndex) {
+        List<Slide> slides = slideshow.getSlides();
+        if (slides.size() == 0 || slides.size() <= activeIndex) {
             // out of bounds
             return;
         }
 
-        image = imageCache.get(photos.get(activeIndex), ImageSize.ORIGINAL);
+        image = imageCache.get(slides.get(activeIndex).getPhoto(), ImageSize.ORIGINAL);
         imageView.setImage(image);
 
         // handling of images in original size can consume a lot of memory so collect it here
