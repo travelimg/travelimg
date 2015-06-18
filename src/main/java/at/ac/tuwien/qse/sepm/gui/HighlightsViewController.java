@@ -209,6 +209,7 @@ public class HighlightsViewController {
 
     private void handlePlaceSelected(Place place) {
         clearMap();
+        wikipediaInfoPane.showDefaultWikiInfo(place);
     }
 
     public PhotoFilter getFilter(){

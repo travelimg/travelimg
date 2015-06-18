@@ -5,10 +5,6 @@ import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.WikiPlaceInfo;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.WikipediaService;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -16,10 +12,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Pair;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class WikipediaInfoPane extends VBox {
@@ -50,21 +48,21 @@ public class WikipediaInfoPane extends VBox {
         categoryName.setCellValueFactory(new PropertyValueFactory<>("Key"));
         categoryValue.setCellValueFactory(new PropertyValueFactory<>("Value"));
 
-        showDefaultWikiInfo();
+        //showDefaultWikiInfo();
     }
 
 
     /**
      * Clear the info table and reset the labels to default values.
      */
-    public void showDefaultWikiInfo() {
+    public void showDefaultWikiInfo(Place place) {
         placeLabel.setText("Stadt");
         countryLabel.setText("Land");
         descriptionText.setText("Your ad here.");
 
         infoTable.getItems().clear();
 
-        showWikipediaInfo(new Place(null, "Gleisdorf", "Austria", 0,0));
+        showWikipediaInfo(place);
     }
 
     /**
