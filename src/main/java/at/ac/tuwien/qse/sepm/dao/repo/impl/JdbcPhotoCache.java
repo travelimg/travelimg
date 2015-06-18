@@ -106,9 +106,7 @@ public class JdbcPhotoCache implements PhotoCache {
 
     @Override public Collection<Path> index() throws DAOException {
         LOGGER.debug("indexing");
-        Collection<Path> result = photoDAO.readAll().stream()
-                .map(Photo::getFile)
-                .collect(Collectors.toList());
+        Collection<Path> result = photoDAO.readAllPaths();
         LOGGER.debug("indexed {}", result.size());
         return result;
     }
