@@ -4,7 +4,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" fx:id="root" type="javafx.scene.layout.AnchorPane"
-         xmlns="http://javafx.com/javafx/8">
+         xmlns="http://javafx.com/javafx/8" fx:controller="at.ac.tuwien.qse.sepm.gui.FullscreenWindow">
     <children>
         <ImageView fx:id="imageView"/>
         <Button fx:id="bt_previous" minHeight="40.0" minWidth="62.0" onAction="#bt_previousPressed" text="&lt;"
