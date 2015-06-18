@@ -22,6 +22,15 @@ public interface SlideshowService {
     Slideshow create(Slideshow slideshow) throws ServiceException;
 
     /**
+     * Update an existing slideshow.
+     *
+     * @param slideshow The slideshow to be updated.
+     * @return The newly updated slideshow.
+     * @throws ServiceException If the update fails.
+     */
+    Slideshow update(Slideshow slideshow) throws ServiceException;
+
+    /**
      * Delete an existing Slideshow.
      *
      * @param slideshow Specifies which slideshow to delete by providing the id;

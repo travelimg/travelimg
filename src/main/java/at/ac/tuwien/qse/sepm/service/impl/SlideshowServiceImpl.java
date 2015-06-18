@@ -39,8 +39,16 @@ public class SlideshowServiceImpl implements SlideshowService {
             LOGGER.error("Failed to create slideshow", ex);
             throw new ServiceException("Failed to create slideshow", ex);
         }
+    }
 
-
+    @Override
+    public Slideshow update(Slideshow slideshow) throws ServiceException {
+        try {
+            return slideshowDAO.update(slideshow);
+        } catch (DAOException | ValidationException ex) {
+            LOGGER.error("Failed to update slideshow", ex);
+            throw new ServiceException("Failed to update slideshow", ex);
+        }
     }
 
     @Override

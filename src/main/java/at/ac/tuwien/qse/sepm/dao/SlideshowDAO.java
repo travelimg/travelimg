@@ -22,10 +22,11 @@ public interface SlideshowDAO {
     /**
      * Update given slideshow
      * @param slideshow to be updated
+     * @return The newly updated slideshow.
      * @throws DAOException if the slideshow can not be updated
      * @throws ValidationException if the slideshow is invalid
      */
-    void update(Slideshow slideshow) throws DAOException, ValidationException;
+    Slideshow update(Slideshow slideshow) throws DAOException, ValidationException;
 
     /**
      * Reads a single slideshow by the id

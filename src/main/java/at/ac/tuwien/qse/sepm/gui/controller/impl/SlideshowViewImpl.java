@@ -92,6 +92,9 @@ public class SlideshowViewImpl implements SlideshowView {
         rb_10sec.setToggleGroup(radioButtons);
         rb_15sec.setToggleGroup(radioButtons);
 
+
+        radioButtons.selectedToggleProperty().addListener(this::updateSlideshowDuration);
+
         slideshowOrganizer.setPresentAction(() -> {
             Slideshow selected = slideshowOrganizer.getSelected();
             PresentationWindow presentationWindow = new PresentationWindow(selected, imageCache);
@@ -131,6 +134,19 @@ public class SlideshowViewImpl implements SlideshowView {
         }
     }
 
+    private void updateSlideshowDuration(Object observable) {
+        Slideshow selected = slideshowOrganizer.getSelected();
+        if (selected != null) {
+            selected.setDurationBetweenPhotos(getSelectedDuration());
+
+            try {
+                slideshowService.update(selected);
+            } catch (ServiceException ex) {
+                ErrorDialog.show(root, "Fehler beim Ändern der Dauer", "Fehlermeldung: " + ex.getMessage());
+            }
+        }
+    }
+
     private void createSlideshow() {
         try {
             Slideshow slideshow = new Slideshow();
@@ -140,7 +156,7 @@ public class SlideshowViewImpl implements SlideshowView {
             } else {
                 slideshow.setId(1);
                 slideshow.setName(tf_slideName.getText());
-                slideshow.setDurationBetweenPhotos(getSelectedRadioButton());
+                slideshow.setDurationBetweenPhotos(getSelectedDuration());
 
                 slideShowService.create(slideshow);
                 cb_getSlideshows.getItems().add(tf_slideName.getText());
@@ -196,16 +212,13 @@ public class SlideshowViewImpl implements SlideshowView {
         return new Slideshow(NEW_SLIDESHOW_MARKER_ID, NEW_SLIDESHOW_PROMPT, durationBetweenPhotos, slides);
     }
 
-    private double getSelectedRadioButton(){
-        double selectedValue=0;
-
-        if(rb_5sec.isSelected())
-            selectedValue=5000;
-        else if (rb_10sec.isSelected())
-            selectedValue=10000;
-        else if (rb_15sec.isSelected())
-            selectedValue=15000;
-
-        return selectedValue;
+    private double getSelectedDuration(){
+        if (rb_5sec.isSelected()) {
+            return 5.0;
+        } else if (rb_10sec.isSelected()) {
+            return 10.0;
+        } else {
+            return 15.0;
+        }
     }
 }

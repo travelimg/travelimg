@@ -28,6 +28,7 @@ import java.util.Map;
 public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
 
     private static final String READ_ALL_STATEMENT = "SELECT id, name, durationbetweenphotos FROM SLIDESHOW;";
+    private static final String UPDATE_STATEMENT = "UPDATE SLIDESHOW SET name = ?, durationbetweenphotos = ? WHERE id = ?;";
 
     private SimpleJdbcInsert insertSlideshow;
 
@@ -66,8 +67,24 @@ public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
     }
 
     @Override
-    public void update(Slideshow slideshow) throws DAOException, ValidationException {
+    public Slideshow update(Slideshow slideshow) throws DAOException, ValidationException {
+        logger.debug("Updating slideshow {}", slideshow);
 
+        SlideshowValidator.validate(slideshow);
+        SlideshowValidator.validateID(slideshow.getId());
+
+        try {
+            jdbcTemplate.update(UPDATE_STATEMENT,
+                    slideshow.getName(),
+                    slideshow.getDurationBetweenPhotos(),
+                    slideshow.getId()
+            );
+            logger.debug("Successfully updated slideshow");
+            return slideshow;
+        } catch (DataAccessException ex) {
+            logger.error("Failed to update slideshow", ex);
+            throw new DAOException("Failed to update slideshow", ex);
+        }
     }
 
     @Override
