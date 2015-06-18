@@ -110,6 +110,8 @@ public class WikipediaServiceImpl implements WikipediaService {
                     if (solution.getLiteral("language") != null) {
                         languages = solution.getLiteral("language").getString();
                     }
+                } else { //no countryLabel
+                    countryName = place.getCountry();
                 }
                 if (solution.getLiteral("utcOffset") != null) {
                     utcOffset = "GMT" + solution.getLiteral("utcOffset").getString();
