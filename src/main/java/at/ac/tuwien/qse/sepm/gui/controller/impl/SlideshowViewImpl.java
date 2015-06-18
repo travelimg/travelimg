@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class SlideshowViewImpl implements SlideshowView {
@@ -183,6 +184,18 @@ public class SlideshowViewImpl implements SlideshowView {
             slideService.update(slide);
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Ändern der Slides", "Fehlermeldung: " + ex.getMessage());
+        }
+
+        // sort slides in the slideshow to which the slide belongs
+        Optional<Slideshow> slideshow = slideshows.stream()
+                .filter(s -> s.getId().equals(slide.getSlideshowId()))
+                .findFirst();
+
+        if (slideshow.isPresent()) {
+            List<Slide> sorted = slideshow.get().getSlides().stream()
+                    .sorted((s1, s2) -> s1.getOrder().compareTo(s2.getOrder()))
+                    .collect(Collectors.toList());
+            slideshow.get().setSlides(sorted);
         }
     }
 
