@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -123,6 +124,18 @@ public class PaginatedImageGrid extends Pagination {
         if (activePageProperty.get() != null) {
             activePageProperty.get().selectAll();
         }
+    }
+
+    /**
+     * Get the currently selected photos.
+     *
+     * @return set of selected photos
+     */
+    public Set<Photo> getSelected() {
+        if (activePageProperty.get() == null) {
+            return new HashSet<>();
+        }
+        return activePageProperty.get().getSelected();
     }
 
     /**

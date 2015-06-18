@@ -42,6 +42,18 @@ public class ImageGrid extends TilePane {
     }
 
     /**
+     * Get the currently selected photos.
+     *
+     * @return set of selected photos
+     */
+    public Set<Photo> getSelected() {
+        return tiles.stream()
+                .filter(ImageGridTile::isSelected)
+                .map(ImageGridTile::getPhoto)
+                .collect(Collectors.toSet());
+    }
+
+    /**
      * Update tile for given photo.
      *
      * @param photo The photo which should be updated in the grid.
@@ -122,14 +134,7 @@ public class ImageGrid extends TilePane {
 
     protected void onSelectionChange() {
         if (selectionChangeAction == null) return;
-        selectionChangeAction.accept(getSelectedItems());
-    }
-
-    private Set<Photo> getSelectedItems() {
-        return tiles.stream()
-                .filter(ImageGridTile::isSelected)
-                .map(ImageGridTile::getPhoto)
-                .collect(Collectors.toSet());
+        selectionChangeAction.accept(getSelected());
     }
 
     private PhotoGridTile findTile(Photo photo) {
