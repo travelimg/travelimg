@@ -7,6 +7,7 @@ import at.ac.tuwien.qse.sepm.entities.PhotoMetadata;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.omg.CORBA.PERSIST_STORE;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -121,13 +122,6 @@ public class PhotoFileRepository implements PhotoRepository {
 
             serializer.update(is, os, photo.getData());
 
-            try {
-                fileManager.copy(temp, file);
-            } catch (IOException ex) {
-                LOGGER.warn("failed copying {} -> {}", temp, file);
-                throw new DAOException(ex);
-            }
-
         } finally {
             try {
                 if (is != null) {
@@ -145,6 +139,14 @@ public class PhotoFileRepository implements PhotoRepository {
                 LOGGER.warn("failed closing output stream for file {}");
                 LOGGER.error(ex);
             }
+        }
+
+        try {
+            fileManager.copy(temp, file);
+        } catch (IOException ex) {
+            LOGGER.warn("failed copying {} -> {}", temp, file);
+            throw new DAOException(ex);
+        } finally {
             try {
                 if (fileManager.exists(temp)) {
                     fileManager.delete(temp);
