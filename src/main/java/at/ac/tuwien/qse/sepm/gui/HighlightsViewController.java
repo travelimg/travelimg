@@ -33,10 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import sun.util.resources.cldr.lag.LocaleNames_lag;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -49,7 +46,10 @@ public class HighlightsViewController {
     @FXML private FilterList<Journey> journeyListView;
     @FXML private ScrollPane scrollPhotoView, treeScroll;
     @FXML private Label titleLabel;
+
     @FXML private Button tag1,tag2,tag3,tag4,good;
+    private List<Button> buttonAr = new LinkedList<>();
+
     @Autowired private ClusterService clusterService;
     @Autowired private PhotoService photoService;
     @Autowired private TagService tagService;
@@ -74,8 +74,10 @@ public class HighlightsViewController {
     private Line redLine;
 
     private List<Photo> hart = new ArrayList<>();
-
+    private HashMap<Place,List<Tag>> placesAndTags = new HashMap<>();
     private HashMap<PlaceDate,List<Photo>> orderedPlacesAndPhotos = new HashMap<>();
+
+
     @FXML
     private StrokeLineCap lineCap;
 
@@ -107,6 +109,10 @@ public class HighlightsViewController {
         }
     }
     public void initialize(){
+        buttonAr.add(tag1);
+        buttonAr.add(tag2);
+        buttonAr.add(tag3);
+        buttonAr.add(tag4);
         /**to remove - BEGIN**/
         HBox vBox = new HBox();
         Button playButton = new Button("Play selected journey!");
@@ -159,7 +165,7 @@ public class HighlightsViewController {
     }
     public void bt_hartPress(){
         FullscreenWindow fw = new FullscreenWindow(this.imageCache);
-        fw.present(hart,hart.get(0));
+        fw.present(hart, hart.get(0));
     }
     public void setMap(GoogleMapsScene map) {
         this.mapsScene = map;
@@ -201,6 +207,7 @@ public class HighlightsViewController {
     private void handleJourneySelected(Journey journey){
         try {
             orderedPlacesAndPhotos.clear();
+            placesAndTags.clear();
             Button back = new Button("<");
             back.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override public void handle(MouseEvent event) {
@@ -261,11 +268,14 @@ public class HighlightsViewController {
 
             clearMap();
             drawDestinationsAsPolyline(toLatLong(places));
+
             VBox v = new VBox();
             v.setSpacing(5.0);
             v.setStyle("-fx-font-size: 16;");
             v.setPadding(new Insets(5.0, 0.0, 0.0, 10.0));
             final ToggleGroup group = new ToggleGroup();
+
+            reloadImages();
 
             for(PlaceDate pd: orderedPlacesAndPhotos.keySet()){
                 Place p = pd.getPlace();
@@ -279,7 +289,7 @@ public class HighlightsViewController {
                 v.getChildren().add(rb);
             }
             left.setCenter(v);
-            reloadImages();
+
 
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -288,6 +298,16 @@ public class HighlightsViewController {
 
     private void handlePlaceSelected(Place place) {
         wikipediaInfoPane.showDefaultWikiInfo(place);
+        if(placesAndTags.size()!=0){
+            if(placesAndTags.get(place).size()!=0) {
+                System.out.println(placesAndTags.get(place).size());
+                for (int i = 0; i < placesAndTags.get(place).size(); i++) {
+                    System.out.println(placesAndTags.get(place).get(i).toString());
+                    System.out.println(buttonAr.size());
+                    buttonAr.get(i).setText(placesAndTags.get(place).get(i).getName());
+                }
+            }
+        }
         //TODO much more stuff ;)
     }
 
@@ -320,17 +340,29 @@ public class HighlightsViewController {
     public void reloadImages(){
         LOGGER.debug("reload Images");
 
-        // all GOOD fotos
+
 
         for(PlaceDate pl :orderedPlacesAndPhotos.keySet()){
+            // mostFreuqentTags to Place
+            try {
+               List<Tag> list = tagService.getMostFrequentTags(orderedPlacesAndPhotos.get(pl));
+                placesAndTags.put(pl.getPlace(),list);
+            } catch (ServiceException e) {
+                //TODO no tag s found
+            }
+
+            // all GOOD fotos
             for(Photo p: orderedPlacesAndPhotos.get(pl)){
                 if(p.getData().getRating().equals(Rating.GOOD)){
                     hart.add(p);
                 }
+
             }
         }
-        System.out.println(hart.size());
-        //
+
+
+
+
 
 
         boolean rbIsSet =false;
