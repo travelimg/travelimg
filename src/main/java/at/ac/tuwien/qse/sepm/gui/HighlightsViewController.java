@@ -31,7 +31,6 @@ import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import sun.rmi.runtime.Log;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -320,15 +319,25 @@ public class HighlightsViewController {
             }
 
 
-            clearMap();
-            drawDestinationsAsPolyline(toLatLong(places));
+
 
             VBox v = new VBox();
             v.setSpacing(5.0);
             v.setStyle("-fx-font-size: 16;");
             v.setPadding(new Insets(5.0, 0.0, 0.0, 10.0));
             final ToggleGroup group = new ToggleGroup();
-
+            RadioButton rbAll = new RadioButton("Alle Orte");
+            rbAll.setToggleGroup(group);
+            rbAll.setOnAction(new EventHandler<ActionEvent>() {
+                @Override public void handle(ActionEvent event) {
+                    clearMap();
+                    drawDestinationsAsPolyline(toLatLong(places));
+                }
+            });
+            v.getChildren().add(rbAll);
+            rbAll.setSelected(true);
+            clearMap();
+            drawDestinationsAsPolyline(toLatLong(places));
             reloadImages();
 
             for(PlaceDate pd: orderedPlacesAndPhotos.keySet()){
