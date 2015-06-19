@@ -92,7 +92,7 @@ public class WikipediaInfoPane extends VBox {
             infoList.add(new Pair<String, String>("Bevölkerung", info.getPopulation().toString()));
         }
         if (info.getArea() != null) {
-            infoList.add(new Pair<String, String>("Fläche", info.getArea().toString() + "m²"));
+            infoList.add(new Pair<String, String>("Fläche", info.getArea().toString() + "km²"));
         }
         if (info.getElevation() != null) {
             infoList.add(new Pair<String, String>("Höhe", info.getElevation().toString() + "m"));

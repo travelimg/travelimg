@@ -125,6 +125,10 @@ public class WikipediaServiceImpl implements WikipediaService {
                 }
                 if (solution.getLiteral("area") != null) {
                     area = solution.getLiteral("area").getDouble();
+                    if (area > 1E6) {
+                        //auf Quadratkilometer normen
+                        area = area / 1E6;
+                    }
                 }
                 if (solution.getLiteral("population") != null) {
                     population = solution.getLiteral("population").getInt();
