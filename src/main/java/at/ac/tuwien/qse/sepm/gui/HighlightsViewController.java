@@ -61,13 +61,11 @@ public class HighlightsViewController {
     private GoogleMap googleMap;
     private ArrayList<Marker> markers = new ArrayList<>();
     private ArrayList<Polyline> polylines = new ArrayList<>();
-    private List<Place> places;
     private ListView<Journey> list = new ListView<>();
     private Marker actualMarker;
     private boolean disableReload = false;
     private Consumer<PhotoFilter> filterChangeCallback;
     private ImageGrid grid;
-    private int pos = 0;
     private TreeView<String> treeView;
     private static final Logger LOGGER = LogManager.getLogger();
     private ImageCache imageCache;
@@ -116,22 +114,6 @@ public class HighlightsViewController {
         buttonAr.add(tag2);
         buttonAr.add(tag3);
         buttonAr.add(tag4);
-        /**to remove - BEGIN**/
-        HBox vBox = new HBox();
-        Button playButton = new Button("Play selected journey!");
-        playButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-            @Override public void handle(MouseEvent event) {
-                if (pos == 0) {
-                    clearMap();
-                }
-                playTheJourney(pos);
-                pos++;
-            }
-        });
-        vBox.getChildren().add(playButton);
-        borderPane.setBottom(vBox);
-        /**to remove - END**/
         redLine = new Line(100, 50, 100, 500);
         redLine.setStroke(Color.DARKGRAY);
         redLine.setStrokeWidth(2);
@@ -339,17 +321,19 @@ public class HighlightsViewController {
             clearMap();
             drawDestinationsAsPolyline(toLatLong(places));
             reloadImages();
-
+            int pos = 0;
             for(PlaceDate pd: orderedPlacesAndPhotos.keySet()){
                 Place p = pd.getPlace();
                 RadioButton rb = new RadioButton(p.getCity());
                 rb.setToggleGroup(group);
+                final int finalPos = pos;
                 rb.setOnAction(new EventHandler<ActionEvent>() {
                     @Override public void handle(ActionEvent event) {
-                        handlePlaceSelected(p);
+                        handlePlaceSelected(new ArrayList<Place>(orderedPlaces.values()),p, finalPos);
                     }
                 });
                 v.getChildren().add(rb);
+                pos++;
             }
             left.setCenter(v);
 
@@ -363,8 +347,9 @@ public class HighlightsViewController {
 
 
      */
-    private void handlePlaceSelected(Place place) {
+    private void handlePlaceSelected(List<Place> places, Place place, int pos) {
         wikipediaInfoPane.showDefaultWikiInfo(place);
+        drawJourneyUntil(places,pos);
         aktivePlace = place;
         // set Buttontext default
         for(int i=0; i<buttonAr.size(); i++){
@@ -650,23 +635,24 @@ public class HighlightsViewController {
         }
     }
 
-    private void playTheJourney(int pos) {
-
+    private void drawJourneyUntil(List<Place> places, int pos) {
+        clearMap();
         LatLong [] path = toLatLong(places);
-
-        fitMarkersToScreen(path, pos, pos + 1);
-        if(actualMarker!=null){
-            googleMap.removeMarker(actualMarker);
+        if(pos==0){
+            Marker m = new Marker(new MarkerOptions().position(path[pos]).icon("https://maps.gstatic.com/intl/en_us/mapfiles/markers2/measle_blue.png"));
+            googleMap.addMarker(m);
+            markers.add(m);
+            fitMarkersToScreen(path, pos, pos);
         }
-        Marker m = new Marker(new MarkerOptions().position(path[pos]).icon("https://maps.gstatic.com/intl/en_us/mapfiles/markers2/measle_blue.png"));
-        googleMap.addMarker(m);
-        markers.add(m);
-        if (pos < path.length - 1) {
-
+        else{
             PolylineOptions polylineOptions = new PolylineOptions();
             MVCArray mvcArray = new MVCArray();
-            mvcArray.push(path[pos]);
-            mvcArray.push(path[pos + 1]);
+            for(int i = 0; i<=pos; i++){
+                mvcArray.push(path[i]);
+                Marker m = new Marker(new MarkerOptions().position(path[i]).icon("https://maps.gstatic.com/intl/en_us/mapfiles/markers2/measle_blue.png"));
+                googleMap.addMarker(m);
+                markers.add(m);
+            }
             polylineOptions.path(mvcArray)
                     .clickable(false)
                     .draggable(false)
@@ -677,10 +663,10 @@ public class HighlightsViewController {
             Polyline polyline = new Polyline(polylineOptions);
             googleMap.addMapShape(polyline);
             polylines.add(polyline);
-            actualMarker = new Marker(new MarkerOptions().position(path[pos+1]));
-            googleMap.addMarker(actualMarker);
+            fitMarkersToScreen(path, pos-1, pos);
         }
-
+        actualMarker = new Marker(new MarkerOptions().position(path[pos]));
+        googleMap.addMarker(actualMarker);
     }
 
     private void fitMarkersToScreen(LatLong[] subpath, int from, int to) {
@@ -737,7 +723,6 @@ public class HighlightsViewController {
             googleMap.removeMapShape(p);
         }
         polylines.clear();
-        pos = 0;
         if(actualMarker!=null){
             googleMap.removeMarker(actualMarker);
         }
