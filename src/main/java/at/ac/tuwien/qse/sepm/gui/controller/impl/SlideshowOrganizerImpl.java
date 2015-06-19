@@ -54,6 +54,7 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     public void setPresentAction(Runnable callback) {
         LOGGER.debug("setting present action");
         presentButton.setOnAction(event -> callback.run());
+
     }
 
     @FXML
@@ -63,6 +64,8 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
         slideshowList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             selectedSlideshowProperty.setValue(newValue);
         });
+
+
 
     }
 

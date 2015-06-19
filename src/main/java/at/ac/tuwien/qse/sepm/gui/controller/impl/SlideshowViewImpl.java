@@ -99,6 +99,8 @@ public class SlideshowViewImpl implements SlideshowView {
             Slideshow selected = slideshowOrganizer.getSelected();
             PresentationWindow presentationWindow = new PresentationWindow(selected, imageCache);
 
+
+
             presentationWindow.present();
         });
     }
