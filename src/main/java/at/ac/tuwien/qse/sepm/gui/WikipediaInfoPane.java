@@ -12,21 +12,22 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.util.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class WikipediaInfoPane extends Pane {
+
+public class WikipediaInfoPane extends VBox {
 
     @FXML
     private Label placeLabel;
     @FXML
     private Label countryLabel;
     @FXML
-    private Label descriptionLabel;
+    private Text descriptionText;
     @FXML
     private TableColumn<String, String> categoryName;
     @FXML
@@ -34,28 +35,34 @@ public class WikipediaInfoPane extends Pane {
     @FXML
     private TableView<Pair<String, String>> infoTable;
 
-    @Autowired
-    WikipediaService wikipediaService;
+    private WikipediaService wikipediaService;
 
+    public WikipediaInfoPane(WikipediaService wikipediaService) {
+        this.wikipediaService = wikipediaService;
+        FXMLLoadHelper.load(this, this, WikipediaInfoPane.class, "view/WikipediaInfoPane.fxml");
+    }
 
-    public void initialize() {
+    @FXML
+    private void initialize() {
 
-        categoryName.setCellValueFactory(new PropertyValueFactory<>("Kategorie"));
-        categoryValue.setCellValueFactory(new PropertyValueFactory<>("Wert"));
+        categoryName.setCellValueFactory(new PropertyValueFactory<>("Key"));
+        categoryValue.setCellValueFactory(new PropertyValueFactory<>("Value"));
 
-        showDefaultWikiInfo();
+        //showDefaultWikiInfo();
     }
 
 
     /**
      * Clear the info table and reset the labels to default values.
      */
-    public void showDefaultWikiInfo() {
+    public void showDefaultWikiInfo(Place place) {
         placeLabel.setText("Stadt");
         countryLabel.setText("Land");
-        descriptionLabel.setText("Your ad here.");
+        descriptionText.setText("Your ad here.");
 
-        infoTable.getColumns().clear();
+        infoTable.getItems().clear();
+
+        showWikipediaInfo(place);
     }
 
     /**
@@ -70,18 +77,18 @@ public class WikipediaInfoPane extends Pane {
             info = wikipediaService.getWikiPlaceInfo(place);
 
         } catch (ServiceException ex) {
-            info = new WikiPlaceInfo(place.getCity(), place.getCountry(), "Fehler beim Laden des Wikipedia Infos",
-                    null, null, null, null, null, null);
+            info = new WikiPlaceInfo(place.getCity(), place.getCountry(),
+                    "Fehler beim Laden des Wikipedia Infos", null, null, null, null, null, null);
         }
 
         placeLabel.setText(info.getPlaceName());
         countryLabel.setText(info.getCountryName());
-        descriptionLabel.setText(info.getDescription());
+        descriptionText.setText(info.getDescription());
 
         List<Pair<String, String>> infoList = new ArrayList<Pair<String, String>>();
 
         if (info.getPopulation() != null) {
-            infoList.add(new Pair<String, String>("Einwohner", info.getPopulation().toString()));
+            infoList.add(new Pair<String, String>("Bevölkerung", info.getPopulation().toString()));
         }
         if (info.getArea() != null) {
             infoList.add(new Pair<String, String>("Fläche", info.getArea().toString() + "m²"));
@@ -99,7 +106,8 @@ public class WikipediaInfoPane extends Pane {
             infoList.add(new Pair<String, String>("Sprache(n)", info.getLanguage()));
         }
 
-        ObservableList<Pair<String, String>> exifData = FXCollections.observableArrayList(infoList);
-        infoTable.setItems(exifData);
+        ObservableList<Pair<String, String>> obsInfoList =
+                FXCollections.observableArrayList(infoList);
+        infoTable.setItems(obsInfoList);
     }
 }

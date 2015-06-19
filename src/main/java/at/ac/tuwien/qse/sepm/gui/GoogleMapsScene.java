@@ -117,6 +117,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      * removes all Marker from Map
      */
     public void removeAktiveMarker() {
+        if(aktivMarker.size()==0) return;
         try {
             for (Marker m : aktivMarker) {
                 map.removeMarker(m);
