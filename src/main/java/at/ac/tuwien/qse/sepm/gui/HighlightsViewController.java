@@ -88,6 +88,9 @@ public class HighlightsViewController {
         this.grid = new ImageGrid(imageCache);
     }
 
+    /**
+     *  private Class conecting Place with LocalDateTime 
+     */
     private class PlaceDate {
         private Place place;
         private LocalDateTime date;
@@ -164,10 +167,17 @@ public class HighlightsViewController {
                     }
                 });
     }
+
     public void bt_hartPress(){
-        FullscreenWindow fw = new FullscreenWindow(this.imageCache);
-        fw.present(hart, hart.get(0));
+        if(hart.size()!=0) {
+            FullscreenWindow fw = new FullscreenWindow(this.imageCache);
+            fw.present(hart, hart.get(0));
+        }
     }
+
+    /**
+     * Button event "Tag Buttons"
+     */
     public void bt_photosByTag(){
         LOGGER.debug("BUTTON is pressed");
         for(Button b : buttonAr){
@@ -240,8 +250,14 @@ public class HighlightsViewController {
 
     private void handleJourneySelected(Journey journey){
         try {
+            /*
+                CLEAR THE HASHMAPS
+             */
             orderedPlacesAndPhotos.clear();
             placesAndTags.clear();
+
+
+
             Button back = new Button("<");
             back.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override public void handle(MouseEvent event) {
@@ -255,11 +271,14 @@ public class HighlightsViewController {
             titleLabel.setText(journey.getName()+" - Orte");
             //TODO this should return the places. List<Place> places = clusterService.getPlacesByJourney(journey);
 
-
+            // is implemented !
             List<Place> places= clusterService.getPlacesByJourney(journey);
 
-            // merge Places with Photos
 
+            /*
+                merge Places with Photos
+                output is a HashSet
+             */
             HashMap<Place,List<Photo>> photoToPlace = new HashMap<>();
             for(Place pl : places){
                 List<Photo> photos = new ArrayList<>();
@@ -289,6 +308,7 @@ public class HighlightsViewController {
                 orderedPlaces.put(min,ple);
             }
 
+            // order the LocalDateTime
             List<LocalDateTime> sortedKeys= new ArrayList<>(orderedPlaces.keySet());
             Collections.reverse(sortedKeys);
 
@@ -329,19 +349,24 @@ public class HighlightsViewController {
             e.printStackTrace();
         }
     }
+    /*
+        show Wikipedia to Place
 
+
+     */
     private void handlePlaceSelected(Place place) {
         wikipediaInfoPane.showDefaultWikiInfo(place);
         aktivePlace = place;
+        // set Buttontext default
         for(int i=0; i<buttonAr.size(); i++){
             buttonAr.get(i).setText("default");
         }
+        // placesAndTags = die most frequent tags ordered by place
         if(placesAndTags.size()!=0){
             if(placesAndTags.get(place).size()!=0) {
-                System.out.println(placesAndTags.get(place).size());
+
                 for (int i = 0; i < placesAndTags.get(place).size(); i++) {
-                    System.out.println(placesAndTags.get(place).get(i).toString());
-                    System.out.println(buttonAr.size());
+                    // set Button-text to TagName
                     buttonAr.get(i).setText(placesAndTags.get(place).get(i).getName());
                 }
             }
@@ -378,7 +403,9 @@ public class HighlightsViewController {
     public void reloadImages(){
         LOGGER.debug("reload Images");
 
-
+        /*
+                NEW FUNCTIONALITY
+         */
 
         for(PlaceDate pl :orderedPlacesAndPhotos.keySet()){
             // mostFreuqentTags to Place
@@ -397,7 +424,11 @@ public class HighlightsViewController {
 
             }
         }
+        /*
 
+            END
+
+         */
 
 
 
