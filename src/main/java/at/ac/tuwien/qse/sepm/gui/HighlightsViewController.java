@@ -159,7 +159,6 @@ public class HighlightsViewController {
                 journeys.getChildren().clear();
                 list.getItems().clear();
             }
-            final ToggleGroup group = new ToggleGroup();
             for(Journey j: listOfJourneys){
                 list.getItems().add(j);
             }
@@ -177,6 +176,7 @@ public class HighlightsViewController {
             Button back = new Button("<");
             back.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override public void handle(MouseEvent event) {
+                    clearMap();
                     left.setCenter(journeys);
                     titleLabel.setText("Reisen");
                     titleHBox.getChildren().remove(0);
