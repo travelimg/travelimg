@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <BorderPane fx:id="borderPane" stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.HighlightsViewController">
     <left>
         <BorderPane fx:id="left" prefWidth="240.0">
@@ -45,7 +46,16 @@
                             </VBox>
                         </ScrollPane>
                     </center>
-
+                    <bottom>
+                        <Button fx:id="good" prefHeight="200" prefWidth="300" styleClass="good">
+                            <tooltip>
+                                <Tooltip text="Gutes Foto"/>
+                            </tooltip>
+                            <graphic>
+                                <FontAwesomeIconView glyphName="HEART" scaleX="6" scaleY="6"/>
+                            </graphic>
+                        </Button>
+                    </bottom>
 
                 </BorderPane>
             </bottom>
@@ -68,39 +78,46 @@
 
                     </top>
                     <center>
-                        <VBox>
-                            <children>
-                                <VBox>
-                                    <children>
-                                        <Button></Button>
-                                        <Button></Button>
-                                    </children>
+                        <ScrollPane fx:id="scrollPhotoView">
+                            <VBox fx:id="photoView">
+                                <children>
 
-                                </VBox>
-                                <VBox>
-                                    <children>
-                                        <Button></Button>
-                                        <Button></Button>
-                                    </children>
-                                </VBox>
-                            </children>
-                        </VBox>
-                    <ScrollPane fx:id="scrollPhotoView" prefWidth="500" prefHeight="400" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
-                        <VBox fx:id="photoView">
-                            <children>
-
-                            </children>
+                                </children>
                                 <padding>
-                                  <Insets left="10.0" top="5.0" />
+                                    <Insets left="10.0" top="5.0" />
                                 </padding>
-                       </VBox>
-                     </ScrollPane>
+                            </VBox>
+                        </ScrollPane>
+
                     </center>
+                    <bottom>
+                        <HBox fx:id="tagContainer" maxHeight="300.0">
+                            <children>
+                                <HBox>
+                                    <children>
+                                        <Button fx:id="tag1" text="Tag1" prefHeight="200" prefWidth="300"></Button>
+                                        <Button fx:id="tag2" text="Tag2" prefHeight="200" prefWidth="300"></Button>
+                                    </children>
+
+                                </HBox>
+                                <HBox>
+                                    <children>
+                                        <Button fx:id="tag3" text="Tag3" prefHeight="200" prefWidth="300"></Button>
+                                        <Button fx:id="tag4" text="Tag4" prefHeight="200" prefWidth="300"></Button>
+                                    </children>
+
+                                </HBox>
+                            </children>
+
+                        </HBox>
+
+                    </bottom>
                 </BorderPane>
             </center>
 
         </BorderPane>
 
     </center>
+
 
 </BorderPane>

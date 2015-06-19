@@ -58,11 +58,19 @@ public class ClusterServiceImpl implements ClusterService {
     @Override
     public List<Place> getPlacesByJourney(Journey journey) throws ServiceException {
         List<Place> places= new ArrayList<>();
-        for(Photo p: photoService.getAllPhotos()){
-            if(p.getData().getJourney().getId().equals(journey.getId())) {
-                if(!places.contains(p.getData().getPlace()))
-                places.add(p.getData().getPlace());
+
+        try {
+            for(Photo p: photoDAO.readPhotosByJourney(journey)){
+               if(places.size()==0){
+                   places.add(p.getData().getPlace());
+               }else{
+                   if(!places.contains(p.getData().getPlace())){
+                       places.add(p.getData().getPlace());
+                   }
+               }
             }
+        } catch (DAOException e) {
+            throw new ServiceException("Failed to read Photos by journey");
         }
         /*try {
             return placeDAO.readByJourney(journey);

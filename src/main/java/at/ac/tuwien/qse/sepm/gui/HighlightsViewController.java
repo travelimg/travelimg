@@ -30,6 +30,7 @@ import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import sun.util.resources.cldr.lag.LocaleNames_lag;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,11 +45,11 @@ public class HighlightsViewController {
     @FXML private BorderPane borderPane,left,FotoContainer,treeBoarder,timeLine;
     @FXML private GoogleMapsScene mapsScene;
     @FXML private VBox journeys, mapContainer, photoView,tree, wikipediaInfoPaneContainer;
-    @FXML private HBox titleHBox;
+    @FXML private HBox titleHBox,tagContainer;
     @FXML private FilterList<Journey> journeyListView;
     @FXML private ScrollPane scrollPhotoView, treeScroll;
     @FXML private Label titleLabel;
-
+    @FXML private Button tag1,tag2,tag3,tag4,good;
     @Autowired private ClusterService clusterService;
     @Autowired private PhotoService photoService;
     @Autowired private TagService tagService;
@@ -72,6 +73,7 @@ public class HighlightsViewController {
     private ImageCache imageCache;
     private Line redLine;
 
+    private HashMap<PlaceDate,List<Photo>> orderedPlacesAndPhotos = new HashMap<>();
     @FXML
     private StrokeLineCap lineCap;
 
@@ -81,7 +83,27 @@ public class HighlightsViewController {
         this.grid = new ImageGrid(imageCache);
     }
 
+    private class PlaceDate {
+        private Place place;
+        private LocalDateTime date;
 
+        public PlaceDate(Place p, LocalDateTime l){
+            this.place=p;
+            this.date=l;
+        }
+        public void setPlace(Place p){
+            this.place=p;
+        }
+        public void setDate(LocalDateTime l){
+            this.date=l;
+        }
+        public Place getPlace(){
+            return this.place;
+        }
+        public LocalDateTime getDate(){
+            return this.date;
+        }
+    }
     public void initialize(){
         /**to remove - BEGIN**/
         HBox vBox = new HBox();
@@ -174,6 +196,7 @@ public class HighlightsViewController {
 
     private void handleJourneySelected(Journey journey){
         try {
+            orderedPlacesAndPhotos.clear();
             Button back = new Button("<");
             back.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override public void handle(MouseEvent event) {
@@ -185,7 +208,52 @@ public class HighlightsViewController {
             titleHBox.getChildren().add(0,back);
             titleLabel.setText(journey.getName()+" - Orte");
             //TODO this should return the places. List<Place> places = clusterService.getPlacesByJourney(journey);
-            List<Place> places = clusterService.getAllPlaces();
+
+
+            List<Place> places= clusterService.getPlacesByJourney(journey);
+
+            // merge Places with Photos
+
+            HashMap<Place,List<Photo>> photoToPlace = new HashMap<>();
+            for(Place pl : places){
+                List<Photo> photos = new ArrayList<>();
+
+                // TODO include PhotoFilter (bug)
+                for(Photo p : photoService.getAllPhotos()){
+                    if(p.getData().getPlace()!=null) {
+                        if (p.getData().getPlace().getId() == pl.getId()) {
+                            photos.add(p);
+                        }
+                    }
+                }
+                photoToPlace.put(pl,photos);
+            }
+
+            // merge Place with DataTime
+            HashMap<LocalDateTime,Place> orderedPlaces = new HashMap<>();
+
+            for(Place ple : photoToPlace.keySet()){
+                LocalDateTime min = LocalDateTime.MAX;
+                for(Photo p: photoToPlace.get(ple)){
+
+                    if(p.getData().getDatetime().compareTo(min)<0){
+                        min = p.getData().getDatetime();
+                    }
+                }
+                orderedPlaces.put(min,ple);
+            }
+
+            List<LocalDateTime> sortedKeys= new ArrayList<>(orderedPlaces.keySet());
+            Collections.reverse(sortedKeys);
+
+
+            // final HashMap with DateTime, Place and photos
+            for(LocalDateTime l : sortedKeys){
+                PlaceDate pl = new PlaceDate(orderedPlaces.get(l),l);
+                orderedPlacesAndPhotos.put(pl,photoToPlace.get(orderedPlaces.get(l)));
+            }
+
+
             clearMap();
             drawDestinationsAsPolyline(toLatLong(places));
             VBox v = new VBox();
@@ -193,7 +261,9 @@ public class HighlightsViewController {
             v.setStyle("-fx-font-size: 16;");
             v.setPadding(new Insets(5.0, 0.0, 0.0, 10.0));
             final ToggleGroup group = new ToggleGroup();
-            for(Place p : places){
+
+            for(PlaceDate pd: orderedPlacesAndPhotos.keySet()){
+                Place p = pd.getPlace();
                 RadioButton rb = new RadioButton(p.getCity());
                 rb.setToggleGroup(group);
                 rb.setOnAction(new EventHandler<ActionEvent>() {
@@ -204,6 +274,8 @@ public class HighlightsViewController {
                 v.getChildren().add(rb);
             }
             left.setCenter(v);
+            reloadImages();
+
         } catch (ServiceException e) {
             e.printStackTrace();
         }
@@ -242,6 +314,19 @@ public class HighlightsViewController {
      */
     public void reloadImages(){
         LOGGER.debug("reload Images");
+
+        // all GOOD fotos
+        List<Photo> hart = new ArrayList<>();
+        for(PlaceDate pl :orderedPlacesAndPhotos.keySet()){
+            for(Photo p: orderedPlacesAndPhotos.get(pl)){
+                if(p.getData().getRating().equals(Rating.GOOD)){
+                    hart.add(p);
+                }
+            }
+        }
+        //
+
+
         boolean rbIsSet =false;
         /*for(RadioButton r:journeyRadioButtonsHashMap.keySet()){
             if(r.isSelected()){
@@ -354,20 +439,6 @@ public class HighlightsViewController {
                         }
                         treeView = new TreeView<>(rootItem);
 
-                       /* tree.getChildren().add(redLine);
-
-                        double distance = redLine.getEndY()-redLine.getStartY();
-
-                        int anz = places.size();
-                        double dist = (500 / anz)/2;
-                        int counter =1;
-                        Text start = new Text(82,50,"START");
-                        start.setStroke(javafx.scene.paint.Paint.valueOf("DARKGRAY"));
-                        tree.getChildren().add(start);
-                        Text end = new Text(88,545,"END");
-                        end.setStroke(javafx.scene.paint.Paint.valueOf("DARKGRAY"));
-                        tree.getChildren().add(end);*/
-
                         String style =" -fx-font-size: 14; -fx-text-fill: #333333; -fx-padding: 5 0 5 10px;";
 
 
@@ -383,18 +454,9 @@ public class HighlightsViewController {
                             tree.getChildren().add(lab);
 
                             tree.getChildren().add(new Label());
-                           /* Line l = new Line(91,50 + counter * dist,109,50 + counter * dist);
-                            l.setStroke(Color.DARKGRAY);
-                            l.setStrokeWidth(4);
-                            l.setStrokeLineCap(StrokeLineCap.ROUND);
-                            Text text = new Text(120,53 + counter * dist,p.getCountry());
-                            LocalDateTime pTime = places.get(p).get(0).getDatetime();
-                            Text text2 = new Text(4,53 + counter * dist,pTime.getYear()+"-"+pTime.getMonthValue()+"-"+pTime.getDayOfMonth());
-                            tree.getChildren().addAll(l,text,text2);
-                            counter++;*/
+
                         }
 
-                       // tree.getChildren().add(treeView);
 
                         photoView.getChildren().addAll(overall);
 
