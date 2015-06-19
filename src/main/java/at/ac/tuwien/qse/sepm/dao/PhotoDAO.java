@@ -55,10 +55,18 @@ public interface PhotoDAO {
     /**
      * Retrieve all existing photos.
      *
-     * @return A List of all currently known photos.
+     * @return A list of all currently known photos.
      * @throws DAOException If the data store fails to retrieve the records.
      */
     List<Photo> readAll() throws DAOException;
+
+    /**
+     * Retrieve the paths of all existing photos.
+     *
+     * @return A list of all currently known photo paths.
+     * @throws DAOException If the data store fails to retrieve the records.
+     */
+    List<Path> readAllPaths() throws DAOException;
 
     /**
      * Retrieve a list of photos from a given journey
