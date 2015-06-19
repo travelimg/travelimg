@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.control.FilterList;
+import at.ac.tuwien.qse.sepm.gui.control.WikipediaInfoPane;
 import at.ac.tuwien.qse.sepm.gui.grid.ImageGrid;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
@@ -30,7 +31,6 @@ import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import sun.util.resources.cldr.lag.LocaleNames_lag;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
