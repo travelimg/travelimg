@@ -298,6 +298,9 @@ public class HighlightsViewController {
 
     private void handlePlaceSelected(Place place) {
         wikipediaInfoPane.showDefaultWikiInfo(place);
+        for(int i=0; i<buttonAr.size(); i++){
+            buttonAr.get(i).setText("default");
+        }
         if(placesAndTags.size()!=0){
             if(placesAndTags.get(place).size()!=0) {
                 System.out.println(placesAndTags.get(place).size());
