@@ -1,8 +1,9 @@
-package at.ac.tuwien.qse.sepm.gui;
+package at.ac.tuwien.qse.sepm.gui.control;
 
 
 import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.WikiPlaceInfo;
+import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.WikipediaService;
 import javafx.collections.FXCollections;
@@ -91,10 +92,10 @@ public class WikipediaInfoPane extends VBox {
             infoList.add(new Pair<String, String>("Bevölkerung", info.getPopulation().toString()));
         }
         if (info.getArea() != null) {
-            infoList.add(new Pair<String, String>("Fläche", info.getArea().toString() + "m²"));
+            infoList.add(new Pair<String, String>("Fläche", info.getArea().toString() + "km²"));
         }
         if (info.getElevation() != null) {
-            infoList.add(new Pair<String, String>("Höhe", info.getElevation().toString() + "m²"));
+            infoList.add(new Pair<String, String>("Höhe", info.getElevation().toString() + "m"));
         }
         if (info.getUtcOffset() != null) {
             infoList.add(new Pair<String, String>("Zeitzone", info.getUtcOffset().toString()));
