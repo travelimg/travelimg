@@ -12,9 +12,6 @@ public class SlideValidator {
         if (entity == null)
             throw new ValidationException("Entity can not be null");
 
-        if (entity.getPhoto() == null)
-            throw new ValidationException("Photo can not be null");
-
         if (entity.getOrder() < 0)
             throw new ValidationException("Order must be non-negative");
     }

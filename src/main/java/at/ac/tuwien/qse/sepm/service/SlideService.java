@@ -24,11 +24,4 @@ public interface SlideService {
     void delete(Slide slide) throws ServiceException;
 
     Slide update(Slide slide) throws ServiceException;
-
-    /**
-     * Return all Slides
-     * @return
-     * @throws ServiceException
-     */
-    List<Slide> readAll() throws ServiceException;
 }

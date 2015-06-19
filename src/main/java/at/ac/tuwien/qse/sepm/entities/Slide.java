@@ -7,16 +7,15 @@ public class Slide {
     }
 
     private Integer id;
-    private Photo photo;
     private Integer slideshowId;
     private Integer order;
+    private String caption;
 
-    public Slide(Integer id, Photo photo, Integer slideshowId, Integer order) {
+    public Slide(Integer id, Integer slideshowId, Integer order, String caption) {
         this.id = id;
-        this.photo = photo;
         this.slideshowId = slideshowId;
         this.order = order;
-
+        this.caption = caption;
     }
 
     public Integer getId() {
@@ -25,14 +24,6 @@ public class Slide {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Photo getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(Photo photo) {
-        this.photo = photo;
     }
 
     public Integer getSlideshowId() {
@@ -51,13 +42,21 @@ public class Slide {
         this.order = order;
     }
 
+    public String getCaption() {
+        return caption;
+    }
+
+    public void setCaption(String caption) {
+        this.caption = caption;
+    }
+
     @Override
     public String toString() {
         return "Slide{" +
                 "id=" + id +
-                ", photo=" + photo +
                 ", slideshowId=" + slideshowId +
                 ", order=" + order +
+                ", caption='" + caption + '\'' +
                 '}';
     }
 }

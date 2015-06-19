@@ -51,13 +51,4 @@ public class SlideServiceImpl implements SlideService{
             throw new ServiceException("Failed to update slide", ex);
         }
     }
-
-    @Override public List<Slide> readAll() throws ServiceException {
-        LOGGER.debug("Retrieving all slides");
-        try {
-            return slideDAO.readAll();
-        } catch (DAOException e) {
-            throw new ServiceException(e);
-        }
-    }
 }

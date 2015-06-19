@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.PhotoSlide;
 import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
@@ -113,10 +114,16 @@ public class PresentationWindow extends AnchorPane{
             return;
         }
 
-        Image image = imageCache.get(slides.get(activeIndex).getPhoto(), ImageSize.ORIGINAL);
-        imageView.setImage(image);
+        // TODO: make generic for all slide types
+        Slide next = slides.get(activeIndex);
 
-        // handling of images in original size can consume a lot of memory so collect it here
-        System.gc();
+        if (next instanceof PhotoSlide) {
+            PhotoSlide photoSlide = (PhotoSlide)next;
+            Image image = imageCache.get(photoSlide.getPhoto(), ImageSize.ORIGINAL);
+            imageView.setImage(image);
+
+            // handling of images in original size can consume a lot of memory so collect it here
+            System.gc();
+        }
     }
 }

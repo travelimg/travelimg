@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.SlideDAO;
 import at.ac.tuwien.qse.sepm.dao.SlideshowDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.PhotoSlide;
 import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
@@ -28,7 +29,7 @@ public class SlideshowServiceImpl implements SlideshowService {
     private SlideshowDAO slideshowDAO;
 
     @Autowired
-    private SlideDAO slideDAO;
+    private SlideDAO<PhotoSlide> photoSlideDAO;
 
     @Override
     public Slideshow create(Slideshow slideshow) throws ServiceException {
@@ -78,8 +79,8 @@ public class SlideshowServiceImpl implements SlideshowService {
 
         try {
             for (Photo photo : photos) {
-                Slide slide = new Slide(-1, photo, slideshow.getId(), order);
-                slide = slideDAO.create(slide);
+                PhotoSlide slide = new PhotoSlide(-1, slideshow.getId(), order, "", photo);
+                slide = photoSlideDAO.create(slide);
 
                 slides.add(slide);
                 slideshow.getSlides().add(slide);

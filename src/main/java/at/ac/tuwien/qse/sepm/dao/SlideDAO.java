@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by mb on 08.06.15.
  */
-public interface SlideDAO {
+public interface SlideDAO<S extends Slide> {
 
     /**
      * Insert the photo wich is addedTo the specified Slideshow
@@ -17,7 +17,7 @@ public interface SlideDAO {
      * @throws DAOException
      * @throws ValidationException
      */
-    Slide create(Slide slide) throws DAOException, ValidationException;
+    S create(S slide) throws DAOException, ValidationException;
 
     /**
      * Delete the photo from the slide
@@ -25,18 +25,9 @@ public interface SlideDAO {
      * @throws DAOException
      * @throws ValidationException
      */
-    void delete(Slide slide) throws DAOException, ValidationException;
+    void delete(S slide) throws DAOException, ValidationException;
 
-    Slide update(Slide slide) throws DAOException, ValidationException;
+    S update(S slide) throws DAOException, ValidationException;
 
-    List<Slide> getSlidesForSlideshow(int slideshowId) throws DAOException, ValidationException;
-
-    /**
-     * Retrieve a list of slides from a given slideshow
-     * @return
-     * @throws DAOException
-     */
-    List<Slide> readAll() throws DAOException;
-
-
+    List<S> getSlidesForSlideshow(int slideshowId) throws DAOException, ValidationException;
 }

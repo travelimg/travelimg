@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.gui.grid;
 
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.PhotoSlide;
 import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
@@ -24,7 +25,9 @@ public class SlideshowGrid extends ImageGrid<SlideGridTile> {
 
         clear();
         List<Photo> photos = slideshow.getSlides().stream()
-                .map(Slide::getPhoto)
+                .filter(s -> s instanceof PhotoSlide) // TODO: remove
+                .map(s -> (PhotoSlide)s) // TODO: remove
+                .map(PhotoSlide::getPhoto)
                 .collect(Collectors.toList());
 
         setPhotos(photos);
