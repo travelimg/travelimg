@@ -728,22 +728,6 @@ public class HighlightsViewController {
                 (ne.getLongitude() + sw.getLongitude()) / 2);
     }
 
-    private LatLong[] getDestinations(){
-        LatLong[] path={
-                new LatLong(48.2363038,16.3478819),
-                new LatLong( 48.236299,16.3478708),
-                new LatLong(48.232022, 16.376037),
-                new LatLong(48.216240, 16.396758),
-                new LatLong(48.197900, 16.415591),
-                new LatLong(48.189453, 16.403740),
-                new LatLong(48.185354, 16.362832),
-                new LatLong(48.194362, 16.343365),
-                new LatLong(48.215007, 16.338477),
-                new LatLong(48.161529, 16.369028)
-        };
-        return path;
-    }
-
     private void clearMap(){
         for(Marker m : markers){
             googleMap.removeMarker(m);
