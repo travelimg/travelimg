@@ -65,4 +65,11 @@ public interface PhotoService {
      * @param callback callback that receives the deleted photos
      */
     void subscribeDelete(Consumer<Path> callback);
+
+    /**
+     * Synchronize the photo repository asynchronously in the background and start watching for changes to the watched files.
+     *
+     * Should only be called once on startup.
+     */
+    void synchronize();
 }

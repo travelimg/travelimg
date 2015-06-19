@@ -18,6 +18,16 @@ public class PhotoMetadata {
     public PhotoMetadata() {
     }
 
+    public PhotoMetadata(LocalDateTime datetime, double latitude, double longitude, Rating rating, Photographer photographer, Place place, Journey journey) {
+        this.datetime = datetime;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.rating = rating;
+        this.photographer = photographer;
+        this.place = place;
+        this.journey = journey;
+    }
+
     public PhotoMetadata(PhotoMetadata from) {
         if (from == null) throw new IllegalArgumentException();
         if (from.datetime != null) {

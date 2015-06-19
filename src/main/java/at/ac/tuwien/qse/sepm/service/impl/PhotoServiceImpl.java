@@ -2,14 +2,11 @@ package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
-import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
-import at.ac.tuwien.qse.sepm.dao.PlaceDAO;
 import at.ac.tuwien.qse.sepm.dao.repo.AsyncPhotoRepository;
 import at.ac.tuwien.qse.sepm.dao.repo.Operation;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoRepository;
 import at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
@@ -18,10 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -29,22 +23,35 @@ import java.util.stream.Collectors;
 public class PhotoServiceImpl implements PhotoService {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    
+    private static final int REFRESH_RATE = 5;
+
     @Autowired
     private PhotoDAO photoDAO;
+    @Autowired
+    private PollingFileWatcher watcher;
     @Autowired
     private AsyncPhotoRepository photoRepository;
 
     private Listener listener;
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private ScheduledFuture<?> watcherSchedule = null;
 
     @Autowired
-    private void initializeWatcher(PollingFileWatcher watcher) {
+    private void initializeListeners(AsyncPhotoRepository repository) {
         listener = new Listener();
-        photoRepository.addListener((AsyncPhotoRepository.AsyncListener)listener);
-        photoRepository.addListener((PhotoRepository.Listener)listener);
+        repository.addListener((AsyncPhotoRepository.AsyncListener)listener);
+        repository.addListener((PhotoRepository.Listener)listener);
+    }
 
-        // update the repository
+    @Override
+    public void synchronize() {
+        LOGGER.debug("Synchronizing repository");
+
+        // schedule the update in a separate thread with a little delay
+        scheduler.schedule(this::synchronizeAndSchedule, 2, TimeUnit.SECONDS);
+    }
+
+    private void synchronizeAndSchedule() {
         watcher.refresh();
         try {
             photoRepository.synchronize();
@@ -52,11 +59,14 @@ public class PhotoServiceImpl implements PhotoService {
             LOGGER.error("Failed to synchronize files", ex);
         }
 
-        int REFRESH_RATE = 5;
-        scheduler.scheduleAtFixedRate(watcher::refresh, REFRESH_RATE, REFRESH_RATE, TimeUnit.SECONDS);
+        // schedule watcher to notify about future changes
+        watcherSchedule = scheduler.scheduleAtFixedRate(watcher::refresh, REFRESH_RATE, REFRESH_RATE, TimeUnit.SECONDS);
     }
 
     public void close() {
+        if (watcherSchedule != null) {
+            watcherSchedule.cancel(true);
+        }
         scheduler.shutdown();
         listener.close();
     }
@@ -69,7 +79,7 @@ public class PhotoServiceImpl implements PhotoService {
         for (Photo p : photos) {
             LOGGER.debug("Deleting photo {}", p);
             try {
-                photoDAO.delete(p);
+                photoRepository.delete(p.getFile());
             } catch (DAOException e) {
                 throw new ServiceException(e);
             }
