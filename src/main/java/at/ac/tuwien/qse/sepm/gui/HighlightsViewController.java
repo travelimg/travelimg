@@ -301,7 +301,10 @@ public class HighlightsViewController {
             }
 
 
-
+            ArrayList<Place> orderedPlacesList = new ArrayList<>();
+            for(PlaceDate pd: orderedPlacesAndPhotos.keySet()){
+                orderedPlacesList.add(pd.getPlace());
+            }
 
             VBox v = new VBox();
             v.setSpacing(5.0);
@@ -319,8 +322,9 @@ public class HighlightsViewController {
             v.getChildren().add(rbAll);
             rbAll.setSelected(true);
             clearMap();
-            drawDestinationsAsPolyline(toLatLong(places));
+            drawDestinationsAsPolyline(toLatLong(orderedPlacesList));
             reloadImages();
+
             int pos = 0;
             for(PlaceDate pd: orderedPlacesAndPhotos.keySet()){
                 Place p = pd.getPlace();
@@ -329,7 +333,7 @@ public class HighlightsViewController {
                 final int finalPos = pos;
                 rb.setOnAction(new EventHandler<ActionEvent>() {
                     @Override public void handle(ActionEvent event) {
-                        handlePlaceSelected(new ArrayList<Place>(orderedPlaces.values()),p, finalPos);
+                        handlePlaceSelected(orderedPlacesList,p, finalPos);
                     }
                 });
                 v.getChildren().add(rb);
