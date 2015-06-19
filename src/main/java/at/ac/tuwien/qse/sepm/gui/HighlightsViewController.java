@@ -189,6 +189,7 @@ public class HighlightsViewController {
     private void handleFilterChange(PhotoFilter filter){
         this.filter = filter;
         tree.getChildren().clear();
+
         if(!disableReload) reloadImages();
     }
     public void setFilterChangeAction(Consumer<PhotoFilter>callback){
@@ -203,6 +204,7 @@ public class HighlightsViewController {
      * add every TitlePane to the GUI
      */
     public void reloadImages(){
+        LOGGER.debug("reload Images");
         boolean rbIsSet =false;
         for(RadioButton r:journeyRadioButtonsHashMap.keySet()){
             if(r.isSelected()){
@@ -211,17 +213,22 @@ public class HighlightsViewController {
             }
         }
         if(rbIsSet=true) {
+            LOGGER.debug("Reise ausgewählt ");
             try {
 
                 List<Photo> allPhotos = photoService.getAllPhotos(filter).stream()
                         .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
                         .collect(Collectors.toList());
+                LOGGER.debug(photoService.getAllPhotos(filter).size());
+                LOGGER.debug(allPhotos.size());
+
                 List<Photo> goodPhotos = new ArrayList<>();
                 for (Photo p : allPhotos) {
                     if (p.getData().getRating() == (Rating.GOOD)) {
                         goodPhotos.add(p);
                     }
                 }
+                LOGGER.debug(goodPhotos.size());
                Collections.sort((ArrayList)goodPhotos);
 
                 if (goodPhotos.size() == 0) {
