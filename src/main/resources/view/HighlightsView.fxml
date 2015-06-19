@@ -47,7 +47,7 @@
                         </ScrollPane>
                     </center>
                     <bottom>
-                        <Button fx:id="good" prefHeight="200" prefWidth="300" styleClass="good">
+                        <Button fx:id="good" prefHeight="200" prefWidth="300" styleClass="good" onAction="#bt_hartPress">
                             <tooltip>
                                 <Tooltip text="Gutes Foto"/>
                             </tooltip>

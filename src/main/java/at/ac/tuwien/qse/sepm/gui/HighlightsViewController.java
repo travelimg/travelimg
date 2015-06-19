@@ -73,6 +73,8 @@ public class HighlightsViewController {
     private ImageCache imageCache;
     private Line redLine;
 
+    private List<Photo> hart = new ArrayList<>();
+
     private HashMap<PlaceDate,List<Photo>> orderedPlacesAndPhotos = new HashMap<>();
     @FXML
     private StrokeLineCap lineCap;
@@ -155,7 +157,10 @@ public class HighlightsViewController {
                     }
                 });
     }
-
+    public void bt_hartPress(){
+        FullscreenWindow fw = new FullscreenWindow(this.imageCache);
+        fw.present(hart,hart.get(0));
+    }
     public void setMap(GoogleMapsScene map) {
         this.mapsScene = map;
         mapView = map.getMapView();
@@ -316,7 +321,7 @@ public class HighlightsViewController {
         LOGGER.debug("reload Images");
 
         // all GOOD fotos
-        List<Photo> hart = new ArrayList<>();
+
         for(PlaceDate pl :orderedPlacesAndPhotos.keySet()){
             for(Photo p: orderedPlacesAndPhotos.get(pl)){
                 if(p.getData().getRating().equals(Rating.GOOD)){
@@ -324,6 +329,7 @@ public class HighlightsViewController {
                 }
             }
         }
+        System.out.println(hart.size());
         //
 
 
