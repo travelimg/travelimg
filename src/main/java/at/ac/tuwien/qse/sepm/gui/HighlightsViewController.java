@@ -31,6 +31,7 @@ import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import sun.rmi.runtime.Log;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -76,7 +77,7 @@ public class HighlightsViewController {
     private List<Photo> hart = new ArrayList<>();
     private HashMap<Place,List<Tag>> placesAndTags = new HashMap<>();
     private HashMap<PlaceDate,List<Photo>> orderedPlacesAndPhotos = new HashMap<>();
-
+    private Place aktivePlace = null;
 
     @FXML
     private StrokeLineCap lineCap;
@@ -166,6 +167,39 @@ public class HighlightsViewController {
     public void bt_hartPress(){
         FullscreenWindow fw = new FullscreenWindow(this.imageCache);
         fw.present(hart, hart.get(0));
+    }
+    public void bt_photosByTag(){
+        LOGGER.debug("BUTTON is pressed");
+        for(Button b : buttonAr){
+            if(b.isArmed() && !b.getText().equals("default")){
+                LOGGER.debug("Button:" +b.getText()+"is pressed");
+                LOGGER.debug(aktivePlace.toString());
+                List<Photo> presentPhotos = new ArrayList<>();
+
+               for(PlaceDate pl :orderedPlacesAndPhotos.keySet()){
+                   if(pl.getPlace().getId() == aktivePlace.getId()){
+                       LOGGER.debug("same ID");
+                       LOGGER.debug("Look @ "+orderedPlacesAndPhotos.get(pl).size()+" Photos");
+                       for(Photo p: orderedPlacesAndPhotos.get(pl)){
+                           LOGGER.debug(p.toString());
+                           for(Tag t: p.getData().getTags()){
+                               if(t.getName().equals(b.getText())){
+                                   presentPhotos.add(p);
+                                   LOGGER.debug("add photo");
+                               }
+                           }
+                       }
+                   }
+               }
+                if(presentPhotos.size()!=0) {
+                    FullscreenWindow fw = new FullscreenWindow(this.imageCache);
+                    fw.present(presentPhotos, presentPhotos.get(0));
+                }else{
+                    LOGGER.debug("no Photos");
+                }
+
+            }
+        }
     }
     public void setMap(GoogleMapsScene map) {
         this.mapsScene = map;
@@ -298,6 +332,7 @@ public class HighlightsViewController {
 
     private void handlePlaceSelected(Place place) {
         wikipediaInfoPane.showDefaultWikiInfo(place);
+        aktivePlace = place;
         for(int i=0; i<buttonAr.size(); i++){
             buttonAr.get(i).setText("default");
         }

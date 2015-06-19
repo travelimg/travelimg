@@ -95,15 +95,15 @@
                             <children>
                                 <HBox>
                                     <children>
-                                        <Button fx:id="tag1" text="Tag1" prefHeight="200" prefWidth="300"></Button>
-                                        <Button fx:id="tag2" text="Tag2" prefHeight="200" prefWidth="300"></Button>
+                                        <Button fx:id="tag1" text="Tag1" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
+                                        <Button fx:id="tag2" text="Tag2" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
                                     </children>
 
                                 </HBox>
                                 <HBox>
                                     <children>
-                                        <Button fx:id="tag3" text="Tag3" prefHeight="200" prefWidth="300"></Button>
-                                        <Button fx:id="tag4" text="Tag4" prefHeight="200" prefWidth="300"></Button>
+                                        <Button fx:id="tag3" text="Tag3" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
+                                        <Button fx:id="tag4" text="Tag4" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
                                     </children>
 
                                 </HBox>
