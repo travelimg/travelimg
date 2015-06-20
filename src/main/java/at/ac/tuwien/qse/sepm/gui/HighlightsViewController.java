@@ -60,6 +60,7 @@ public class HighlightsViewController {
     private ArrayList<Marker> markers = new ArrayList<>();
     private ArrayList<Polyline> polylines = new ArrayList<>();
     private List<Button> buttonAr = new LinkedList<>();
+    private Label noJourneysAvailableLabel = new Label("Keine Reisen gefunden. Bitte fügen Sie eine neue ein.");
     private Journey selectedJourney;
     private WikipediaInfoPane wikipediaInfoPane;
     private GoogleMapView mapView;
@@ -128,53 +129,15 @@ public class HighlightsViewController {
                 .addListener(new ChangeListener<Journey>() {
                     public void changed(ObservableValue<? extends Journey> observable,
                             Journey oldValue, Journey newValue) {
-                        handleJourneySelected(newValue);
+                        LOGGER.debug("Selected {}", newValue);
+                        if(newValue != null){
+                            handleJourneySelected(newValue);
+                        }
+
+
                     }
                 });
-    }
-
-    public void bt_heartPress(){
-        if(goodPhotosList.size()!=0) {
-            FullscreenWindow fw = new FullscreenWindow(this.imageCache);
-            fw.present(goodPhotosList, goodPhotosList.get(0));
-        }
-    }
-
-    /**
-     * Button event "Tag Buttons"
-     */
-    public void bt_photosByTag(){
-        LOGGER.debug("BUTTON is pressed");
-        for(Button b : buttonAr){
-            if(b.isArmed() && !b.getText().equals("default")){
-                LOGGER.debug("Button:" +b.getText()+"is pressed");
-                LOGGER.debug(aktivePlace.toString());
-                List<Photo> presentPhotos = new ArrayList<>();
-
-               for(PlaceDate pl :orderedPlacesAndPhotos.keySet()){
-                   if(pl.getPlace().getId() == aktivePlace.getId()){
-                       LOGGER.debug("same ID");
-                       LOGGER.debug("Look @ "+orderedPlacesAndPhotos.get(pl).size()+" Photos");
-                       for(Photo p: orderedPlacesAndPhotos.get(pl)){
-                           LOGGER.debug(p.toString());
-                           for(Tag t: p.getData().getTags()){
-                               if(t.getName().equals(b.getText())){
-                                   presentPhotos.add(p);
-                                   LOGGER.debug("add photo");
-                               }
-                           }
-                       }
-                   }
-               }
-                if(presentPhotos.size()!=0) {
-                    FullscreenWindow fw = new FullscreenWindow(this.imageCache);
-                    fw.present(presentPhotos, presentPhotos.get(0));
-                }else{
-                    LOGGER.debug("no Photos");
-                }
-
-            }
-        }
+        noJourneysAvailableLabel.setWrapText(true);
     }
 
     public void reloadJourneys(){
@@ -184,19 +147,19 @@ public class HighlightsViewController {
         lab2.setText("Bitte eine Reise auswählen");
         //.getChildren().add(lab2);
 
+        journeys.getChildren().clear();
+        journeysListView.getItems().clear();
         try {
             List<Journey> listOfJourneys = clusterService.getAllJourneys();
             if(listOfJourneys.size()>0){
-                journeys.getChildren().clear();
-                journeysListView.getItems().clear();
+                journeysListView.getItems().addAll(listOfJourneys);
+                journeys.getChildren().add(journeysListView);
             }
-            journeysListView.getItems().addAll(listOfJourneys);
-
-            journeys.getChildren().add(journeysListView);
+            else{
+                journeys.getChildren().add(noJourneysAvailableLabel);
+            }
         } catch (ServiceException e) {
-            Label lab = new Label();
-            lab.setText("keine Reisen vorhanden");
-            journeys.getChildren().add(lab);
+            journeys.getChildren().add(noJourneysAvailableLabel);
         }
     }
 
@@ -208,19 +171,25 @@ public class HighlightsViewController {
             orderedPlacesAndPhotos.clear();
             placesAndTags.clear();
 
-
+            HBox placesTitleHBox = new HBox();
+            Label placesTitleLabel = new Label("Orte");
+            placesTitleLabel.setStyle("-fx-background-color: #333333; -fx-font-size: 18; -fx-text-fill: white; -fx-padding: 5 0 5 10px;");
+            placesTitleLabel.setPrefWidth(259);
+            placesTitleLabel.setPrefHeight(20);
 
             Button back = new Button("<");
             back.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override public void handle(MouseEvent event) {
                     clearMap();
+                    left.setTop(titleHBox);
                     left.setCenter(journeys);
-                    titleLabel.setText("Reisen");
-                    titleHBox.getChildren().remove(0);
                 }
             });
-            titleHBox.getChildren().add(0,back);
-            titleLabel.setText(journey.getName()+" - Orte");
+
+            placesTitleHBox.getChildren().add(back);
+            placesTitleHBox.getChildren().add(placesTitleLabel);
+            left.setTop(placesTitleHBox);
+
             Set<Place> places= clusterService.getPlacesByJourney(journey);
 
 
@@ -312,6 +281,50 @@ public class HighlightsViewController {
 
         } catch (ServiceException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void bt_heartPress(){
+        if(goodPhotosList.size()!=0) {
+            FullscreenWindow fw = new FullscreenWindow(this.imageCache);
+            fw.present(goodPhotosList, goodPhotosList.get(0));
+        }
+    }
+
+    /**
+     * Button event "Tag Buttons"
+     */
+    public void bt_photosByTag(){
+        LOGGER.debug("BUTTON is pressed");
+        for(Button b : buttonAr){
+            if(b.isArmed() && !b.getText().equals("default")){
+                LOGGER.debug("Button:" +b.getText()+"is pressed");
+                LOGGER.debug(aktivePlace.toString());
+                List<Photo> presentPhotos = new ArrayList<>();
+
+               for(PlaceDate pl :orderedPlacesAndPhotos.keySet()){
+                   if(pl.getPlace().getId() == aktivePlace.getId()){
+                       LOGGER.debug("same ID");
+                       LOGGER.debug("Look @ "+orderedPlacesAndPhotos.get(pl).size()+" Photos");
+                       for(Photo p: orderedPlacesAndPhotos.get(pl)){
+                           LOGGER.debug(p.toString());
+                           for(Tag t: p.getData().getTags()){
+                               if(t.getName().equals(b.getText())){
+                                   presentPhotos.add(p);
+                                   LOGGER.debug("add photo");
+                               }
+                           }
+                       }
+                   }
+               }
+                if(presentPhotos.size()!=0) {
+                    FullscreenWindow fw = new FullscreenWindow(this.imageCache);
+                    fw.present(presentPhotos, presentPhotos.get(0));
+                }else{
+                    LOGGER.debug("no Photos");
+                }
+
+            }
         }
     }
 
