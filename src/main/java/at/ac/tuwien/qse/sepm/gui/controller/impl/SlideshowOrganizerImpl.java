@@ -92,6 +92,7 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
         updateButton.setOnAction(this::updateSelectedSlideshowName);
         slideshowList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             selectedSlideshowProperty.setValue(newValue);
+            onActiveSlideshowChanged();
         });
 
         //Add Buttons to Tooggle Group
@@ -102,6 +103,8 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
 
 
         radioButtons.selectedToggleProperty().addListener(this::updateSlideshowDuration);
+
+
 
     }
 
@@ -135,7 +138,9 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
             updatedSlideshow.setId(getSelected().getId());
             try {
                 slideshowService.update(updatedSlideshow);
+                getSelected().setName(slideshowNameTextField.getText());
                 updateSlideshowListView();
+                slideshowNameTextField.clear();
             } catch (ServiceException e) {
                 ErrorDialog.show(root, "Fehler beim Ändern der Slideshow", "Fehlermeldung: " + e.getMessage());
             }
@@ -148,10 +153,14 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
 
     private void updateSlideshowListView() {
         ObservableList<Slideshow> slideshows = slideshowList.getItems();
-        getSelected().setName(slideshowNameTextField.getText());
         slideshowList.setItems(FXCollections.observableArrayList());
         slideshowList.setItems(slideshows);
 
+
+    }
+
+    private void onActiveSlideshowChanged(){
+        slideshowNameTextField.setText(getSelected().getName());
     }
 
     private void updateSlideshowDuration(Object observable) {
@@ -161,7 +170,6 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
 
             try {
                 slideshowService.update(selected);
-                LOGGER.debug(getSelectedDuration()+"Aktuelle Duration!");
             } catch (ServiceException ex) {
                 ErrorDialog.show(root, "Fehler beim Ändern der Dauer", "Fehlermeldung: " + ex.getMessage());
             }
