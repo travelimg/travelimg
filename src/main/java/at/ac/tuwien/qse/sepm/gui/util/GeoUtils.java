@@ -75,4 +75,37 @@ public class GeoUtils {
         return path;
     }
 
+    /**
+     * Returns the radius
+     * @param degrees
+     * @return the dadius
+     */
+    @Deprecated
+    public double ToRadians(double degrees) {
+        double radians = degrees * Math.PI / 180;
+        return radians;
+    }
+
+    /**
+     * Retruns the distance between 2 LatLong Objekts
+     * @param lat1
+     * @param lng1
+     * @param lat2
+     * @param lng2
+     * @return
+     */
+    @Deprecated
+    public double DirectDistance(double lat1, double lng1, double lat2, double lng2) {
+        double earthRadius = 3958.75;
+        double dLat = ToRadians(lat2-lat1);
+        double dLng = ToRadians(lng2-lng1);
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(ToRadians(lat1)) * Math.cos(ToRadians(lat2)) *
+                        Math.sin(dLng/2) * Math.sin(dLng/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double dist = earthRadius * c;
+        double meterConversion = 1609.00;
+        return dist * meterConversion;
+    }
+
 }
