@@ -8,6 +8,7 @@ import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import at.ac.tuwien.qse.sepm.gui.util.LRUCache;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Pos;
 import javafx.scene.control.Pagination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -25,6 +26,8 @@ import java.util.stream.Collectors;
 public class PaginatedImageGrid extends StackPane {
 
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final int PADDING = 2;
+    private static final int GAP = 2;
 
     private Menu menu;
     private ImageCache imageCache;
@@ -43,6 +46,7 @@ public class PaginatedImageGrid extends StackPane {
         heightProperty().addListener(this::handleSizeChange);
         widthProperty().addListener(this::handleSizeChange);
         activePageProperty.addListener(this::handlePageChange);
+        setAlignment(Pos.CENTER);
 
         menu.addListener(new PageSwitchListener());
     }
@@ -195,7 +199,6 @@ public class PaginatedImageGrid extends StackPane {
         int startIndex = Math.min(pageIndex * photosPerPage, endIndex);
 
         ImageGridPage page = new ImageGridPage(photos.subList(startIndex, endIndex), imageCache);
-
         pageCache.put(pageIndex, page);
         return page;
     }
@@ -242,10 +245,8 @@ public class PaginatedImageGrid extends StackPane {
      */
     private void handleSizeChange(Object observable) {
         // estimate tile size
-        int gap = 16;
-        int padding = 8;
         int size = ImageSize.inPixels(ImageSize.MEDIUM);
-        int tileSize = padding + gap + size;
+        int tileSize = PADDING + GAP + size;
 
         int photosPerRow = (int) getWidth() / tileSize;
         int photosPerCol = (int) getHeight() / tileSize;

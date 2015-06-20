@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.gui.grid;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
+import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.TilePane;
@@ -28,6 +29,7 @@ public class ImageGrid extends TilePane {
         this.imageCache = imageCache;
 
         getStyleClass().add("image-grid");
+        setAlignment(Pos.CENTER);
     }
 
     public void setPhotos(List<Photo> photos) {

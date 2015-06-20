@@ -336,7 +336,7 @@
 
 .image-grid {
     -fx-background-color: #dddddd;
-    -fx-padding: 1px;
+    -fx-padding: 2px;
     -fx-hgap: 2px;
     -fx-vgap: 2px;
 }
