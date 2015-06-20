@@ -1,7 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.*;
-import at.ac.tuwien.qse.sepm.gui.control.FilterList;
 import at.ac.tuwien.qse.sepm.gui.control.WikipediaInfoPane;
 import at.ac.tuwien.qse.sepm.gui.grid.ImageGrid;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
@@ -43,7 +42,6 @@ public class HighlightsViewController {
     @FXML private GoogleMapsScene mapsScene;
     @FXML private VBox journeys,tree, tagheartContainer;
     @FXML private HBox titleHBox,tagContainer,wikipediaInfoPaneContainer, mapContainer;
-    @FXML private FilterList<Journey> journeyListView;
     @FXML private ScrollPane scrollPhotoView, treeScroll;
     @FXML private Label titleLabel;
     @FXML private Button tag1,tag2,tag3,tag4,good;
@@ -54,33 +52,44 @@ public class HighlightsViewController {
     @Autowired private TagService tagService;
     @Autowired private WikipediaService wikipediaService;
 
-    private List<Button> buttonAr = new LinkedList<>();
-    private WikipediaInfoPane wikipediaInfoPane;
-    private PhotoFilter filter = new PhotoFilter();
-    private Journey selectedJourney;
-    private GoogleMapView mapView;
-    private GoogleMap googleMap;
+    private ListView<Journey> journeysListView = new ListView<>();
+    private HashMap<Place,List<Tag>> placesAndTags = new HashMap<>();
+    private HashMap<PlaceDate,List<Photo>> orderedPlacesAndPhotos = new HashMap<>();
+    private List<Photo> goodPhotosList = new ArrayList<>();
     private ArrayList<Marker> markers = new ArrayList<>();
     private ArrayList<Polyline> polylines = new ArrayList<>();
-    private ListView<Journey> list = new ListView<>();
+    private List<Button> buttonAr = new LinkedList<>();
+    private Journey selectedJourney;
+    private WikipediaInfoPane wikipediaInfoPane;
+    private GoogleMapView mapView;
+    private GoogleMap googleMap;
     private Marker actualMarker;
-    private boolean disableReload = false;
+    private Place aktivePlace = null;
+    private PhotoFilter filter = new PhotoFilter();
     private Consumer<PhotoFilter> filterChangeCallback;
     private ImageGrid grid;
     private TreeView<String> treeView;
-    private static final Logger LOGGER = LogManager.getLogger();
     private ImageCache imageCache;
     private Line redLine;
-
-    private List<Photo> hart = new ArrayList<>();
-    private HashMap<Place,List<Tag>> placesAndTags = new HashMap<>();
-    private HashMap<PlaceDate,List<Photo>> orderedPlacesAndPhotos = new HashMap<>();
-    private Place aktivePlace = null;
+    private boolean disableReload = false;
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
     public void setImageCache(ImageCache imageCache) {
         this.imageCache = imageCache;
         this.grid = new ImageGrid(imageCache);
+    }
+
+    public void setMap(GoogleMapsScene map) {
+        this.mapsScene = map;
+        mapView = map.getMapView();
+        mapView.addMapInializedListener(new MapComponentInitializedListener() {
+            @Override public void mapInitialized() {
+                //wait for the map to initialize.
+                googleMap = mapView.getMap();
+            }
+        });
+        mapContainer.getChildren().add(map.getMapView());
     }
 
     public void initialize(){
@@ -99,7 +108,7 @@ public class HighlightsViewController {
         wikipediaInfoPane = new WikipediaInfoPane(wikipediaService);
         wikipediaInfoPaneContainer.getChildren().add(wikipediaInfoPane);
 
-        list.setCellFactory(new Callback<ListView<Journey>, ListCell<Journey>>() {
+        journeysListView.setCellFactory(new Callback<ListView<Journey>, ListCell<Journey>>() {
 
             public ListCell<Journey> call(ListView<Journey> param) {
                 final ListCell<Journey> cell = new ListCell<Journey>() {
@@ -114,7 +123,7 @@ public class HighlightsViewController {
             }
         }); // setCellFactory
 
-        list.getSelectionModel().selectedItemProperty()
+        journeysListView.getSelectionModel().selectedItemProperty()
                 .addListener(new ChangeListener<Journey>() {
                     public void changed(ObservableValue<? extends Journey> observable,
                             Journey oldValue, Journey newValue) {
@@ -123,10 +132,10 @@ public class HighlightsViewController {
                 });
     }
 
-    public void bt_hartPress(){
-        if(hart.size()!=0) {
+    public void bt_heartPress(){
+        if(goodPhotosList.size()!=0) {
             FullscreenWindow fw = new FullscreenWindow(this.imageCache);
-            fw.present(hart, hart.get(0));
+            fw.present(goodPhotosList, goodPhotosList.get(0));
         }
     }
 
@@ -167,18 +176,6 @@ public class HighlightsViewController {
         }
     }
 
-    public void setMap(GoogleMapsScene map) {
-        this.mapsScene = map;
-        mapView = map.getMapView();
-        mapView.addMapInializedListener(new MapComponentInitializedListener() {
-            @Override public void mapInitialized() {
-                //wait for the map to initialize.
-                googleMap = mapView.getMap();
-            }
-        });
-        mapContainer.getChildren().add(map.getMapView());
-    }
-
     public void reloadJourneys(){
         //photoView.getChildren().clear();
         tree.getChildren().clear();
@@ -190,13 +187,13 @@ public class HighlightsViewController {
             List<Journey> listOfJourneys = clusterService.getAllJourneys();
             if(listOfJourneys.size()>0){
                 journeys.getChildren().clear();
-                list.getItems().clear();
+                journeysListView.getItems().clear();
             }
             for(Journey j: listOfJourneys){
-                list.getItems().add(j);
+                journeysListView.getItems().add(j);
             }
 
-            journeys.getChildren().add(list);
+            journeys.getChildren().add(journeysListView);
         } catch (ServiceException e) {
             Label lab = new Label();
             lab.setText("keine Reisen vorhanden");
@@ -367,7 +364,7 @@ public class HighlightsViewController {
 
     /**
      * Filters all good Photos from the selected journey
-     * generate a list of the most used Tags
+     * generate a journeysListView of the most used Tags
      * generate for every Tag(only 5) a TitlePane and fill the pane with the right Fotos
      * add every TitlePane to the GUI
      */
@@ -390,7 +387,7 @@ public class HighlightsViewController {
             // all GOOD fotos
             for(Photo p: orderedPlacesAndPhotos.get(pl)){
                 if(p.getData().getRating().equals(Rating.GOOD)){
-                    hart.add(p);
+                    goodPhotosList.add(p);
                 }
 
             }

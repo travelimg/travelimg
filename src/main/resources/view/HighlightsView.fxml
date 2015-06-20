@@ -63,7 +63,7 @@
                                 <VBox fx:id="tagheartContainer">
                                     <children>
                                         <Button fx:id="tag5" text="Tag5" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
-                                        <Button fx:id="good" prefHeight="200" prefWidth="300" styleClass="good" onAction="#bt_hartPress">
+                                        <Button fx:id="good" prefHeight="200" prefWidth="300" styleClass="good" onAction="#bt_heartPress">
                                             <tooltip>
                                                 <Tooltip text="Gutes Foto"/>
                                             </tooltip>
