@@ -1,11 +1,13 @@
 package at.ac.tuwien.qse.sepm.gui.grid;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.scene.control.Button;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.text.TextAlignment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,14 +17,24 @@ public class SlideDivider extends Button {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private final FontAwesomeIconView icon = new FontAwesomeIconView();
     private Consumer<Integer> slideDroppedCallback = null;
 
     public SlideDivider() {
+        getStyleClass().add("divider");
+
         setOnDragEntered(this::handleDragEntered);
         setOnDragOver(this::handleDragOver);
         setOnDragDropped(this::handleDragDropped);
         setOnDragExited(this::handleDragExited);
-        setGraphic(new Rectangle(30, 150, Paint.valueOf("blue")));
+
+        setMaxWidth(Double.MAX_VALUE);
+        setMaxHeight(Double.MAX_VALUE);
+
+        icon.setGlyphName("PLUS");
+        icon.setTextAlignment(TextAlignment.CENTER);
+        HBox.setHgrow(icon, Priority.ALWAYS);
+        setGraphic(icon);
     }
 
     public void setSlideDroppedCallback(Consumer<Integer> callback) {
@@ -31,7 +43,7 @@ public class SlideDivider extends Button {
 
     private void handleDragEntered(DragEvent event) {
         LOGGER.debug("drag entered");
-        getStyleClass().add("drag-entered");
+        getStyleClass().add("dropping");
         event.consume();
     }
 
@@ -64,7 +76,7 @@ public class SlideDivider extends Button {
 
     private void handleDragExited(DragEvent event) {
         LOGGER.debug("drag exited");
-        getStyleClass().removeAll("drag-entered");
+        getStyleClass().removeAll("dropping");
         event.consume();
     }
 }

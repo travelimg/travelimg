@@ -16,9 +16,13 @@ public class SlideTile extends StackPane {
     public SlideTile(int id) {
         this.id = id;
 
+        getStyleClass().add("tile");
+
         setOnDragDetected(this::handleDragDetected);
         setOnDragDone(this::handleDragDone);
-        getChildren().add(new Rectangle(150, 150, Paint.valueOf("red")));
+
+        setMaxWidth(Double.MAX_VALUE);
+        setMaxHeight(Double.MAX_VALUE);
     }
 
     public Slide getSlide() {

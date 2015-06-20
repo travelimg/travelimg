@@ -6,5 +6,6 @@ public class TitleSlideTile extends SlideTileBase<TitleSlide> {
 
     public TitleSlideTile(TitleSlide slide) {
         super(slide);
+        getStyleClass().add("title");
     }
 }

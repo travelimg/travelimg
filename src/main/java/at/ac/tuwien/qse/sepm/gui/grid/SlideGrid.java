@@ -19,7 +19,6 @@ public class SlideGrid extends TilePane {
     private Consumer<Slide> slideChangedCallback = null;
 
     public SlideGrid() {
-        setVgap(10);
 
         nodes.add(new SlideGridNode(new SlideTile(1)));
         nodes.add(new SlideGridNode(new SlideTile(2)));
@@ -34,6 +33,7 @@ public class SlideGrid extends TilePane {
         nodes.add(new SlideGridNode(new SlideTile(11)));
         nodes.add(new SlideGridNode(new SlideTile(12)));
 
+        getStyleClass().add("slide-grid");
         getChildren().addAll(nodes);
 
         nodes.forEach(n -> n.setSlidePositionChangeCallback(this::handleSlidePositionChange));

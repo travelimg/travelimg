@@ -30,7 +30,26 @@
 
     -fx-indetermined: #2196F3;
     -fx-indetermined-light: #42A5F5;
-    -fx-indetermined-light: #1E88E5;
+    -fx-indetermined-dark: #1E88E5;
+
+    -tmg-bg-z0: #111111;
+    -tmg-bg-z1: #222222;
+    -tmg-bg-z2: #333333;
+
+    -tmg-light: rgba(255, 255, 255, 0.025);
+    -tmg-dark: rgba(0, 0, 0, 0.2);
+
+    -tmg-text: rgba(255, 255, 255, 0.5);
+    -tmg-text-light: rgba(255, 255, 255, 0.75);
+    -tmg-text-bright: rgba(255, 255, 255, 1);
+    -tmg-text-dark: rgba(255, 255, 255, 0.25);
+
+    -tmg-primary: rgba(233, 30, 90, 1);
+    -tmg-primary-muted: rgba(233, 30, 90, 0.5);
+    -tmg-primary-muted-light: rgba(233, 30, 90, 0.6);
+    -tmg-primary-muted-dark: rgba(233, 30, 90, 0.4);
+    -tmg-secondary: rgba(33, 150, 243, 1);
+    -tmg-secondary-muted: rgba(33, 150, 243, 0.5);
 }
 * {
     -fx-background-insets: 0;
@@ -46,7 +65,6 @@
     -fx-padding: 11px 8px;
     -fx-background-radius: 3px;
     -fx-font-size: 14px;
-    -fx-min-width: 48px;
 }
 .button:hover {
     -fx-background-color: -fx-default-hover;
@@ -610,4 +628,74 @@
 }
 .status .success .glyph-icon {
     -fx-fill: -fx-accent;
+}
+
+/* RESET */
+.slide-grid, .slide-grid * {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+}
+.slide-grid *:hover {
+    -fx-background-color: transparent;
+}
+.slide-grid *:focused {
+    -fx-background-color: transparent;
+}
+.slide-grid *:pressed {
+    -fx-background-color: transparent;
+}
+
+.slide-grid {
+    -fx-background-color: -tmg-bg-z0;
+    -fx-vgap: 32px;
+    -fx-padding: 48px 48px 48px 16px;
+}
+.slide-grid .node {
+    -fx-padding: 0 2px 0 0;
+    -fx-spacing: 2px;
+}
+.slide-grid .divider {
+    -fx-pref-width: 32px;
+}
+.slide-grid .divider:hover {
+    -fx-background-color: -tmg-light;
+}
+.slide-grid .divider:pressed {
+    -fx-background-color: -tmg-dark;
+}
+.slide-grid .divider.dropping {
+    -fx-background-color: -tmg-secondary-muted;
+}
+.slide-grid .divider .glyph-icon {
+    -glyph-size: 16px;
+    -fx-fill: transparent;
+}
+.slide-grid .divider:hover .glyph-icon {
+    -fx-fill: -tmg-text;
+}
+.slide-grid .divider.dropping .glyph-icon {
+    -fx-fill: -tmg-text-bright;
+    -glyph-name: "ARROWS_H";
+}
+.slide-grid .divider:pressed .glyph-icon {
+    -fx-fill: -tmg-text-light;
+}
+.slide-grid .tile {
+    -fx-pref-height: 160px;
+    -fx-pref-width: 160px;
+    -fx-background-color: -tmg-bg-z1;
+}
+.slide-grid .tile.photo {
+
+}
+.slide-grid .tile.title {
+
+}
+.slide-grid .tile.map {
+
 }
