@@ -592,6 +592,7 @@ public class HighlightsViewController {
      * @param degrees
      * @return the dadius
      */
+    @Deprecated
     public double ToRadians(double degrees) {
         double radians = degrees * Math.PI / 180;
         return radians;
@@ -605,6 +606,7 @@ public class HighlightsViewController {
      * @param lng2
      * @return
      */
+    @Deprecated
     public double DirectDistance(double lat1, double lng1, double lat2, double lng2) {
         double earthRadius = 3958.75;
         double dLat = ToRadians(lat2-lat1);
@@ -617,7 +619,6 @@ public class HighlightsViewController {
         double meterConversion = 1609.00;
         return dist * meterConversion;
     }
-
 
     private void drawDestinationsAsPolyline(LatLong[] path){
         PolylineOptions polylineOptions = new PolylineOptions();
