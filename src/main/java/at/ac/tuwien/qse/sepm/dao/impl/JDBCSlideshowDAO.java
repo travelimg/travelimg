@@ -22,9 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by mb on 08.06.15.
- */
+
 public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
 
     private static final String READ_ALL_STATEMENT = "SELECT id, name, durationbetweenphotos FROM SLIDESHOW;";

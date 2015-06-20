@@ -28,9 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
-/**
- * Created by mb on 14.06.15.
- */
+
 public class PresentationWindow extends AnchorPane{
 
     private static final Logger logger = LogManager.getLogger();
@@ -64,7 +62,7 @@ public class PresentationWindow extends AnchorPane{
         stage.setScene(scene);
         imageView.fitWidthProperty().bind(root.widthProperty());
         imageView.fitHeightProperty().bind(root.heightProperty());
-        root.setOnKeyPressed((keyEvent) -> {
+       /* root.setOnKeyPressed((keyEvent) -> {
             if (keyEvent.getCode() == KeyCode.RIGHT) {
                 showNextSlide(null);
             }
@@ -73,6 +71,19 @@ public class PresentationWindow extends AnchorPane{
             }
             if (keyEvent.getCode() == KeyCode.ESCAPE) {
                 close();
+            }
+        });*/
+        root.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            public void handle(final KeyEvent keyEvent) {
+                if (keyEvent.getCode() == KeyCode.RIGHT) {
+                    showNextSlide(null);
+                }
+                if (keyEvent.getCode() == KeyCode.LEFT) {
+                    showPrevSlide(null);
+                }
+                if (keyEvent.getCode() == KeyCode.ESCAPE) {
+                    close();
+                }
             }
         });
     }
@@ -95,6 +106,7 @@ public class PresentationWindow extends AnchorPane{
         }
 
         stage.close();
+
     }
 
     private void showPrevSlide(ActionEvent event) {
@@ -103,6 +115,7 @@ public class PresentationWindow extends AnchorPane{
     }
 
     private void showNextSlide(ActionEvent event) {
+        logger.debug("Next Slide clikced!!");
         activeIndex = Math.min(slideshow.getSlides().size() - 1, activeIndex + 1);
         loadImage();
     }
@@ -121,9 +134,11 @@ public class PresentationWindow extends AnchorPane{
             PhotoSlide photoSlide = (PhotoSlide)next;
             Image image = imageCache.get(photoSlide.getPhoto(), ImageSize.ORIGINAL);
             imageView.setImage(image);
+            logger.debug("Bild wurde richtig angezeigt!!"+photoSlide.getPhoto().getPath());
 
             // handling of images in original size can consume a lot of memory so collect it here
             System.gc();
         }
+
     }
 }
