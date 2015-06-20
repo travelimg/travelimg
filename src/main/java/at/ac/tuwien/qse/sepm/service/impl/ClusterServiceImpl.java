@@ -86,8 +86,8 @@ public class ClusterServiceImpl implements ClusterService {
         } catch (DAOException ex) {
             logger.error("Journey-creation for {} failed.", journey);
             throw new ServiceException("Creation of journey failed.", ex);
-        } catch (ValidationException e) {
-            throw new ServiceException("Failed to validate entity", e);
+        } catch (ValidationException ex) {
+            throw new ServiceException("Failed to validate entity: " + ex.getMessage(), ex);
         }
     }
 
