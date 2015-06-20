@@ -43,7 +43,7 @@ public class PageSelector extends HBox {
         nextIcon.setGlyphName("CHEVRON_RIGHT");
         nextButton.setGraphic(nextIcon);
         Tooltip nextTooltip = new Tooltip();
-        nextTooltip.setText("Vorige Seite");
+        nextTooltip.setText("Nächste Seite");
         nextButton.setTooltip(nextTooltip);
         nextButton.getStyleClass().addAll("previous");
         nextButton.setOnAction(e -> nextPage());
