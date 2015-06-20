@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 
 <Pane prefHeight="405.0" prefWidth="250.0" styleClass="organizer" stylesheets="@style.css"
-      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowViewImpl">
+      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.MapsSlideInspectorImpl">
     <children>
     </children>
 </Pane>

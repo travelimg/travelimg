@@ -12,7 +12,10 @@ public class SlideTile extends StackPane {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public SlideTile() {
+    Integer id;
+    public SlideTile(int id) {
+        this.id = id;
+
         getStyleClass().add("tile");
 
         setOnDragDetected(this::handleDragDetected);
@@ -24,7 +27,7 @@ public class SlideTile extends StackPane {
 
     public Slide getSlide() {
         Slide slide = new Slide();
-        slide.setId(123);
+        slide.setId(id);
         return slide;
     }
 
@@ -34,7 +37,7 @@ public class SlideTile extends StackPane {
 
         Dragboard db = startDragAndDrop(TransferMode.MOVE);
         ClipboardContent content = new ClipboardContent();
-        content.putString(getSlide().getId().toString());
+        content.putString("slide: " + getSlide().getId().toString());
         db.setContent(content);
 
         event.consume();
