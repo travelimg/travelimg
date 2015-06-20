@@ -14,19 +14,21 @@
     <left>
         <BorderPane fx:id="left" prefWidth="240.0">
             <top>
-                <HBox fx:id="titleHBox">
-                    <Label fx:id="titleLabel" prefHeight="20.0" prefWidth="259.0" style="-fx-background-color: #333333; -fx-font-size: 18; -fx-text-fill: white; -fx-padding: 5 0 5 10px;" text="Reisen" />
-                </HBox>
+                <VBox>
+                    <HBox fx:id="titleHBox">
+                        <Label fx:id="titleLabel" prefHeight="20.0" prefWidth="259.0" style="-fx-background-color: #333333; -fx-font-size: 18; -fx-text-fill: white; -fx-padding: 5 0 5 10px;" text="Reisen" />
+                    </HBox>
+                </VBox>
             </top>
             <center>
                 <VBox fx:id="journeys" spacing="5.0" style="-fx-font-size: 16;">
-                   <children>
-                       <Label text="Keine Reisen gefunden. Bitte fügen Sie eine neue ein." wrapText="true" />
-                   </children>
-                    <padding>
-                        <Insets left="10.0" top="5.0" />
-                    </padding>
-                </VBox>
+                <children>
+                    <Label text="Keine Reisen gefunden. Bitte fügen Sie eine neue ein." wrapText="true" />
+                </children>
+                <padding>
+                    <Insets left="10.0" top="5.0" />
+                </padding>
+            </VBox>
 
             </center>
             <bottom>
@@ -43,78 +45,59 @@
                             </VBox>
                         </ScrollPane>
                     </center>
-                    <bottom>
-                        <Button fx:id="good" prefHeight="200" prefWidth="300" styleClass="good" onAction="#bt_hartPress">
-                            <tooltip>
-                                <Tooltip text="Gutes Foto"/>
-                            </tooltip>
-                            <graphic>
-                                <FontAwesomeIconView glyphName="HEART" scaleX="6" scaleY="6"/>
-                            </graphic>
-                        </Button>
-                    </bottom>
-
                 </BorderPane>
             </bottom>
-         <padding>
-            <Insets top="5.0" />
-         </padding>
+            <padding>
+                <Insets top="5.0" />
+            </padding>
         </BorderPane>
     </left>
     <center>
-        <BorderPane>
-            <top>
+        <VBox>
+            <children>
                 <HBox>
-                    <VBox fx:id="mapContainer" maxHeight="300.0"/>
-                    <VBox fx:id="wikipediaInfoPaneContainer" maxHeight="300.0"/>
-                </HBox>
-            </top>
-            <center>
-                <BorderPane fx:id="FotoContainer" prefWidth="30" >
-                    <top>
-
-                    </top>
-                    <center>
-                        <ScrollPane fx:id="scrollPhotoView">
-                            <VBox fx:id="photoView">
-                                <children>
-
-                                </children>
-                                <padding>
-                                    <Insets left="10.0" top="5.0" />
-                                </padding>
-                            </VBox>
-                        </ScrollPane>
-
-                    </center>
-                    <bottom>
-                        <HBox fx:id="tagContainer" maxHeight="300.0">
+                    <children>
+                        <HBox fx:id="wikipediaInfoPaneContainer" prefWidth="250"/>
+                        <HBox>
                             <children>
-                                <HBox>
+                                <VBox fx:id="tagheartContainer">
                                     <children>
-                                        <Button fx:id="tag1" text="Tag1" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
-                                        <Button fx:id="tag2" text="Tag2" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
+                                        <Button fx:id="tag5" text="Tag5" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
+                                        <Button fx:id="good" prefHeight="200" prefWidth="300" styleClass="good" onAction="#bt_hartPress">
+                                            <tooltip>
+                                                <Tooltip text="Gutes Foto"/>
+                                            </tooltip>
+                                            <graphic>
+                                                <FontAwesomeIconView glyphName="HEART" scaleX="6" scaleY="6"/>
+                                            </graphic>
+                                        </Button>
                                     </children>
-
-                                </HBox>
-                                <HBox>
-                                    <children>
-                                        <Button fx:id="tag3" text="Tag3" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
-                                        <Button fx:id="tag4" text="Tag4" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
-                                    </children>
-
-                                </HBox>
+                                </VBox>
+                                <HBox fx:id="mapContainer" prefWidth="600" prefHeight="400"></HBox>
+                            </children>
+                        </HBox>
+                    </children>
+                </HBox>
+                <HBox fx:id="tagContainer" maxHeight="300.0">
+                    <children>
+                        <HBox>
+                            <children>
+                                <Button fx:id="tag1" text="Tag1" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
+                                <Button fx:id="tag2" text="Tag2" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
                             </children>
 
                         </HBox>
+                        <HBox>
+                            <children>
+                                <Button fx:id="tag3" text="Tag3" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
+                                <Button fx:id="tag4" text="Tag4" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
+                            </children>
 
-                    </bottom>
-                </BorderPane>
-            </center>
-
-        </BorderPane>
-
+                        </HBox>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
     </center>
-
 
 </BorderPane>

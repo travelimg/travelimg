@@ -39,10 +39,10 @@ import java.util.stream.Collectors;
 
 public class HighlightsViewController {
 
-    @FXML private BorderPane borderPane,left,FotoContainer,treeBoarder,timeLine;
+    @FXML private BorderPane borderPane, left,FotoContainer,treeBoarder,timeLine;
     @FXML private GoogleMapsScene mapsScene;
-    @FXML private VBox journeys, mapContainer, photoView,tree, wikipediaInfoPaneContainer;
-    @FXML private HBox titleHBox,tagContainer;
+    @FXML private VBox journeys,tree, tagheartContainer;
+    @FXML private HBox titleHBox,tagContainer,wikipediaInfoPaneContainer, mapContainer;
     @FXML private FilterList<Journey> journeyListView;
     @FXML private ScrollPane scrollPhotoView, treeScroll;
     @FXML private Label titleLabel;
@@ -205,11 +205,11 @@ public class HighlightsViewController {
     }
 
     public void reloadJourneys(){
-        photoView.getChildren().clear();
+        //photoView.getChildren().clear();
         tree.getChildren().clear();
         Label lab2 = new Label();
         lab2.setText("Bitte eine Reise auswählen");
-        photoView.getChildren().add(lab2);
+        //.getChildren().add(lab2);
 
         try {
             List<Journey> listOfJourneys = clusterService.getAllJourneys();
@@ -459,10 +459,10 @@ public class HighlightsViewController {
                Collections.sort((ArrayList)goodPhotos);
 
                 if (goodPhotos.size() == 0) {
-                    photoView.getChildren().clear();
+                    //photoView.getChildren().clear();
                     Label lab = new Label();
                     lab.setText("Es sind kein mit 'good' bewerteten Fotos zu dieser Reise vorhanden");
-                    photoView.getChildren().add(lab);
+                    //photoView.getChildren().add(lab);
 
                 } else {
                     try {
@@ -563,27 +563,27 @@ public class HighlightsViewController {
                         }
 
 
-                        photoView.getChildren().addAll(overall);
+                        //photoView.getChildren().addAll(overall);
 
                     } catch (ServiceException e) {
                         LOGGER.debug("Photos habe keine Tag's ", e);
-                        photoView.getChildren().clear();
+                        //photoView.getChildren().clear();
                         grid = new ImageGrid(imageCache);
                         grid.setPhotos(goodPhotos);
-                        photoView.getChildren().add(grid);
+                        //photoView.getChildren().add(grid);
                     }
                 }
             } catch (ServiceException e) {
-                photoView.getChildren().clear();
+                //photoView.getChildren().clear();
                 Label lab = new Label();
                 lab.setText("Keine Fotos vorhanden");
-                photoView.getChildren().add(lab);
+                //photoView.getChildren().add(lab);
             }
         }else{
-            photoView.getChildren().clear();
+            //photoView.getChildren().clear();
             Label lab = new Label();
             lab.setText("Bitte eine Reise auswählen");
-            photoView.getChildren().add(lab);
+            //photoView.getChildren().add(lab);
         }
     }
 
@@ -709,8 +709,8 @@ public class HighlightsViewController {
         double latFraction = ((ne.latToRadians()) - sw.latToRadians()) / Math.PI;
         double lngDiff = ne.getLongitude() - sw.getLongitude();
         double lngFraction = ((lngDiff < 0) ? (lngDiff + 360) : lngDiff) / 360;
-        double latZoom = Math.floor(Math.log(300 / 256 / latFraction) / 0.6931472);
-        double lngZoom = Math.floor(Math.log((borderPane.getWidth()-240) / 256 / lngFraction) / 0.6931472);
+        double latZoom = Math.floor(Math.log(mapContainer.getHeight() / 256 / latFraction) / 0.6931472);
+        double lngZoom = Math.floor(Math.log((mapContainer.getWidth()) / 256 / lngFraction) / 0.6931472);
         double min = Math.min(latZoom, lngZoom);
         min = Math.min(min,21);
         mapsScene.setZoom((int) min);
