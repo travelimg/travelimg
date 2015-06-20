@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.gui;
 import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.control.WikipediaInfoPane;
 import at.ac.tuwien.qse.sepm.gui.grid.ImageGrid;
+import at.ac.tuwien.qse.sepm.gui.util.GeoUtils;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
@@ -285,13 +286,13 @@ public class HighlightsViewController {
             rbAll.setOnAction(new EventHandler<ActionEvent>() {
                 @Override public void handle(ActionEvent event) {
                     clearMap();
-                    drawDestinationsAsPolyline(toLatLong(places));
+                    drawDestinationsAsPolyline(GeoUtils.toLatLong(places));
                 }
             });
             v.getChildren().add(rbAll);
             rbAll.setSelected(true);
             clearMap();
-            drawDestinationsAsPolyline(toLatLong(orderedPlacesList));
+            drawDestinationsAsPolyline(GeoUtils.toLatLong(orderedPlacesList));
             reloadImages();
 
             int pos = 0;
@@ -599,7 +600,7 @@ public class HighlightsViewController {
         Polyline polyline = new Polyline(polylineOptions);
         googleMap.addMapShape(polyline);
         polylines.add(polyline);
-        fitMarkersToScreen(path, 0, path.length - 1);
+        GeoUtils.fitMarkersToScreen(path, 0, path.length - 1, mapContainer.getHeight(), mapContainer.getWidth(), mapsScene);
         for(int i = 0; i<path.length;i++) {
             Marker m = new Marker(new MarkerOptions().position(path[i]).icon("https://maps.gstatic.com/intl/en_us/mapfiles/markers2/measle_blue.png"));
             googleMap.addMarker(m);
@@ -609,12 +610,12 @@ public class HighlightsViewController {
 
     private void drawJourneyUntil(List<Place> places, int pos) {
         clearMap();
-        LatLong [] path = toLatLong(places);
+        LatLong [] path = GeoUtils.toLatLong(places);
         if(pos==0){
             Marker m = new Marker(new MarkerOptions().position(path[pos]).icon("https://maps.gstatic.com/intl/en_us/mapfiles/markers2/measle_blue.png"));
             googleMap.addMarker(m);
             markers.add(m);
-            fitMarkersToScreen(path, pos, pos);
+            GeoUtils.fitMarkersToScreen(path, pos, pos, mapContainer.getHeight(), mapContainer.getWidth(), mapsScene);
         }
         else{
             PolylineOptions polylineOptions = new PolylineOptions();
@@ -635,56 +636,14 @@ public class HighlightsViewController {
             Polyline polyline = new Polyline(polylineOptions);
             googleMap.addMapShape(polyline);
             polylines.add(polyline);
-            fitMarkersToScreen(path, pos-1, pos);
+            GeoUtils.fitMarkersToScreen(path, pos - 1, pos, mapContainer.getHeight(),
+                    mapContainer.getWidth(), mapsScene);
         }
         actualMarker = new Marker(new MarkerOptions().position(path[pos]));
         googleMap.addMarker(actualMarker);
     }
 
-    private void fitMarkersToScreen(LatLong[] subpath, int from, int to) {
-        Double ne_lat = null;
-        Double ne_long = null;
-        Double sw_lat = null;
-        Double sw_long = null;
-        for(int i = from; i<=to && i<subpath.length;i++) {
-            if (ne_lat == null) {
-                ne_lat = subpath[i].getLatitude();
-            }
-            if (ne_long == null) {
-                ne_long = subpath[i].getLongitude();
-            }
-            if (sw_lat == null) {
-                sw_lat = subpath[i].getLatitude();
-            }
-            if (sw_long == null) {
-                sw_long = subpath[i].getLongitude();
-            }
-            if (subpath[i].getLatitude() > ne_lat) {
-                ne_lat = subpath[i].getLatitude();
-            }
-            if (subpath[i].getLongitude() > ne_long) {
-                ne_long = subpath[i].getLongitude();
-            }
-            if (subpath[i].getLatitude() < sw_lat) {
-                sw_lat = subpath[i].getLatitude();
-            }
-            if (subpath[i].getLongitude() < sw_long) {
-                sw_long = subpath[i].getLongitude();
-            }
-        }
-        LatLong ne = new LatLong(ne_lat,ne_long);
-        LatLong sw = new LatLong(sw_lat,sw_long);
-        double latFraction = ((ne.latToRadians()) - sw.latToRadians()) / Math.PI;
-        double lngDiff = ne.getLongitude() - sw.getLongitude();
-        double lngFraction = ((lngDiff < 0) ? (lngDiff + 360) : lngDiff) / 360;
-        double latZoom = Math.floor(Math.log(mapContainer.getHeight() / 256 / latFraction) / 0.6931472);
-        double lngZoom = Math.floor(Math.log((mapContainer.getWidth()) / 256 / lngFraction) / 0.6931472);
-        double min = Math.min(latZoom, lngZoom);
-        min = Math.min(min,21);
-        mapsScene.setZoom((int) min);
-        mapsScene.setCenter((ne.getLatitude() + sw.getLatitude()) / 2,
-                (ne.getLongitude() + sw.getLongitude()) / 2);
-    }
+
 
     private void clearMap(){
         for(Marker m : markers){
@@ -698,14 +657,6 @@ public class HighlightsViewController {
         if(actualMarker!=null){
             googleMap.removeMarker(actualMarker);
         }
-    }
-
-    private LatLong[] toLatLong(List<Place> places){
-        LatLong[] path = new LatLong[places.size()];
-        for(int i = 0; i<places.size(); i++){
-            path[i] = new LatLong(places.get(i).getLatitude(),places.get(i).getLongitude());
-        }
-        return path;
     }
 
     /**
