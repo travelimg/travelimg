@@ -85,7 +85,7 @@ public class InspectorImpl implements Inspector {
         // mapsScene.removeAktiveMarker();
         activePhotos.addAll(photos);
         activePhotos.forEach(photo -> mapsScene.addMarker(photo));
-        showDetails(activePhotos);
+        showDetails(new ArrayList<>(activePhotos));
     }
 
     @Override public void setUpdateHandler(Runnable updateHandler) {
