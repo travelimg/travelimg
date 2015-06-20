@@ -3,22 +3,16 @@ package at.ac.tuwien.qse.sepm.gui.controller.impl;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
-import at.ac.tuwien.qse.sepm.gui.FullscreenWindow;
 import at.ac.tuwien.qse.sepm.gui.PresentationWindow;
-import at.ac.tuwien.qse.sepm.gui.controller.SlideshowOrganizer;
 import at.ac.tuwien.qse.sepm.gui.controller.SlideshowView;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
-import at.ac.tuwien.qse.sepm.gui.grid.SlideshowGrid;
+import at.ac.tuwien.qse.sepm.gui.grid.SlideGrid;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
-import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
 import at.ac.tuwien.qse.sepm.service.SlideshowService;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -52,19 +46,9 @@ public class SlideshowViewImpl implements SlideshowView {
     @Autowired
     private SlideshowService slideshowService;
 
-    private SlideshowGrid grid = null;
+    private SlideGrid grid = new SlideGrid();
 
     private ObservableList<Slideshow> slideshows = FXCollections.observableArrayList();
-
-    @Autowired
-    public void setImageCache(ImageCache imageCache) {
-        if (grid == null) {
-            this.grid = new SlideshowGrid(imageCache);
-            this.grid.setSlideChangedCallback(this::handleSlideChanged);
-
-
-        }
-    }
 
     @FXML
     private void initialize() {
@@ -73,8 +57,7 @@ public class SlideshowViewImpl implements SlideshowView {
 
         slideshowOrganizer.setSlideshows(slideshows);
         slideshowOrganizer.getSelectedSlideshowProperty().addListener((observable, oldValue, newValue) -> {
-            grid.setSlideshow(newValue);
-
+            //grid.setSlideshow(newValue);
         });
 
         loadAllSlideshows();
@@ -110,7 +93,7 @@ public class SlideshowViewImpl implements SlideshowView {
             // add the photos to the grid if the slideshow is currently being displayed
             Slideshow selected = slideshowOrganizer.getSelected();
             if (selected != null && selected.getId().equals(slideshow.getId())) {
-                grid.setSlideshow(slideshow);
+                //grid.setSlideshow(slideshow);
             }
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Hinzufügen zur Slideshow", "Fehlermeldung: " + ex.getMessage());
