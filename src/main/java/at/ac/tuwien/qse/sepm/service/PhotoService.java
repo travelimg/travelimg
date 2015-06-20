@@ -1,11 +1,9 @@
 package at.ac.tuwien.qse.sepm.service;
 
-import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Place;
 
 import java.nio.file.Path;
-import java.time.YearMonth;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -21,7 +19,7 @@ public interface PhotoService {
      * @param photos the list of photos
      * @throws ServiceException
      */
-    void deletePhotos(List<Photo> photos) throws ServiceException;
+    void deletePhotos(Collection<Photo> photos) throws ServiceException;
 
     /**
      * @return the list of all available photos
