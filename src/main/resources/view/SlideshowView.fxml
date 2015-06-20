@@ -16,5 +16,5 @@
                     fitToWidth="true" fitToHeight="true"/>
     </center>
 
-    <right><fx:include source="/view/SlideInspector.fxml"></fx:include></right>
+    <right><fx:include source="/view/TitleSlideInspector.fxml"></fx:include></right>
 </BorderPane>
