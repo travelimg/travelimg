@@ -35,4 +35,8 @@ public class SlideGridNode extends HBox {
             callback.accept(tile, sourceId);
         });
     }
+
+    public void setSlideAddedCallback(Consumer<SlideGridNode> callback) {
+        divider.setSlideAddedCallback(() -> callback.accept(this));
+    }
 }

@@ -54,6 +54,9 @@ public class SlideshowViewImpl implements SlideshowView {
     private void initialize() {
         gridContainer.setContent(grid);
 
+        grid.setSlideChangedCallback(this::handleSlideChanged);
+        grid.setSlideAddedCallback(this::handleSlideAdded);
+
 
         slideshowOrganizer.setSlideshows(slideshows);
         slideshowOrganizer.getSelectedSlideshowProperty().addListener((observable, oldValue, newValue) -> {
@@ -160,6 +163,39 @@ public class SlideshowViewImpl implements SlideshowView {
                     .sorted((s1, s2) -> s1.getOrder().compareTo(s2.getOrder()))
                     .collect(Collectors.toList());
             slideshow.get().setSlides(sorted);
+        }
+    }
+
+    private void handleSlideAdded(Slide slide, Integer position) {
+        Slideshow selected = slideshowOrganizer.getSelected();
+
+        if (selected == null) {
+            return;
+        }
+
+        slide.setOrder(position);
+        slide.setSlideshowId(selected.getId());
+
+        try {
+            slideService.create(slide);
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Erstellen der Slide", "");
+            return;
+        }
+
+        int i = 0;
+        for (Slide s : selected.getSlides()) {
+            if (i > position) {
+                s.setOrder(s.getOrder() + 1);
+
+                try {
+                    slideService.update(s);
+                } catch (ServiceException ex) {
+                    ErrorDialog.show(root, "Fehler beim Setzen der neuen Reihenfolge", "");
+                }
+            }
+
+            i++;
         }
     }
 
