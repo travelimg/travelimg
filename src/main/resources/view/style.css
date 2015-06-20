@@ -335,17 +335,16 @@
 }
 
 .image-grid {
-    -fx-padding: 16px;
     -fx-background-color: #dddddd;
-    -fx-hgap: 16px;
-    -fx-vgap: 16px;
+    -fx-padding: 1px;
+    -fx-hgap: 2px;
+    -fx-vgap: 2px;
 }
 .image-tile {
     -fx-background-color: #eeeeee;
-    -fx-effect: -fx-dropshadow-2;
+    -fx-padding: 0;
 }
 .image-tile.selected {
-    -fx-effect: -fx-dropshadow-3;
     -fx-background-color: -fx-primary;
 }
 .image-tile .progress-indicator {
@@ -355,13 +354,15 @@
 .photo-tile .overlay {
     -fx-max-height: 20px;
     -fx-padding: 8px;
-    -fx-background-color: rgba(0, 0, 0, 0.3);
+    -fx-opacity: 0;
 }
 .photo-tile:hover .overlay {
-    -fx-background-color: rgba(0, 0, 0, 0.6);
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+    -fx-opacity: 1.0;
 }
 .photo-tile.selected .overlay {
-    -fx-background-color: rgba(0, 0, 0, 0.6);
+    -fx-background-color: -fx-indetermined;
+    -fx-opacity: 1.0;
 }
 .photo-tile .overlay .glyph-icon {
     -fx-fill: #eeeeee;
