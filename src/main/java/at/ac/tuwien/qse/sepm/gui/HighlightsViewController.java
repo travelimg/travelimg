@@ -223,7 +223,7 @@ public class HighlightsViewController {
             });
             titleHBox.getChildren().add(0,back);
             titleLabel.setText(journey.getName()+" - Orte");
-            List<Place> places= clusterService.getPlacesByJourney(journey);
+            Set<Place> places= clusterService.getPlacesByJourney(journey);
 
 
             /*
@@ -286,7 +286,7 @@ public class HighlightsViewController {
             rbAll.setOnAction(new EventHandler<ActionEvent>() {
                 @Override public void handle(ActionEvent event) {
                     clearMap();
-                    drawDestinationsAsPolyline(GeoUtils.toLatLong(places));
+                    drawDestinationsAsPolyline(GeoUtils.toLatLong(new ArrayList<Place>(places)));
                 }
             });
             v.getChildren().add(rbAll);
@@ -555,8 +555,6 @@ public class HighlightsViewController {
         }
     }
 
-
-
     private void drawDestinationsAsPolyline(LatLong[] path){
         PolylineOptions polylineOptions = new PolylineOptions();
         polylineOptions.path(new MVCArray(path))
@@ -611,8 +609,6 @@ public class HighlightsViewController {
         actualMarker = new Marker(new MarkerOptions().position(path[pos]));
         googleMap.addMarker(actualMarker);
     }
-
-
 
     private void clearMap(){
         for(Marker m : markers){

@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Place;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ClusterService {
 
@@ -30,7 +31,7 @@ public interface ClusterService {
      * @return the places
      * @throws ServiceException propagates DAOExceptions
      */
-    List<Place> getPlacesByJourney(Journey journey) throws ServiceException;
+    Set<Place> getPlacesByJourney(Journey journey) throws ServiceException;
 
     /**
      * Adds a new place to the datastore.

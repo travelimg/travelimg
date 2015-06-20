@@ -16,9 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class ClusterServiceImpl implements ClusterService {
 
@@ -56,29 +54,16 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
-    public List<Place> getPlacesByJourney(Journey journey) throws ServiceException {
-        List<Place> places= new ArrayList<>();
+    public Set<Place> getPlacesByJourney(Journey journey) throws ServiceException {
+        Set<Place> places= new HashSet<>();
 
         try {
             for(Photo p: photoDAO.readPhotosByJourney(journey)){
-               if(places.size()==0){
-                   places.add(p.getData().getPlace());
-               }else{
-                   if(!places.contains(p.getData().getPlace())){
-                       places.add(p.getData().getPlace());
-                   }
-               }
+                places.add(p.getData().getPlace());
             }
         } catch (DAOException e) {
             throw new ServiceException("Failed to read Photos by journey");
         }
-        /*try {
-            return placeDAO.readByJourney(journey);
-        } catch (DAOException e) {
-            throw new ServiceException("Failed to get places", e);
-        } catch (ValidationException e) {
-            throw new ServiceException("Failed to validate journey id", e);
-        }*/
         return places;
     }
 
