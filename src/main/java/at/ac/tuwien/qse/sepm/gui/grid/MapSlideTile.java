@@ -6,5 +6,6 @@ public class MapSlideTile extends SlideTileBase<MapSlide> {
 
     public MapSlideTile(MapSlide slide) {
         super(slide);
+        getStyleClass().add("map");
     }
 }

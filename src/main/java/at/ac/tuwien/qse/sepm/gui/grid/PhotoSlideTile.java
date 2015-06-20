@@ -6,5 +6,6 @@ public class PhotoSlideTile extends SlideTileBase<PhotoSlide> {
 
     public PhotoSlideTile(PhotoSlide slide) {
         super(slide);
+        getStyleClass().add("photo");
     }
 }

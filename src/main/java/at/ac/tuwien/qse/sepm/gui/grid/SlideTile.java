@@ -13,9 +13,13 @@ public class SlideTile extends StackPane {
     private static final Logger LOGGER = LogManager.getLogger();
 
     public SlideTile() {
+        getStyleClass().add("tile");
+
         setOnDragDetected(this::handleDragDetected);
         setOnDragDone(this::handleDragDone);
-        getChildren().add(new Rectangle(150, 150, Paint.valueOf("red")));
+
+        setMaxWidth(Double.MAX_VALUE);
+        setMaxHeight(Double.MAX_VALUE);
     }
 
     public Slide getSlide() {

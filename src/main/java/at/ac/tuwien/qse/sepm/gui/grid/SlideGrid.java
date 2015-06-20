@@ -1,6 +1,5 @@
 package at.ac.tuwien.qse.sepm.gui.grid;
 
-import at.ac.tuwien.qse.sepm.entities.PhotoSlide;
 import at.ac.tuwien.qse.sepm.entities.Slide;
 import javafx.scene.layout.TilePane;
 
@@ -16,7 +15,7 @@ public class SlideGrid extends TilePane {
     private final List<SlideGridNode> nodes = new LinkedList<>();
 
     public SlideGrid() {
-        setVgap(10);
+        getStyleClass().add("slide-grid");
         getChildren().addAll(
                 new SlideGridNode(new SlideTile()),
                 new SlideGridNode(new SlideTile()),
