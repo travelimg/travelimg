@@ -190,9 +190,7 @@ public class HighlightsViewController {
                 journeys.getChildren().clear();
                 journeysListView.getItems().clear();
             }
-            for(Journey j: listOfJourneys){
-                journeysListView.getItems().add(j);
-            }
+            journeysListView.getItems().addAll(listOfJourneys);
 
             journeys.getChildren().add(journeysListView);
         } catch (ServiceException e) {
