@@ -122,9 +122,13 @@ public class InspectorImpl implements Inspector {
         tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService, root);
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
         ratingPickerContainer.getChildren().add(ratingPicker);
+
         mapContainer.getChildren().add(mapsScene.getMapView());
         tagSelectionContainer.getChildren().add(tagSelector);
         addToSlideshowButton.setOnAction(this::handleAddToSlideshow);
+
+        slideshowsCombobox.setConverter(new SlideshowStringConverter());
+        slideshowsCombobox.setItems(slideshowView.getSlideshows());
     }
 
     private void handleRatingChange(Rating newRating) {
