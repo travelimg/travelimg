@@ -36,6 +36,10 @@
     -fx-background-insets: 0;
 }
 
+.border-pane, .scroll-pane {
+    -fx-padding: 0 !important;
+}
+
 /* light button */
 .button {
     -fx-background-color: transparent;
