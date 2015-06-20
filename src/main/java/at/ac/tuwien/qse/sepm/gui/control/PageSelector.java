@@ -85,17 +85,7 @@ public class PageSelector extends HBox {
         buttons.forEach(b -> b.setSelected(false));
         currentPageProperty().set(currentPage);
         buttons.get(getCurrentPage()).setSelected(true);
-
-        previousButton.setDisable(false);
-        nextButton.setDisable(false);
-        if (isFirstPage()) {
-            LOGGER.debug("current page is first page");
-            previousButton.setDisable(true);
-        }
-        if (isLastPage()) {
-            LOGGER.debug("current page is last page");
-            nextButton.setDisable(true);
-        }
+        updateNavigationButtons();
     }
 
     public int getLastPage() {
@@ -142,7 +132,20 @@ public class PageSelector extends HBox {
         if (getCurrentPage() > getLastPage()) {
             setCurrentPage(getLastPage());
         }
-        buttons.get(getCurrentPage()).setSelected(true);
+        updateNavigationButtons();
+    }
+
+    private void updateNavigationButtons() {
+        previousButton.setDisable(false);
+        nextButton.setDisable(false);
+        if (isFirstPage()) {
+            LOGGER.debug("current page is first page");
+            previousButton.setDisable(true);
+        }
+        if (isLastPage()) {
+            LOGGER.debug("current page is last page");
+            nextButton.setDisable(true);
+        }
     }
 
     private void handleClick(Object button) {
@@ -152,7 +155,8 @@ public class PageSelector extends HBox {
             return;
         }
         if (index > getLastPage()) {
-            LOGGER.warn("button list size {} is too long for the page count of {}", buttons.size(), getPageCount());
+            LOGGER.warn("button list size {} is too long for the page count of {}", buttons.size(),
+                    getPageCount());
             return;
         }
         setCurrentPage(index);
