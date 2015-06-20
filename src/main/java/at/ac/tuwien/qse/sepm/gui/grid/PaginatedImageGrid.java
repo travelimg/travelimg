@@ -2,15 +2,16 @@ package at.ac.tuwien.qse.sepm.gui.grid;
 
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.gui.controller.Menu;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import at.ac.tuwien.qse.sepm.gui.util.LRUCache;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Pagination;
+import javafx.scene.layout.Pane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -19,10 +20,11 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class PaginatedImageGrid extends Pagination {
+public class PaginatedImageGrid extends Pane {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private Menu menu;
     private ImageCache imageCache;
     private List<Photo> photos = new ArrayList<>();
 
@@ -32,16 +34,17 @@ public class PaginatedImageGrid extends Pagination {
     private int photosPerPage = 24;
     private ObjectProperty<ImageGridPage> activePageProperty = new SimpleObjectProperty<>(null);
 
-    public PaginatedImageGrid(ImageCache imageCache) {
-        super(0, 0);
-
+    public PaginatedImageGrid(Menu menu, ImageCache imageCache) {
+        this.menu = menu;
         this.imageCache = imageCache;
 
-        setPageFactory(this::getPage);
         getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
 
         heightProperty().addListener(this::handleSizeChange);
+        widthProperty().addListener(this::handleSizeChange);
         activePageProperty.addListener(this::handlePageChange);
+
+        menu.addListener(new PageSwitchListener());
     }
 
     public List<Photo> getPhotos() {
@@ -54,22 +57,18 @@ public class PaginatedImageGrid extends Pagination {
      * @param photos The photos to show in the grid
      */
     public void setPhotos(List<Photo> photos) {
-        clear();
-
+        int oldPageCount = calculatePageCount();
         this.photos = photos;
+        int newPageCount = calculatePageCount();
 
-        // reset the cache
         pageCache.clear();
 
-        // force an update of the current page
-        // if the page count stayed the same
-        if (getPageCount() == calculatePageCount()) {
-            setPageCount(calculatePageCount() + 1);
-
-        }
-
         // set the new page count
-        setPageCount(calculatePageCount());
+        menu.setPageCount(newPageCount);
+
+        if (oldPageCount == newPageCount) {
+            updatePage();
+        }
     }
 
     /**
@@ -78,17 +77,22 @@ public class PaginatedImageGrid extends Pagination {
      * @param photo The photo to be added
      */
     public void addPhoto(Photo photo) {
+        int oldPageCount = calculatePageCount();
+
         photos.add(photo);
 
         photos = photos.stream()
                 .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
                 .collect(Collectors.toList());
 
-        pageCache.clear();
+        int newPageCount = calculatePageCount();
 
-        // force relayout
-        setPageCount(calculatePageCount() + 1);
-        setPageCount(calculatePageCount());
+        pageCache.clear();
+        menu.setPageCount(newPageCount);
+
+        if (oldPageCount == newPageCount) {
+            updatePage();
+        }
     }
 
     public void setSelectionChangeAction(Consumer<Set<Photo>> selectionChangeAction) {
@@ -144,18 +148,17 @@ public class PaginatedImageGrid extends Pagination {
      * @param photo The photo to be removed.
      */
     public void removePhoto(Photo photo) {
+        int oldPageCount = calculatePageCount();
+
         photos.remove(photo);
         pageCache.clear();
 
-        int currentPage = getCurrentPageIndex();
+        int newPageCount = calculatePageCount();
 
-        setPageCount(calculatePageCount() + 2);
-        setPageCount(calculatePageCount());
+        menu.setPageCount(newPageCount);
 
-        if (currentPage >= getPageCount()) {
-            setCurrentPageIndex(getPageCount() - 1);
-        } else {
-            setCurrentPageIndex(currentPage);
+        if (oldPageCount == newPageCount) {
+            updatePage();
         }
     }
 
@@ -182,16 +185,6 @@ public class PaginatedImageGrid extends Pagination {
         }
 
         photos.set(index, photo);
-    }
-
-    /**
-     * Clear the grids and remove all pages except for an empty first one
-     */
-    public void clear() {
-        photos.clear();
-        pageCache.clear();
-
-        setPageCount(1);
     }
 
     private ImageGridPage createPage(int pageIndex) {
@@ -257,15 +250,14 @@ public class PaginatedImageGrid extends Pagination {
         int photosPerRow = (int) getWidth() / tileSize;
         int photosPerCol = (int) getHeight() / tileSize;
 
-        int totalPhotos = photosPerRow * photosPerCol;
+        int totalPhotos = Math.max(photosPerRow * photosPerCol, 1);
 
         if (totalPhotos != photosPerPage) {
             photosPerPage = totalPhotos;
             pageCache.clear();
 
-            // force relayout
-            setPageCount(calculatePageCount() + 1);
-            setPageCount(calculatePageCount());
+            menu.setPageCount(calculatePageCount());
+            updatePage();
         }
     }
 
@@ -282,6 +274,20 @@ public class PaginatedImageGrid extends Pagination {
 
         if (index != -1) {
             newValue.selectAt(index);
+        }
+    }
+
+    private void updatePage() {
+        ImageGridPage page = getPage(menu.getCurrentPage());
+
+        getChildren().clear();
+        getChildren().add(page);
+    }
+
+    private class PageSwitchListener implements Menu.Listener {
+        @Override
+        public void onPageSwitch(Menu sender) {
+            updatePage();
         }
     }
 }

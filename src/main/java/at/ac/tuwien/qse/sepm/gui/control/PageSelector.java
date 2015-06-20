@@ -81,7 +81,8 @@ public class PageSelector extends HBox {
         LOGGER.debug("setting current page from {} to {}", getCurrentPage(), currentPage);
         if (currentPage < 0) throw new IndexOutOfBoundsException();
         if (currentPage >= getPageCount()) throw new IndexOutOfBoundsException();
-        buttons.get(getCurrentPage()).setSelected(false);
+
+        buttons.forEach(b -> b.setSelected(false));
         currentPageProperty().set(currentPage);
         buttons.get(getCurrentPage()).setSelected(true);
 

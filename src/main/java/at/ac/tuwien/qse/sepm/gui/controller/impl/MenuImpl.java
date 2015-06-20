@@ -54,7 +54,7 @@ public class MenuImpl implements Menu {
     }
 
     @Override public int getCurrentPage() {
-        return getCurrentPage();
+        return pageSelector.getCurrentPage();
     }
 
     @FXML
