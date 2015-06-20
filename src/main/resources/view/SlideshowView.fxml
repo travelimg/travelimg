@@ -11,6 +11,7 @@
     </left>
 
     <center>
+
         <ScrollPane fx:id="gridContainer" prefWidth="500" prefHeight="400" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
                     fitToWidth="true" fitToHeight="true"/>
     </center>

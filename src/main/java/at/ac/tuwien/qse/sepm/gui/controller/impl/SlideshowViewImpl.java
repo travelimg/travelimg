@@ -46,12 +46,6 @@ public class SlideshowViewImpl implements SlideshowView {
 
     @FXML private BorderPane root;
     @FXML private ScrollPane gridContainer;
-    @FXML private Button Btn_Add;
-    @FXML private ComboBox cb_getSlideshows;
-    @FXML private TextField tf_slideName;
-    @FXML private RadioButton rb_5sec;
-    @FXML private RadioButton rb_10sec;
-    @FXML private RadioButton rb_15sec;
 
     @Autowired
     private SlideshowOrganizerImpl slideshowOrganizer;
@@ -62,13 +56,12 @@ public class SlideshowViewImpl implements SlideshowView {
 
     private ObservableList<Slideshow> slideshows = FXCollections.observableArrayList();
 
-    private ToggleGroup radioButtons = new ToggleGroup();
-
     @Autowired
     public void setImageCache(ImageCache imageCache) {
         if (grid == null) {
             this.grid = new SlideshowGrid(imageCache);
             this.grid.setSlideChangedCallback(this::handleSlideChanged);
+
 
         }
     }
@@ -77,7 +70,7 @@ public class SlideshowViewImpl implements SlideshowView {
     private void initialize() {
         gridContainer.setContent(grid);
 
-        Btn_Add.setOnAction(this::handlesetShowSlides);
+
         slideshowOrganizer.setSlideshows(slideshows);
         slideshowOrganizer.getSelectedSlideshowProperty().addListener((observable, oldValue, newValue) -> {
             grid.setSlideshow(newValue);
@@ -86,21 +79,9 @@ public class SlideshowViewImpl implements SlideshowView {
 
         loadAllSlideshows();
 
-        //Add Buttons to Tooggle Group
-        rb_5sec.setSelected(true);
-        rb_5sec.setToggleGroup(radioButtons);
-        rb_10sec.setToggleGroup(radioButtons);
-        rb_15sec.setToggleGroup(radioButtons);
-
-
-        radioButtons.selectedToggleProperty().addListener(this::updateSlideshowDuration);
-
         slideshowOrganizer.setPresentAction(() -> {
             Slideshow selected = slideshowOrganizer.getSelected();
             PresentationWindow presentationWindow = new PresentationWindow(selected, imageCache);
-
-
-
             presentationWindow.present();
         });
     }
@@ -139,7 +120,8 @@ public class SlideshowViewImpl implements SlideshowView {
     private void updateSlideshowDuration(Object observable) {
         Slideshow selected = slideshowOrganizer.getSelected();
         if (selected != null) {
-            selected.setDurationBetweenPhotos(getSelectedDuration());
+            selected.setDurationBetweenPhotos(slideshowOrganizer.getSelectedDuration());
+            LOGGER.debug(slideshowOrganizer.getSelectedDuration()+"Aktuelle Duration!");
 
             try {
                 slideshowService.update(selected);
@@ -148,7 +130,7 @@ public class SlideshowViewImpl implements SlideshowView {
             }
         }
     }
-
+/* -- TODO: Delete Methods
     private void createSlideshow() {
         try {
             Slideshow slideshow = new Slideshow();
@@ -158,7 +140,7 @@ public class SlideshowViewImpl implements SlideshowView {
             } else {
                 slideshow.setId(1);
                 slideshow.setName(tf_slideName.getText());
-                slideshow.setDurationBetweenPhotos(getSelectedDuration());
+                slideshow.setDurationBetweenPhotos(slideshowOrganizer.getSelectedDuration());
 
                 slideShowService.create(slideshow);
                 cb_getSlideshows.getItems().add(tf_slideName.getText());
@@ -175,7 +157,8 @@ public class SlideshowViewImpl implements SlideshowView {
 
     private void handlesetShowSlides(Event event) {
         createSlideshow();
-    }
+
+    }*/
 
     private void handleSlideChanged(Slide slide) {
         try {
@@ -214,13 +197,6 @@ public class SlideshowViewImpl implements SlideshowView {
         return new Slideshow(NEW_SLIDESHOW_MARKER_ID, NEW_SLIDESHOW_PROMPT, durationBetweenPhotos, slides);
     }
 
-    private double getSelectedDuration(){
-        if (rb_5sec.isSelected()) {
-            return 5.0;
-        } else if (rb_10sec.isSelected()) {
-            return 10.0;
-        } else {
-            return 15.0;
-        }
-    }
+
+
 }

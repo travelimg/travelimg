@@ -7,12 +7,5 @@
 <Pane prefHeight="405.0" prefWidth="250.0" styleClass="organizer" stylesheets="@style.css"
       xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowViewImpl">
     <children>
-        <Button fx:id="Btn_Add" layoutX="47.0" layoutY="137.0" mnemonicParsing="false" text="Update Slideshow Name" BorderPane.alignment="CENTER" />
-        <TextField fx:id="tf_slideName" layoutX="46.0" layoutY="80.0" BorderPane.alignment="CENTER" />
-        <ComboBox fx:id="cb_getSlideshows" layoutX="46.0" layoutY="215.0" prefHeight="40.0" prefWidth="165.0" />
-      <RadioButton fx:id="rb_5sec" layoutX="71.0" layoutY="300.0" mnemonicParsing="false" text=" 5 sec" />
-      <RadioButton fx:id="rb_10sec" layoutX="72.0" layoutY="329.0" mnemonicParsing="false" text="10 sec" />
-      <RadioButton fx:id="rb_15sec" layoutX="72.0" layoutY="357.0" mnemonicParsing="false" text="15 sec" />
     </children>
-
 </Pane>

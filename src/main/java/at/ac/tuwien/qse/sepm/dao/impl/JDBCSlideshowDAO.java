@@ -33,7 +33,7 @@ public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
     private SimpleJdbcInsert insertSlideshow;
 
     @Autowired
-    private SlideDAO slideDAO;
+    private SlideDAO<Slide> slideDAO;
 
     @Override
     @Autowired

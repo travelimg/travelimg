@@ -4,18 +4,23 @@ package at.ac.tuwien.qse.sepm.gui.controller.impl;
 import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.gui.controller.SlideshowOrganizer;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
+import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.SlideshowService;
+import at.ac.tuwien.qse.sepm.service.impl.SlideshowServiceImpl;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,8 +35,31 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     private ListView<Slideshow> slideshowList;
 
     @FXML
+    private BorderPane root;
+
+    @FXML
     private Button presentButton;
 
+    @FXML
+    private Button updateButton;
+
+    @FXML
+    private TextField slideshowNameTextField;
+
+    @FXML
+    private RadioButton FivesecRadioButton;
+
+    @FXML
+    private RadioButton TensecRadioButton;
+
+    @FXML
+    private RadioButton FifteensecRadioButton;
+
+    private ToggleGroup radioButtons = new ToggleGroup();
+
+
+    @Autowired
+    private SlideshowServiceImpl slideshowService;
 
     private ObjectProperty<Slideshow> selectedSlideshowProperty = new SimpleObjectProperty<>(null);
 
@@ -61,11 +89,19 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     private void initialize() {
 
         slideshowList.setCellFactory(new SlideshowCellFactory());
+        updateButton.setOnAction(this::updateSelectedSlideshowName);
         slideshowList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             selectedSlideshowProperty.setValue(newValue);
         });
 
+        //Add Buttons to Tooggle Group
+        FivesecRadioButton.setSelected(true);
+        FivesecRadioButton.setToggleGroup(radioButtons);
+        TensecRadioButton.setToggleGroup(radioButtons);
+        FifteensecRadioButton.setToggleGroup(radioButtons);
 
+
+        radioButtons.selectedToggleProperty().addListener(this::updateSlideshowDuration);
 
     }
 
@@ -84,6 +120,61 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
             if (item != null) {
                 setText(item.getName());
             }
+        }
+    }
+
+
+    private void updateSelectedSlideshowName(Event event) {
+        if(slideshowNameTextField.getText().isEmpty())
+            slideshowNameTextField.setText(getSelected().getName());
+        else {
+            Slideshow updatedSlideshow = new Slideshow();
+            updatedSlideshow.setName(slideshowNameTextField.getText());
+            updatedSlideshow.setDurationBetweenPhotos(getSelected().getDurationBetweenPhotos());
+            updatedSlideshow.setSlides(getSelected().getSlides());
+            updatedSlideshow.setId(getSelected().getId());
+            try {
+                slideshowService.update(updatedSlideshow);
+                updateSlideshowListView();
+            } catch (ServiceException e) {
+                ErrorDialog.show(root, "Fehler beim Ändern der Slideshow", "Fehlermeldung: " + e.getMessage());
+            }
+
+
+        }
+
+
+    }
+
+    private void updateSlideshowListView() {
+        ObservableList<Slideshow> slideshows = slideshowList.getItems();
+        getSelected().setName(slideshowNameTextField.getText());
+        slideshowList.setItems(FXCollections.observableArrayList());
+        slideshowList.setItems(slideshows);
+
+    }
+
+    private void updateSlideshowDuration(Object observable) {
+        Slideshow selected = getSelected();
+        if (selected != null) {
+            selected.setDurationBetweenPhotos(getSelectedDuration());
+
+            try {
+                slideshowService.update(selected);
+                LOGGER.debug(getSelectedDuration()+"Aktuelle Duration!");
+            } catch (ServiceException ex) {
+                ErrorDialog.show(root, "Fehler beim Ändern der Dauer", "Fehlermeldung: " + ex.getMessage());
+            }
+        }
+    }
+
+    public double getSelectedDuration(){
+        if (FivesecRadioButton.isSelected()) {
+            return 5.0;
+        } else if (TensecRadioButton.isSelected()) {
+            return 10.0;
+        } else {
+            return 15.0;
         }
     }
 
