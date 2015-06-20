@@ -9,7 +9,9 @@ import at.ac.tuwien.qse.sepm.gui.util.LRUCache;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Pagination;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,7 +22,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class PaginatedImageGrid extends Pane {
+public class PaginatedImageGrid extends StackPane {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -37,8 +39,6 @@ public class PaginatedImageGrid extends Pane {
     public PaginatedImageGrid(Menu menu, ImageCache imageCache) {
         this.menu = menu;
         this.imageCache = imageCache;
-
-        getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
 
         heightProperty().addListener(this::handleSizeChange);
         widthProperty().addListener(this::handleSizeChange);

@@ -53,8 +53,6 @@ public class GridViewImpl implements GridView {
 
     @FXML
     private BorderPane root;
-    @FXML
-    private ScrollPane gridContainer;
 
     private PaginatedImageGrid grid;
     private boolean disableReload = false;
@@ -64,9 +62,10 @@ public class GridViewImpl implements GridView {
         LOGGER.debug("initializing");
 
         this.grid = new PaginatedImageGrid(menu, imageCache);
-        gridContainer.setContent(grid);
+        root.setCenter(grid);
         menu.addListener(new MenuListener());
         organizer.setFilterChangeAction(this::handleFilterChange);
+        root.setCenter(grid);
 
         // Selected photos are shown in the inspector.
         grid.setSelectionChangeAction(inspector::setActivePhotos);
