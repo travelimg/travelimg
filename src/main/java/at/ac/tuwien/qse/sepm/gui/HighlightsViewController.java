@@ -39,21 +39,22 @@ import java.util.stream.Collectors;
 
 public class HighlightsViewController {
 
-    @FXML private BorderPane borderPane, left,FotoContainer,treeBoarder,timeLine;
+    @FXML private BorderPane borderPane, left, FotoContainer,treeBoarder,timeLine;
     @FXML private GoogleMapsScene mapsScene;
     @FXML private VBox journeys,tree, tagheartContainer;
     @FXML private HBox titleHBox,tagContainer,wikipediaInfoPaneContainer, mapContainer;
     @FXML private FilterList<Journey> journeyListView;
     @FXML private ScrollPane scrollPhotoView, treeScroll;
     @FXML private Label titleLabel;
-
     @FXML private Button tag1,tag2,tag3,tag4,good;
-    private List<Button> buttonAr = new LinkedList<>();
+    @FXML private StrokeLineCap lineCap;
 
     @Autowired private ClusterService clusterService;
     @Autowired private PhotoService photoService;
     @Autowired private TagService tagService;
     @Autowired private WikipediaService wikipediaService;
+
+    private List<Button> buttonAr = new LinkedList<>();
     private WikipediaInfoPane wikipediaInfoPane;
     private PhotoFilter filter = new PhotoFilter();
     private Journey selectedJourney;
@@ -76,39 +77,12 @@ public class HighlightsViewController {
     private HashMap<PlaceDate,List<Photo>> orderedPlacesAndPhotos = new HashMap<>();
     private Place aktivePlace = null;
 
-    @FXML
-    private StrokeLineCap lineCap;
-
     @Autowired
     public void setImageCache(ImageCache imageCache) {
         this.imageCache = imageCache;
         this.grid = new ImageGrid(imageCache);
     }
 
-    /**
-     *  private Class conecting Place with LocalDateTime 
-     */
-    private class PlaceDate {
-        private Place place;
-        private LocalDateTime date;
-
-        public PlaceDate(Place p, LocalDateTime l){
-            this.place=p;
-            this.date=l;
-        }
-        public void setPlace(Place p){
-            this.place=p;
-        }
-        public void setDate(LocalDateTime l){
-            this.date=l;
-        }
-        public Place getPlace(){
-            return this.place;
-        }
-        public LocalDateTime getDate(){
-            return this.date;
-        }
-    }
     public void initialize(){
         buttonAr.add(tag1);
         buttonAr.add(tag2);
@@ -192,6 +166,7 @@ public class HighlightsViewController {
             }
         }
     }
+
     public void setMap(GoogleMapsScene map) {
         this.mapsScene = map;
         mapView = map.getMapView();
@@ -346,11 +321,7 @@ public class HighlightsViewController {
             e.printStackTrace();
         }
     }
-    /*
-        show Wikipedia to Place
 
-
-     */
     private void handlePlaceSelected(List<Place> places, Place place, int pos) {
         wikipediaInfoPane.showDefaultWikiInfo(place);
         drawJourneyUntil(places,pos);
@@ -375,6 +346,7 @@ public class HighlightsViewController {
     public PhotoFilter getFilter(){
         return filter;
     }
+
     private void handleFilterChange(){
         LOGGER.debug("filter changed");
         if(filterChangeCallback ==null) return;
@@ -387,6 +359,7 @@ public class HighlightsViewController {
 
         if(!disableReload) reloadImages();
     }
+
     public void setFilterChangeAction(Consumer<PhotoFilter>callback){
         LOGGER.debug("setting filter change action");
         filterChangeCallback = callback;
@@ -739,5 +712,30 @@ public class HighlightsViewController {
             path[i] = new LatLong(places.get(i).getLatitude(),places.get(i).getLongitude());
         }
         return path;
+    }
+
+    /**
+     *  private Class connecting Place with LocalDateTime
+     */
+    private class PlaceDate {
+        private Place place;
+        private LocalDateTime date;
+
+        public PlaceDate(Place p, LocalDateTime l){
+            this.place=p;
+            this.date=l;
+        }
+        public void setPlace(Place p){
+            this.place=p;
+        }
+        public void setDate(LocalDateTime l){
+            this.date=l;
+        }
+        public Place getPlace(){
+            return this.place;
+        }
+        public LocalDateTime getDate(){
+            return this.date;
+        }
     }
 }
