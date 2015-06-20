@@ -222,9 +222,6 @@ public class HighlightsViewController {
             });
             titleHBox.getChildren().add(0,back);
             titleLabel.setText(journey.getName()+" - Orte");
-            //TODO this should return the places. List<Place> places = clusterService.getPlacesByJourney(journey);
-
-            // is implemented !
             List<Place> places= clusterService.getPlacesByJourney(journey);
 
 
