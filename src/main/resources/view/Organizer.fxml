@@ -8,8 +8,12 @@
             fx:controller="at.ac.tuwien.qse.sepm.gui.controller.Organizer">
     <center>
         <ScrollPane hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
+
             <VBox fx:id="filterContainer">
-                <Button fx:id="resetButton" text="Zurücksetzen"/>
+                <HBox>
+                    <Button fx:id="resetButton" text="Zurücksetzen"/>
+                    <Button fx:id="switchViewButton" text="Ansicht ändern"/>
+                </HBox>
             </VBox>
         </ScrollPane>
     </center>

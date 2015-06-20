@@ -11,14 +11,24 @@ import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.TagService;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
+import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.h2.store.fs.FilePath;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -64,9 +74,14 @@ public class OrganizerImpl implements Organizer {
     private FilterList<Place> placeListView;
     @FXML
     private Button resetButton;
+    @FXML
+    private Button switchViewButton;
+
+    @FXML private TreeView<String> filesTree;
 
     private PhotoFilter filter = new PhotoFilter();
     private Runnable filterChangeCallback;
+    private TreeView<String> treeView;
 
     @Override public void setPresentAction(Runnable callback) {
         LOGGER.debug("setting present action");
@@ -100,6 +115,8 @@ public class OrganizerImpl implements Organizer {
     @FXML
     private void initialize() {
         resetButton.setOnAction(event -> resetFilter());
+        switchViewButton.setOnAction(event -> switchView());
+
 
         ratingListView = new FilterList<>(value -> {
             switch (value) {
@@ -145,10 +162,64 @@ public class OrganizerImpl implements Organizer {
         resetFilter();
     }
 
+
+    private void switchView() {
+        LOGGER.debug("Switch view");
+        filterContainer.getChildren().clear();
+        filesTree = new TreeView<>();
+        filesTree.setOnMouseClicked(event -> handleFolderChange());
+        Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
+        findFiles(rootDirectories.toFile(), null);
+//        TreeItem<String> rootNode=new TreeItem<>(rootDirectories.toString());
+//
+//        rootNode.setExpanded(true);
+
+        //create the tree view
+
+        filterContainer.getChildren().addAll(new Label("File browser"),filesTree);
+        VBox.setVgrow(filesTree, Priority.ALWAYS);
+    }
+
+    private void findFiles(File dir, FilePathTreeItem parent) {
+        FilePathTreeItem root = new FilePathTreeItem(dir.toPath());
+        root.setExpanded(true);
+        try {
+            File[] files = dir.listFiles();
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    System.out.println("directory:" + file.getCanonicalPath());
+                    findFiles(file,root);
+                } else {
+//                    System.out.println("     file:" + file.getCanonicalPath());
+//                    root.getChildren().add(new FilePathTreeItem(file.toPath()));
+                }
+
+            }
+            if(parent==null){
+                filesTree.setRoot(root);
+            } else {
+                parent.getChildren().add(root);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        filter = new PhotoPathFilter();
+    }
+
     private void handleFilterChange() {
         LOGGER.debug("filter changed");
         if (filterChangeCallback == null) return;
         filterChangeCallback.run();
+    }
+
+    private void handleFolderChange() {
+        LOGGER.debug("Choose folder");
+        FilePathTreeItem item = (FilePathTreeItem) filesTree.getSelectionModel().getSelectedItem();
+        if(item != null){
+            if(filter instanceof PhotoPathFilter)
+                ((PhotoPathFilter) filter).setIncludedPath(Paths.get(item.getFullPath()));
+            handleFilterChange();
+        }
     }
 
     private void handleRatingsChange(List<Rating> values) {
