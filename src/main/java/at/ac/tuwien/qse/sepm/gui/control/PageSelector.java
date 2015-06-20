@@ -84,8 +84,7 @@ public class PageSelector extends HBox {
 
         buttons.forEach(b -> b.setSelected(false));
         currentPageProperty().set(currentPage);
-        buttons.get(getCurrentPage()).setSelected(true);
-        updateNavigationButtons();
+        updateCurrentPage();
     }
 
     public int getLastPage() {
@@ -132,10 +131,11 @@ public class PageSelector extends HBox {
         if (getCurrentPage() > getLastPage()) {
             setCurrentPage(getLastPage());
         }
-        updateNavigationButtons();
+        updateCurrentPage();
     }
 
-    private void updateNavigationButtons() {
+    private void updateCurrentPage() {
+        buttons.get(getCurrentPage()).setSelected(true);
         previousButton.setDisable(false);
         nextButton.setDisable(false);
         if (isFirstPage()) {
