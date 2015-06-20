@@ -12,8 +12,6 @@ import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.Polyline;
 import com.lynden.gmapsfx.shapes.PolylineOptions;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -125,18 +123,13 @@ public class HighlightsViewController {
             }
         }); // setCellFactory
 
-        journeysListView.getSelectionModel().selectedItemProperty()
-                .addListener(new ChangeListener<Journey>() {
-                    public void changed(ObservableValue<? extends Journey> observable,
-                            Journey oldValue, Journey newValue) {
-                        LOGGER.debug("Selected {}", newValue);
-                        if(newValue != null){
-                            handleJourneySelected(newValue);
-                        }
+        journeysListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
-
-                    }
-                });
+            @Override
+            public void handle(MouseEvent event) {
+                handleJourneySelected(journeysListView.getSelectionModel().getSelectedItem());
+            }
+        });
         noJourneysAvailableLabel.setWrapText(true);
     }
 
