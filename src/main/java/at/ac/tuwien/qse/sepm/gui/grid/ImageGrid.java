@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.gui.grid;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
+import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.TilePane;
@@ -33,6 +34,7 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
         this.tileFactory = tileFactory;
 
         getStyleClass().add("image-grid");
+        setAlignment(Pos.CENTER);
     }
 
     public void setPhotos(List<Photo> photos) {
@@ -49,6 +51,18 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
 
     public void setSelectionChangeAction(Consumer<Set<Photo>> selectionChangeAction) {
         this.selectionChangeAction = selectionChangeAction;
+    }
+
+    /**
+     * Get the currently selected photos.
+     *
+     * @return set of selected photos
+     */
+    public Set<Photo> getSelected() {
+        return tiles.stream()
+                .filter(ImageGridTile::isSelected)
+                .map(ImageGridTile::getPhoto)
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -134,6 +148,7 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
 
     protected void onSelectionChange() {
         if (selectionChangeAction == null) return;
+
         selectionChangeAction.accept(getSelectedItems());
     }
 

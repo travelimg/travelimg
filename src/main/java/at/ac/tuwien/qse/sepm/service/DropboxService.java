@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -30,5 +31,5 @@ public interface DropboxService {
      * @param errorHandler Handler for occuring exceptions.
      * @return A cancelable task for aborting the upload if desired.
      */
-    Cancelable uploadPhotos(List<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler);
+    Cancelable uploadPhotos(Collection<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler);
 }

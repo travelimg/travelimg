@@ -63,6 +63,7 @@
     <!-- Service beans -->
     <bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"></bean>
     <bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl" destroy-method="close"></bean>
+    <bean id="synchronizationService" class="at.ac.tuwien.qse.sepm.service.impl.SynchronizationServiceImpl"></bean>
     <bean id="dropboxService" class="at.ac.tuwien.qse.sepm.service.impl.DropboxServiceImpl"></bean>
     <bean id="photographerService" class="at.ac.tuwien.qse.sepm.service.impl.PhotographerServiceImpl"></bean>
     <bean id="tagService" class="at.ac.tuwien.qse.sepm.service.impl.TagServiceImpl"></bean>
@@ -81,5 +82,7 @@
     <bean id="inspectorController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.InspectorImpl"></bean>
     <bean id="slideshowViewController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowViewImpl"></bean>
     <bean id="slideshowOrganizer" class="at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowOrganizerImpl"></bean>
+    <bean id="menuController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.MenuImpl"></bean>
+    <bean id="statusIndicatorController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.StatusIndicatorImpl"></bean>
     <bean id="imageCache" class="at.ac.tuwien.qse.sepm.gui.util.ImageCacheImpl"></bean>
 </beans>

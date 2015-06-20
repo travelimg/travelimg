@@ -55,25 +55,4 @@
             </children>
         </StackPane>
     </center>
-    <bottom>
-        <HBox prefHeight="40.0" styleClass="navbar">
-            <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity"
-                    styleClass="delete" HBox.hgrow="ALWAYS">
-                <graphic>
-                    <FontAwesomeIconView glyphName="TRASH"/>
-                </graphic>
-                <tooltip>
-                    <Tooltip text="Ausgewählte löschen"/>
-                </tooltip>
-            </Button>
-            <Button fx:id="dropboxButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
-                <graphic>
-                    <FontAwesomeIconView glyphName="DROPBOX"/>
-                </graphic>
-                <tooltip>
-                    <Tooltip text="Dropbox-Export"/>
-                </tooltip>
-            </Button>
-        </HBox>
-    </bottom>
 </BorderPane>

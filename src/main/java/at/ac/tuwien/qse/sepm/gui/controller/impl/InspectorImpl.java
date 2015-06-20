@@ -45,10 +45,6 @@ public class InspectorImpl implements Inspector {
     @FXML
     private Node multiAlert;
     @FXML
-    private Button deleteButton;
-    @FXML
-    private Button dropboxButton;
-    @FXML
     private VBox tagSelectionContainer;
     @FXML
     private VBox mapContainer;
@@ -69,7 +65,6 @@ public class InspectorImpl implements Inspector {
     private TagSelector tagSelector;
     private GoogleMapsScene mapsScene;
     private Runnable updateHandler;
-    private Runnable deleteHandler;
 
     @Autowired
     private SlideshowViewImpl slideshowView;
@@ -95,15 +90,11 @@ public class InspectorImpl implements Inspector {
         // mapsScene.removeAktiveMarker();
         activePhotos.addAll(photos);
         activePhotos.forEach(photo -> mapsScene.addMarker(photo));
-        showDetails(activePhotos);
+        showDetails(new ArrayList<>(activePhotos));
     }
 
     @Override public void setUpdateHandler(Runnable updateHandler) {
         this.updateHandler = updateHandler;
-    }
-
-    @Override public void setDeleteHandler(Runnable deleteHandler) {
-        this.deleteHandler = deleteHandler;
     }
 
     @Override public GoogleMapsScene getMap() {
@@ -131,51 +122,9 @@ public class InspectorImpl implements Inspector {
         tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService, root);
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
         ratingPickerContainer.getChildren().add(ratingPicker);
-        deleteButton.setOnAction(this::handleDelete);
-        addToSlideshowButton.setOnAction(this::handleAddToSlideshow);
-        dropboxButton.setOnAction(this::handleDropbox);
         mapContainer.getChildren().add(mapsScene.getMapView());
         tagSelectionContainer.getChildren().add(tagSelector);
-
-        slideshowsCombobox.setConverter(new SlideshowStringConverter());
-        slideshowsCombobox.setItems(slideshowView.getSlideshows());
-    }
-
-    private void handleDelete(Event event) {
-        if (activePhotos.isEmpty()) {
-            return;
-        }
-
-        DeleteDialog deleteDialog = new DeleteDialog(root, activePhotos.size());
-        Optional<Boolean> confirmed = deleteDialog.showForResult();
-        if (!confirmed.isPresent() || !confirmed.get()) return;
-
-        try {
-            photoservice.deletePhotos(activePhotos);
-            onDelete();
-        } catch (ServiceException ex) {
-            LOGGER.error("failed deleting photos", ex);
-            ErrorDialog.show(root, "Fehler beim Löschen", "Die ausgewählten Fotos konnten nicht gelöscht werden.");
-        }
-    }
-
-    private void handleDropbox(Event event) {
-        String dropboxFolder = "";
-        try {
-            dropboxFolder = dropboxService.getDropboxFolder();
-        } catch (ServiceException ex) {
-            ErrorDialog.show(root, "Fehler beim Export", "Konnte keinen Dropboxordner finden");
-        }
-
-        ExportDialog dialog = new ExportDialog(root, dropboxFolder, activePhotos.size());
-
-        Optional<String> destinationPath = dialog.showForResult();
-        if (!destinationPath.isPresent()) return;
-
-        dropboxService.uploadPhotos(activePhotos, destinationPath.get(), photo -> {
-            // TODO: progressbar
-        }, exception -> ErrorDialog.show(root, "Fehler beim Export",
-                "Fehlermeldung: " + exception.getMessage()));
+        addToSlideshowButton.setOnAction(this::handleAddToSlideshow);
     }
 
     private void handleRatingChange(Rating newRating) {
@@ -293,13 +242,6 @@ public class InspectorImpl implements Inspector {
         if (updateHandler != null) {
             updateHandler.run();
         }
-    }
-
-    private void onDelete() {
-        if (deleteHandler != null) {
-            deleteHandler.run();
-        }
-        setActivePhotos(null);
     }
 
     private void handleAddToSlideshow(Event event) {
