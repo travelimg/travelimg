@@ -1,26 +1,23 @@
 package at.ac.tuwien.qse.sepm.gui;
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.PhotoSlide;
 import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
+import at.ac.tuwien.qse.sepm.gui.slide.SlideView;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
@@ -29,29 +26,22 @@ import org.apache.logging.log4j.Logger;
 import java.util.List;
 
 
-public class PresentationWindow extends AnchorPane{
+public class PresentationWindow extends StackPane {
 
     private static final Logger logger = LogManager.getLogger();
 
     private Stage stage;
     private Scene scene;
 
-    @FXML
-    private AnchorPane root;
-    @FXML
-    private ImageView imageView;
-
     private int activeIndex = 0;
     private Timeline timeline = null;
 
     private Slideshow slideshow;
-    private ImageCache imageCache;
 
-    public PresentationWindow(Slideshow slideshow, ImageCache imageCache) {
+    public PresentationWindow(Slideshow slideshow) {
         FXMLLoadHelper.load(this, this, PresentationWindow.class, "view/PresentationWindow.fxml");
 
         this.slideshow = slideshow;
-        this.imageCache = imageCache;
     }
 
     @FXML
@@ -60,20 +50,8 @@ public class PresentationWindow extends AnchorPane{
         this.scene = new Scene(this);
 
         stage.setScene(scene);
-        imageView.fitWidthProperty().bind(root.widthProperty());
-        imageView.fitHeightProperty().bind(root.heightProperty());
-       /* root.setOnKeyPressed((keyEvent) -> {
-            if (keyEvent.getCode() == KeyCode.RIGHT) {
-                showNextSlide(null);
-            }
-            if (keyEvent.getCode() == KeyCode.LEFT) {
-                showPrevSlide(null);
-            }
-            if (keyEvent.getCode() == KeyCode.ESCAPE) {
-                close();
-            }
-        });*/
-        root.setOnKeyPressed(new EventHandler<KeyEvent>() {
+
+        setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(final KeyEvent keyEvent) {
                 if (keyEvent.getCode() == KeyCode.RIGHT) {
                     showNextSlide(null);
@@ -89,7 +67,7 @@ public class PresentationWindow extends AnchorPane{
     }
 
     public void present() {
-        loadImage();
+        loadSlide();
 
         stage.setFullScreen(true);
         stage.setFullScreenExitHint("");
@@ -106,39 +84,28 @@ public class PresentationWindow extends AnchorPane{
         }
 
         stage.close();
-
     }
 
     private void showPrevSlide(ActionEvent event) {
         activeIndex = Math.max(0, activeIndex - 1);
-        loadImage();
+        loadSlide();
     }
 
     private void showNextSlide(ActionEvent event) {
-        logger.debug("Next Slide clikced!!");
         activeIndex = Math.min(slideshow.getSlides().size() - 1, activeIndex + 1);
-        loadImage();
+        loadSlide();
     }
 
-    private void loadImage() {
+    private void loadSlide() {
         List<Slide> slides = slideshow.getSlides();
         if (slides.size() == 0 || slides.size() <= activeIndex) {
             // out of bounds
             return;
         }
 
-        // TODO: make generic for all slide types
-        Slide next = slides.get(activeIndex);
+        SlideView slideView = SlideView.of(slides.get(activeIndex));
 
-        if (next instanceof PhotoSlide) {
-            PhotoSlide photoSlide = (PhotoSlide)next;
-            Image image = imageCache.get(photoSlide.getPhoto(), ImageSize.ORIGINAL);
-            imageView.setImage(image);
-            logger.debug("Bild wurde richtig angezeigt!!"+photoSlide.getPhoto().getPath());
-
-            // handling of images in original size can consume a lot of memory so collect it here
-            System.gc();
-        }
-
+        getChildren().clear();
+        getChildren().add(slideView);
     }
 }

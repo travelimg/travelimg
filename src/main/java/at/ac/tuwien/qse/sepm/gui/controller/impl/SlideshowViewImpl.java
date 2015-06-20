@@ -64,7 +64,7 @@ public class SlideshowViewImpl implements SlideshowView {
 
         slideshowOrganizer.setPresentAction(() -> {
             Slideshow selected = slideshowOrganizer.getSelected();
-            PresentationWindow presentationWindow = new PresentationWindow(selected, imageCache);
+            PresentationWindow presentationWindow = new PresentationWindow(selected);
             presentationWindow.present();
         });
     }
