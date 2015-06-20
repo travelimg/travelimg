@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import at.ac.tuwien.qse.sepm.gui.control.PageSelector?>
 <?import de.jensd.fx.glyphs.fontawesome.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -42,8 +43,11 @@
                 </Button>
             </children>
         </HBox>
-   </left>
-   <right>
+    </left>
+    <center>
+        <PageSelector fx:id="pageSelector" alignment="CENTER"/>
+    </center>
+    <right>
         <HBox styleClass="right" BorderPane.alignment="CENTER">
            <children>
                <Button fx:id="deleteButton" maxHeight="Infinity" styleClass="delete" HBox.hgrow="ALWAYS">

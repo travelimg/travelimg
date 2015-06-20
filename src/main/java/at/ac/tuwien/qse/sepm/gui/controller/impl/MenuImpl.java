@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
+import at.ac.tuwien.qse.sepm.gui.control.PageSelector;
 import at.ac.tuwien.qse.sepm.gui.controller.Menu;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -33,6 +34,9 @@ public class MenuImpl implements Menu {
     @FXML
     private Button exportButton;
 
+    @FXML
+    private PageSelector pageSelector;
+
     @Override public void addListener(Listener listener) {
         if (listener == null) throw new IllegalArgumentException();
         listeners.add(listener);
@@ -45,6 +49,14 @@ public class MenuImpl implements Menu {
         LOGGER.debug("removed listener {}", listener);
     }
 
+    @Override public void setPageCount(int pageCount) {
+        pageSelector.setPageCount(pageCount);
+    }
+
+    @Override public int getCurrentPage() {
+        return getCurrentPage();
+    }
+
     @FXML
     private void initialize() {
         presentButton.setOnAction((e) -> listeners.forEach(l -> l.onPresent(this)));
@@ -53,5 +65,7 @@ public class MenuImpl implements Menu {
         journeyButton.setOnAction((e) -> listeners.forEach(l -> l.onJourney(this)));
         deleteButton.setOnAction((e) -> listeners.forEach(l -> l.onDelete(this)));
         exportButton.setOnAction((e) -> listeners.forEach(l -> l.onExport(this)));
+        pageSelector.currentPageProperty().addListener((object, oldValue, newValue) ->
+            listeners.forEach(l -> l.onPageSwitch(this)));
     }
 }

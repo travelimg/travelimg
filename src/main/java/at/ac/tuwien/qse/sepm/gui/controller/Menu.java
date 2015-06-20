@@ -19,6 +19,22 @@ public interface Menu {
      */
     void removeListener(Listener listener);
 
+    /**
+     * Set the number of grid pages that can be accessed via the menu.
+     *
+     * @param pageCount number of pages
+     */
+    void setPageCount(int pageCount);
+
+    /**
+     * Get the index of the current page.
+     *
+     * This index is non-negative and always less than the page count.
+     *
+     * @return index of the page
+     */
+    int getCurrentPage();
+
     interface Listener {
 
         /**
@@ -62,5 +78,12 @@ public interface Menu {
          * @param sender menu instance sending the notification
          */
         default void onExport(Menu sender) { }
+
+        /**
+         * Notify the listener that the user switched to another page.
+         *
+         * @param sender menu instance sending the notification
+         */
+        default void onPageSwitch(Menu sender) { }
     }
 }

@@ -317,32 +317,67 @@
 }
 .menu .button {
     -fx-border-radius: 0;
+    -fx-background-radius: 0;
     -fx-padding: 10px 20px;
 }
 .menu .button:hover {
     -fx-background-color: -fx-primary-hover;
 }
 .menu .button:focused {
-    -fx-background-color: -fx-primary-focus;
+    -fx-background-color: transparent;
 }
 .menu .button:pressed {
     -fx-background-color: -fx-primary-press;
 }
-.menu .button .glyph-icon {
-    -fx-fill: rgba(255, 255, 255, 0.5);
-    -glyph-size: 20;
+.menu .button:disabled {
+    -fx-background-color: transparent;
 }
-.menu .button:focused .glyph-icon {
+.menu .button .glyph-icon {
     -fx-fill: white;
+    -fx-opacity: 0.5;
+    -glyph-size: 20px;
+}
+.menu .button:hover .glyph-icon {
+    -fx-opacity: 0.75;
 }
 .menu .button:pressed .glyph-icon {
-    -fx-fill: white;
-}
-.menu .button:disabled {
-    -fx-background-color: #1E88E5;
+    -fx-opacity: 1.0;
 }
 .menu .button:disabled .glyph-icon {
-    -fx-opacity: 0.3;
+    -fx-opacity: 0.25;
+}
+
+.page-selector, .page-selector * {
+    -fx-padding: 0;
+}
+.page-selector .button {
+    -fx-background-color: transparent;
+}
+.page-selector .button:hover {
+    -fx-background-color: transparent;
+}
+.page-selector .button:focused {
+    -fx-background-color: transparent;
+}
+.page-selector .page-button:pressed {
+    -fx-background-color: transparent;
+}
+.page-selector .page-button {
+    -fx-padding: 0 3px;
+    -fx-background-color: transparent;
+    -fx-min-width: 0;
+}
+.page-selector .page-button .glyph-icon {
+    -glyph-size: 13px;
+    -fx-opacity: 0.1;
+}
+.page-selector .page-button:hover .glyph-icon {
+    -glyph-size: 13px;
+    -fx-opacity: 0.2;
+}
+.page-selector .page-button.selected .glyph-icon {
+    -fx-fill: -fx-accent;
+    -fx-opacity: 1.0;
 }
 
 .image-grid {
