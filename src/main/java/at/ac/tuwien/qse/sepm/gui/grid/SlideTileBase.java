@@ -11,6 +11,7 @@ public class SlideTileBase<S extends Slide> extends SlideTile {
     private final S slide;
 
     public SlideTileBase(S slide) {
+        super(42);
         if (slide == null) throw new IllegalArgumentException();
         this.slide = slide;
     }

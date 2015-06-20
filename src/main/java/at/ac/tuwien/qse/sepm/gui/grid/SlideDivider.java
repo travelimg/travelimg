@@ -9,9 +9,13 @@ import javafx.scene.shape.Rectangle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.function.Consumer;
+
 public class SlideDivider extends Button {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private Consumer<Integer> slideDroppedCallback = null;
 
     public SlideDivider() {
         setOnDragEntered(this::handleDragEntered);
@@ -19,6 +23,10 @@ public class SlideDivider extends Button {
         setOnDragDropped(this::handleDragDropped);
         setOnDragExited(this::handleDragExited);
         setGraphic(new Rectangle(30, 150, Paint.valueOf("blue")));
+    }
+
+    public void setSlideDroppedCallback(Consumer<Integer> callback) {
+        this.slideDroppedCallback = callback;
     }
 
     private void handleDragEntered(DragEvent event) {
@@ -38,7 +46,17 @@ public class SlideDivider extends Button {
         Dragboard dragboard = event.getDragboard();
         boolean success = dragboard.hasString();
         if (success) {
-            LOGGER.debug("dropped {}", dragboard.getString());
+            try {
+                int slideId = Integer.parseInt(dragboard.getString().replace("slide: ", ""));
+                LOGGER.debug("dropped slide with id {} on divider", slideId);
+
+                if (slideDroppedCallback != null) {
+                    slideDroppedCallback.accept(slideId);
+                }
+            } catch (NumberFormatException ex) {
+                success = false;
+            }
+
         }
         event.setDropCompleted(success);
         event.consume();
