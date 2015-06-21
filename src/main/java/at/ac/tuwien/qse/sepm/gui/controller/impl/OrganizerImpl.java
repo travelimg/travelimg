@@ -52,14 +52,6 @@ public class OrganizerImpl implements Organizer {
     @FXML
     private BorderPane root;
     @FXML
-    private Button importButton;
-    @FXML
-    private Button flickrButton;
-    @FXML
-    private Button presentButton;
-    @FXML
-    private Button addJourneyButton;
-    @FXML
     private VBox filterContainer;
     @FXML
     private FilterList<Rating> ratingListView;
@@ -82,7 +74,6 @@ public class OrganizerImpl implements Organizer {
 
     private PhotoFilter filter = new PhotoFilter();
     private Runnable filterChangeCallback;
-    private TreeView<String> treeView;
 
     @Override public void setFilterChangeAction(Runnable callback) {
         LOGGER.debug("setting filter change action");
@@ -166,20 +157,20 @@ public class OrganizerImpl implements Organizer {
     }
 
     private void findFiles(File dir, FilePathTreeItem parent) {
-        FilePathTreeItem root = new FilePathTreeItem(dir.toPath());
-        root.setExpanded(true);
+        FilePathTreeItem rootNode = new FilePathTreeItem(dir.toPath());
+        rootNode.setExpanded(true);
         try {
             File[] files = dir.listFiles();
             for (File file : files) {
                 if (file.isDirectory()) {
                     System.out.println("directory:" + file.getCanonicalPath());
-                    findFiles(file, root);
+                    findFiles(file, rootNode);
                 }
             }
             if(parent==null){
-                filesTree.setRoot(root);
+                filesTree.setRoot(rootNode);
             } else {
-                parent.getChildren().add(root);
+                parent.getChildren().add(rootNode);
             }
         } catch (IOException e) {
             e.printStackTrace();
