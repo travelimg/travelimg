@@ -54,8 +54,6 @@ public class OrganizerImpl implements Organizer {
     private FilterList<Journey> journeyListView;
     @FXML
     private FilterList<Place> placeListView;
-    @FXML
-    private Button resetButton;
 
     private PhotoFilter filter = new PhotoFilter();
     private Runnable filterChangeCallback;
@@ -71,8 +69,6 @@ public class OrganizerImpl implements Organizer {
 
     @FXML
     private void initialize() {
-        resetButton.setOnAction(event -> resetFilter());
-
         ratingListView = new FilterList<>(value -> {
             switch (value) {
                 case GOOD:

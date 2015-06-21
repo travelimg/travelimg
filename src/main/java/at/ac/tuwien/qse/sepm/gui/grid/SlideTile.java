@@ -54,7 +54,7 @@ public class SlideTile extends Tile {
 
     private void update() {
         slideNumber.setText(slide.getOrder().toString());
-        boolean hasCaption = slide.getCaption() != null;
+        boolean hasCaption = slide.getCaption() != null && !slide.getCaption().isEmpty();
         caption.setVisible(hasCaption);
         caption.setText(slide.getCaption());
     }

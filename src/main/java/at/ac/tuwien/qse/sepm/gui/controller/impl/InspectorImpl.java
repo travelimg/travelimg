@@ -15,10 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -44,6 +41,8 @@ public class InspectorImpl implements Inspector {
     private Node details;
     @FXML
     private Node multiAlert;
+    @FXML
+    private Label multiCount;
     @FXML
     private VBox tagSelectionContainer;
     @FXML
@@ -187,6 +186,7 @@ public class InspectorImpl implements Inspector {
         details.setManaged(hasActive);
         multiAlert.setVisible(multipleActive);
         multiAlert.setManaged(multipleActive);
+        multiCount.setText(Integer.toString(photos.size()) + " Fotos");
         exifTable.setVisible(singleActive);
         exifTable.setManaged(singleActive);
         tagSelectionContainer.setVisible(singleActive);

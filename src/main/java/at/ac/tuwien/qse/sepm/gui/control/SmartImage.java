@@ -16,8 +16,6 @@ public class SmartImage extends StackPane {
     public SmartImage() {
         getStyleClass().add("smart-image");
 
-        progress.setMaxWidth(50);
-        progress.setMaxHeight(50);
         setMargin(progress, new Insets(16));
         setPadding(new Insets(4));
 
