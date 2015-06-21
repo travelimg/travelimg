@@ -90,13 +90,7 @@ public class HighlightsViewController {
     public void setMap(GoogleMapsScene map) {
         this.mapsScene = map;
         mapView = map.getMapView();
-        mapView.addMapInializedListener(new MapComponentInitializedListener() {
-            @Override
-            public void mapInitialized() {
-                //wait for the map to initialize.
-                googleMap = mapView.getMap();
-            }
-        });
+        mapView.addMapInializedListener(() -> googleMap = mapView.getMap());
         mapContainer.getChildren().add(map.getMapView());
     }
 
