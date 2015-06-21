@@ -24,8 +24,7 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
     private static final String readAllStatement = "SELECT id, city, country, latitude, longitude FROM PLACE;";
     private static final String updateStatement = "UPDATE PLACE SET city = ?, country = ?, latitude = ?, longitude = ? WHERE id = ?";
     private static final String readByCountryCityStatement = "SELECT id, city, country, latitude, longitude FROM PLACE WHERE country=? AND city=?;";
-    @Autowired
-    JourneyDAO journeyDAO;
+
     private SimpleJdbcInsert insertPlace;
 
     @Override
