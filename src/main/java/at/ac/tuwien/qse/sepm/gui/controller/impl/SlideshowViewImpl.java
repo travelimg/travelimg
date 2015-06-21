@@ -60,7 +60,7 @@ public class SlideshowViewImpl implements SlideshowView {
 
         slideshowOrganizer.setSlideshows(slideshows);
         slideshowOrganizer.getSelectedSlideshowProperty().addListener((observable, oldValue, newValue) -> {
-            //grid.setSlideshow(newValue);
+            grid.setSlides(newValue.getSlides());
         });
 
         loadAllSlideshows();

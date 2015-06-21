@@ -41,23 +41,7 @@ public class SlideGrid extends TilePane {
     private BiConsumer<Slide, Integer> slideAddedCallback = null;
 
     public SlideGrid() {
-
-        /*addSlide(new TitleSlide(1, 1, 1, "Indien 2015", 0));
-        addSlide(new PhotoSlide(2, 1, 2, "1. November - Bombai Test eines sehr langen textes", photos[0]));
-        addSlide(new PhotoSlide(3, 1, 3, null, photos[1]));
-        addSlide(new PhotoSlide(4, 1, 4, null, photos[2]));
-        addSlide(new PhotoSlide(5, 1, 5, null, photos[3]));
-        addSlide(new MapSlide(6, 1, 6, null, 10.0, 15.0));
-        addSlide(new PhotoSlide(7, 1, 7, "4. November - Elefanten", photos[4]));
-        addSlide(new PhotoSlide(8, 1, 8, null, photos[5]));
-        addSlide(new PhotoSlide(9, 1, 9, null, photos[6]));
-        addSlide(new MapSlide(10, 1, 10, "Indien 2015", 10.0, 15.0));
-        addSlide(new PhotoSlide(11, 1, 11, null, photos[7]));
-        addSlide(new PhotoSlide(12, 1, 12, null, photos[8]));
-        addSlide(new TitleSlide(14, 1, 13, null, 0));*/
-
         getStyleClass().add("slide-grid");
-        getChildren().addAll(nodes);
         setAlignment(Pos.TOP_CENTER);
     }
 
@@ -76,7 +60,9 @@ public class SlideGrid extends TilePane {
         SlideGridNode node = new SlideGridNode(tile);
         node.setSlidePositionChangeCallback(this::handleSlidePositionChange);
         node.setSlideAddedCallback(this::handleSlideAdded);
+
         nodes.add(node);
+        getChildren().add(node);
     }
 
     public List<Slide> getSlides() {
@@ -84,7 +70,11 @@ public class SlideGrid extends TilePane {
     }
 
     public void setSlides(List<Slide> slides) {
+        nodes.clear();
+        getChildren().clear();
+
         this.slides = slides;
+        slides.forEach(this::addSlide);
     }
 
     public void setSlideChangedCallback(Consumer<Slide> slideChangedCallback) {
