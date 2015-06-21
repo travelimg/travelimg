@@ -6,6 +6,7 @@ import at.ac.tuwien.qse.sepm.gui.controller.SlideshowOrganizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.impl.SlideshowServiceImpl;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -27,30 +28,19 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
 
     @FXML
     private ListView<Slideshow> slideshowList;
-
     @FXML
     private BorderPane root;
-
     @FXML
     private Button presentButton;
-
-    @FXML
-    private Button updateButton;
-
     @FXML
     private TextField slideshowNameTextField;
-
     @FXML
     private RadioButton shortDurationButton;
-
     @FXML
     private RadioButton mediumDurationButton;
-
     @FXML
     private RadioButton longDurationButton;
-
     private ToggleGroup durationToggleGroup = new ToggleGroup();
-
 
     @Autowired
     private SlideshowServiceImpl slideshowService;
@@ -76,27 +66,80 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     public void setPresentAction(Runnable callback) {
         LOGGER.debug("setting present action");
         presentButton.setOnAction(event -> callback.run());
-
     }
 
     @FXML
     private void initialize() {
-
         slideshowList.setCellFactory(new SlideshowCellFactory());
-        updateButton.setOnAction(this::updateSelectedSlideshowName);
 
-        slideshowList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            selectedSlideshowProperty.setValue(newValue);
-            onActiveSlideshowChanged();
-        });
-
-        //Add Buttons to Tooggle Group
+        // add Buttons to toggle Group
         shortDurationButton.setSelected(true);
         shortDurationButton.setToggleGroup(durationToggleGroup);
         mediumDurationButton.setToggleGroup(durationToggleGroup);
         longDurationButton.setToggleGroup(durationToggleGroup);
-        
+
+        slideshowNameTextField.textProperty().addListener(this::updateSelectedSlideshowName);
         durationToggleGroup.selectedToggleProperty().addListener(this::updateSlideshowDuration);
+        slideshowList.getSelectionModel().selectedItemProperty().addListener(this::onActiveSlideshowChanged);
+    }
+
+    private void refreshSlideshowList() {
+        int selectedIndex = slideshowList.getSelectionModel().getSelectedIndex();
+        
+        ObservableList<Slideshow> slideshows = slideshowList.getItems();
+        slideshowList.setItems(FXCollections.observableArrayList());
+        slideshowList.setItems(slideshows);
+
+        slideshowList.getSelectionModel().select(selectedIndex);
+    }
+
+    private void onActiveSlideshowChanged(Observable observable) {
+        Slideshow selected = slideshowList.getSelectionModel().getSelectedItem();
+        selectedSlideshowProperty.setValue(selected);
+
+        if (selected != null) {
+            slideshowNameTextField.setText(selected.getName());
+        }
+    }
+
+    private void updateSelectedSlideshowName(Object observable) {
+        Slideshow selected = getSelected();
+        String name = slideshowNameTextField.getText();
+
+        if (selected != null && !name.equals(selected.getName())) {
+            LOGGER.debug("Setting name from {} to {}", selected.getName(), name);
+            selected.setName(name);
+
+            try {
+                slideshowService.update(selected);
+                refreshSlideshowList();
+            } catch (ServiceException ex) {
+                ErrorDialog.show(root, "Fehler beim Ändern der Slideshow", "");
+            }
+        }
+    }
+
+    private void updateSlideshowDuration(Object observable) {
+        Slideshow selected = getSelected();
+        if (selected != null) {
+            selected.setDurationBetweenPhotos(getSelectedDuration());
+
+            try {
+                slideshowService.update(selected);
+            } catch (ServiceException ex) {
+                ErrorDialog.show(root, "Fehler beim Ändern der Dauer", "Fehlermeldung: " + ex.getMessage());
+            }
+        }
+    }
+
+    private double getSelectedDuration() {
+        if (shortDurationButton.isSelected()) {
+            return 5.0;
+        } else if (mediumDurationButton.isSelected()) {
+            return 10.0;
+        } else {
+            return 15.0;
+        }
     }
 
     private class SlideshowCellFactory implements Callback<ListView<Slideshow>, ListCell<Slideshow>> {
@@ -116,66 +159,4 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
             }
         }
     }
-
-
-    private void updateSelectedSlideshowName(Event event) {
-        if(slideshowNameTextField.getText().isEmpty())
-            slideshowNameTextField.setText(getSelected().getName());
-        else {
-            Slideshow updatedSlideshow = new Slideshow();
-            updatedSlideshow.setName(slideshowNameTextField.getText());
-            updatedSlideshow.setDurationBetweenPhotos(getSelected().getDurationBetweenPhotos());
-            updatedSlideshow.setSlides(getSelected().getSlides());
-            updatedSlideshow.setId(getSelected().getId());
-            try {
-                slideshowService.update(updatedSlideshow);
-                getSelected().setName(slideshowNameTextField.getText());
-                updateSlideshowListView();
-                slideshowNameTextField.clear();
-            } catch (ServiceException e) {
-                ErrorDialog.show(root, "Fehler beim Ändern der Slideshow", "Fehlermeldung: " + e.getMessage());
-            }
-
-
-        }
-
-
-    }
-
-    private void updateSlideshowListView() {
-        ObservableList<Slideshow> slideshows = slideshowList.getItems();
-        slideshowList.setItems(FXCollections.observableArrayList());
-        slideshowList.setItems(slideshows);
-
-
-    }
-
-    private void onActiveSlideshowChanged(){
-        slideshowNameTextField.setText(getSelected().getName());
-    }
-
-    private void updateSlideshowDuration(Object observable) {
-        Slideshow selected = getSelected();
-        if (selected != null) {
-            selected.setDurationBetweenPhotos(getSelectedDuration());
-
-            try {
-                slideshowService.update(selected);
-            } catch (ServiceException ex) {
-                ErrorDialog.show(root, "Fehler beim Ändern der Dauer", "Fehlermeldung: " + ex.getMessage());
-            }
-        }
-    }
-
-    public double getSelectedDuration(){
-        if (shortDurationButton.isSelected()) {
-            return 5.0;
-        } else if (mediumDurationButton.isSelected()) {
-            return 10.0;
-        } else {
-            return 15.0;
-        }
-    }
-
-
 }

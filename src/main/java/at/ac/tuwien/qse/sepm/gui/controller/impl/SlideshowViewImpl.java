@@ -103,19 +103,6 @@ public class SlideshowViewImpl implements SlideshowView {
         }
     }
 
-    private void updateSlideshowDuration(Object observable) {
-        Slideshow selected = slideshowOrganizer.getSelected();
-        if (selected != null) {
-            selected.setDurationBetweenPhotos(slideshowOrganizer.getSelectedDuration());
-            LOGGER.debug(slideshowOrganizer.getSelectedDuration()+"Aktuelle Duration!");
-
-            try {
-                slideshowService.update(selected);
-            } catch (ServiceException ex) {
-                ErrorDialog.show(root, "Fehler beim Ändern der Dauer", "Fehlermeldung: " + ex.getMessage());
-            }
-        }
-    }
 /* -- TODO: Delete Methods
     private void createSlideshow() {
         try {
