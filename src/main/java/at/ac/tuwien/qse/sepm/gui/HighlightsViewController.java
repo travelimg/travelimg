@@ -606,6 +606,16 @@ public class HighlightsViewController {
     private void setMostUsedTagsWithPhotos(Place place){
         //TODO we should use our own photofilter.
         List<Photo> filteredByPlace = new ArrayList<>();
+        for(int i= 0; i<5; i++){
+            Button tagButton = tagButtons.get(i);
+            tagButton.setStyle("-fx-background-image: none;");
+            tagButton.setText("");
+            tagButton.setOnAction(new EventHandler<ActionEvent>() {
+                @Override public void handle(ActionEvent event) {
+
+                }
+            });
+        }
         if(place==null){
             filteredByPlace = currentPhotosOfSelectedJourney;
         }
@@ -616,6 +626,7 @@ public class HighlightsViewController {
         }
         try {
             List<Tag> mostUsedTags = tagService.getMostFrequentTags(filteredByPlace);
+
             for(int i = 0; i<mostUsedTags.size(); i++){
                 Tag t = mostUsedTags.get(i);
                 List<Photo> filteredByTags = filteredByPlace.stream().filter(p->p.getData().getTags().contains(t)).collect(Collectors.toList());
@@ -624,7 +635,7 @@ public class HighlightsViewController {
                 setBackroundImageForButton(filteredByTags.get(0).getPath(),tagButton);
                 tagButton.setOnAction(new EventHandler<ActionEvent>() {
                     @Override public void handle(ActionEvent event) {
-                        if(goodPhotosList.size()!=0) {
+                        if(filteredByTags.size()!=0) {
                             FullscreenWindow fw = new FullscreenWindow(imageCache);
                             fw.present(filteredByTags, filteredByTags.get(0));
                         }
@@ -645,7 +656,6 @@ public class HighlightsViewController {
         int i = 0;
         while (nrOfPhotos > 0 && i < filteredByPlace.size()) {
             Button tagButton = tagButtons.get(5-nrOfPhotos);
-            tagButton.setText("");
             setBackroundImageForButton(filteredByPlace.get(i).getPath(),tagButton);
             nrOfPhotos--;
             i++;
