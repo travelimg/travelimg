@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -185,7 +186,9 @@ public class GridViewImpl implements GridView {
 
         @Override public void onPresent(Menu sender) {
             FullscreenWindow fullscreen = new FullscreenWindow(imageCache);
-            fullscreen.present(grid.getPhotos(), grid.getActivePhoto());
+            List<Photo> getSelectedPhoto = new ArrayList<>();
+            getSelectedPhoto.addAll(grid.getSelected());
+            fullscreen.present(grid.getPhotos(), getSelectedPhoto.get(0));
         }
 
         @Override public void onImport(Menu sender) {
