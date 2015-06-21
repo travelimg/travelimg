@@ -266,7 +266,7 @@ public class HighlightsViewController {
             drawDestinationsAsPolyline(GeoUtils.toLatLong(orderedPlacesList));
             setGoodPhotos(null);
             setMostUsedTagsWithPhotos(null);
-            reloadImages();
+            //reloadImages();
 
             int pos = 0;
             for(PlaceDate pd: orderedPlacesAndPhotos.keySet()){
@@ -358,15 +358,10 @@ public class HighlightsViewController {
     }
 
 
-
-    public PhotoFilter getFilter(){
-        return filter;
-    }
-
     private void handleFilterChange(){
         LOGGER.debug("filter changed");
         if(filterChangeCallback ==null) return;
-        filterChangeCallback.accept(getFilter());
+        filterChangeCallback.accept(filter);
     }
 
     private void handleFilterChange(PhotoFilter filter){
