@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<BorderPane fx:id="borderPane" stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.HighlightsViewController">
+<BorderPane fx:id="root" stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.HighlightsViewController">
     <left>
         <BorderPane fx:id="left" prefWidth="240.0">
             <top>

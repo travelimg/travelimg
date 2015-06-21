@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.control.WikipediaInfoPane;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.grid.ImageGrid;
 import at.ac.tuwien.qse.sepm.gui.util.GeoUtils;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
@@ -43,7 +44,7 @@ public class HighlightsViewController {
     private static final Logger LOGGER = LogManager.getLogger();
     List<Button> tagButtons = new ArrayList<>();
     @FXML
-    private BorderPane borderPane, left, FotoContainer, treeBoarder, timeLine;
+    private BorderPane root, left, FotoContainer, treeBoarder, timeLine;
     @FXML
     private GoogleMapsScene mapsScene;
     @FXML
@@ -215,27 +216,15 @@ public class HighlightsViewController {
                 merge Places with Photos
                 output is a HashSet
              */
-            HashMap<Place, List<Photo>> photoToPlace = new HashMap<>();
-            for (Place pl : places) {
-                List<Photo> photos = new ArrayList<>();
+            Map<Place, List<Photo>> photosByPlace = getPhotosByPlace(places);
 
-                // TODO include PhotoFilter (bug)
-                for (Photo p : photoService.getAllPhotos()) {
-                    if (p.getData().getPlace() != null) {
-                        if (p.getData().getPlace().getId() == pl.getId()) {
-                            photos.add(p);
-                        }
-                    }
-                }
-                photoToPlace.put(pl, photos);
-            }
 
             // merge Place with DataTime
             HashMap<LocalDateTime, Place> orderedPlaces = new HashMap<>();
 
-            for (Place ple : photoToPlace.keySet()) {
+            for (Place ple : photosByPlace.keySet()) {
                 LocalDateTime min = LocalDateTime.MAX;
-                for (Photo p : photoToPlace.get(ple)) {
+                for (Photo p : photosByPlace.get(ple)) {
 
                     if (p.getData().getDatetime().compareTo(min) < 0) {
                         min = p.getData().getDatetime();
@@ -252,7 +241,7 @@ public class HighlightsViewController {
             // final HashMap with DateTime, Place and photos
             for (LocalDateTime l : sortedKeys) {
                 PlaceDate pl = new PlaceDate(orderedPlaces.get(l), l);
-                orderedPlacesAndPhotos.put(pl, photoToPlace.get(orderedPlaces.get(l)));
+                orderedPlacesAndPhotos.put(pl, photosByPlace.get(orderedPlaces.get(l)));
             }
 
 
@@ -306,6 +295,27 @@ public class HighlightsViewController {
         } catch (ServiceException e) {
             e.printStackTrace();
         }
+    }
+
+    private Map<Place, List<Photo>> getPhotosByPlace(Set<Place> places) {
+        List<Photo> photos;
+        Map<Place, List<Photo>> photosByPlace = new HashMap<>();
+
+        try {
+            photos = photoService.getAllPhotos();
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Konnte nicht alle Fotos laden", "");
+            return photosByPlace;
+        }
+
+        places.forEach(place -> {
+            photosByPlace.put(place, photos.stream()
+                .filter(p -> p.getData().getPlace().equals(place))
+                .collect(Collectors.toList())
+            );
+        });
+
+        return photosByPlace;
     }
 
     private void handlePlaceSelected(List<Place> places, Place place, int pos) {
@@ -423,15 +433,12 @@ public class HighlightsViewController {
             List<Photo> allPhotos = photoService.getAllPhotos(filter).stream()
                     .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
                     .collect(Collectors.toList());
-            LOGGER.debug(photoService.getAllPhotos(filter).size());
-            LOGGER.debug(allPhotos.size());
 
-            List<Photo> goodPhotos = new ArrayList<>();
-            for (Photo p : allPhotos) {
-                if (p.getData().getRating() == (Rating.GOOD)) {
-                    goodPhotos.add(p);
-                }
-            }
+
+            List<Photo> goodPhotos = allPhotos.stream()
+                    .filter(p -> p.getData().getRating() == Rating.GOOD)
+                    .collect(Collectors.toList());
+
             LOGGER.debug(goodPhotos.size());
             Collections.sort((ArrayList) goodPhotos);
 
@@ -584,17 +591,12 @@ public class HighlightsViewController {
     private void setMostUsedTagsWithPhotos(Place place) {
         //TODO we should use our own photofilter.
         List<Photo> filteredByPlace = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            Button tagButton = tagButtons.get(i);
-            tagButton.setStyle("-fx-background-image: none;");
-            tagButton.setText("");
-            tagButton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
 
-                }
-            });
-        }
+        tagButtons.forEach(button -> {
+            button.setStyle("-fx-background-image: none;");
+            button.setText("");
+        });
+
         if (place == null) {
             filteredByPlace = currentPhotosOfSelectedJourney;
         } else {
@@ -669,6 +671,7 @@ public class HighlightsViewController {
         googleMap.addMapShape(polyline);
         polylines.add(polyline);
         GeoUtils.fitMarkersToScreen(path, 0, path.length - 1, mapContainer.getHeight(), mapContainer.getWidth(), mapsScene);
+
         for (int i = 0; i < path.length; i++) {
             Marker m = new Marker(new MarkerOptions().position(path[i]).icon("https://maps.gstatic.com/intl/en_us/mapfiles/markers2/measle_blue.png"));
             googleMap.addMarker(m);
@@ -711,14 +714,12 @@ public class HighlightsViewController {
     }
 
     private void clearMap() {
-        for (Marker m : markers) {
-            googleMap.removeMarker(m);
-        }
+        markers.forEach(marker -> googleMap.removeMarker(marker));
+        polylines.forEach(line -> googleMap.removeMapShape(line));
+
         markers.clear();
-        for (Polyline p : polylines) {
-            googleMap.removeMapShape(p);
-        }
         polylines.clear();
+
         if (actualMarker != null) {
             googleMap.removeMarker(actualMarker);
         }
