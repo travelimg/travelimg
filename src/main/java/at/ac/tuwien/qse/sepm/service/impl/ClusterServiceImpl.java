@@ -55,10 +55,10 @@ public class ClusterServiceImpl implements ClusterService {
 
     @Override
     public Set<Place> getPlacesByJourney(Journey journey) throws ServiceException {
-        Set<Place> places= new HashSet<>();
+        Set<Place> places = new HashSet<>();
 
         try {
-            for(Photo p: photoDAO.readPhotosByJourney(journey)){
+            for (Photo p : photoDAO.readPhotosByJourney(journey)) {
                 places.add(p.getData().getPlace());
             }
         } catch (DAOException e) {
@@ -79,15 +79,15 @@ public class ClusterServiceImpl implements ClusterService {
         }
     }
 
-            @Override
-            public Journey addJourney(Journey journey) throws ServiceException {
-                try {
-                    return journeyDAO.create(journey);
-                } catch (DAOException ex) {
-                    logger.error("Journey-creation for {} failed.", journey);
-                    throw new ServiceException("Creation of journey failed.", ex);
-                } catch (ValidationException ex) {
-                    throw new ServiceException("Failed to validate entity: " + ex.getMessage(), ex);
+    @Override
+    public Journey addJourney(Journey journey) throws ServiceException {
+        try {
+            return journeyDAO.create(journey);
+        } catch (DAOException ex) {
+            logger.error("Journey-creation for {} failed.", journey);
+            throw new ServiceException("Creation of journey failed.", ex);
+        } catch (ValidationException ex) {
+            throw new ServiceException("Failed to validate entity: " + ex.getMessage(), ex);
         }
     }
 
