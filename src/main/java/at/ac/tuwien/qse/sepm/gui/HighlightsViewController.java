@@ -294,7 +294,7 @@ public class HighlightsViewController {
         wikipediaInfoPane.showDefaultWikiInfo(place);
         drawJourneyUntil(places,pos);
         setGoodPhotos(place);
-        setMostUsedTagsWithPhotos(null);
+        setMostUsedTagsWithPhotos(place);
 
         /*aktivePlace = place;
         // set Buttontext default
@@ -581,7 +581,8 @@ public class HighlightsViewController {
      * @param place
      */
     private void setGoodPhotos(Place place){
-        //TODO we should use our own photofilter here.
+        //TODO we should use our own photofilter.
+        good.setText("");
         if(place==null){
             goodPhotosList = currentPhotosOfSelectedJourney.stream()
                     .filter(p->p.getData().getRating().equals(Rating.GOOD))
@@ -595,55 +596,59 @@ public class HighlightsViewController {
         }
 
         if(goodPhotosList.isEmpty()){
-            good.setText("No photos");
+            good.setStyle("-fx-background-image: none;");
         }
-        setBackroundImageForButton(goodPhotosList.get(0).getPath(),good);
+        else{
+            setBackroundImageForButton(goodPhotosList.get(0).getPath(),good);
+        }
     }
 
-    private void setMostUsedTagsWithPhotos(PhotoFilter photoFilter){
+    private void setMostUsedTagsWithPhotos(Place place){
+        //TODO we should use our own photofilter.
+        List<Photo> filteredByPlace = new ArrayList<>();
+        if(place==null){
+            filteredByPlace = currentPhotosOfSelectedJourney;
+        }
+        else{
+            filteredByPlace = currentPhotosOfSelectedJourney.stream()
+                    .filter(p->p.getData().getPlace().getId().equals(place.getId()))
+                    .collect(Collectors.toList());
+        }
         try {
-            List<Photo> list = photoService.getAllPhotos(); //TODO will use here the filter
-            List<Tag> mostUsedTags = tagService.getMostFrequentTags(list);
+            List<Tag> mostUsedTags = tagService.getMostFrequentTags(filteredByPlace);
             for(int i = 0; i<mostUsedTags.size(); i++){
                 Tag t = mostUsedTags.get(i);
+                List<Photo> filteredByTags = filteredByPlace.stream().filter(p->p.getData().getTags().contains(t)).collect(Collectors.toList());
                 Button tagButton = tagButtons.get(i);
                 tagButton.setText(t.getName());
-                setBackroundImageForButton(list.get(0).getPath(),tagButton);
-                //TODO
-                /* get the tagged photos */
+                setBackroundImageForButton(filteredByTags.get(0).getPath(),tagButton);
                 tagButton.setOnAction(new EventHandler<ActionEvent>() {
                     @Override public void handle(ActionEvent event) {
                         if(goodPhotosList.size()!=0) {
                             FullscreenWindow fw = new FullscreenWindow(imageCache);
-                            fw.present(list, list.get(0));
+                            fw.present(filteredByTags, filteredByTags.get(0));
                         }
                     }
                 });
 
             }
             int remainingEmptyTagButtons = 5 - mostUsedTags.size();
-            fillWithPhotos(remainingEmptyTagButtons,photoFilter);
+            fillWithPhotos(remainingEmptyTagButtons,filteredByPlace);
 
         } catch (ServiceException e) {
-            fillWithPhotos(5,photoFilter);
+            fillWithPhotos(5,filteredByPlace);
         }
 
     }
 
-    private void fillWithPhotos(int nrOfPhotos, PhotoFilter photoFilter) {
-
-        try {
-            List<Photo> list = photoService.getAllPhotos(); //TODO will use here the filter
-            int i = 0;
-            while (nrOfPhotos > 0 && i < list.size()) {
-                Button tagButton = tagButtons.get(5-nrOfPhotos);
-                tagButton.setText("");
-                setBackroundImageForButton(list.get(i).getPath(),tagButton);
-                nrOfPhotos--;
-                i++;
-            }
-        } catch (ServiceException e) {
-
+    private void fillWithPhotos(int nrOfPhotos, List<Photo> filteredByPlace) {
+        int i = 0;
+        while (nrOfPhotos > 0 && i < filteredByPlace.size()) {
+            Button tagButton = tagButtons.get(5-nrOfPhotos);
+            tagButton.setText("");
+            setBackroundImageForButton(filteredByPlace.get(i).getPath(),tagButton);
+            nrOfPhotos--;
+            i++;
         }
     }
 
