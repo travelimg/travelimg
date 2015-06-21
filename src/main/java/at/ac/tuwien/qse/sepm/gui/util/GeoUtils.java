@@ -18,21 +18,21 @@ public class GeoUtils {
      * @param mapsScene the google maps scene
      */
     public static void fitMarkersToScreen(LatLong[] path, int from, int to, double mapHeight, double mapWidth, GoogleMapsScene mapsScene) {
-        Double ne_lat = null;
-        Double ne_long = null;
-        Double sw_lat = null;
-        Double sw_long = null;
-        for(int i = from; i<=to && i<path.length;i++) {
-            if (ne_lat == null) {
+        double ne_lat = 0.0;
+        double ne_long = 0.0;
+        double sw_lat = 0.0;
+        double sw_long = 0.0;
+        for (int i = from; i <= to && i < path.length; i++) {
+            if (Double.compare(ne_lat, 0.0) == 0) {
                 ne_lat = path[i].getLatitude();
             }
-            if (ne_long == null) {
+            if (Double.compare(ne_long, 0.0) == 0) {
                 ne_long = path[i].getLongitude();
             }
-            if (sw_lat == null) {
+            if (Double.compare(sw_lat, 0.0) == 0) {
                 sw_lat = path[i].getLatitude();
             }
-            if (sw_long == null) {
+            if (Double.compare(sw_long, 0.0) == 0) {
                 sw_long = path[i].getLongitude();
             }
             if (path[i].getLatitude() > ne_lat) {
