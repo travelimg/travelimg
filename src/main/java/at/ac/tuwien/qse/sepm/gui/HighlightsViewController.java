@@ -56,6 +56,7 @@ public class HighlightsViewController {
     private ListView<Journey> journeysListView = new ListView<>();
     private HashMap<Place,List<Tag>> placesAndTags = new HashMap<>();
     private HashMap<PlaceDate,List<Photo>> orderedPlacesAndPhotos = new HashMap<>();
+    private List<Photo> currentPhotosOfSelectedJourney = new ArrayList<>();
     private List<Photo> goodPhotosList = new ArrayList<>();
     private ArrayList<Marker> markers = new ArrayList<>();
     private ArrayList<Polyline> polylines = new ArrayList<>();
@@ -162,6 +163,10 @@ public class HighlightsViewController {
     private void handleJourneySelected(Journey journey){
 
         try {
+            currentPhotosOfSelectedJourney = photoService.getAllPhotos()
+                    .stream()
+                    .filter(p -> p.getData().getJourney().getId().equals(journey.getId()))
+                    .collect(Collectors.toList()); //TODO should use our own photofilter for that.
             /*
                 CLEAR THE HASHMAPS
              */
@@ -288,7 +293,7 @@ public class HighlightsViewController {
     private void handlePlaceSelected(List<Place> places, Place place, int pos) {
         wikipediaInfoPane.showDefaultWikiInfo(place);
         drawJourneyUntil(places,pos);
-        setGoodPhotos(null);
+        setGoodPhotos(place);
         setMostUsedTagsWithPhotos(null);
 
         /*aktivePlace = place;
@@ -573,18 +578,26 @@ public class HighlightsViewController {
 
     /**
      * Sets the good rated photos for the heart button based on a filter.
-     * @param filter
+     * @param place
      */
-    private void setGoodPhotos(PhotoFilter filter){
-        try {
-            goodPhotosList = photoService.getAllPhotos(); //TODO will use here the filter to get the GOOD rated photos.
-            setBackroundImageForButton(goodPhotosList.get(0).getPath(),good);
-            if(goodPhotosList.isEmpty()){
-                good.setText("No photos");
-            }
-        } catch (ServiceException e) {
+    private void setGoodPhotos(Place place){
+        //TODO we should use our own photofilter here.
+        if(place==null){
+            goodPhotosList = currentPhotosOfSelectedJourney.stream()
+                    .filter(p->p.getData().getRating().equals(Rating.GOOD))
+                    .collect(Collectors.toList());
+        }
+        else{
+            goodPhotosList = currentPhotosOfSelectedJourney.stream()
+                    .filter(p->p.getData().getPlace().getId().equals(place.getId())
+                            && p.getData().getRating().equals(Rating.GOOD))
+                    .collect(Collectors.toList());
+        }
+
+        if(goodPhotosList.isEmpty()){
             good.setText("No photos");
         }
+        setBackroundImageForButton(goodPhotosList.get(0).getPath(),good);
     }
 
     private void setMostUsedTagsWithPhotos(PhotoFilter photoFilter){
