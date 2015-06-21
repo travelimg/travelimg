@@ -75,19 +75,12 @@ public class HighlightsViewController {
     private ArrayList<Polyline> polylines = new ArrayList<>();
     private List<Button> buttonAr = new LinkedList<>();
     private Label noJourneysAvailableLabel = new Label("Keine Reisen gefunden. Bitte fügen Sie eine neue ein.");
-    private Journey selectedJourney;
     private WikipediaInfoPane wikipediaInfoPane;
     private GoogleMapView mapView;
     private GoogleMap googleMap;
     private Marker actualMarker;
-    private Place aktivePlace = null;
-    private PhotoFilter filter = new PhotoFilter();
-    private Consumer<PhotoFilter> filterChangeCallback;
-    private ImageGrid grid;
-    private TreeView<String> treeView;
     private ImageCache imageCache;
     private Line redLine;
-    private boolean disableReload = false;
 
     @Autowired
     public void setImageCache(ImageCache imageCache) {
