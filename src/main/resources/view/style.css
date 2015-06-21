@@ -743,3 +743,60 @@
     -fx-border-color: -tmg-primary;
     -fx-text-fill: -tmg-text-bright;
 }
+
+.toggle-button {
+    -fx-background-color: transparent;
+    -fx-padding: 11px 8px;
+    -fx-background-radius: 3px;
+    -fx-font-size: 14px;
+    -fx-text-fill: -fx-text;
+}
+.toggle-button:hover {
+    -fx-background-color: -tmg-bg2-light;
+}
+.toggle-button:focused {
+    -fx-background-color: -tmg-bg2-light;
+}
+.toggle-button:pressed {
+    -fx-background-color: -tmg-bg2-dark;
+}
+
+.tree-view {
+    -fx-border-color: -fx-text;
+    -fx-border-style: solid;
+    -fx-border-width: 0 0 2px 0;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-font-size: 16px;
+    -fx-padding: 11px 0 0 0;
+}
+.tree-view:focused {
+    -fx-border-color: -fx-accent;
+}
+.tree-view .text-input {
+    -fx-padding: 0 0 4px 0;
+    -fx-border-width: 0;
+}
+.tree-view .tree-view-popup {
+    -fx-background-color: -fx-default;
+    -fx-border-width: 0;
+    -fx-effect: -fx-dropshadow-3;
+    -fx-background-insets: 0;
+    -fx-padding: 0px;
+}
+.tree-view .tree-cell {
+    -fx-padding: 0;
+    -fx-padding: 6px 20px 6px 10px;
+    -fx-text-fill: -fx-text;
+}
+.tree-view .tree-cell:hover {
+    -fx-background-color: -fx-default-hover;
+}
+.tree-view .tree-cell:focused {
+    -fx-background-color: -fx-default-focus;
+}
+.tree-view .tree-cell:selected {
+    -fx-background-color: -fx-default-press;
+}
+
+   
