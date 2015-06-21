@@ -15,14 +15,13 @@ import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.h2.store.fs.FilePath;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -115,7 +114,7 @@ public class OrganizerImpl implements Organizer {
     @FXML
     private void initialize() {
         resetButton.setOnAction(event -> resetFilter());
-        switchViewButton.setOnAction(event -> switchView());
+        switchViewButton.setOnAction(event -> folderViewClicked());
 
 
         ratingListView = new FilterList<>(value -> {
@@ -162,21 +161,24 @@ public class OrganizerImpl implements Organizer {
         resetFilter();
     }
 
+    private void filterViewClicked(){
+        filterContainer.getChildren().clear();
+        HBox hBox = new HBox(resetButton, switchViewButton);
+        filterContainer.getChildren().addAll(hBox, ratingListView,
+                categoryListView, photographerListView, journeyListView, placeListView);
+        switchViewButton.setOnAction(event -> folderViewClicked());
+    }
 
-    private void switchView() {
+    private void folderViewClicked() {
         LOGGER.debug("Switch view");
         filterContainer.getChildren().clear();
         filesTree = new TreeView<>();
         filesTree.setOnMouseClicked(event -> handleFolderChange());
         Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
         findFiles(rootDirectories.toFile(), null);
-//        TreeItem<String> rootNode=new TreeItem<>(rootDirectories.toString());
-//
-//        rootNode.setExpanded(true);
 
-        //create the tree view
-
-        filterContainer.getChildren().addAll(new Label("File browser"),filesTree);
+        switchViewButton.setOnAction(event -> filterViewClicked());
+        filterContainer.getChildren().addAll(switchViewButton, new Label("File browser"),filesTree);
         VBox.setVgrow(filesTree, Priority.ALWAYS);
     }
 
