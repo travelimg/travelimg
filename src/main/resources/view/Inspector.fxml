@@ -12,7 +12,7 @@
             <children>
                 <VBox fx:id="placeholder" styleClass="placeholder" alignment="CENTER">
                     <children>
-                        <FontAwesomeIconView glyphName="TH_LARGE"/>
+                        <FontAwesomeIconView/>
                         <Label text="Kein Foto ausgewählt."/>
                     </children>
                 </VBox>
@@ -20,13 +20,11 @@
                     <children>
                         <VBox fx:id="multiAlert" alignment="CENTER" spacing="16.0" styleClass="alert, warning">
                             <children>
-                                <FontAwesomeIconView glyphName="EXCLAMATION_TRIANGLE"/>
-                                <Label text="Mehrere Fotos ausgewählt." textFill="WHITE" wrapText="true"
-                                       VBox.vgrow="ALWAYS"/>
+                                <Label fx:id="multiCount" styleClass="count" VBox.vgrow="ALWAYS"/>
                             </children>
                         </VBox>
-                        <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0"/>
                         <VBox fx:id="ratingPickerContainer"></VBox>
+                        <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0"/>
                         <VBox fx:id="tagSelectionContainer">
                             <VBox.margin>
                                 <Insets bottom="5"/>
@@ -38,6 +36,18 @@
                                 <TableColumn fx:id="exifValue" prefWidth="135.0" text="Wert"/>
                             </columns>
                         </TableView>
+
+                        <VBox>
+                            <children>
+                                <Label text="Zu Präsentation hinzufügen:"></Label>
+                                <HBox>
+                                    <children>
+                                        <ComboBox fx:id="slideshowsCombobox" />
+                                        <Button fx:id="addToSlideshowButton" text="Add" styleClass="add"></Button>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
                     </children>
                 </VBox>
             </children>

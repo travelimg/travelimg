@@ -1,39 +1,38 @@
 package at.ac.tuwien.qse.sepm.gui.util;
 
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
 import javafx.scene.image.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.MalformedURLException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 public class ImageCacheImpl implements ImageCache {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private LRUCache<Integer, Image> smallCache = new LRUCache<>(500);
-    private LRUCache<Integer, Image> mediumCache = new LRUCache<>(300);
-    private LRUCache<Integer, Image> originalCache = new LRUCache<>(5);
+    private LRUCache<Path, Image> smallCache = new LRUCache<>(500);
+    private LRUCache<Path, Image> mediumCache = new LRUCache<>(300);
+    private LRUCache<Path, Image> originalCache = new LRUCache<>(5);
 
     @Override
-    public Image get(Photo photo, ImageSize size) {
-        LRUCache<Integer, Image> cache = getCacheForSize(size);
+    public Image get(Path path, ImageSize size) {
+        LRUCache<Path, Image> cache = getCacheForSize(size);
 
-        if (!cache.containsKey(photo.getId())) {
-            load(photo, size);
+        if (!cache.containsKey(path)) {
+            load(path, size);
         }
 
-        return cache.get(photo.getId());
+        return cache.get(path);
     }
 
     @Override
-    public void load(Photo photo, ImageSize size) {
+    public void load(Path path, ImageSize size) {
         String url;
 
         try {
-            url = Paths.get(photo.getPath()).toUri().toURL().toString();
+            url = path.toUri().toURL().toString();
         } catch (MalformedURLException ex) {
             LOGGER.error("Failed to convert photo path to URL", ex);
             return;
@@ -51,10 +50,10 @@ public class ImageCacheImpl implements ImageCache {
         }
 
         // put image in cache
-        getCacheForSize(size).put(photo.getId(), image);
+        getCacheForSize(size).put(path, image);
     }
 
-    private LRUCache<Integer, Image> getCacheForSize(ImageSize size) {
+    private LRUCache<Path, Image> getCacheForSize(ImageSize size) {
         if (size == ImageSize.SMALL) return smallCache;
         if (size == ImageSize.MEDIUM) return mediumCache;
         return originalCache;

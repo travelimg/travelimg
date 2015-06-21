@@ -56,12 +56,22 @@ public class GridViewImpl implements GridView {
 
     private PaginatedImageGrid grid;
     private boolean disableReload = false;
+    private boolean treeViewActive = false;
+
+    @Autowired
+    public void setImageCache(ImageCache imageCache) {
+        this.imageCache = imageCache;
+
+        if (grid == null) {
+            this.grid = new PaginatedImageGrid(menu);
+        }
+    }
 
     @FXML
     private void initialize() {
         LOGGER.debug("initializing");
 
-        this.grid = new PaginatedImageGrid(menu, imageCache);
+        this.grid = new PaginatedImageGrid(menu);
         root.setCenter(grid);
         menu.addListener(new MenuListener());
         organizer.setFilterChangeAction(this::handleFilterChange);
@@ -160,6 +170,7 @@ public class GridViewImpl implements GridView {
 
     private void reloadImages() {
         try {
+
             grid.setPhotos(photoService.getAllPhotos(organizer.getFilter()).stream()
                             .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
                             .collect(Collectors.toList()));

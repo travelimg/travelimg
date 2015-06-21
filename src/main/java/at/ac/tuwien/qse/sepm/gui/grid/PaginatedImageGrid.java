@@ -30,7 +30,6 @@ public class PaginatedImageGrid extends StackPane {
     private static final int GAP = 2;
 
     private Menu menu;
-    private ImageCache imageCache;
     private List<Photo> photos = new ArrayList<>();
 
     private LRUCache<Integer, ImageGridPage> pageCache = new LRUCache<>(10);
@@ -39,9 +38,8 @@ public class PaginatedImageGrid extends StackPane {
     private int photosPerPage = 24;
     private ObjectProperty<ImageGridPage> activePageProperty = new SimpleObjectProperty<>(null);
 
-    public PaginatedImageGrid(Menu menu, ImageCache imageCache) {
+    public PaginatedImageGrid(Menu menu) {
         this.menu = menu;
-        this.imageCache = imageCache;
 
         heightProperty().addListener(this::handleSizeChange);
         widthProperty().addListener(this::handleSizeChange);
@@ -198,7 +196,7 @@ public class PaginatedImageGrid extends StackPane {
         int endIndex = Math.min((pageIndex + 1) * photosPerPage, photos.size());
         int startIndex = Math.min(pageIndex * photosPerPage, endIndex);
 
-        ImageGridPage page = new ImageGridPage(photos.subList(startIndex, endIndex), imageCache);
+        ImageGridPage page = new ImageGridPage(photos.subList(startIndex, endIndex));
         pageCache.put(pageIndex, page);
         return page;
     }

@@ -34,7 +34,7 @@ public class PageSelector extends HBox {
         Tooltip previousTooltip = new Tooltip();
         previousTooltip.setText("Vorige Seite");
         previousButton.setTooltip(previousTooltip);
-        previousButton.getStyleClass().addAll("previous");
+        previousButton.getStyleClass().addAll("nav-button");
         previousButton.setOnAction(e -> previousPage());
         previousButton.setMaxHeight(Double.MAX_VALUE);
         HBox.setHgrow(previousButton, Priority.ALWAYS);
@@ -45,7 +45,7 @@ public class PageSelector extends HBox {
         Tooltip nextTooltip = new Tooltip();
         nextTooltip.setText("Vorige Seite");
         nextButton.setTooltip(nextTooltip);
-        nextButton.getStyleClass().addAll("previous");
+        nextButton.getStyleClass().addAll("nav-button");
         nextButton.setOnAction(e -> nextPage());
         nextButton.setMaxHeight(Double.MAX_VALUE);
         HBox.setHgrow(nextButton, Priority.ALWAYS);
