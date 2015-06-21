@@ -81,7 +81,6 @@ public class HighlightsViewController {
     @Autowired
     public void setImageCache(ImageCache imageCache) {
         this.imageCache = imageCache;
-        this.grid = new ImageGrid(imageCache);
     }
 
     public void setMap(GoogleMapsScene map) {
@@ -514,13 +513,13 @@ public class HighlightsViewController {
                                     }
                                 }
 
-                                ImageGrid grid2 = new ImageGrid(imageCache);
-                                grid2.setPhotos(name);
-                                TitledPane tp2 = new TitledPane(t.getName(), grid2);
+                                //ImageGrid grid2 = new ImageGrid(imageCache);
+                                //grid2.setPhotos(name);
+                                //TitledPane tp2 = new TitledPane(t.getName(), grid2);
                                 //Tree
-                                ti.getChildren().add(new TreeItem<String>(t.getName()));
+                                //ti.getChildren().add(new TreeItem<String>(t.getName()));
 
-                                tagTitle.getChildren().add(tp2);
+                                //tagTitle.getChildren().add(tp2);
                             }
                             tp.setContent(tagTitle);
                             rootItem.getChildren().add(ti);
@@ -550,11 +549,7 @@ public class HighlightsViewController {
                         //photoView.getChildren().addAll(overall);
 
                     } catch (ServiceException e) {
-                        LOGGER.debug("Photos habe keine Tag's ", e);
-                        //photoView.getChildren().clear();
-                        grid = new ImageGrid(imageCache);
-                        grid.setPhotos(goodPhotos);
-                        //photoView.getChildren().add(grid);
+                        LOGGER.debug("Photos habe keine Tag'sXXXXXXXXXXXXXXXXXXXX ", e);
                     }
                 }
             } catch (ServiceException e) {
