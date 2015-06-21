@@ -1,9 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
-import at.ac.tuwien.qse.sepm.entities.Exif;
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Rating;
-import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.*;
 import at.ac.tuwien.qse.sepm.gui.control.RatingPicker;
 import at.ac.tuwien.qse.sepm.gui.control.TagSelector;
@@ -18,14 +15,12 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
+import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,9 +42,7 @@ public class InspectorImpl implements Inspector {
     @FXML
     private Node multiAlert;
     @FXML
-    private Button deleteButton;
-    @FXML
-    private Button dropboxButton;
+    private Label multiCount;
     @FXML
     private VBox tagSelectionContainer;
     @FXML
@@ -63,11 +56,17 @@ public class InspectorImpl implements Inspector {
     @FXML
     private TableColumn<String, String> exifValue;
     @FXML
+    private ComboBox<Slideshow> slideshowsCombobox;
+    @FXML
+    private Button addToSlideshowButton;
+    @FXML
     private TableView<Pair<String, String>> exifTable;
     private TagSelector tagSelector;
     private GoogleMapsScene mapsScene;
     private Runnable updateHandler;
-    private Runnable deleteHandler;
+
+    @Autowired
+    private SlideshowViewImpl slideshowView;
 
     @Autowired
     private DropboxService dropboxService;
@@ -90,15 +89,11 @@ public class InspectorImpl implements Inspector {
         // mapsScene.removeAktiveMarker();
         activePhotos.addAll(photos);
         activePhotos.forEach(photo -> mapsScene.addMarker(photo));
-        showDetails(activePhotos);
+        showDetails(new ArrayList<>(activePhotos));
     }
 
     @Override public void setUpdateHandler(Runnable updateHandler) {
         this.updateHandler = updateHandler;
-    }
-
-    @Override public void setDeleteHandler(Runnable deleteHandler) {
-        this.deleteHandler = deleteHandler;
     }
 
     @Override public GoogleMapsScene getMap() {
@@ -126,48 +121,13 @@ public class InspectorImpl implements Inspector {
         tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService, root);
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
         ratingPickerContainer.getChildren().add(ratingPicker);
-        deleteButton.setOnAction(this::handleDelete);
-        dropboxButton.setOnAction(this::handleDropbox);
+
         mapContainer.getChildren().add(mapsScene.getMapView());
         tagSelectionContainer.getChildren().add(tagSelector);
+        addToSlideshowButton.setOnAction(this::handleAddToSlideshow);
 
-    }
-
-    private void handleDelete(Event event) {
-        if (activePhotos.isEmpty()) {
-            return;
-        }
-
-        DeleteDialog deleteDialog = new DeleteDialog(root, activePhotos.size());
-        Optional<Boolean> confirmed = deleteDialog.showForResult();
-        if (!confirmed.isPresent() || !confirmed.get()) return;
-
-        try {
-            photoservice.deletePhotos(activePhotos);
-            onDelete();
-        } catch (ServiceException ex) {
-            LOGGER.error("failed deleting photos", ex);
-            ErrorDialog.show(root, "Fehler beim Löschen", "Die ausgewählten Fotos konnten nicht gelöscht werden.");
-        }
-    }
-
-    private void handleDropbox(Event event) {
-        String dropboxFolder = "";
-        try {
-            dropboxFolder = dropboxService.getDropboxFolder();
-        } catch (ServiceException ex) {
-            ErrorDialog.show(root, "Fehler beim Export", "Konnte keinen Dropboxordner finden");
-        }
-
-        ExportDialog dialog = new ExportDialog(root, dropboxFolder, activePhotos.size());
-
-        Optional<String> destinationPath = dialog.showForResult();
-        if (!destinationPath.isPresent()) return;
-
-        dropboxService.uploadPhotos(activePhotos, destinationPath.get(), photo -> {
-            // TODO: progressbar
-        }, exception -> ErrorDialog.show(root, "Fehler beim Export",
-                "Fehlermeldung: " + exception.getMessage()));
+        slideshowsCombobox.setConverter(new SlideshowStringConverter());
+        slideshowsCombobox.setItems(slideshowView.getSlideshows());
     }
 
     private void handleRatingChange(Rating newRating) {
@@ -226,6 +186,7 @@ public class InspectorImpl implements Inspector {
         details.setManaged(hasActive);
         multiAlert.setVisible(multipleActive);
         multiAlert.setManaged(multipleActive);
+        multiCount.setText(Integer.toString(photos.size()) + " Fotos");
         exifTable.setVisible(singleActive);
         exifTable.setManaged(singleActive);
         tagSelectionContainer.setVisible(singleActive);
@@ -287,11 +248,14 @@ public class InspectorImpl implements Inspector {
         }
     }
 
-    private void onDelete() {
-        if (deleteHandler != null) {
-            deleteHandler.run();
+    private void handleAddToSlideshow(Event event) {
+        Slideshow slideshow = slideshowsCombobox.getSelectionModel().getSelectedItem();
+
+        if (slideshow == null) {
+            return;
         }
-        setActivePhotos(null);
+
+        slideshowView.addPhotosToSlideshow(activePhotos, slideshow);
     }
 
     private class TagListChangeListener implements ListChangeListener<Tag> {
@@ -326,6 +290,17 @@ public class InspectorImpl implements Inspector {
             if (updateNeeded)
                 onUpdate();
         }
+    }
 
+    private static class SlideshowStringConverter extends StringConverter<Slideshow> {
+        @Override
+        public String toString(Slideshow object) {
+            return object.getName();
+        }
+
+        @Override
+        public Slideshow fromString(String string) {
+            return null;
+        }
     }
 }

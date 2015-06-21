@@ -57,6 +57,7 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
         for (Path file : cachedIndex) {
             if (!getRepository().contains(file)) {
                 getCache().remove(file);
+                notifyDelete(file);
                 continue;
             }
             addOperation(new ReadOperation(file));

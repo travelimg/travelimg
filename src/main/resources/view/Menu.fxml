@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import at.ac.tuwien.qse.sepm.gui.control.PageSelector?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane styleClass="menu" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" prefHeight="45"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.controller.Menu">
+   <left>
+        <HBox styleClass="left" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="importButton" maxHeight="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
+                    <graphic>
+                        <FontAwesomeIconView glyphName="FOLDER" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Von Speichermedium importieren" />
+                    </tooltip>
+                </Button>
+                <Button fx:id="flickrButton" maxHeight="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
+                    <graphic>
+                        <FontAwesomeIconView glyphName="FLICKR" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Von Flickr importieren" />
+                    </tooltip>
+                </Button>
+                <Button fx:id="journeyButton" maxHeight="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
+                    <graphic>
+                        <FontAwesomeIconView glyphName="PLUS" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Reise hinzufügen" />
+                    </tooltip>
+                </Button>
+                <Button fx:id="presentButton" maxHeight="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
+                    <graphic>
+                        <FontAwesomeIconView glyphName="EXPAND" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Vollbild-Modus" />
+                    </tooltip>
+                </Button>
+            </children>
+        </HBox>
+    </left>
+    <center>
+        <PageSelector fx:id="pageSelector" alignment="CENTER"/>
+    </center>
+    <right>
+        <HBox styleClass="right" BorderPane.alignment="CENTER">
+           <children>
+               <Button fx:id="deleteButton" maxHeight="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
+                   <graphic>
+                       <FontAwesomeIconView glyphName="TRASH" />
+                   </graphic>
+                   <tooltip>
+                       <Tooltip text="Ausgewählte löschen" />
+                   </tooltip>
+               </Button>
+               <Button fx:id="exportButton" maxHeight="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
+                   <graphic>
+                       <FontAwesomeIconView glyphName="DROPBOX" />
+                   </graphic>
+                   <tooltip>
+                       <Tooltip text="Export" />
+                   </tooltip>
+               </Button>
+               <fx:include source="/view/StatusIndicator.fxml" HBox.hgrow="ALWAYS"/>
+           </children>
+        </HBox>
+   </right>
+</BorderPane>
