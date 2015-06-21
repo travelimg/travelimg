@@ -62,7 +62,8 @@ public class FilePathTreeItem extends TreeItem<String> {
             @Override public void handle(Event e) {
                 FilePathTreeItem source = (FilePathTreeItem) e.getSource();
                 if (source.isDirectory() && source.isExpanded()) {
-                    source.setGraphic(folderIconOpen);
+                    FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.FOLDER_OPEN_ALT);
+                    source.setGraphic(icon);
                     //                    ImageView iv = (ImageView) source.getGraphic();
                     //                    iv.setImage(folderExpandImage);
                 }
@@ -91,7 +92,8 @@ public class FilePathTreeItem extends TreeItem<String> {
             @Override public void handle(Event e) {
                 FilePathTreeItem source = (FilePathTreeItem) e.getSource();
                 if (source.isDirectory() && !source.isExpanded()) {
-                    source.setGraphic(folderIconClosed);
+                    FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.FOLDER_ALT);
+                    source.setGraphic(icon);
                     //                    ImageView iv = (ImageView) source.getGraphic();
                     //                    iv.setImage(folderCollapseImage);
                 }
