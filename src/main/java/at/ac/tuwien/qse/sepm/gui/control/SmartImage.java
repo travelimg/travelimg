@@ -34,8 +34,6 @@ public class SmartImage extends StackPane {
         heightProperty().addListener(this::handleSizeChange);
         widthProperty().addListener(this::handleSizeChange);
 
-        imageView.setPreserveRatio(true);
-
         getChildren().add(progress);
         getChildren().add(imageView);
     }
