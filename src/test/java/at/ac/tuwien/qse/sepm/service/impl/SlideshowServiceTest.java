@@ -7,6 +7,7 @@ import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
 import at.ac.tuwien.qse.sepm.service.SlideshowService;
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,8 +29,9 @@ public class SlideshowServiceTest extends ServiceTestBase {
     @Autowired
    private SlideshowService slideshowService;
 
+
     private Slideshow createAmerika() throws ServiceException {
-        return slideshowService.create(new Slideshow(1,"Amerika",1.0,null));
+        return slideshowService.create(new Slideshow(1,"Amerika",1.0,new ArrayList<Slide>()));
     }
 
 
@@ -42,13 +44,10 @@ public class SlideshowServiceTest extends ServiceTestBase {
 
     @Test
     public void test_create() throws ServiceException {
-
-
         Slideshow slideshow = new Slideshow();
         slideshow.setName("Testslideshow");
         slideshow.setDurationBetweenPhotos(5.0);
         slideshow.setSlides(null);
-
 
         assertEquals(slideshowService.getAllSlideshows().size(),0);
 
@@ -58,18 +57,14 @@ public class SlideshowServiceTest extends ServiceTestBase {
 
     }
 
-
     @Test
     public void test_update_SlideshowName() throws ServiceException{
         Slideshow slideshow = createAmerika();
 
-
         slideshow.setName("Amerika2");
         slideshowService.update(slideshow);
 
-        //List<Slideshow> slideshows = slideshowService.getAllSlideshows();
-
-        assertThat(slideshowService.getAllSlideshows(), contains(slideshow));
+        assertThat(slideshowService.getAllSlideshows(), hasItem(slideshow));
 
     }
 
@@ -88,6 +83,17 @@ public class SlideshowServiceTest extends ServiceTestBase {
 
     }
 
+    @Test
+    public void test_return_all_created_slideshows () throws ServiceException {
+        Slideshow s1 = slideshowService
+                .create(new Slideshow(-1, "Amerika", 5.0, new ArrayList<Slide>()));
+        Slideshow s2 = slideshowService
+                .create(new Slideshow(-1, "Europa", 10.0, new ArrayList<Slide>()));
+        Slideshow s3 = slideshowService
+                .create(new Slideshow(-1, "China", 1.0, new ArrayList<Slide>()));
+
+        assertThat(slideshowService.getAllSlideshows(), containsInAnyOrder(s1,s2,s3));
+    }
 
 
 }
