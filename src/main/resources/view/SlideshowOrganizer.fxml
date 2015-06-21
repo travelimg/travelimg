@@ -6,31 +6,34 @@
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="240.0" styleClass="organizer"
             stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
             fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowOrganizerImpl">
-    <top>
-        <ScrollPane hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
-            <ListView fx:id="slideshowList">
-            </ListView>
-        </ScrollPane>
-    </top>
     <center>
-    <VBox prefHeight="70">
-        <children>
-            <TextField fx:id="slideshowNameTextField"/>
-            <RadioButton fx:id="shortDurationButton" layoutX="71.0" layoutY="300.0" mnemonicParsing="false" text=" 5 sec" />
-            <RadioButton fx:id="mediumDurationButton" layoutX="72.0" layoutY="329.0" mnemonicParsing="false" text="10 sec" />
-            <RadioButton fx:id="longDurationButton" layoutX="72.0" layoutY="357.0" mnemonicParsing="false" text="15 sec" />
-        </children>
-    </VBox>
+        <VBox>
+            <children>
+                <ScrollPane hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true"
+                            maxHeight="Infinity" VBox.vgrow="ALWAYS">
+                    <ListView fx:id="slideshowList">
+                    </ListView>
+                </ScrollPane>
+                <VBox fx:id="slideshowPropertiesBox" prefHeight="100">
+                    <children>
+                        <TextField fx:id="slideshowNameTextField"/>
+                        <RadioButton fx:id="shortDurationButton" mnemonicParsing="false" text="5 Sekunden" />
+                        <RadioButton fx:id="mediumDurationButton" mnemonicParsing="false" text="10 Sekunden" />
+                        <RadioButton fx:id="longDurationButton" mnemonicParsing="false" text="15 Sekunden" />
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
     </center>
     <bottom>
-        <HBox prefHeight="40.0" styleClass="navbar">
+        <HBox styleClass="navbar">
             <children>
                 <Button fx:id="importButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                     <graphic>
-                        <FontAwesomeIconView glyphName="Add"/>
+                        <FontAwesomeIconView glyphName="PLUS"/>
                     </graphic>
                     <tooltip>
-                        <Tooltip text="TODO"/>
+                        <Tooltip text="Diashow hinzufügen"/>
                     </tooltip>
                 </Button>
                 <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
@@ -38,7 +41,7 @@
                         <FontAwesomeIconView glyphName="EXPAND"/>
                     </graphic>
                     <tooltip>
-                        <Tooltip text="TODO"/>
+                        <Tooltip text="Diashow starten"/>
                     </tooltip>
                 </Button>
             </children>

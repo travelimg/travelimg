@@ -16,6 +16,7 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,6 +33,8 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     private BorderPane root;
     @FXML
     private Button presentButton;
+    @FXML
+    private VBox slideshowPropertiesBox;
     @FXML
     private TextField slideshowNameTextField;
     @FXML
@@ -81,11 +84,14 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
         slideshowNameTextField.textProperty().addListener(this::updateSelectedSlideshowName);
         durationToggleGroup.selectedToggleProperty().addListener(this::updateSlideshowDuration);
         slideshowList.getSelectionModel().selectedItemProperty().addListener(this::onActiveSlideshowChanged);
+
+        slideshowPropertiesBox.visibleProperty().bind(selectedSlideshowProperty.isNotNull());
+        slideshowPropertiesBox.managedProperty().bind(slideshowPropertiesBox.visibleProperty());
     }
 
     private void refreshSlideshowList() {
         int selectedIndex = slideshowList.getSelectionModel().getSelectedIndex();
-        
+
         ObservableList<Slideshow> slideshows = slideshowList.getItems();
         slideshowList.setItems(FXCollections.observableArrayList());
         slideshowList.setItems(slideshows);
