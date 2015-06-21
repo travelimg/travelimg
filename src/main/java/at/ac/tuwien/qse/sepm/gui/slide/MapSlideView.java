@@ -6,7 +6,7 @@ public class MapSlideView extends SlideView {
 
     private final MapSlide slide;
 
-    public MapSlideView(MapSlide slide) {
+    public MapSlideView(MapSlide slide, int height, int width) {
         this.slide = slide;
     }
 }

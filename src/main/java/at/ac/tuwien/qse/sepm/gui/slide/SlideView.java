@@ -5,13 +5,13 @@ import javafx.scene.layout.StackPane;
 
 public class SlideView extends StackPane {
 
-    public static SlideView of(Slide slide) {
+    public static SlideView of(Slide slide, int width, int height) {
         if (slide instanceof PhotoSlide) {
-            return new PhotoSlideView((PhotoSlide)slide, null);
+            return new PhotoSlideView((PhotoSlide)slide, width, height);
         } else if (slide instanceof MapSlide) {
-            return new MapSlideView((MapSlide)slide);
+            return new MapSlideView((MapSlide)slide, width, height);
         } else if (slide instanceof TitleSlide) {
-            return new TitleSlideView((TitleSlide)slide);
+            return new TitleSlideView((TitleSlide)slide, width, height);
         }
 
         return null;
