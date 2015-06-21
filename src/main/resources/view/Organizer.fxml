@@ -10,10 +10,6 @@
         <ScrollPane hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
 
             <VBox fx:id="filterContainer">
-                <HBox>
-                    <Button fx:id="resetButton" text="Zurücksetzen"/>
-                    <Button fx:id="switchViewButton" text="Ansicht ändern"/>
-                </HBox>
             </VBox>
         </ScrollPane>
     </center>

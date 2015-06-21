@@ -15,8 +15,10 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 
 public class FilePathTreeItem extends TreeItem<String> {
-    public FontAwesomeIconView folderIconOpen = new FontAwesomeIconView(FontAwesomeIcon.FOLDER_OPEN_ALT);
-    public FontAwesomeIconView folderIconClosed = new FontAwesomeIconView(FontAwesomeIcon.FOLDER_ALT);
+    public FontAwesomeIconView folderIconOpen = new FontAwesomeIconView(
+            FontAwesomeIcon.FOLDER_OPEN_ALT);
+    public FontAwesomeIconView folderIconClosed = new FontAwesomeIconView(
+            FontAwesomeIcon.FOLDER_ALT);
 
     //this stores the full path to the file or directory
     private String fullPath;
@@ -40,11 +42,6 @@ public class FilePathTreeItem extends TreeItem<String> {
             this.isDirectory = true;
             this.setGraphic(folderIconOpen);
         }
-        //        else {
-        //            this.isDirectory = false;
-        //            this.setGraphic(new ImageView(fileImage));
-        //            //if you want different icons for different file types this is where you'd do it
-        //        }
 
         //set the value
         if (!fullPath.endsWith(File.separator)) {
@@ -62,10 +59,9 @@ public class FilePathTreeItem extends TreeItem<String> {
             @Override public void handle(Event e) {
                 FilePathTreeItem source = (FilePathTreeItem) e.getSource();
                 if (source.isDirectory() && source.isExpanded()) {
-                    FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.FOLDER_OPEN_ALT);
+                    FontAwesomeIconView icon = new FontAwesomeIconView(
+                            FontAwesomeIcon.FOLDER_OPEN_ALT);
                     source.setGraphic(icon);
-                    //                    ImageView iv = (ImageView) source.getGraphic();
-                    //                    iv.setImage(folderExpandImage);
                 }
                 try {
                     if (source.getChildren().isEmpty()) {
@@ -79,8 +75,6 @@ public class FilePathTreeItem extends TreeItem<String> {
                                 source.getChildren().add(treeNode);
                             }
                         }
-                    } else {
-                        //if you want to implement rescanning a directory for changes this would be the place to do it
                     }
                 } catch (IOException x) {
                     x.printStackTrace();
@@ -94,8 +88,6 @@ public class FilePathTreeItem extends TreeItem<String> {
                 if (source.isDirectory() && !source.isExpanded()) {
                     FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.FOLDER_ALT);
                     source.setGraphic(icon);
-                    //                    ImageView iv = (ImageView) source.getGraphic();
-                    //                    iv.setImage(folderCollapseImage);
                 }
             }
         });

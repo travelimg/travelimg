@@ -71,12 +71,14 @@ public class OrganizerImpl implements Organizer {
     private FilterList<Journey> journeyListView;
     @FXML
     private FilterList<Place> placeListView;
-    @FXML
-    private Button resetButton;
-    @FXML
-    private Button switchViewButton;
+
+    private Button resetButton = new Button("Zurücksetzen");
+
+    private Button switchViewButton = new Button("Ansicht ändern");
 
     @FXML private TreeView<String> filesTree;
+
+    private HBox buttonBox;
 
     private PhotoFilter filter = new PhotoFilter();
     private Runnable filterChangeCallback;
@@ -115,7 +117,7 @@ public class OrganizerImpl implements Organizer {
     private void initialize() {
         resetButton.setOnAction(event -> resetFilter());
         switchViewButton.setOnAction(event -> folderViewClicked());
-
+        buttonBox = new HBox(resetButton, switchViewButton);
 
         ratingListView = new FilterList<>(value -> {
             switch (value) {
@@ -153,9 +155,8 @@ public class OrganizerImpl implements Organizer {
         placeListView.setTitle("Orte");
         placeListView.setChangeHandler(this::handlePlacesChange);
 
-        filterContainer.getChildren().addAll(ratingListView, categoryListView, photographerListView, journeyListView,
+        filterContainer.getChildren().addAll(buttonBox, ratingListView, categoryListView, photographerListView, journeyListView,
                 placeListView);
-
 
         refreshLists();
         resetFilter();
@@ -164,8 +165,7 @@ public class OrganizerImpl implements Organizer {
     // This Method let's the User switch to the filter-view
     private void filterViewClicked(){
         filterContainer.getChildren().clear();
-        HBox hBox = new HBox(resetButton, switchViewButton);
-        filterContainer.getChildren().addAll(hBox, ratingListView,
+        filterContainer.getChildren().addAll(buttonBox, ratingListView,
                 categoryListView, photographerListView, journeyListView, placeListView);
         switchViewButton.setOnAction(event -> folderViewClicked());
     }
@@ -180,7 +180,8 @@ public class OrganizerImpl implements Organizer {
         findFiles(rootDirectories.toFile(), null);
 
         switchViewButton.setOnAction(event -> filterViewClicked());
-        filterContainer.getChildren().addAll(switchViewButton, new Label("File browser"),filesTree);
+        resetButton.setOnAction(event -> folderViewClicked());
+        filterContainer.getChildren().addAll(buttonBox, new Label("File browser"), filesTree);
         VBox.setVgrow(filesTree, Priority.ALWAYS);
     }
 
@@ -192,7 +193,7 @@ public class OrganizerImpl implements Organizer {
             for (File file : files) {
                 if (file.isDirectory()) {
                     System.out.println("directory:" + file.getCanonicalPath());
-                    findFiles(file,root);
+                    findFiles(file, root);
                 }
             }
             if(parent==null){
