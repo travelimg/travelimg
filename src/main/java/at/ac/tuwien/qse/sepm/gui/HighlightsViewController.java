@@ -42,10 +42,10 @@ public class HighlightsViewController {
     @FXML private BorderPane borderPane, left, FotoContainer,treeBoarder,timeLine;
     @FXML private GoogleMapsScene mapsScene;
     @FXML private VBox journeys,tree, tagheartContainer;
-    @FXML private HBox titleHBox,tagContainer,wikipediaInfoPaneContainer, mapContainer;
+    @FXML private HBox titleHBox,tagContainer,wikipediaInfoPaneContainer, mapContainer, firstFourTagsHBox;
     @FXML private ScrollPane scrollPhotoView, treeScroll;
     @FXML private Label titleLabel;
-    @FXML private Button tag1,tag2,tag3,tag4,good;
+    @FXML private Button tag1,tag2,tag3,tag4,tag5,good;
     @FXML private StrokeLineCap lineCap;
 
     @Autowired private ClusterService clusterService;
@@ -250,6 +250,7 @@ public class HighlightsViewController {
                     clearMap();
                     drawDestinationsAsPolyline(GeoUtils.toLatLong(new ArrayList<Place>(places)));
                     setGoodPhotos(null);
+                    setMostUsedTagsWithPhotos(null);
                 }
             });
             v.getChildren().add(rbAll);
@@ -257,6 +258,7 @@ public class HighlightsViewController {
             clearMap();
             drawDestinationsAsPolyline(GeoUtils.toLatLong(orderedPlacesList));
             setGoodPhotos(null);
+            setMostUsedTagsWithPhotos(null);
             reloadImages();
 
             int pos = 0;
@@ -285,9 +287,9 @@ public class HighlightsViewController {
         wikipediaInfoPane.showDefaultWikiInfo(place);
         drawJourneyUntil(places,pos);
         setGoodPhotos(null);
+        setMostUsedTagsWithPhotos(null);
 
-
-        aktivePlace = place;
+        /*aktivePlace = place;
         // set Buttontext default
         for(int i=0; i<buttonAr.size(); i++){
             buttonAr.get(i).setText("default");
@@ -301,8 +303,7 @@ public class HighlightsViewController {
                     buttonAr.get(i).setText(placesAndTags.get(place).get(i).getName());
                 }
             }
-        }
-        //TODO much more stuff ;)
+        }*/
     }
 
     public void bt_heartPress(){
@@ -581,6 +582,42 @@ public class HighlightsViewController {
             }
         } catch (ServiceException e) {
             good.setText("No photos");
+        }
+    }
+
+    private void setMostUsedTagsWithPhotos(PhotoFilter photoFilter){
+        try {
+            List<Photo> list = photoService.getAllPhotos(); //TODO will use here the filter
+            List<Tag> mostUsedTags = tagService.getMostFrequentTags(list);
+            for(Tag t : mostUsedTags){
+                //TODO fill the tag buttons with photos
+            }
+            int remainingEmptyTagButtons = 5 - mostUsedTags.size();
+            fillWithPhotos(remainingEmptyTagButtons,photoFilter);
+
+        } catch (ServiceException e) {
+            fillWithPhotos(5,photoFilter);
+        }
+
+    }
+
+    private void fillWithPhotos(int nrOfPhotos, PhotoFilter photoFilter) {
+
+        try {
+            List<Photo> list = photoService.getAllPhotos(); //TODO will use here the filter
+            List<Button> tagButtons = new ArrayList<>();
+            tagButtons.addAll(Arrays.asList(tag1,tag2,tag3,tag4,tag5));
+            int i = 0;
+            while (nrOfPhotos > 0 && i < list.size()) {
+                //TODO try adding photos instead
+                Button tagButton = tagButtons.get(nrOfPhotos-1);
+                tagButton.setText("");
+                setBackroundImageForButton(list.get(i).getPath(),tagButton);
+                nrOfPhotos--;
+                i++;
+            }
+        } catch (ServiceException e) {
+
         }
     }
 
