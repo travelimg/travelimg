@@ -52,7 +52,7 @@ public class SlideTile extends Tile {
         return slide;
     }
 
-    private void update() {
+    public void update() {
         slideNumber.setText(slide.getOrder().toString());
         boolean hasCaption = slide.getCaption() != null;
         caption.setVisible(hasCaption);

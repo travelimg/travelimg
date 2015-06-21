@@ -132,6 +132,8 @@ public class SlideGrid extends TilePane {
         for (SlideGridNode node : nodesNewOrder) {
             node.getTile().getSlide().setOrder(order);
             order++;
+
+            node.getTile().update();
         }
 
         nodes.clear();
