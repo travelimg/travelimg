@@ -19,8 +19,11 @@ public class SmartImage extends StackPane {
     private final ImageView imageView = new ImageView();
 
     private Image image = null;
+    private ImageSize size;
 
-    public SmartImage() {
+    public SmartImage(ImageSize size) {
+        this.size = size;
+
         getStyleClass().add("smart-image");
 
         progress.setMaxWidth(50);
@@ -44,7 +47,7 @@ public class SmartImage extends StackPane {
             return;
         }
 
-        image = cache.get(path, ImageSize.MEDIUM); // TODO
+        image = cache.get(path, size);
 
         imageView.setImage(image);
 

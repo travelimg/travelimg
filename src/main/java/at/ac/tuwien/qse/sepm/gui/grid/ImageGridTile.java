@@ -2,10 +2,11 @@ package at.ac.tuwien.qse.sepm.gui.grid;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.control.SmartImage;
+import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 
 public abstract class ImageGridTile extends Tile {
 
-    private static final int IMG_SIZE = 200;
+    private static final ImageSize size = ImageSize.MEDIUM;
 
     private Photo photo = null;
     private SmartImage image = null;
@@ -30,9 +31,9 @@ public abstract class ImageGridTile extends Tile {
             return;
         }
 
-        image = new SmartImage();
-        image.setPrefHeight(IMG_SIZE);
-        image.setPrefWidth(IMG_SIZE);
+        image = new SmartImage(size);
+        image.setPrefHeight(ImageSize.inPixels(size));
+        image.setPrefWidth(ImageSize.inPixels(size));
         image.setImage(photo.getFile());
 
         getChildren().add(0, image);
