@@ -378,7 +378,7 @@
 }
 
 .smart-image {
-    -fx-background-color: -tmg-bg-z2;
+    -fx-background-color: -tmg-bg1;
     -fx-padding: 0;
 }
 .smart-image .progress-indicator {
