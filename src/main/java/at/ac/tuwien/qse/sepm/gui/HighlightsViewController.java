@@ -6,6 +6,7 @@ import at.ac.tuwien.qse.sepm.gui.grid.ImageGrid;
 import at.ac.tuwien.qse.sepm.gui.util.GeoUtils;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
+import at.ac.tuwien.qse.sepm.service.impl.JourneyFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
@@ -174,10 +175,13 @@ public class HighlightsViewController {
     private void handleJourneySelected(Journey journey) {
 
         try {
+            JourneyFilter filter = new JourneyFilter();
+            filter.getIncludedJourneys().add(journey);
+
             currentPhotosOfSelectedJourney = photoService.getAllPhotos()
                     .stream()
-                    .filter(p -> p.getData().getJourney().getId().equals(journey.getId()))
-                    .collect(Collectors.toList()); //TODO should use our own photofilter for that.
+                    .filter(filter)
+                    .collect(Collectors.toList());
             /*
                 CLEAR THE HASHMAPS
              */
