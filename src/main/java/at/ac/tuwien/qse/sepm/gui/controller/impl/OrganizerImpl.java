@@ -13,9 +13,7 @@ import at.ac.tuwien.qse.sepm.service.TagService;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -64,9 +62,10 @@ public class OrganizerImpl implements Organizer {
     @FXML
     private FilterList<Place> placeListView;
 
-    private Button resetButton = new Button("Zurücksetzen");
 
-    private Button switchViewButton = new Button("Ansicht ändern");
+
+    private ToggleButton folderViewButton = new ToggleButton("Ordneransicht");
+    private ToggleButton filterViewButton = new ToggleButton("Filteransicht");
 
     @FXML private TreeView<String> filesTree;
 
@@ -87,9 +86,16 @@ public class OrganizerImpl implements Organizer {
 
     @FXML
     private void initialize() {
-        resetButton.setOnAction(event -> resetFilter());
-        switchViewButton.setOnAction(event -> folderViewClicked());
-        buttonBox = new HBox(resetButton, switchViewButton);
+        filesTree = new TreeView<>();
+        filesTree.setOnMouseClicked(event -> handleFolderChange());
+        folderViewButton.setOnAction(event -> folderViewClicked());
+        filterViewButton.setOnAction(event -> filterViewClicked());
+
+        ToggleGroup toggleGroup = new ToggleGroup();
+        filterViewButton.setToggleGroup(toggleGroup);
+        folderViewButton.setToggleGroup(toggleGroup);
+
+        buttonBox = new HBox(filterViewButton, folderViewButton);
 
         ratingListView = new FilterList<>(value -> {
             switch (value) {
@@ -139,22 +145,22 @@ public class OrganizerImpl implements Organizer {
         filterContainer.getChildren().clear();
         filterContainer.getChildren().addAll(buttonBox, ratingListView,
                 categoryListView, photographerListView, journeyListView, placeListView);
-        switchViewButton.setOnAction(event -> folderViewClicked());
+        folderViewButton.setOnAction(event -> folderViewClicked());
     }
 
     // This Method let's the User switch to the folder-view
     private void folderViewClicked() {
         LOGGER.debug("Switch view");
         filterContainer.getChildren().clear();
-        filesTree = new TreeView<>();
-        filesTree.setOnMouseClicked(event -> handleFolderChange());
+
         Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
         findFiles(rootDirectories.toFile(), null);
 
-        switchViewButton.setOnAction(event -> filterViewClicked());
-        resetButton.setOnAction(event -> folderViewClicked());
-        filterContainer.getChildren().addAll(buttonBox, new Label("File browser"), filesTree);
+        folderViewButton.setOnAction(event -> filterViewClicked());
+        filterContainer.getChildren().addAll(buttonBox, filesTree);
+
         VBox.setVgrow(filesTree, Priority.ALWAYS);
+
     }
 
     private void findFiles(File dir, FilePathTreeItem parent) {
@@ -186,13 +192,16 @@ public class OrganizerImpl implements Organizer {
     }
 
     private void handleFolderChange() {
-        LOGGER.debug("Choose folder");
+        LOGGER.debug("handle folder");
         FilePathTreeItem item = (FilePathTreeItem) filesTree.getSelectionModel().getSelectedItem();
         if(item != null){
             if(filter instanceof PhotoPathFilter)
                 ((PhotoPathFilter) filter).setIncludedPath(Paths.get(item.getFullPath()));
             handleFilterChange();
         }
+//        Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
+//        findFiles(rootDirectories.toFile(), null);
+//        filesTree.getSelectionModel().select(item);
     }
 
     private void handleRatingsChange(List<Rating> values) {
