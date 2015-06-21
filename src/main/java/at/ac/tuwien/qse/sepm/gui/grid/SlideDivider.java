@@ -18,7 +18,9 @@ public class SlideDivider extends Button {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final FontAwesomeIconView icon = new FontAwesomeIconView();
+
     private Consumer<Integer> slideDroppedCallback = null;
+    private Runnable slideAddedCallback = null;
 
     public SlideDivider() {
         getStyleClass().add("divider");
@@ -35,10 +37,20 @@ public class SlideDivider extends Button {
         icon.setTextAlignment(TextAlignment.CENTER);
         HBox.setHgrow(icon, Priority.ALWAYS);
         setGraphic(icon);
+
+        setOnAction((event) -> {
+            if (slideAddedCallback != null) {
+                slideAddedCallback.run();
+            }
+        });
     }
 
     public void setSlideDroppedCallback(Consumer<Integer> callback) {
         this.slideDroppedCallback = callback;
+    }
+
+    public void setSlideAddedCallback(Runnable callback) {
+        this.slideAddedCallback = callback;
     }
 
     private void handleDragEntered(DragEvent event) {
