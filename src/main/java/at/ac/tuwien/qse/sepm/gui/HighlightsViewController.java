@@ -1,15 +1,11 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.*;
+import at.ac.tuwien.qse.sepm.gui.control.TravelRouteMap;
 import at.ac.tuwien.qse.sepm.gui.control.WikipediaInfoPane;
-import at.ac.tuwien.qse.sepm.gui.util.GeoUtils;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.JourneyFilter;
-import com.lynden.gmapsfx.GoogleMapView;
-import com.lynden.gmapsfx.javascript.object.*;
-import com.lynden.gmapsfx.shapes.Polyline;
-import com.lynden.gmapsfx.shapes.PolylineOptions;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -39,8 +35,6 @@ public class HighlightsViewController {
     @FXML
     private BorderPane root, left, FotoContainer, treeBoarder, timeLine;
     @FXML
-    private GoogleMapsScene mapsScene;
-    @FXML
     private VBox journeys, tree, tagheartContainer;
     @FXML
     private HBox titleHBox, tagContainer, wikipediaInfoPaneContainer, mapContainer, firstFourTagsHBox;
@@ -64,16 +58,13 @@ public class HighlightsViewController {
     private HashMap<Place, List<Tag>> placesAndTags = new HashMap<>();
     private List<Photo> currentPhotosOfSelectedJourney = new ArrayList<>();
     private List<Photo> goodPhotosList = new ArrayList<>();
-    private ArrayList<Marker> markers = new ArrayList<>();
-    private ArrayList<Polyline> polylines = new ArrayList<>();
     private List<Button> buttonAr = new LinkedList<>();
     private Label noJourneysAvailableLabel = new Label("Keine Reisen gefunden. Bitte fügen Sie eine neue ein.");
     private WikipediaInfoPane wikipediaInfoPane;
-    private GoogleMapView mapView;
-    private GoogleMap googleMap;
-    private Marker actualMarker;
     private ImageCache imageCache;
     private Line redLine;
+
+    private TravelRouteMap travelRouteMap = null;
 
     @Autowired
     public void setImageCache(ImageCache imageCache) {
@@ -81,9 +72,10 @@ public class HighlightsViewController {
     }
 
     public void setMap(GoogleMapsScene map) {
-        this.mapsScene = map;
-        mapView = map.getMapView();
-        mapView.addMapInializedListener(() -> googleMap = mapView.getMap());
+        map.getMapView().addMapInializedListener(() -> {
+            travelRouteMap = new TravelRouteMap(map);
+        });
+
         mapContainer.getChildren().add(map.getMapView());
     }
 
@@ -205,16 +197,19 @@ public class HighlightsViewController {
             rbAll.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent event) {
-                    clearMap();
-                    drawDestinationsAsPolyline(GeoUtils.toLatLong(new ArrayList<Place>(places)));
+                    travelRouteMap.clear();
+                    travelRouteMap.drawJourney(new ArrayList<>(places));
+
                     setGoodPhotos(null);
                     setMostUsedTagsWithPhotos(null);
                 }
             });
             v.getChildren().add(rbAll);
             rbAll.setSelected(true);
-            clearMap();
-            drawDestinationsAsPolyline(GeoUtils.toLatLong(orderedPlaces));
+
+            travelRouteMap.clear();
+            travelRouteMap.drawJourney(orderedPlaces);
+
             setGoodPhotos(null);
             setMostUsedTagsWithPhotos(null);
             //reloadImages();
@@ -381,70 +376,14 @@ public class HighlightsViewController {
         }
     }
 
-    private void drawDestinationsAsPolyline(LatLong[] path) {
-        PolylineOptions polylineOptions = new PolylineOptions();
-        polylineOptions.path(new MVCArray(path))
-                .clickable(false)
-                .draggable(false)
-                .editable(false)
-                .strokeColor("#ff4500")
-                .strokeWeight(2)
-                .visible(true);
-        Polyline polyline = new Polyline(polylineOptions);
-        googleMap.addMapShape(polyline);
-        polylines.add(polyline);
-        GeoUtils.fitMarkersToScreen(path, 0, path.length - 1, mapContainer.getHeight(), mapContainer.getWidth(), mapsScene);
-
-        for (int i = 0; i < path.length; i++) {
-            Marker m = new Marker(new MarkerOptions().position(path[i]).icon("https://maps.gstatic.com/intl/en_us/mapfiles/markers2/measle_blue.png"));
-            googleMap.addMarker(m);
-            markers.add(m);
-        }
-    }
-
     private void drawJourneyUntil(List<Place> places, int pos) {
-        clearMap();
-        LatLong[] path = GeoUtils.toLatLong(places);
-        if (pos == 0) {
-            Marker m = new Marker(new MarkerOptions().position(path[pos]).icon("https://maps.gstatic.com/intl/en_us/mapfiles/markers2/measle_blue.png"));
-            googleMap.addMarker(m);
-            markers.add(m);
-            GeoUtils.fitMarkersToScreen(path, pos, pos, mapContainer.getHeight(), mapContainer.getWidth(), mapsScene);
-        } else {
-            PolylineOptions polylineOptions = new PolylineOptions();
-            MVCArray mvcArray = new MVCArray();
-            for (int i = 0; i <= pos; i++) {
-                mvcArray.push(path[i]);
-                Marker m = new Marker(new MarkerOptions().position(path[i]).icon("https://maps.gstatic.com/intl/en_us/mapfiles/markers2/measle_blue.png"));
-                googleMap.addMarker(m);
-                markers.add(m);
-            }
-            polylineOptions.path(mvcArray)
-                    .clickable(false)
-                    .draggable(false)
-                    .editable(false)
-                    .strokeColor("#ff4500")
-                    .strokeWeight(2)
-                    .visible(true);
-            Polyline polyline = new Polyline(polylineOptions);
-            googleMap.addMapShape(polyline);
-            polylines.add(polyline);
-            GeoUtils.fitMarkersToScreen(path, pos - 1, pos, mapContainer.getHeight(),
-                    mapContainer.getWidth(), mapsScene);
-        }
-        actualMarker = new Marker(new MarkerOptions().position(path[pos]));
-        googleMap.addMarker(actualMarker);
+        List<Place> placesUntil = places.subList(0, pos + 1);
+        travelRouteMap.drawJourney(placesUntil);
     }
 
     private void clearMap() {
-        markers.forEach(marker -> googleMap.removeMarker(marker));
-        polylines.forEach(line -> googleMap.removeMapShape(line));
-
-        markers.clear();
-        polylines.clear();
-
-        if (actualMarker != null) {
-            googleMap.removeMarker(actualMarker);
+        if (travelRouteMap != null) {
+            travelRouteMap.clear();
         }
     }
 }

@@ -29,10 +29,6 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
     private ArrayList<Photo> markers = null;
     private ArrayList<Marker> aktivMarker = new ArrayList<>();
     private HashMap<String, LatLong> displayedMarker = new HashMap<>();
-    @Autowired
-    private WorldmapView worldmapView;
-    @Autowired
-    private GeoService geoService;
     /**
      * Default Constructor
      */
