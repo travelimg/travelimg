@@ -96,7 +96,7 @@ public class SlideshowViewImpl implements SlideshowView {
                 slideshow = slideshowService.create(slideshow);
 
                 // remove placeholder, add new slideshow and add new placeholder
-                Slideshow placeholder = slideshows.remove(slideshows.size() - 1);
+                slideshows.remove(slideshows.size() - 1);
                 slideshows.add(slideshow);
                 slideshows.add(createNewSlideshowPlaceholder());
             }
@@ -106,7 +106,7 @@ public class SlideshowViewImpl implements SlideshowView {
             // add the photos to the grid if the slideshow is currently being displayed
             Slideshow selected = slideshowOrganizer.getSelected();
             if (selected != null && selected.getId().equals(slideshow.getId())) {
-                //grid.setSlideshow(slideshow);
+                grid.setSlides(slideshow.getSlides());
             }
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Hinzufügen zur Slideshow", "Fehlermeldung: " + ex.getMessage());
