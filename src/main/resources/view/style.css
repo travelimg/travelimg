@@ -117,6 +117,88 @@
     -fx-fill: white;
 }
 
+/* light toggle-button */
+.toggle-button {
+    -fx-background-color: transparent;
+    -fx-padding: 11px 8px;
+    -fx-background-radius: 3px;
+    -fx-font-size: 14px;
+    -fx-min-width: 48px;
+}
+.toggle-button:hover {
+    -fx-background-color: -fx-default-hover;
+}
+.toggle-button:focused {
+    -fx-background-color: -fx-default-focus;
+}
+.toggle-button:pressed {
+    -fx-background-color: -fx-default-press;
+}
+.toggle-button .glyph-icon {
+    -glyph-size: 20;
+    -fx-fill: -fx-text;
+}
+.toggle-button.primary {
+    -fx-text-fill: -fx-primary;
+}
+.toggle-button.primary:focused {
+    -fx-background-color: -fx-primary-light-focus;
+}
+.toggle-button.primary:hover {
+    -fx-background-color: -fx-primary-light-hover;
+}
+.toggle-button.primary:pressed {
+    -fx-background-color: -fx-primary-light-press;
+}
+.toggle-button.primary .glyph-icon {
+    -fx-fill: -fx-primary;
+}
+.toggle-button:disabled {
+    -fx-opacity: 0.5;
+}
+
+/* raised toggle-button */
+.toggle-button.raised {
+    -fx-background-color: -fx-default;
+    -fx-effect: -fx-dropshadow-1;
+}
+.toggle-button.raised:focused {
+    -fx-background-color: -fx-default-focus;
+    -fx-effect: -fx-dropshadow-3;
+}
+.toggle-button.raised:hover {
+    -fx-background-color: -fx-default-hover;
+}
+.toggle-button.raised:pressed {
+    -fx-effect: -fx-dropshadow-3;
+    -fx-background-color: -fx-default-press;
+}
+.toggle-button.raised:disabled {
+    -fx-effect: none;
+    -fx-background-color: -fx-default-disabled;
+}
+.toggle-button.raised.primary {
+    -fx-text-fill: white;
+    -fx-background-color: -fx-primary;
+}
+.toggle-button.raised.primary:focused {
+    -fx-background-color: -fx-primary-focus;
+}
+.toggle-button.raised.primary:hover {
+    -fx-background-color: -fx-primary-hover;
+}
+.toggle-button.raised.primary:pressed {
+    -fx-background-color: -fx-primary-press;
+}
+.toggle-button.raised.primary .glyph-icon {
+    -fx-fill: white;
+}
+
+/* tree-view */
+.tree-view {
+    -fx-font-size: 14px;
+}
+
 /* input fields */
 .text-field {
     -fx-background-color: transparent;

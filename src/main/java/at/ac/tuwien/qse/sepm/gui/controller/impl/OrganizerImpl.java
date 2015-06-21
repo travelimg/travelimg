@@ -13,6 +13,7 @@ import at.ac.tuwien.qse.sepm.service.TagService;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -96,6 +97,7 @@ public class OrganizerImpl implements Organizer {
         folderViewButton.setToggleGroup(toggleGroup);
 
         buttonBox = new HBox(filterViewButton, folderViewButton);
+        buttonBox.setAlignment(Pos.CENTER);
 
         ratingListView = new FilterList<>(value -> {
             switch (value) {
