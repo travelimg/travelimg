@@ -17,9 +17,9 @@
         <children>
             <TextField fx:id="slideshowNameTextField"  layoutX="46.0" layoutY="80.0"/>
             <Button fx:id="updateButton" text="Update Slideshowname"/>
-            <RadioButton fx:id="FivesecRadioButton" layoutX="71.0" layoutY="300.0" mnemonicParsing="false" text=" 5 sec" />
-            <RadioButton fx:id="TensecRadioButton" layoutX="72.0" layoutY="329.0" mnemonicParsing="false" text="10 sec" />
-            <RadioButton fx:id="FifteensecRadioButton" layoutX="72.0" layoutY="357.0" mnemonicParsing="false" text="15 sec" />
+            <RadioButton fx:id="shortDurationButton" layoutX="71.0" layoutY="300.0" mnemonicParsing="false" text=" 5 sec" />
+            <RadioButton fx:id="mediumDurationButton" layoutX="72.0" layoutY="329.0" mnemonicParsing="false" text="10 sec" />
+            <RadioButton fx:id="longDurationButton" layoutX="72.0" layoutY="357.0" mnemonicParsing="false" text="15 sec" />
         </children>
     </VBox>
     </center>

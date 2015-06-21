@@ -1,12 +1,10 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 
-import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.gui.controller.SlideshowOrganizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.service.SlideshowService;
 import at.ac.tuwien.qse.sepm.service.impl.SlideshowServiceImpl;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -21,10 +19,6 @@ import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class SlideshowOrganizerImpl implements SlideshowOrganizer {
@@ -47,15 +41,15 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     private TextField slideshowNameTextField;
 
     @FXML
-    private RadioButton FivesecRadioButton;
+    private RadioButton shortDurationButton;
 
     @FXML
-    private RadioButton TensecRadioButton;
+    private RadioButton mediumDurationButton;
 
     @FXML
-    private RadioButton FifteensecRadioButton;
+    private RadioButton longDurationButton;
 
-    private ToggleGroup radioButtons = new ToggleGroup();
+    private ToggleGroup durationToggleGroup = new ToggleGroup();
 
 
     @Autowired
@@ -90,22 +84,19 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
 
         slideshowList.setCellFactory(new SlideshowCellFactory());
         updateButton.setOnAction(this::updateSelectedSlideshowName);
+
         slideshowList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             selectedSlideshowProperty.setValue(newValue);
             onActiveSlideshowChanged();
         });
 
         //Add Buttons to Tooggle Group
-        FivesecRadioButton.setSelected(true);
-        FivesecRadioButton.setToggleGroup(radioButtons);
-        TensecRadioButton.setToggleGroup(radioButtons);
-        FifteensecRadioButton.setToggleGroup(radioButtons);
-
-
-        radioButtons.selectedToggleProperty().addListener(this::updateSlideshowDuration);
-
-
-
+        shortDurationButton.setSelected(true);
+        shortDurationButton.setToggleGroup(durationToggleGroup);
+        mediumDurationButton.setToggleGroup(durationToggleGroup);
+        longDurationButton.setToggleGroup(durationToggleGroup);
+        
+        durationToggleGroup.selectedToggleProperty().addListener(this::updateSlideshowDuration);
     }
 
     private class SlideshowCellFactory implements Callback<ListView<Slideshow>, ListCell<Slideshow>> {
@@ -177,9 +168,9 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     }
 
     public double getSelectedDuration(){
-        if (FivesecRadioButton.isSelected()) {
+        if (shortDurationButton.isSelected()) {
             return 5.0;
-        } else if (TensecRadioButton.isSelected()) {
+        } else if (mediumDurationButton.isSelected()) {
             return 10.0;
         } else {
             return 15.0;
