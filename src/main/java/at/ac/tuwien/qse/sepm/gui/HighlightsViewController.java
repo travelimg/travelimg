@@ -30,6 +30,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.net.MalformedURLException;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Consumer;
@@ -125,8 +127,7 @@ public class HighlightsViewController {
 
         journeysListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
-            @Override
-            public void handle(MouseEvent event) {
+            @Override public void handle(MouseEvent event) {
                 handleJourneySelected(journeysListView.getSelectionModel().getSelectedItem());
             }
         });
@@ -157,6 +158,7 @@ public class HighlightsViewController {
     }
 
     private void handleJourneySelected(Journey journey){
+
         try {
             /*
                 CLEAR THE HASHMAPS
@@ -247,12 +249,14 @@ public class HighlightsViewController {
                 @Override public void handle(ActionEvent event) {
                     clearMap();
                     drawDestinationsAsPolyline(GeoUtils.toLatLong(new ArrayList<Place>(places)));
+                    setGoodPhotos(null);
                 }
             });
             v.getChildren().add(rbAll);
             rbAll.setSelected(true);
             clearMap();
             drawDestinationsAsPolyline(GeoUtils.toLatLong(orderedPlacesList));
+            setGoodPhotos(null);
             reloadImages();
 
             int pos = 0;
@@ -275,6 +279,30 @@ public class HighlightsViewController {
         } catch (ServiceException e) {
             e.printStackTrace();
         }
+    }
+
+    private void handlePlaceSelected(List<Place> places, Place place, int pos) {
+        wikipediaInfoPane.showDefaultWikiInfo(place);
+        drawJourneyUntil(places,pos);
+        setGoodPhotos(null);
+
+
+        aktivePlace = place;
+        // set Buttontext default
+        for(int i=0; i<buttonAr.size(); i++){
+            buttonAr.get(i).setText("default");
+        }
+        // placesAndTags = die most frequent tags ordered by place
+        if(placesAndTags.size()!=0){
+            if(placesAndTags.get(place).size()!=0) {
+
+                for (int i = 0; i < placesAndTags.get(place).size(); i++) {
+                    // set Button-text to TagName
+                    buttonAr.get(i).setText(placesAndTags.get(place).get(i).getName());
+                }
+            }
+        }
+        //TODO much more stuff ;)
     }
 
     public void bt_heartPress(){
@@ -321,26 +349,7 @@ public class HighlightsViewController {
         }
     }
 
-    private void handlePlaceSelected(List<Place> places, Place place, int pos) {
-        wikipediaInfoPane.showDefaultWikiInfo(place);
-        drawJourneyUntil(places,pos);
-        aktivePlace = place;
-        // set Buttontext default
-        for(int i=0; i<buttonAr.size(); i++){
-            buttonAr.get(i).setText("default");
-        }
-        // placesAndTags = die most frequent tags ordered by place
-        if(placesAndTags.size()!=0){
-            if(placesAndTags.get(place).size()!=0) {
 
-                for (int i = 0; i < placesAndTags.get(place).size(); i++) {
-                    // set Button-text to TagName
-                    buttonAr.get(i).setText(placesAndTags.get(place).get(i).getName());
-                }
-            }
-        }
-        //TODO much more stuff ;)
-    }
 
     public PhotoFilter getFilter(){
         return filter;
@@ -389,7 +398,7 @@ public class HighlightsViewController {
             // all GOOD fotos
             for(Photo p: orderedPlacesAndPhotos.get(pl)){
                 if(p.getData().getRating().equals(Rating.GOOD)){
-                    goodPhotosList.add(p);
+                    //goodPhotosList.add(p);
                 }
 
             }
@@ -556,6 +565,36 @@ public class HighlightsViewController {
             Label lab = new Label();
             lab.setText("Bitte eine Reise auswählen");
             //photoView.getChildren().add(lab);
+        }
+    }
+
+    /**
+     * Sets the good rated photos for the heart button based on a filter.
+     * @param filter
+     */
+    private void setGoodPhotos(PhotoFilter filter){
+        try {
+            goodPhotosList = photoService.getAllPhotos(); //TODO will use here the filter to get the GOOD rated photos.
+            setBackroundImageForButton(goodPhotosList.get(0).getPath(),good);
+            if(goodPhotosList.isEmpty()){
+                good.setText("No photos");
+            }
+        } catch (ServiceException e) {
+            good.setText("No photos");
+        }
+    }
+
+    /**
+     * Sets an image as the background of the button
+     * @param path the path to the image
+     * @param button
+     */
+    private void setBackroundImageForButton(String path, Button button){
+        try {
+            button.setStyle("-fx-background-image: url('"+Paths.get(path).toUri().toURL().toString()+"');"+
+                    "-fx-background-size: 100% 100%;");
+        } catch (MalformedURLException e) {
+            LOGGER.error("Failed to convert photo path to URL", e);
         }
     }
 
