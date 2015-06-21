@@ -2,14 +2,11 @@ package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.control.WikipediaInfoPane;
-import at.ac.tuwien.qse.sepm.gui.grid.ImageGrid;
 import at.ac.tuwien.qse.sepm.gui.util.GeoUtils;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.JourneyFilter;
-import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import com.lynden.gmapsfx.GoogleMapView;
-import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.Polyline;
 import com.lynden.gmapsfx.shapes.PolylineOptions;
@@ -25,7 +22,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
-import javafx.scene.text.Font;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,9 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class HighlightsViewController {
@@ -68,7 +62,6 @@ public class HighlightsViewController {
     private WikipediaService wikipediaService;
     private ListView<Journey> journeysListView = new ListView<>();
     private HashMap<Place, List<Tag>> placesAndTags = new HashMap<>();
-    private HashMap<PlaceDate, List<Photo>> orderedPlacesAndPhotos = new HashMap<>();
     private List<Photo> currentPhotosOfSelectedJourney = new ArrayList<>();
     private List<Photo> goodPhotosList = new ArrayList<>();
     private ArrayList<Marker> markers = new ArrayList<>();
@@ -128,12 +121,8 @@ public class HighlightsViewController {
             }
         }); // setCellFactory
 
-        journeysListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-                handleJourneySelected(journeysListView.getSelectionModel().getSelectedItem());
-            }
+        journeysListView.setOnMouseClicked(event -> {
+            handleJourneySelected(journeysListView.getSelectionModel().getSelectedItem());
         });
         noJourneysAvailableLabel.setWrapText(true);
     }
@@ -166,14 +155,14 @@ public class HighlightsViewController {
             JourneyFilter filter = new JourneyFilter();
             filter.getIncludedJourneys().add(journey);
 
-            currentPhotosOfSelectedJourney = photoService.getAllPhotos()
-                    .stream()
+            List<Photo> allPhotos = photoService.getAllPhotos();
+
+            currentPhotosOfSelectedJourney = allPhotos.stream()
                     .filter(filter)
                     .collect(Collectors.toList());
             /*
                 CLEAR THE HASHMAPS
              */
-            orderedPlacesAndPhotos.clear();
             placesAndTags.clear();
 
             HBox placesTitleHBox = new HBox();
@@ -203,39 +192,8 @@ public class HighlightsViewController {
                 merge Places with Photos
                 output is a HashSet
              */
-            Map<Place, List<Photo>> photosByPlace = getPhotosByPlace(places);
-
-
-            // merge Place with DataTime
-            HashMap<LocalDateTime, Place> orderedPlaces = new HashMap<>();
-
-            for (Place ple : photosByPlace.keySet()) {
-                LocalDateTime min = LocalDateTime.MAX;
-                for (Photo p : photosByPlace.get(ple)) {
-
-                    if (p.getData().getDatetime().compareTo(min) < 0) {
-                        min = p.getData().getDatetime();
-                    }
-                }
-                orderedPlaces.put(min, ple);
-            }
-
-            // order the LocalDateTime
-            List<LocalDateTime> sortedKeys = new ArrayList<>(orderedPlaces.keySet());
-            Collections.reverse(sortedKeys);
-
-
-            // final HashMap with DateTime, Place and photos
-            for (LocalDateTime l : sortedKeys) {
-                PlaceDate pl = new PlaceDate(orderedPlaces.get(l), l);
-                orderedPlacesAndPhotos.put(pl, photosByPlace.get(orderedPlaces.get(l)));
-            }
-
-
-            ArrayList<Place> orderedPlacesList = new ArrayList<>();
-            for (PlaceDate pd : orderedPlacesAndPhotos.keySet()) {
-                orderedPlacesList.add(pd.getPlace());
-            }
+            Map<Place, List<Photo>> photosByPlace = getPhotosByPlace(places, allPhotos);
+            List<Place> orderedPlaces = orderPlacesByVisitingDate(places, photosByPlace);
 
             VBox v = new VBox();
             v.setSpacing(5.0);
@@ -256,25 +214,19 @@ public class HighlightsViewController {
             v.getChildren().add(rbAll);
             rbAll.setSelected(true);
             clearMap();
-            drawDestinationsAsPolyline(GeoUtils.toLatLong(orderedPlacesList));
+            drawDestinationsAsPolyline(GeoUtils.toLatLong(orderedPlaces));
             setGoodPhotos(null);
             setMostUsedTagsWithPhotos(null);
             //reloadImages();
 
-            int pos = 0;
-            for (PlaceDate pd : orderedPlacesAndPhotos.keySet()) {
-                Place p = pd.getPlace();
-                RadioButton rb = new RadioButton(p.getCity());
-                rb.setToggleGroup(group);
-                final int finalPos = pos;
-                rb.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        handlePlaceSelected(orderedPlacesList, p, finalPos);
-                    }
+            for (Place place : orderedPlaces) {
+                RadioButton button = new RadioButton(place.getCity());
+                button.setToggleGroup(group);
+                button.setOnAction((event) -> {
+                    handlePlaceSelected(orderedPlaces, place, orderedPlaces.indexOf(place));
                 });
-                v.getChildren().add(rb);
-                pos++;
+
+                v.getChildren().add(button);
             }
             left.setCenter(v);
 
@@ -284,16 +236,8 @@ public class HighlightsViewController {
         }
     }
 
-    private Map<Place, List<Photo>> getPhotosByPlace(Set<Place> places) {
-        List<Photo> photos;
+    private Map<Place, List<Photo>> getPhotosByPlace(Set<Place> places, List<Photo> photos) {
         Map<Place, List<Photo>> photosByPlace = new HashMap<>();
-
-        try {
-            photos = photoService.getAllPhotos();
-        } catch (ServiceException ex) {
-            ErrorDialog.show(root, "Konnte nicht alle Fotos laden", "");
-            return photosByPlace;
-        }
 
         places.forEach(place -> {
             photosByPlace.put(place, photos.stream()
@@ -335,7 +279,7 @@ public class HighlightsViewController {
 
     @FXML
     private void bt_heartPress() {
-        if (goodPhotosList.size() != 0) {
+        if (!goodPhotosList.isEmpty()) {
             FullscreenWindow fw = new FullscreenWindow(this.imageCache);
             fw.present(goodPhotosList, goodPhotosList.get(0));
         }
@@ -369,7 +313,7 @@ public class HighlightsViewController {
 
     private void setMostUsedTagsWithPhotos(Place place) {
         //TODO we should use our own photofilter.
-        List<Photo> filteredByPlace = new ArrayList<>();
+        List<Photo> filteredByPlace;
 
         tagButtons.forEach(button -> {
             button.setStyle("-fx-background-image: none;");
@@ -501,35 +445,6 @@ public class HighlightsViewController {
 
         if (actualMarker != null) {
             googleMap.removeMarker(actualMarker);
-        }
-    }
-
-    /**
-     * private Class connecting Place with LocalDateTime
-     */
-    private class PlaceDate {
-        private Place place;
-        private LocalDateTime date;
-
-        public PlaceDate(Place p, LocalDateTime l) {
-            this.place = p;
-            this.date = l;
-        }
-
-        public Place getPlace() {
-            return this.place;
-        }
-
-        public void setPlace(Place p) {
-            this.place = p;
-        }
-
-        public LocalDateTime getDate() {
-            return this.date;
-        }
-
-        public void setDate(LocalDateTime l) {
-            this.date = l;
         }
     }
 }
