@@ -1,27 +1,18 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
-import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
 import at.ac.tuwien.qse.sepm.service.SlideshowService;
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class SlideshowServiceTest extends ServiceTestBase {
 
@@ -29,7 +20,7 @@ public class SlideshowServiceTest extends ServiceTestBase {
    private SlideshowService slideshowService;
 
     private Slideshow createAmerika() throws ServiceException {
-        return slideshowService.create(new Slideshow(1,"Amerika",1.0,null));
+        return slideshowService.create(new Slideshow(1,"Amerika",1.0,new ArrayList<Slide>()));
     }
 
 
@@ -68,7 +59,6 @@ public class SlideshowServiceTest extends ServiceTestBase {
         slideshowService.update(slideshow);
 
         //List<Slideshow> slideshows = slideshowService.getAllSlideshows();
-
         assertThat(slideshowService.getAllSlideshows(), contains(slideshow));
 
     }
