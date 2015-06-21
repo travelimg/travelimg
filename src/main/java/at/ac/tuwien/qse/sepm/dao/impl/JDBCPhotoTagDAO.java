@@ -128,7 +128,7 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
 
         try {
             jdbcTemplate.update(DELETE_BY_PHOTO_STRING, photo.getId());
-            LOGGER.info("Photo-Tag entries of {} successfully deleted, photo");
+            LOGGER.info("Photo-Tag entries of {} successfully deleted", photo);
         } catch (DataAccessException ex) {
             LOGGER.error("Photo-Tag entry deletion failed due to DataAccessException");
             throw new DAOException("Could not delete photo-tag entries.", ex);

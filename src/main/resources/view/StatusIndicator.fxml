@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.Tooltip?>
+<StackPane fx:id="root" styleClass="status" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.controller.StatusIndicator">
+    <children>
+        <Label fx:id="successIndicator" maxHeight="Infinity" styleClass="success" HBox.hgrow="ALWAYS">
+            <graphic>
+                <FontAwesomeIconView glyphName="CHECK" />
+            </graphic>
+            <tooltip>
+                <Tooltip text="synchronisiert" />
+            </tooltip>
+        </Label>
+        <ProgressIndicator fx:id="progressIndicator" maxHeight="Infinity" styleClass="progress" HBox.hgrow="ALWAYS">
+            <tooltip>
+                <Tooltip text="wird synchronisiert" />
+            </tooltip>
+        </ProgressIndicator>
+        <Button fx:id="errorIndicator" maxHeight="Infinity" styleClass="error" HBox.hgrow="ALWAYS">
+            <graphic>
+                <FontAwesomeIconView glyphName="EXCLAMATION_CIRCLE" />
+            </graphic>
+            <tooltip>
+                <Tooltip text="Fehler anzeigen" />
+            </tooltip>
+        </Button>
+    </children>
+</StackPane>

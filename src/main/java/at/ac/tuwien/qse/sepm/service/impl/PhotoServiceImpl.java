@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
@@ -72,7 +73,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public void deletePhotos(List<Photo> photos) throws ServiceException {
+    public void deletePhotos(Collection<Photo> photos) throws ServiceException {
         if (photos == null) {
             throw new ServiceException("List<Photo> photos is null");
         }

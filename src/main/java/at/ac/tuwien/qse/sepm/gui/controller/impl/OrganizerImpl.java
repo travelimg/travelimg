@@ -52,14 +52,6 @@ public class OrganizerImpl implements Organizer {
     @FXML
     private BorderPane root;
     @FXML
-    private Button importButton;
-    @FXML
-    private Button flickrButton;
-    @FXML
-    private Button presentButton;
-    @FXML
-    private Button addJourneyButton;
-    @FXML
     private VBox filterContainer;
     @FXML
     private FilterList<Rating> ratingListView;
@@ -83,26 +75,6 @@ public class OrganizerImpl implements Organizer {
     private PhotoFilter filter = new PhotoFilter();
     private Runnable filterChangeCallback;
     private TreeView<String> treeView;
-
-    @Override public void setPresentAction(Runnable callback) {
-        LOGGER.debug("setting present action");
-        presentButton.setOnAction(event -> callback.run());
-    }
-
-    @Override public void setImportAction(Runnable callback) {
-        LOGGER.debug("setting import action");
-        importButton.setOnAction(event -> callback.run());
-    }
-
-    @Override public void setJourneyAction(Runnable callback) {
-        LOGGER.debug("setting journey action");
-        addJourneyButton.setOnAction(event -> callback.run());
-    }
-
-    @Override public void setFlickrAction(Runnable callback) {
-        LOGGER.debug("setting flickr action");
-        flickrButton.setOnAction(event -> callback.run());
-    }
 
     @Override public void setFilterChangeAction(Runnable callback) {
         LOGGER.debug("setting filter change action");

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -79,7 +80,7 @@ public class DropboxServiceImpl implements DropboxService {
     }
 
     @Override
-    public Cancelable uploadPhotos(List<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
+    public Cancelable uploadPhotos(Collection<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
         LOGGER.debug("uploading photos to {}", destination);
         AsyncExporter exporter = new AsyncExporter(photos, destination, callback, errorHandler);
         executorService.submit(exporter);
@@ -88,12 +89,12 @@ public class DropboxServiceImpl implements DropboxService {
     }
 
     private class AsyncExporter extends CancelableTask {
-        private List<Photo> photos;
+        private Collection<Photo> photos;
         private String destination;
         private Consumer<Photo> callback;
         private ErrorHandler<ServiceException> errorHandler;
 
-        public AsyncExporter(List<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
+        public AsyncExporter(Collection<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
             super();
             this.photos = photos;
             this.destination = destination;

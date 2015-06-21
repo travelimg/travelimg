@@ -32,13 +32,6 @@ public interface Inspector extends MapUser {
     void setUpdateHandler(Runnable updateHandler);
 
     /**
-     * Set a function that is invoked when the active photos are deleted.
-     *
-     * @param deleteHandler
-     */
-    void setDeleteHandler(Runnable deleteHandler);
-
-    /**
      * Reloads data.
      */
     void refresh();

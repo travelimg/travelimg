@@ -4,11 +4,9 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.FullscreenWindow;
 import at.ac.tuwien.qse.sepm.gui.controller.GridView;
 import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
+import at.ac.tuwien.qse.sepm.gui.controller.Menu;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
-import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
-import at.ac.tuwien.qse.sepm.gui.dialogs.FlickrDialog;
-import at.ac.tuwien.qse.sepm.gui.dialogs.ImportDialog;
-import at.ac.tuwien.qse.sepm.gui.dialogs.JourneyDialog;
+import at.ac.tuwien.qse.sepm.gui.dialogs.*;
 import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
@@ -23,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,6 +37,8 @@ public class GridViewImpl implements GridView {
     @Autowired
     private FlickrService flickrService;
     @Autowired
+    private DropboxService dropboxService;
+    @Autowired
     private PhotographerService photographerService;
     @Autowired
     private ClusterService clusterService;
@@ -46,12 +47,12 @@ public class GridViewImpl implements GridView {
     @Autowired
     private Inspector inspector;
     @Autowired
+    private Menu menu;
+    @Autowired
     private ImageCache imageCache;
 
     @FXML
     private BorderPane root;
-    @FXML
-    private ScrollPane gridContainer;
 
     private PaginatedImageGrid grid;
     private boolean disableReload = false;
@@ -61,34 +62,11 @@ public class GridViewImpl implements GridView {
     private void initialize() {
         LOGGER.debug("initializing");
 
-        this.grid = new PaginatedImageGrid(imageCache);
-        gridContainer.setContent(grid);
-
-        organizer.setImportAction(() -> {
-            ImportDialog dialog = new ImportDialog(root, photographerService);
-            Optional<List<Photo>> photos = dialog.showForResult();
-            if (!photos.isPresent())
-                return;
-            importService
-                    .importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
-        });
-        organizer.setFlickrAction(() -> {
-            FlickrDialog flickrDialog = new FlickrDialog(root, "Flickr Import", flickrService);
-            Optional<List<Photo>> photos = flickrDialog.showForResult();
-            if (!photos.isPresent()) return;
-            importService.importPhotos(photos.get(), this::handleImportedPhoto, this::handleImportError);
-        });
-
-        organizer.setPresentAction(() -> {
-            FullscreenWindow fullscreen = new FullscreenWindow(imageCache);
-            fullscreen.present(grid.getPhotos(), grid.getActivePhoto());
-        });
-        organizer.setJourneyAction(() -> {
-            JourneyDialog dialog = new JourneyDialog(root, clusterService);
-            dialog.showForResult();
-        });
-
+        this.grid = new PaginatedImageGrid(menu, imageCache);
+        root.setCenter(grid);
+        menu.addListener(new MenuListener());
         organizer.setFilterChangeAction(this::handleFilterChange);
+        root.setCenter(grid);
 
         // Selected photos are shown in the inspector.
         grid.setSelectionChangeAction(inspector::setActivePhotos);
@@ -108,11 +86,6 @@ public class GridViewImpl implements GridView {
             inspector.getActivePhotos().stream()
                     .filter(organizer.getFilter())
                     .forEach(grid::updatePhoto);
-        });
-
-        // Deleted photos are removed from the grid.
-        inspector.setDeleteHandler(() -> {
-            inspector.  getActivePhotos().forEach(grid::removePhoto);
         });
 
         // Apply the initial filter.
@@ -196,6 +169,77 @@ public class GridViewImpl implements GridView {
             LOGGER.error("failed loading fotos", ex);
             ErrorDialog.show(root, "Laden von Fotos fehlgeschlagen",
                     "Fehlermeldung: " + ex.getMessage());
+        }
+    }
+
+    private class MenuListener implements Menu.Listener {
+
+        @Override public void onPresent(Menu sender) {
+            FullscreenWindow fullscreen = new FullscreenWindow(imageCache);
+            fullscreen.present(grid.getPhotos(), grid.getActivePhoto());
+        }
+
+        @Override public void onImport(Menu sender) {
+            ImportDialog dialog = new ImportDialog(root, photographerService);
+            Optional<List<Photo>> photos = dialog.showForResult();
+            if (!photos.isPresent())
+                return;
+            importService.importPhotos(photos.get(), GridViewImpl.this::handleImportedPhoto,
+                    GridViewImpl.this::handleImportError);
+        }
+
+        @Override public void onFlickr(Menu sender) {
+            FlickrDialog flickrDialog = new FlickrDialog(root, "Flickr Import", flickrService);
+            Optional<List<Photo>> photos = flickrDialog.showForResult();
+            if (!photos.isPresent()) return;
+            importService.importPhotos(photos.get(),
+                    GridViewImpl.this::handleImportedPhoto,
+                    GridViewImpl.this::handleImportError);
+        }
+
+        @Override public void onJourney(Menu sender) {
+            JourneyDialog dialog = new JourneyDialog(root, clusterService);
+            dialog.showForResult();
+        }
+
+        @Override public void onDelete(Menu sender) {
+            Collection<Photo> selection = grid.getSelected();
+            if (selection.isEmpty()) {
+                return;
+            }
+
+            DeleteDialog deleteDialog = new DeleteDialog(root, selection.size());
+            Optional<Boolean> confirmed = deleteDialog.showForResult();
+            if (!confirmed.isPresent() || !confirmed.get()) return;
+
+            try {
+                photoService.deletePhotos(selection);
+            } catch (ServiceException ex) {
+                LOGGER.error("failed deleting photos", ex);
+                ErrorDialog.show(root, "Fehler beim Löschen", "Die ausgewählten Fotos konnten nicht gelöscht werden.");
+            }
+
+            selection.forEach(grid::removePhoto);
+        }
+
+        @Override public void onExport(Menu sender) {
+            Collection<Photo> selection = grid.getSelected();
+            String dropboxFolder = "";
+            try {
+                dropboxFolder = dropboxService.getDropboxFolder();
+            } catch (ServiceException ex) {
+                ErrorDialog.show(root, "Fehler beim Export", "Konnte keinen Dropboxordner finden");
+            }
+
+            ExportDialog dialog = new ExportDialog(root, dropboxFolder, selection.size());
+
+            Optional<String> destinationPath = dialog.showForResult();
+            if (!destinationPath.isPresent()) return;
+
+            dropboxService.uploadPhotos(selection, destinationPath.get(), photo -> {
+                // TODO: progressbar
+            }, exception -> ErrorDialog.show(root, "Fehler beim Export",
+                    "Fehlermeldung: " + exception.getMessage()));
         }
     }
 }
