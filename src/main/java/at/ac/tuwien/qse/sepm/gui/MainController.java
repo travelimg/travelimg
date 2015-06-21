@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
+import at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowViewImpl;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -28,7 +29,7 @@ public class MainController {
     @Autowired
     private Inspector inspector;
     @Autowired
-    private SlideshowView slideshowView;
+    private SlideshowViewImpl slideshowView;
     private EventHandler<javafx.scene.input.MouseEvent> ehandl;
     private GoogleMapsScene map;
 
@@ -38,7 +39,6 @@ public class MainController {
 
     @FXML
     private void initialize() {
-
         root.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
                                                                         @Override
                                                                         public void changed(ObservableValue<? extends Tab> ov, Tab t,
@@ -49,21 +49,10 @@ public class MainController {
                                                                             if (t.equals(world) && t1.equals(grid)) {
                                                                                 inspector.setMap(worldMapView.getMap());
                                                                             }
-                                                                            if (t.equals(world) && t1.equals(slide)) {
-                                                                                slideshowView.setMap(worldMapView.getMap());
-                                                                            }
-                                                                            if (t.equals(grid) && t1.equals(slide)) {
-                                                                                slideshowView.setMap(inspector.getMap());
-                                                                            }
-                                                                            if (t.equals(slide) && t1.equals(world)) {
-                                                                                worldMapView.setMap(slideshowView.getMap());
-                                                                            }
-                                                                            if (t.equals(slide) && t1.equals(grid)) {
-                                                                                inspector.setMap(slideshowView.getMap());
-                                                                            }
                                                                         }
                                                                     }
         );
+
     }
 
 }
