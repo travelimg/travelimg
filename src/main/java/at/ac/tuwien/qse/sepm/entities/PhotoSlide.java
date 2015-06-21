@@ -22,6 +22,6 @@ public class PhotoSlide extends Slide {
     public String toString() {
         return "PhotoSlide{" +
                 "photo=" + photo +
-                '}';
+                "} " + super.toString();
     }
 }
