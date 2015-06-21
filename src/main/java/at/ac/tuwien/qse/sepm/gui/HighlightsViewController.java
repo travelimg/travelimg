@@ -416,162 +416,143 @@ public class HighlightsViewController {
                 //TODO no tag s found
             }
         }
-        /*
 
-            END
+        LOGGER.debug("Reise ausgewählt ");
+        try {
 
-         */
+            List<Photo> allPhotos = photoService.getAllPhotos(filter).stream()
+                    .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
+                    .collect(Collectors.toList());
+            LOGGER.debug(photoService.getAllPhotos(filter).size());
+            LOGGER.debug(allPhotos.size());
 
-
-        boolean rbIsSet = false;
-        /*for(RadioButton r:journeyRadioButtonsHashMap.keySet()){
-            if(r.isSelected()){
-                System.out.println(journeyRadioButtonsHashMap.get(r).getName());
-                rbIsSet=true;
-            }
-        }*/
-        if (rbIsSet = true) {
-            LOGGER.debug("Reise ausgewählt ");
-            try {
-
-                List<Photo> allPhotos = photoService.getAllPhotos(filter).stream()
-                        .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
-                        .collect(Collectors.toList());
-                LOGGER.debug(photoService.getAllPhotos(filter).size());
-                LOGGER.debug(allPhotos.size());
-
-                List<Photo> goodPhotos = new ArrayList<>();
-                for (Photo p : allPhotos) {
-                    if (p.getData().getRating() == (Rating.GOOD)) {
-                        goodPhotos.add(p);
-                    }
+            List<Photo> goodPhotos = new ArrayList<>();
+            for (Photo p : allPhotos) {
+                if (p.getData().getRating() == (Rating.GOOD)) {
+                    goodPhotos.add(p);
                 }
-                LOGGER.debug(goodPhotos.size());
-                Collections.sort((ArrayList) goodPhotos);
+            }
+            LOGGER.debug(goodPhotos.size());
+            Collections.sort((ArrayList) goodPhotos);
 
-                if (goodPhotos.size() == 0) {
-                    //photoView.getChildren().clear();
-                    Label lab = new Label();
-                    lab.setText("Es sind kein mit 'good' bewerteten Fotos zu dieser Reise vorhanden");
-                    //photoView.getChildren().add(lab);
+            if (goodPhotos.size() == 0) {
+                //photoView.getChildren().clear();
+                Label lab = new Label();
+                lab.setText("Es sind kein mit 'good' bewerteten Fotos zu dieser Reise vorhanden");
+                //photoView.getChildren().add(lab);
 
-                } else {
-                    try {
-                        //get all places with photos from the journey
+            } else {
+                try {
+                    //get all places with photos from the journey
 
-                        HashMap<Place, List<Photo>> places = new HashMap<>();
-                        for (Photo ph : goodPhotos) {
-                            if (places.size() == 0) {
+                    HashMap<Place, List<Photo>> places = new HashMap<>();
+                    for (Photo ph : goodPhotos) {
+                        if (places.size() == 0) {
+                            ArrayList<Photo> list = new ArrayList<>();
+                            list.add(ph);
+
+                            places.put(ph.getData().getPlace(), list);
+                        } else {
+                            if (places.containsKey(ph.getData().getPlace())) {
+                                List<Photo> list2 = places.get(ph.getData().getPlace());
+                                list2.add(ph);
+
+                                places.put(ph.getData().getPlace(), list2);
+                            } else {
                                 ArrayList<Photo> list = new ArrayList<>();
                                 list.add(ph);
 
                                 places.put(ph.getData().getPlace(), list);
-                            } else {
-                                if (places.containsKey(ph.getData().getPlace())) {
-                                    List<Photo> list2 = places.get(ph.getData().getPlace());
-                                    list2.add(ph);
-
-                                    places.put(ph.getData().getPlace(), list2);
-                                } else {
-                                    ArrayList<Photo> list = new ArrayList<>();
-                                    list.add(ph);
-
-                                    places.put(ph.getData().getPlace(), list);
-                                }
                             }
                         }
-                        HashMap<LocalDateTime, Place> orderedPlaces = new HashMap<>();
+                    }
+                    HashMap<LocalDateTime, Place> orderedPlaces = new HashMap<>();
 
-                        for (Place ple : places.keySet()) {
+                    for (Place ple : places.keySet()) {
 
-                            LocalDateTime min = LocalDateTime.MAX;
-                            for (Photo p : places.get(ple)) {
-                                if (p.getData().getDatetime().compareTo(min) < 0) {
-                                    min = p.getData().getDatetime();
-                                }
+                        LocalDateTime min = LocalDateTime.MAX;
+                        for (Photo p : places.get(ple)) {
+                            if (p.getData().getDatetime().compareTo(min) < 0) {
+                                min = p.getData().getDatetime();
                             }
-                            orderedPlaces.put(min, ple);
                         }
-                        List<LocalDateTime> sortedKeys = new ArrayList<>(orderedPlaces.keySet());
-                        Collections.sort(sortedKeys);
+                        orderedPlaces.put(min, ple);
+                    }
+                    List<LocalDateTime> sortedKeys = new ArrayList<>(orderedPlaces.keySet());
+                    Collections.sort(sortedKeys);
 
-                        VBox overall = new VBox();
+                    VBox overall = new VBox();
 
-                        TreeItem<String> rootItem = new TreeItem<>(selectedJourney.getName());
-                        for (LocalDateTime time : sortedKeys) {
-                            Place p = orderedPlaces.get(time);
-                            TitledPane tp = new TitledPane();
-                            tp.setText(p.getCountry() + " (" + p.getCity() + ") ");
+                    TreeItem<String> rootItem = new TreeItem<>(selectedJourney.getName());
+                    for (LocalDateTime time : sortedKeys) {
+                        Place p = orderedPlaces.get(time);
+                        TitledPane tp = new TitledPane();
+                        tp.setText(p.getCountry() + " (" + p.getCity() + ") ");
 
-                            //tree
-                            TreeItem<String> ti = new TreeItem<>(p.getCountry() + " (" + p.getCity() + ") ");
+                        //tree
+                        TreeItem<String> ti = new TreeItem<>(p.getCountry() + " (" + p.getCity() + ") ");
 
-                            VBox tagTitle = new VBox();
+                        VBox tagTitle = new VBox();
 
-                            List<Tag> taglist = tagService.getMostFrequentTags(places.get(p));
-                            for (Tag t : taglist) {
-                                List<Photo> name = new ArrayList<>();
-                                int counter = 0;
-                                for (Photo ph : places.get(p)) {
-                                    for (Tag t2 : ph.getData().getTags()) {
-                                        if (t.getId() == t2.getId() && counter < 5) {
-                                            name.add(ph);
-                                            counter++;
-                                        }
+                        List<Tag> taglist = tagService.getMostFrequentTags(places.get(p));
+                        for (Tag t : taglist) {
+                            List<Photo> name = new ArrayList<>();
+                            int counter = 0;
+                            for (Photo ph : places.get(p)) {
+                                for (Tag t2 : ph.getData().getTags()) {
+                                    if (t.getId() == t2.getId() && counter < 5) {
+                                        name.add(ph);
+                                        counter++;
                                     }
                                 }
-
-                                //ImageGrid grid2 = new ImageGrid(imageCache);
-                                //grid2.setPhotos(name);
-                                //TitledPane tp2 = new TitledPane(t.getName(), grid2);
-                                //Tree
-                                //ti.getChildren().add(new TreeItem<String>(t.getName()));
-
-                                //tagTitle.getChildren().add(tp2);
                             }
-                            tp.setContent(tagTitle);
-                            rootItem.getChildren().add(ti);
-                            overall.getChildren().add(tp);
+
+                            //ImageGrid grid2 = new ImageGrid(imageCache);
+                            //grid2.setPhotos(name);
+                            //TitledPane tp2 = new TitledPane(t.getName(), grid2);
+                            //Tree
+                            //ti.getChildren().add(new TreeItem<String>(t.getName()));
+
+                            //tagTitle.getChildren().add(tp2);
                         }
-                        treeView = new TreeView<>(rootItem);
-
-                        String style = " -fx-font-size: 14; -fx-text-fill: #333333; -fx-padding: 5 0 5 10px;";
-
-
-                        for (Place p : places.keySet()) {
-                            LocalDateTime pTime = places.get(p).get(0).getData().getDatetime();
-                            String text = pTime.getYear() + "-" + pTime.getMonthValue() + "-" + pTime.getDayOfMonth() + "    -" + p.getCountry();
-
-                            Label lab = new Label();
-                            lab.setFont(new Font(18));
-                            lab.setStyle(style);
-                            lab.setText("-| " + text);
-
-                            tree.getChildren().add(lab);
-
-                            tree.getChildren().add(new Label());
-
-                        }
-
-
-                        //photoView.getChildren().addAll(overall);
-
-                    } catch (ServiceException e) {
-                        LOGGER.debug("Photos habe keine Tag'sXXXXXXXXXXXXXXXXXXXX ", e);
+                        tp.setContent(tagTitle);
+                        rootItem.getChildren().add(ti);
+                        overall.getChildren().add(tp);
                     }
+                    treeView = new TreeView<>(rootItem);
+
+                    String style = " -fx-font-size: 14; -fx-text-fill: #333333; -fx-padding: 5 0 5 10px;";
+
+
+                    for (Place p : places.keySet()) {
+                        LocalDateTime pTime = places.get(p).get(0).getData().getDatetime();
+                        String text = pTime.getYear() + "-" + pTime.getMonthValue() + "-" + pTime.getDayOfMonth() + "    -" + p.getCountry();
+
+                        Label lab = new Label();
+                        lab.setFont(new Font(18));
+                        lab.setStyle(style);
+                        lab.setText("-| " + text);
+
+                        tree.getChildren().add(lab);
+
+                        tree.getChildren().add(new Label());
+
+                    }
+
+
+                    //photoView.getChildren().addAll(overall);
+
+                } catch (ServiceException e) {
+                    LOGGER.debug("Photos habe keine Tag'sXXXXXXXXXXXXXXXXXXXX ", e);
                 }
-            } catch (ServiceException e) {
-                //photoView.getChildren().clear();
-                Label lab = new Label();
-                lab.setText("Keine Fotos vorhanden");
-                //photoView.getChildren().add(lab);
             }
-        } else {
+        } catch (ServiceException e) {
             //photoView.getChildren().clear();
             Label lab = new Label();
-            lab.setText("Bitte eine Reise auswählen");
+            lab.setText("Keine Fotos vorhanden");
             //photoView.getChildren().add(lab);
         }
+
     }
 
     /**
