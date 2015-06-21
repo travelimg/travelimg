@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
 public class SlideshowServiceTest extends ServiceTestBase {
 
     @Autowired
-   private SlideshowServiceImpl slideshowService;
+   private SlideshowService slideshowService;
 
     @Test
     public void test_create() throws ServiceException {
