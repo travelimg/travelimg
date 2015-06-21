@@ -57,7 +57,7 @@
                             <children>
                                 <VBox fx:id="tagheartContainer" spacing="2.0">
                                     <children>
-                                        <Button fx:id="tag5" text="Tag5" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
+                                        <Button fx:id="tag5" text="Tag5" prefHeight="200" prefWidth="300"></Button>
                                         <Button fx:id="good" prefHeight="200" prefWidth="300" styleClass="good" onAction="#bt_heartPress">
                                             <tooltip>
                                                 <Tooltip text="Gutes Foto"/>
@@ -77,10 +77,10 @@
                     <children>
                         <HBox fx:id="firstFourTagsHBox" spacing="2.0">
                             <children>
-                                <Button fx:id="tag1" text="Tag1" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
-                                <Button fx:id="tag2" text="Tag2" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
-                                <Button fx:id="tag3" text="Tag3" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
-                                <Button fx:id="tag4" text="Tag4" prefHeight="200" prefWidth="300" onAction="#bt_photosByTag"></Button>
+                                <Button fx:id="tag1" text="Tag1" prefHeight="200" prefWidth="300" ></Button>
+                                <Button fx:id="tag2" text="Tag2" prefHeight="200" prefWidth="300" ></Button>
+                                <Button fx:id="tag3" text="Tag3" prefHeight="200" prefWidth="300" ></Button>
+                                <Button fx:id="tag4" text="Tag4" prefHeight="200" prefWidth="300" ></Button>
                             </children>
                         </HBox>
                     </children>

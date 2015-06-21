@@ -60,6 +60,7 @@ public class HighlightsViewController {
     private ArrayList<Marker> markers = new ArrayList<>();
     private ArrayList<Polyline> polylines = new ArrayList<>();
     private List<Button> buttonAr = new LinkedList<>();
+    List<Button> tagButtons = new ArrayList<>();
     private Label noJourneysAvailableLabel = new Label("Keine Reisen gefunden. Bitte fügen Sie eine neue ein.");
     private Journey selectedJourney;
     private WikipediaInfoPane wikipediaInfoPane;
@@ -99,6 +100,7 @@ public class HighlightsViewController {
         buttonAr.add(tag2);
         buttonAr.add(tag3);
         buttonAr.add(tag4);
+        tagButtons.addAll(Arrays.asList(tag1,tag2,tag3,tag4,tag5));
         redLine = new Line(100, 50, 100, 500);
         redLine.setStroke(Color.DARKGRAY);
         redLine.setStrokeWidth(2);
@@ -589,8 +591,22 @@ public class HighlightsViewController {
         try {
             List<Photo> list = photoService.getAllPhotos(); //TODO will use here the filter
             List<Tag> mostUsedTags = tagService.getMostFrequentTags(list);
-            for(Tag t : mostUsedTags){
-                //TODO fill the tag buttons with photos
+            for(int i = 0; i<mostUsedTags.size(); i++){
+                Tag t = mostUsedTags.get(i);
+                Button tagButton = tagButtons.get(i);
+                tagButton.setText(t.getName());
+                setBackroundImageForButton(list.get(0).getPath(),tagButton);
+                //TODO
+                /* get the tagged photos */
+                tagButton.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override public void handle(ActionEvent event) {
+                        if(goodPhotosList.size()!=0) {
+                            FullscreenWindow fw = new FullscreenWindow(imageCache);
+                            fw.present(list, list.get(0));
+                        }
+                    }
+                });
+
             }
             int remainingEmptyTagButtons = 5 - mostUsedTags.size();
             fillWithPhotos(remainingEmptyTagButtons,photoFilter);
@@ -605,12 +621,9 @@ public class HighlightsViewController {
 
         try {
             List<Photo> list = photoService.getAllPhotos(); //TODO will use here the filter
-            List<Button> tagButtons = new ArrayList<>();
-            tagButtons.addAll(Arrays.asList(tag1,tag2,tag3,tag4,tag5));
             int i = 0;
             while (nrOfPhotos > 0 && i < list.size()) {
-                //TODO try adding photos instead
-                Button tagButton = tagButtons.get(nrOfPhotos-1);
+                Button tagButton = tagButtons.get(5-nrOfPhotos);
                 tagButton.setText("");
                 setBackroundImageForButton(list.get(i).getPath(),tagButton);
                 nrOfPhotos--;
