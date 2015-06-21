@@ -79,15 +79,15 @@ public class ClusterServiceImpl implements ClusterService {
         }
     }
 
-    @Override
-    public Journey addJourney(Journey journey) throws ServiceException {
-        try {
-            return journeyDAO.create(journey);
-        } catch (DAOException ex) {
-            logger.error("Journey-creation for {} failed.", journey);
-            throw new ServiceException("Creation of journey failed.", ex);
-        } catch (ValidationException e) {
-            throw new ServiceException("Failed to validate entity", e);
+            @Override
+            public Journey addJourney(Journey journey) throws ServiceException {
+                try {
+                    return journeyDAO.create(journey);
+                } catch (DAOException ex) {
+                    logger.error("Journey-creation for {} failed.", journey);
+                    throw new ServiceException("Creation of journey failed.", ex);
+                } catch (ValidationException ex) {
+                    throw new ServiceException("Failed to validate entity: " + ex.getMessage(), ex);
         }
     }
 

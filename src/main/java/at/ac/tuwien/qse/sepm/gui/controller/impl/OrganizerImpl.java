@@ -11,14 +11,23 @@ import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.TagService;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
+import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TreeView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -43,6 +52,14 @@ public class OrganizerImpl implements Organizer {
     @FXML
     private BorderPane root;
     @FXML
+    private Button importButton;
+    @FXML
+    private Button flickrButton;
+    @FXML
+    private Button presentButton;
+    @FXML
+    private Button addJourneyButton;
+    @FXML
     private VBox filterContainer;
     @FXML
     private FilterList<Rating> ratingListView;
@@ -55,8 +72,37 @@ public class OrganizerImpl implements Organizer {
     @FXML
     private FilterList<Place> placeListView;
 
+    private Button resetButton = new Button("Zurücksetzen");
+
+    private Button switchViewButton = new Button("Ansicht ändern");
+
+    @FXML private TreeView<String> filesTree;
+
+    private HBox buttonBox;
+
     private PhotoFilter filter = new PhotoFilter();
     private Runnable filterChangeCallback;
+    private TreeView<String> treeView;
+
+    @Override public void setPresentAction(Runnable callback) {
+        LOGGER.debug("setting present action");
+        presentButton.setOnAction(event -> callback.run());
+    }
+
+    @Override public void setImportAction(Runnable callback) {
+        LOGGER.debug("setting import action");
+        importButton.setOnAction(event -> callback.run());
+    }
+
+    @Override public void setJourneyAction(Runnable callback) {
+        LOGGER.debug("setting journey action");
+        addJourneyButton.setOnAction(event -> callback.run());
+    }
+
+    @Override public void setFlickrAction(Runnable callback) {
+        LOGGER.debug("setting flickr action");
+        flickrButton.setOnAction(event -> callback.run());
+    }
 
     @Override public void setFilterChangeAction(Runnable callback) {
         LOGGER.debug("setting filter change action");
@@ -69,6 +115,10 @@ public class OrganizerImpl implements Organizer {
 
     @FXML
     private void initialize() {
+        resetButton.setOnAction(event -> resetFilter());
+        switchViewButton.setOnAction(event -> folderViewClicked());
+        buttonBox = new HBox(resetButton, switchViewButton);
+
         ratingListView = new FilterList<>(value -> {
             switch (value) {
                 case GOOD:
@@ -105,18 +155,72 @@ public class OrganizerImpl implements Organizer {
         placeListView.setTitle("Orte");
         placeListView.setChangeHandler(this::handlePlacesChange);
 
-        filterContainer.getChildren().addAll(ratingListView, categoryListView, photographerListView, journeyListView,
+        filterContainer.getChildren().addAll(buttonBox, ratingListView, categoryListView, photographerListView, journeyListView,
                 placeListView);
-
 
         refreshLists();
         resetFilter();
+    }
+
+    // This Method let's the User switch to the filter-view
+    private void filterViewClicked(){
+        filterContainer.getChildren().clear();
+        filterContainer.getChildren().addAll(buttonBox, ratingListView,
+                categoryListView, photographerListView, journeyListView, placeListView);
+        switchViewButton.setOnAction(event -> folderViewClicked());
+    }
+
+    // This Method let's the User switch to the folder-view
+    private void folderViewClicked() {
+        LOGGER.debug("Switch view");
+        filterContainer.getChildren().clear();
+        filesTree = new TreeView<>();
+        filesTree.setOnMouseClicked(event -> handleFolderChange());
+        Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
+        findFiles(rootDirectories.toFile(), null);
+
+        switchViewButton.setOnAction(event -> filterViewClicked());
+        resetButton.setOnAction(event -> folderViewClicked());
+        filterContainer.getChildren().addAll(buttonBox, new Label("File browser"), filesTree);
+        VBox.setVgrow(filesTree, Priority.ALWAYS);
+    }
+
+    private void findFiles(File dir, FilePathTreeItem parent) {
+        FilePathTreeItem root = new FilePathTreeItem(dir.toPath());
+        root.setExpanded(true);
+        try {
+            File[] files = dir.listFiles();
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    System.out.println("directory:" + file.getCanonicalPath());
+                    findFiles(file, root);
+                }
+            }
+            if(parent==null){
+                filesTree.setRoot(root);
+            } else {
+                parent.getChildren().add(root);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        filter = new PhotoPathFilter();
     }
 
     private void handleFilterChange() {
         LOGGER.debug("filter changed");
         if (filterChangeCallback == null) return;
         filterChangeCallback.run();
+    }
+
+    private void handleFolderChange() {
+        LOGGER.debug("Choose folder");
+        FilePathTreeItem item = (FilePathTreeItem) filesTree.getSelectionModel().getSelectedItem();
+        if(item != null){
+            if(filter instanceof PhotoPathFilter)
+                ((PhotoPathFilter) filter).setIncludedPath(Paths.get(item.getFullPath()));
+            handleFilterChange();
+        }
     }
 
     private void handleRatingsChange(List<Rating> values) {
