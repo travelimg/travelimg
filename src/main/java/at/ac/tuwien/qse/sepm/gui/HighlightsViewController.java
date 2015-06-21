@@ -415,14 +415,6 @@ public class HighlightsViewController {
             } catch (ServiceException e) {
                 //TODO no tag s found
             }
-
-            // all GOOD fotos
-            for (Photo p : orderedPlacesAndPhotos.get(pl)) {
-                if (p.getData().getRating().equals(Rating.GOOD)) {
-                    //goodPhotosList.add(p);
-                }
-
-            }
         }
         /*
 
