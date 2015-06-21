@@ -1,9 +1,11 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.PhotoSlide;
 import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.gui.PresentationWindow;
+import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.SlideshowView;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.grid.SlideGrid;
@@ -20,9 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SlideshowViewImpl implements SlideshowView {
@@ -37,6 +37,8 @@ public class SlideshowViewImpl implements SlideshowView {
     @Autowired
     private ImageCache imageCache;
 
+    @Autowired
+    private Inspector<PhotoSlide> photoSlideInspector;
 
     @FXML private BorderPane root;
     @FXML private ScrollPane gridContainer;
@@ -57,7 +59,17 @@ public class SlideshowViewImpl implements SlideshowView {
         grid.setSlideChangedCallback(this::handleSlideChanged);
         grid.setSlideAddedCallback(this::handleSlideAdded);
 
-        slideshowOrganizer.setSlideshows(slideshows);
+        grid.setSelectionChangeCallback(() -> {
+            Collection<PhotoSlide> result = new LinkedList<>();
+            for (Slide slide : grid.getSelected()) {
+                if (slide instanceof PhotoSlide) {
+                    result.add((PhotoSlide)slide);
+                }
+            }
+            photoSlideInspector.setEntities(result);
+        });
+
+                slideshowOrganizer.setSlideshows(slideshows);
         slideshowOrganizer.getSelectedSlideshowProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 grid.setSlides(newValue.getSlides());

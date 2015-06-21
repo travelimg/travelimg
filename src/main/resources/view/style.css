@@ -669,35 +669,31 @@
     -fx-padding: 8px 12px;
 }
 
-.inspector {
+.inspector-pane {
     -fx-background-color: -tmg-bg1;
+    -fx-pref-width: 280px;
 }
-.inspector .placeholder {
+.inspector-pane .placeholder {
     -fx-spacing: 16px;
+    -fx-alignment: center;
 }
-.inspector .placeholder * {
+.inspector-pane .placeholder .label {
     -fx-text-fill: -tmg-text;
 }
-.inspector .placeholder .glyph-icon {
+.inspector-pane .placeholder .glyph-icon {
     -fx-fill: -tmg-bg0;
     -glyph-name: "CAMERA";
-    -glyph-size: 80;
+    -glyph-size: 80px;
 }
-.inspector .alert {
-    -fx-background-color: -fx-background-alt;
+.inspector-pane .selection-info {
+    -fx-background-color: -tmg-secondary;
     -fx-text-fill: -tmg-text-bright;
     -fx-padding: 16px 16px;
 }
-.inspector .alert.warning {
-    -fx-background-color: -tmg-secondary;
-}
-.inspector .alert .glyph-icon {
-    -glyph-size: 50;
-    -fx-fill: -tmg-text-bright;
-}
-.inspector .alert .count {
+.inspector-pane .selection-info .label {
     -fx-font-size: 20px;
     -fx-text-fill: -tmg-text-bright;
+    -fx-alignment: center;
 }
 
 .rating-picker .button {

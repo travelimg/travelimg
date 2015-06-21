@@ -1,7 +1,9 @@
 package at.ac.tuwien.qse.sepm.gui;
 
+import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
+import at.ac.tuwien.qse.sepm.gui.controller.impl.PhotoInspectorImpl;
 import at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowViewImpl;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -27,7 +29,7 @@ public class MainController {
     @Autowired
     private WorldmapView worldMapView;
     @Autowired
-    private Inspector inspector;
+    private PhotoInspectorImpl photoInspector;
     @Autowired
     private SlideshowViewImpl slideshowView;
     private EventHandler<javafx.scene.input.MouseEvent> ehandl;
@@ -44,10 +46,12 @@ public class MainController {
                                                                         public void changed(ObservableValue<? extends Tab> ov, Tab t,
                                                                                             Tab t1) {
                                                                             if (t.equals(grid) && t1.equals(world)) {
-                                                                                worldMapView.setMap(inspector.getMap());
+                                                                                worldMapView.setMap(
+                                                                                        photoInspector
+                                                                                                .getMap());
                                                                             }
                                                                             if (t.equals(world) && t1.equals(grid)) {
-                                                                                inspector.setMap(worldMapView.getMap());
+                                                                                photoInspector.setMap(worldMapView.getMap());
                                                                             }
                                                                         }
                                                                     }

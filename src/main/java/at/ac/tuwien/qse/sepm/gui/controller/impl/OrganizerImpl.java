@@ -45,7 +45,7 @@ public class OrganizerImpl implements Organizer {
     @Autowired
     private ClusterService clusterService;
     @Autowired
-    private Inspector inspectorController;
+    private Inspector<Photo> inspectorController;
     @Autowired
     private TagService tagService;
 
