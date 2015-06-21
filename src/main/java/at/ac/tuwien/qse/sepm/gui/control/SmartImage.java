@@ -1,12 +1,19 @@
 package at.ac.tuwien.qse.sepm.gui.control;
 
+import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
+import at.ac.tuwien.qse.sepm.gui.util.ImageCacheImpl;
+import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import javafx.geometry.Insets;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 
+import java.nio.file.Path;
+
 public class SmartImage extends StackPane {
+
+    private static final ImageCache cache = new ImageCacheImpl();
 
     private final ProgressIndicator progress = new ProgressIndicator();
     private final ImageView imageView = new ImageView();
@@ -24,16 +31,20 @@ public class SmartImage extends StackPane {
         heightProperty().addListener(this::handleSizeChange);
         widthProperty().addListener(this::handleSizeChange);
 
+        imageView.setPreserveRatio(true);
+
         getChildren().add(progress);
         getChildren().add(imageView);
     }
 
-    public void setImage(Image image) {
+    public void setImage(Path path) {
         indicateLoading();
 
-        if (image == null) {
+        if (path == null) {
             return;
         }
+
+        image = cache.get(path, ImageSize.MEDIUM); // TODO
 
         imageView.setImage(image);
 
@@ -48,6 +59,10 @@ public class SmartImage extends StackPane {
                 indicateLoaded();
             }
         });
+
+        if (image.getProgress() == 1.0) {
+            indicateLoaded();
+        }
     }
 
     public void cancel() {

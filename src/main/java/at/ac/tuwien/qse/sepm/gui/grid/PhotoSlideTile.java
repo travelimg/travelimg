@@ -18,17 +18,7 @@ public class PhotoSlideTile extends SlideTileBase<PhotoSlide> {
         super(slide);
         getStyleClass().add("photo");
         getChildren().add(0, imageView);
-
-        String url;
-        try {
-            url = slide.getPhoto().getFile().toUri().toURL().toString();
-        } catch (MalformedURLException ex) {
-            LOGGER.warn("could not convert path to URL {}", slide.getPhoto().getPath());
-            LOGGER.error(ex);
-            return;
-        }
-
-        Image image = new Image(url, true);
-        imageView.setImage(image);
+        
+        imageView.setImage(slide.getPhoto().getFile());
     }
 }

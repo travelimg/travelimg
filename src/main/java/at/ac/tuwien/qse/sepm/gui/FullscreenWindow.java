@@ -161,7 +161,7 @@ public class FullscreenWindow extends AnchorPane {
             return;
         }
 
-        image = imageCache.get(photos.get(activeIndex), ImageSize.ORIGINAL);
+        image = imageCache.get(photos.get(activeIndex).getFile(), ImageSize.ORIGINAL);
         imageView.setImage(image);
 
         // handling of images in original size can consume a lot of memory so collect it here

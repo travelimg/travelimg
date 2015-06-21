@@ -1,7 +1,8 @@
 package at.ac.tuwien.qse.sepm.gui.util;
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
 import javafx.scene.image.Image;
+
+import java.nio.file.Path;
 
 /**
  * Cache for images. If the image is not present it is loaded from disk and put into the cache.
@@ -15,17 +16,17 @@ public interface ImageCache {
      *
      * If it is not already in the cache then load it from disk.
      *
-     * @param photo The photo for which to retrieve the image file.
+     * @param path The photo path for which to retrieve the image file.
      * @param size  The size for which the photo should be loaded.
      * @return The image at the given size.
      */
-    Image get(Photo photo, ImageSize size);
+    Image get(Path path, ImageSize size);
 
     /**
      * Load an image from disk into the cache at the given size.
      *
-     * @param photo The image to load.
+     * @param path The image path to load.
      * @param size  The size of the resulting image
      */
-    void load(Photo photo, ImageSize size);
+    void load(Path path, ImageSize size);
 }
