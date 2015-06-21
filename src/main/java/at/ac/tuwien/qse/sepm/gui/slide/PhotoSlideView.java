@@ -19,12 +19,15 @@ public class PhotoSlideView extends SlideView {
     private final PhotoSlide slide;
     private final ImageView imageView = new ImageView();
 
-    public PhotoSlideView(PhotoSlide slide, ImageCache imageCache) {
+    public PhotoSlideView(PhotoSlide slide, int width, int height) {
         this.slide = slide;
 
         Image image = loadImage();
 
         if (image != null) {
+            imageView.setPreserveRatio(true);
+            imageView.setFitHeight(height);
+            imageView.setFitWidth(width);
             imageView.setImage(loadImage());
             getChildren().add(imageView);
         }

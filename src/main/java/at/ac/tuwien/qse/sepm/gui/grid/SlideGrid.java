@@ -127,6 +127,15 @@ public class SlideGrid extends TilePane {
             }
         }
 
+        // set the order attribute of the slides
+        int order = 1;
+        for (SlideGridNode node : nodesNewOrder) {
+            node.getTile().getSlide().setOrder(order);
+            order++;
+
+            node.getTile().update();
+        }
+
         nodes.clear();
         nodes.addAll(nodesNewOrder);
 
@@ -147,10 +156,10 @@ public class SlideGrid extends TilePane {
 
         if (type.isPresent()) {
             if (type.get() == SlideType.MAP) {
-                MapSlide slide = new MapSlide(-1, 0, 0, "caption", 0, 0);
+                MapSlide slide = new MapSlide(-1, 0, 0, "", 0, 0);
                 slideAddedCallback.accept(slide, index);
             } else {
-                TitleSlide slide = new TitleSlide(-1, 0, 0, "caption", 0);
+                TitleSlide slide = new TitleSlide(-1, 0, 0, "", 0);
                 slideAddedCallback.accept(slide, index);
             }
         }

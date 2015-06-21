@@ -34,6 +34,6 @@ public class MapSlide extends Slide {
         return "MapSlide{" +
                 "latitude=" + latitude +
                 ", longitude=" + longitude +
-                '}';
+                "} " + super.toString();
     }
 }

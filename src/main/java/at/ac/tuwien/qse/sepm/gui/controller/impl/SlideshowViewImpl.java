@@ -57,10 +57,13 @@ public class SlideshowViewImpl implements SlideshowView {
         grid.setSlideChangedCallback(this::handleSlideChanged);
         grid.setSlideAddedCallback(this::handleSlideAdded);
 
-
         slideshowOrganizer.setSlideshows(slideshows);
         slideshowOrganizer.getSelectedSlideshowProperty().addListener((observable, oldValue, newValue) -> {
-            grid.setSlides(newValue.getSlides());
+            if (newValue != null) {
+                grid.setSlides(newValue.getSlides());
+            } else {
+                grid.setSlides(FXCollections.observableArrayList());
+            }
         });
 
         loadAllSlideshows();
@@ -93,7 +96,7 @@ public class SlideshowViewImpl implements SlideshowView {
                 slideshow = slideshowService.create(slideshow);
 
                 // remove placeholder, add new slideshow and add new placeholder
-                Slideshow placeholder = slideshows.remove(slideshows.size() - 1);
+                slideshows.remove(slideshows.size() - 1);
                 slideshows.add(slideshow);
                 slideshows.add(createNewSlideshowPlaceholder());
             }
@@ -103,42 +106,12 @@ public class SlideshowViewImpl implements SlideshowView {
             // add the photos to the grid if the slideshow is currently being displayed
             Slideshow selected = slideshowOrganizer.getSelected();
             if (selected != null && selected.getId().equals(slideshow.getId())) {
-                //grid.setSlideshow(slideshow);
+                grid.setSlides(slideshow.getSlides());
             }
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Hinzufügen zur Slideshow", "Fehlermeldung: " + ex.getMessage());
         }
     }
-
-/* -- TODO: Delete Methods
-    private void createSlideshow() {
-        try {
-            Slideshow slideshow = new Slideshow();
-
-            if (tf_slideName.getText().isEmpty()) {
-                LOGGER.debug("Bitte geben Sie einen Namen für die Slideshow ein!");//TODO: Show an InfoBox
-            } else {
-                slideshow.setId(1);
-                slideshow.setName(tf_slideName.getText());
-                slideshow.setDurationBetweenPhotos(slideshowOrganizer.getSelectedDuration());
-
-                slideShowService.create(slideshow);
-                cb_getSlideshows.getItems().add(tf_slideName.getText());
-                tf_slideName.clear();
-                LOGGER.info("Slideshow wurde korrekt angelegt!");
-            }
-
-
-        } catch (ServiceException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private void handlesetShowSlides(Event event) {
-        createSlideshow();
-
-    }*/
 
     private void handleSlideChanged(Slide slide) {
         try {
@@ -167,11 +140,12 @@ public class SlideshowViewImpl implements SlideshowView {
             return;
         }
 
-        slide.setOrder(position);
+        slide.setOrder(position + 1);
         slide.setSlideshowId(selected.getId());
 
         try {
-            slideService.create(slide);
+            slide = slideService.create(slide);
+            selected.getSlides().add(position, slide);
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Erstellen der Slide", "");
             return;
@@ -191,6 +165,8 @@ public class SlideshowViewImpl implements SlideshowView {
 
             i++;
         }
+
+        grid.setSlides(selected.getSlides());
     }
 
     private void loadAllSlideshows() {

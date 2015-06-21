@@ -23,6 +23,6 @@ public class TitleSlide extends Slide {
     public String toString() {
         return "TitleSlide{" +
                 "color=" + color +
-                '}';
+                "} " + super.toString();
     }
 }

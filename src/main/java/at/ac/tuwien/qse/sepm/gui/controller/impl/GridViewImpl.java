@@ -62,7 +62,7 @@ public class GridViewImpl implements GridView {
         this.imageCache = imageCache;
 
         if (grid == null) {
-            this.grid = new PaginatedImageGrid(menu, imageCache);
+            this.grid = new PaginatedImageGrid(menu);
         }
     }
 
@@ -70,7 +70,7 @@ public class GridViewImpl implements GridView {
     private void initialize() {
         LOGGER.debug("initializing");
 
-        this.grid = new PaginatedImageGrid(menu, imageCache);
+        this.grid = new PaginatedImageGrid(menu);
         root.setCenter(grid);
         menu.addListener(new MenuListener());
         organizer.setFilterChangeAction(this::handleFilterChange);

@@ -22,15 +22,13 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final ImageCache imageCache;
     private final Supplier<T> tileFactory;
 
     protected List<Photo> photos = new ArrayList<>();
     protected final List<T> tiles = new LinkedList<>();
     private Consumer<Set<Photo>> selectionChangeAction = null;
 
-    public ImageGrid(ImageCache imageCache, Supplier<T> tileFactory) {
-        this.imageCache = imageCache;
+    public ImageGrid(Supplier<T> tileFactory) {
         this.tileFactory = tileFactory;
 
         getStyleClass().add("image-grid");
@@ -41,7 +39,6 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
         this.photos = photos;
 
         photos.forEach(this::addPhoto);
-
     }
 
     public void clear() {
@@ -84,8 +81,7 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
 
         photos.set(index, photo);
 
-        Image image = imageCache.get(photo, ImageSize.MEDIUM);
-        tile.setPhoto(photo, image);
+        tile.setPhoto(photo);
     }
 
     /**
@@ -107,10 +103,8 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
     }
 
     private void addPhoto(Photo photo) {
-        Image image = imageCache.get(photo, ImageSize.MEDIUM);
-
         T tile = tileFactory.get();
-        tile.setPhoto(photo, image);
+        tile.setPhoto(photo);
 
         tile.setOnMouseClicked(event -> handleTileClicked(tile, event));
 
