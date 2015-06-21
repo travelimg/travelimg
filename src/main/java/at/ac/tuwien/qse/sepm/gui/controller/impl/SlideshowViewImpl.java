@@ -110,36 +110,6 @@ public class SlideshowViewImpl implements SlideshowView {
         }
     }
 
-/* -- TODO: Delete Methods
-    private void createSlideshow() {
-        try {
-            Slideshow slideshow = new Slideshow();
-
-            if (tf_slideName.getText().isEmpty()) {
-                LOGGER.debug("Bitte geben Sie einen Namen für die Slideshow ein!");//TODO: Show an InfoBox
-            } else {
-                slideshow.setId(1);
-                slideshow.setName(tf_slideName.getText());
-                slideshow.setDurationBetweenPhotos(slideshowOrganizer.getSelectedDuration());
-
-                slideShowService.create(slideshow);
-                cb_getSlideshows.getItems().add(tf_slideName.getText());
-                tf_slideName.clear();
-                LOGGER.info("Slideshow wurde korrekt angelegt!");
-            }
-
-
-        } catch (ServiceException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private void handlesetShowSlides(Event event) {
-        createSlideshow();
-
-    }*/
-
     private void handleSlideChanged(Slide slide) {
         try {
             slideService.update(slide);
