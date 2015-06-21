@@ -80,7 +80,7 @@ public class PresentationWindow extends StackPane {
 
     public void present() {
         loadSlide();
-        
+
         stage.setFullScreen(true);
         stage.setFullScreenExitHint("");
         stage.show();
