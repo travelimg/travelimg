@@ -2,7 +2,6 @@ package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.control.WikipediaInfoPane;
-import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.grid.ImageGrid;
 import at.ac.tuwien.qse.sepm.gui.util.GeoUtils;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
@@ -108,7 +107,8 @@ public class HighlightsViewController {
         mapContainer.getChildren().add(map.getMapView());
     }
 
-    public void initialize() {
+    @FXML
+    private void initialize() {
         buttonAr.add(tag1);
         buttonAr.add(tag2);
         buttonAr.add(tag3);
@@ -318,70 +318,39 @@ public class HighlightsViewController {
         return photosByPlace;
     }
 
+    private List<Place> orderPlacesByVisitingDate(Set<Place> places, Map<Place, List<Photo>> photosByPlace) {
+        List<Place> orderedPlaces = new ArrayList<>(places);
+
+        // sort places by time
+        // the photo with the lowest datetime which belongs to a place determines the visiting time
+        orderedPlaces.sort((p1, p2) -> {
+            List<Photo> l1 = photosByPlace.get(p1);
+            List<Photo> l2 = photosByPlace.get(p2);
+
+            Optional<Photo> min1 = l1.stream().min((ph1, ph2) -> ph1.compareTo(ph2));
+            Optional<Photo> min2 = l2.stream().min((ph1, ph2) -> ph1.compareTo(ph2));
+
+            if (!min1.isPresent() || !min2.isPresent())
+                return 0;
+
+            return min1.get().getData().getDatetime().compareTo(min2.get().getData().getDatetime());
+        });
+
+        return orderedPlaces;
+    }
+
     private void handlePlaceSelected(List<Place> places, Place place, int pos) {
         wikipediaInfoPane.showDefaultWikiInfo(place);
         drawJourneyUntil(places, pos);
         setGoodPhotos(place);
         setMostUsedTagsWithPhotos(place);
-
-        /*aktivePlace = place;
-        // set Buttontext default
-        for(int i=0; i<buttonAr.size(); i++){
-            buttonAr.get(i).setText("default");
-        }
-        // placesAndTags = die most frequent tags ordered by place
-        if(placesAndTags.size()!=0){
-            if(placesAndTags.get(place).size()!=0) {
-
-                for (int i = 0; i < placesAndTags.get(place).size(); i++) {
-                    // set Button-text to TagName
-                    buttonAr.get(i).setText(placesAndTags.get(place).get(i).getName());
-                }
-            }
-        }*/
     }
 
-    public void bt_heartPress() {
+    @FXML
+    private void bt_heartPress() {
         if (goodPhotosList.size() != 0) {
             FullscreenWindow fw = new FullscreenWindow(this.imageCache);
             fw.present(goodPhotosList, goodPhotosList.get(0));
-        }
-    }
-
-    /**
-     * Button event "Tag Buttons"
-     */
-    public void bt_photosByTag() {
-        LOGGER.debug("BUTTON is pressed");
-        for (Button b : buttonAr) {
-            if (b.isArmed() && !b.getText().equals("default")) {
-                LOGGER.debug("Button:" + b.getText() + "is pressed");
-                LOGGER.debug(aktivePlace.toString());
-                List<Photo> presentPhotos = new ArrayList<>();
-
-                for (PlaceDate pl : orderedPlacesAndPhotos.keySet()) {
-                    if (pl.getPlace().getId() == aktivePlace.getId()) {
-                        LOGGER.debug("same ID");
-                        LOGGER.debug("Look @ " + orderedPlacesAndPhotos.get(pl).size() + " Photos");
-                        for (Photo p : orderedPlacesAndPhotos.get(pl)) {
-                            LOGGER.debug(p.toString());
-                            for (Tag t : p.getData().getTags()) {
-                                if (t.getName().equals(b.getText())) {
-                                    presentPhotos.add(p);
-                                    LOGGER.debug("add photo");
-                                }
-                            }
-                        }
-                    }
-                }
-                if (presentPhotos.size() != 0) {
-                    FullscreenWindow fw = new FullscreenWindow(this.imageCache);
-                    fw.present(presentPhotos, presentPhotos.get(0));
-                } else {
-                    LOGGER.debug("no Photos");
-                }
-
-            }
         }
     }
 
