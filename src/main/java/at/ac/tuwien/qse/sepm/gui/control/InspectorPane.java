@@ -8,32 +8,25 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
-@DefaultProperty("children")
-public class InspectorPane extends StackPane {
+public class InspectorPane extends VBox {
 
     private final Node placeholder;
     private final HBox selectionInfo = new HBox();
     private final Label selectionInfoLabel = new Label();
-    private final VBox main = new VBox();
-    private final VBox content = new VBox();
 
     public InspectorPane() {
         getStyleClass().add("inspector-pane");
 
         placeholder = createPlaceholder();
-        super.getChildren().add(placeholder);
+        getChildren().add(placeholder);
         selectionInfo.getStyleClass().add("selection-info");
         VBox.setVgrow(selectionInfoLabel, Priority.ALWAYS);
         selectionInfo.getChildren().add(selectionInfoLabel);
         selectionInfo.setAlignment(Pos.CENTER);
 
-        main.getChildren().addAll(selectionInfo, content);
-        super.getChildren().add(main);
+        getChildren().add(selectionInfo);
         setCount(0);
     }
 
@@ -52,16 +45,17 @@ public class InspectorPane extends StackPane {
         boolean multiple = count > 1;
         placeholder.setVisible(hasNone);
         placeholder.setManaged(hasNone);
-        main.setVisible(hasActive);
-        main.setManaged(hasActive);
-        main.setMaxWidth(Double.MAX_VALUE);
         selectionInfo.setVisible(multiple);
         selectionInfo.setManaged(multiple);
         selectionInfoLabel.setText(Integer.toString(count) + " Elemente");
-    }
 
-    @Override public ObservableList<Node> getChildren() {
-        return content.getChildren();
+        // en/disable content
+        for (Node node : getChildren()) {
+            if (node != placeholder && node != selectionInfo) {
+                node.setVisible(hasActive);
+                node.setManaged(hasActive);
+            }
+        }
     }
 
     private static Node createPlaceholder() {
