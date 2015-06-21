@@ -28,7 +28,7 @@
     <bottom>
         <HBox styleClass="navbar">
             <children>
-                <Button fx:id="importButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                <Button fx:id="addButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                     <graphic>
                         <FontAwesomeIconView glyphName="PLUS"/>
                     </graphic>
