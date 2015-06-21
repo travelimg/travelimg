@@ -764,7 +764,7 @@
     -fx-border-color: -fx-text;
     -fx-border-style: solid;
     -fx-border-width: 0 0 2px 0;
-    -fx-background-color: transparent;
+    -fx-background-color: -fx-primary;
     -fx-background-radius: 0;
     -fx-font-size: 16px;
     -fx-padding: 11px 0 0 0;
@@ -776,26 +776,21 @@
     -fx-padding: 0 0 4px 0;
     -fx-border-width: 0;
 }
-.tree-view .tree-view-popup {
-    -fx-background-color: -fx-default;
-    -fx-border-width: 0;
-    -fx-effect: -fx-dropshadow-3;
-    -fx-background-insets: 0;
-    -fx-padding: 0px;
-}
+
 .tree-view .tree-cell {
     -fx-padding: 0;
     -fx-padding: 6px 20px 6px 10px;
-    -fx-text-fill: -fx-text;
+    -fx-text-fill: white;
+    -fx-background-color: -fx-primary;
 }
 .tree-view .tree-cell:hover {
-    -fx-background-color: -fx-default-hover;
+    -fx-background-color: -tmg-bg2-light;
 }
 .tree-view .tree-cell:focused {
-    -fx-background-color: -fx-default-focus;
+    -fx-background-color: -tmg-bg2-light;
 }
 .tree-view .tree-cell:selected {
-    -fx-background-color: -fx-default-press;
+    -fx-background-color: -tmg-bg2-dark;
 }
 
    

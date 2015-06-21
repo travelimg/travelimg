@@ -39,31 +39,18 @@ public class OrganizerImpl implements Organizer {
 
     private static final Logger LOGGER = LogManager.getLogger(OrganizerImpl.class);
     private final DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy MMM");
-    @Autowired
-    private PhotographerService photographerService;
-    @Autowired
-    private ClusterService clusterService;
-    @Autowired
-    private Inspector inspectorController;
-    @Autowired
-    private TagService tagService;
+    @Autowired private PhotographerService photographerService;
+    @Autowired private ClusterService clusterService;
+    @Autowired private Inspector inspectorController;
+    @Autowired private TagService tagService;
 
-    @FXML
-    private BorderPane root;
-    @FXML
-    private VBox filterContainer;
-    @FXML
-    private FilterList<Rating> ratingListView;
-    @FXML
-    private FilterList<Tag> categoryListView;
-    @FXML
-    private FilterList<Photographer> photographerListView;
-    @FXML
-    private FilterList<Journey> journeyListView;
-    @FXML
-    private FilterList<Place> placeListView;
-
-
+    @FXML private BorderPane root;
+    @FXML private VBox filterContainer;
+    @FXML private FilterList<Rating> ratingListView;
+    @FXML private FilterList<Tag> categoryListView;
+    @FXML private FilterList<Photographer> photographerListView;
+    @FXML private FilterList<Journey> journeyListView;
+    @FXML private FilterList<Place> placeListView;
 
     private ToggleButton folderViewButton = new ToggleButton("Ordneransicht");
     private ToggleButton filterViewButton = new ToggleButton("Filteransicht");
@@ -84,8 +71,7 @@ public class OrganizerImpl implements Organizer {
         return filter;
     }
 
-    @FXML
-    private void initialize() {
+    @FXML private void initialize() {
         filesTree = new TreeView<>();
         filesTree.setOnMouseClicked(event -> handleFolderChange());
         folderViewButton.setOnAction(event -> folderViewClicked());
@@ -113,7 +99,8 @@ public class OrganizerImpl implements Organizer {
         ratingListView.setTitle("Bewertungen");
         ratingListView.setChangeHandler(this::handleRatingsChange);
         categoryListView = new FilterList<>(value -> {
-            if (value == null) return "Nicht kategorisiert";
+            if (value == null)
+                return "Nicht kategorisiert";
             return value.getName();
         });
         categoryListView.setTitle("Kategorien");
@@ -122,31 +109,34 @@ public class OrganizerImpl implements Organizer {
         photographerListView.setTitle("Fotografen");
         photographerListView.setChangeHandler(this::handlePhotographersChange);
         journeyListView = new FilterList<>(value -> {
-            if (value == null) return "Keiner Reise zugeordnet";
+            if (value == null)
+                return "Keiner Reise zugeordnet";
             return value.getName();
         });
         journeyListView.setTitle("Reisen");
         journeyListView.setChangeHandler(this::handleJourneysChange);
         placeListView = new FilterList<Place>(value -> {
-            if (value == null) return "Keinem Ort zugeordnet";
+            if (value == null)
+                return "Keinem Ort zugeordnet";
             return value.getCountry() + ", " + value.getCity();
         });
         placeListView.setTitle("Orte");
         placeListView.setChangeHandler(this::handlePlacesChange);
 
-        filterContainer.getChildren().addAll(buttonBox, ratingListView, categoryListView, photographerListView, journeyListView,
-                placeListView);
+        filterContainer.getChildren()
+                .addAll(buttonBox, ratingListView, categoryListView, photographerListView,
+                        journeyListView, placeListView);
 
         refreshLists();
         resetFilter();
     }
 
     // This Method let's the User switch to the filter-view
-    private void filterViewClicked(){
+    private void filterViewClicked() {
         filterContainer.getChildren().clear();
-        filterContainer.getChildren().addAll(buttonBox, ratingListView,
-                categoryListView, photographerListView, journeyListView, placeListView);
-        folderViewButton.setOnAction(event -> folderViewClicked());
+        filterContainer.getChildren()
+                .addAll(buttonBox, ratingListView, categoryListView, photographerListView,
+                        journeyListView, placeListView);
     }
 
     // This Method let's the User switch to the folder-view
@@ -157,7 +147,6 @@ public class OrganizerImpl implements Organizer {
         Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
         findFiles(rootDirectories.toFile(), null);
 
-        folderViewButton.setOnAction(event -> filterViewClicked());
         filterContainer.getChildren().addAll(buttonBox, filesTree);
 
         VBox.setVgrow(filesTree, Priority.ALWAYS);
@@ -175,7 +164,7 @@ public class OrganizerImpl implements Organizer {
                     findFiles(file, rootNode);
                 }
             }
-            if(parent==null){
+            if (parent == null) {
                 filesTree.setRoot(rootNode);
             } else {
                 parent.getChildren().add(rootNode);
@@ -188,21 +177,22 @@ public class OrganizerImpl implements Organizer {
 
     private void handleFilterChange() {
         LOGGER.debug("filter changed");
-        if (filterChangeCallback == null) return;
+        if (filterChangeCallback == null)
+            return;
         filterChangeCallback.run();
     }
 
     private void handleFolderChange() {
         LOGGER.debug("handle folder");
         FilePathTreeItem item = (FilePathTreeItem) filesTree.getSelectionModel().getSelectedItem();
-        if(item != null){
-            if(filter instanceof PhotoPathFilter)
+        if (item != null) {
+            if (filter instanceof PhotoPathFilter)
                 ((PhotoPathFilter) filter).setIncludedPath(Paths.get(item.getFullPath()));
             handleFilterChange();
         }
-//        Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
-//        findFiles(rootDirectories.toFile(), null);
-//        filesTree.getSelectionModel().select(item);
+        //        Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
+        //        findFiles(rootDirectories.toFile(), null);
+        //        filesTree.getSelectionModel().select(item);
     }
 
     private void handleRatingsChange(List<Rating> values) {
@@ -273,7 +263,8 @@ public class OrganizerImpl implements Organizer {
             return list;
         } catch (ServiceException ex) {
             LOGGER.error("fetching categories failed", ex);
-            ErrorDialog.show(root, "Fehler beim Laden", "Foto-Kategorien konnten nicht geladen werden.");
+            ErrorDialog.show(root, "Fehler beim Laden",
+                    "Foto-Kategorien konnten nicht geladen werden.");
             return new ArrayList<>();
         }
     }
