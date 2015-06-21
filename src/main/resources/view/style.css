@@ -66,16 +66,6 @@
     -google-map-bg: rgb(233, 229, 220);
 }
 
-* {
-    -fx-padding: 0;
-    -fx-background-color: transparent;
-    -fx-background-radius: 0;
-    -fx-border-radius: 0;
-    -fx-border-width: 0;
-    -fx-background-insets: 0;
-    -fx-border-insets: 0;
-}
-
 .border-pane, .scroll-pane {
     -fx-padding: 0;
 }
@@ -700,6 +690,15 @@
     -fx-text-fill: -tmg-text-bright;
 }
 
+.rating-picker * {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+}
 .rating-picker .button {
     -fx-padding: 16px;
 }
