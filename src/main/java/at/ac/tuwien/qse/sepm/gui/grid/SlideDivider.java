@@ -59,7 +59,7 @@ public class SlideDivider extends Button {
         boolean success = dragboard.hasString();
         if (success) {
             try {
-                int slideId = Integer.parseInt(dragboard.getString().replace("slide: ", ""));
+                int slideId = Integer.parseInt(dragboard.getString());
                 LOGGER.debug("dropped slide with id {} on divider", slideId);
 
                 if (slideDroppedCallback != null) {
