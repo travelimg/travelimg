@@ -161,6 +161,7 @@ public class OrganizerImpl implements Organizer {
         resetFilter();
     }
 
+    // This Method let's the User switch to the filter-view
     private void filterViewClicked(){
         filterContainer.getChildren().clear();
         HBox hBox = new HBox(resetButton, switchViewButton);
@@ -169,6 +170,7 @@ public class OrganizerImpl implements Organizer {
         switchViewButton.setOnAction(event -> folderViewClicked());
     }
 
+    // This Method let's the User switch to the folder-view
     private void folderViewClicked() {
         LOGGER.debug("Switch view");
         filterContainer.getChildren().clear();
@@ -191,11 +193,7 @@ public class OrganizerImpl implements Organizer {
                 if (file.isDirectory()) {
                     System.out.println("directory:" + file.getCanonicalPath());
                     findFiles(file,root);
-                } else {
-//                    System.out.println("     file:" + file.getCanonicalPath());
-//                    root.getChildren().add(new FilePathTreeItem(file.toPath()));
                 }
-
             }
             if(parent==null){
                 filesTree.setRoot(root);
