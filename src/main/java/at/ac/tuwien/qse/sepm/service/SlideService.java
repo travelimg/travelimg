@@ -14,7 +14,7 @@ public interface SlideService {
      * @param slide
      * @throws ServiceException
      */
-    void create(Slide slide) throws ServiceException;
+    Slide create(Slide slide) throws ServiceException;
 
     /**
      * Delete a slide

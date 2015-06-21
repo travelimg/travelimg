@@ -57,7 +57,6 @@ public class SlideshowViewImpl implements SlideshowView {
         grid.setSlideChangedCallback(this::handleSlideChanged);
         grid.setSlideAddedCallback(this::handleSlideAdded);
 
-
         slideshowOrganizer.setSlideshows(slideshows);
         slideshowOrganizer.getSelectedSlideshowProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -141,11 +140,12 @@ public class SlideshowViewImpl implements SlideshowView {
             return;
         }
 
-        slide.setOrder(position);
+        slide.setOrder(position + 1);
         slide.setSlideshowId(selected.getId());
 
         try {
-            slideService.create(slide);
+            slide = slideService.create(slide);
+            selected.getSlides().add(position, slide);
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Erstellen der Slide", "");
             return;
@@ -165,6 +165,8 @@ public class SlideshowViewImpl implements SlideshowView {
 
             i++;
         }
+
+        grid.setSlides(selected.getSlides());
     }
 
     private void loadAllSlideshows() {

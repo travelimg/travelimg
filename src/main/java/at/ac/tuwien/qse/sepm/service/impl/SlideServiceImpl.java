@@ -30,16 +30,17 @@ public class SlideServiceImpl implements SlideService{
     private SlideDAO<TitleSlide> titleSlideDAO;
 
 
-    @Override public void create(Slide slide) throws ServiceException {
+    @Override public Slide create(Slide slide) throws ServiceException {
 
         try {
             if (slide instanceof PhotoSlide) {
-                photoSlideDAO.create((PhotoSlide)slide);
+                return photoSlideDAO.create((PhotoSlide)slide);
             } else if (slide instanceof MapSlide) {
-                mapSlideDAO.create((MapSlide)slide);
+                return mapSlideDAO.create((MapSlide)slide);
             } else if (slide instanceof TitleSlide) {
-                titleSlideDAO.create((TitleSlide)slide);
+                return titleSlideDAO.create((TitleSlide)slide);
             }
+            return null;
         } catch (DAOException | ValidationException ex) {
             throw new ServiceException("Failed to create Slide", ex);
         }
