@@ -16,23 +16,15 @@
                 <VBox maxWidth="Infinity" styleClass="body" maxHeight="Infinity">
                     <children>
                         <Label text="Ordner auswählen"/>
-                        <HBox prefHeight="0.0" prefWidth="0.0" VBox.vgrow="ALWAYS">
+                        <HBox prefHeight="0.0" prefWidth="0.0" VBox.vgrow="ALWAYS" spacing="8">
                             <children>
-                                <Button fx:id="browseButton" styleClass="search,raised"
-                                        HBox.hgrow="ALWAYS">
+                                <TextField fx:id="directoryField" HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="browseButton" styleClass="btn" HBox.hgrow="ALWAYS">
                                     <graphic>
                                         <FontAwesomeIconView glyphName="FOLDER"/>
                                     </graphic>
-                                    <HBox.margin>
-                                        <Insets right="16.0"/>
-                                    </HBox.margin>
                                 </Button>
-                                <TextField fx:id="directoryField" HBox.hgrow="ALWAYS">
-                                    <HBox.margin>
-                                        <Insets right="16.0"/>
-                                    </HBox.margin>
-                                </TextField>
-                                <Button fx:id="dropboxButton" styleClass="search,raised"
+                                <Button fx:id="dropboxButton" styleClass="btn"
                                         HBox.hgrow="ALWAYS">
                                     <graphic>
                                         <FontAwesomeIconView glyphName="DROPBOX"/>
@@ -46,17 +38,13 @@
             <bottom>
                 <BorderPane maxWidth="Infinity" styleClass="footer">
                     <left>
-                        <Label fx:id="statusText" text="X Fotos ausgewählt"
-                               BorderPane.alignment="CENTER_LEFT"/>
+                        <Label fx:id="statusText" text="X Fotos ausgewählt" BorderPane.alignment="CENTER_LEFT"/>
                     </left>
                     <right>
                         <HBox spacing="8.0">
                             <children>
-                                <Button fx:id="cancelButton" alignment="CENTER_RIGHT"
-                                        text="ABBRECHEN"/>
-                                <Button fx:id="exportButton" alignment="CENTER_RIGHT"
-                                        styleClass="primary"
-                                        text="EXPORTIEREN"/>
+                                <Button fx:id="cancelButton" alignment="CENTER_RIGHT" text="ABBRECHEN" styleClass="btn"/>
+                                <Button fx:id="exportButton" alignment="CENTER_RIGHT" styleClass="btn,primary" text="EXPORTIEREN"/>
                             </children>
                         </HBox>
                     </right>
