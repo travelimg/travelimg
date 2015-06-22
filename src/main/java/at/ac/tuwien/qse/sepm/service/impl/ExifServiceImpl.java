@@ -126,6 +126,10 @@ public class ExifServiceImpl implements ExifService {
         photo.getData().setLongitude(longitude);
     }
 
+    @Override public void setDateAndGeoData(Photo photo) throws ServiceException {
+        //TODO
+    };
+
     private LocalDateTime getDateTime(ImageMetadata metadata) {
         if (metadata == null)
             return null;
