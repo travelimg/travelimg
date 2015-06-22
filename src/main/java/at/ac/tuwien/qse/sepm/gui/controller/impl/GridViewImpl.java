@@ -209,9 +209,6 @@ public class GridViewImpl implements GridView {
             FlickrDialog flickrDialog = new FlickrDialog(root, "Flickr Import", flickrService, exifService, ioHandler);
             Optional<List<Photo>> photos = flickrDialog.showForResult();
             if (!photos.isPresent()) return;
-            importService.importPhotos(photos.get(),
-                    GridViewImpl.this::handleImportedPhoto,
-                    GridViewImpl.this::handleImportError);
         }
 
         @Override public void onJourney(Menu sender) {
