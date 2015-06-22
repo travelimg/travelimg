@@ -60,7 +60,7 @@
                </Button>
                <Button fx:id="exportButton" maxHeight="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
                    <graphic>
-                       <FontAwesomeIconView glyphName="DROPBOX" />
+                       <FontAwesomeIconView glyphName="UPLOAD" />
                    </graphic>
                    <tooltip>
                        <Tooltip text="Export" />

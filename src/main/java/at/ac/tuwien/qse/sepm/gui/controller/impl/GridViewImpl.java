@@ -236,14 +236,8 @@ public class GridViewImpl implements GridView {
 
         @Override public void onExport(Menu sender) {
             Collection<Photo> selection = grid.getSelected();
-            String dropboxFolder = "";
-            try {
-                dropboxFolder = dropboxService.getDropboxFolder();
-            } catch (ServiceException ex) {
-                ErrorDialog.show(root, "Fehler beim Export", "Konnte keinen Dropboxordner finden");
-            }
 
-            ExportDialog dialog = new ExportDialog(root, dropboxFolder, selection.size());
+            ExportDialog dialog = new ExportDialog(root, dropboxService, selection.size());
 
             Optional<String> destinationPath = dialog.showForResult();
             if (!destinationPath.isPresent()) return;
