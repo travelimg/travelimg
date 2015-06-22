@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui.grid;
 
 import at.ac.tuwien.qse.sepm.entities.MapSlide;
+import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.scene.image.ImageView;
 
@@ -17,7 +18,7 @@ public class MapSlideTile extends SlideTileBase<MapSlide> {
         getChildren().add(0, image);
 
         image.setPreserveRatio(false);
-        image.setFitWidth(200);
-        image.setFitHeight(200);
+        image.setFitWidth(ImageSize.inPixels(ImageSize.MEDIUM));
+        image.setFitHeight(ImageSize.inPixels(ImageSize.MEDIUM));
     }
 }
