@@ -98,6 +98,10 @@ public class SlideshowViewImpl implements SlideshowView {
             PresentationWindow presentationWindow = new PresentationWindow(selected);
             presentationWindow.present();
         });
+
+        photoSlideInspector.setUpdateHandler(() -> grid.setSlides(slideshowOrganizer.getSelected().getSlides()));
+        mapSlideInspector.setUpdateHandler(() -> grid.setSlides(slideshowOrganizer.getSelected().getSlides()));
+        titleSlideInspector.setUpdateHandler(() -> grid.setSlides(slideshowOrganizer.getSelected().getSlides()));
     }
 
     private void setInspectorEntities(Set<Slide> slides) {

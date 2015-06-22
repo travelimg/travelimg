@@ -59,6 +59,7 @@ public class TitleSlideInspectorImpl extends SlideInspectorImpl<TitleSlide> {
 
         try {
             slideService.update(slide);
+            onUpdate();
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Ändern des Textes", "");
         }
@@ -74,6 +75,7 @@ public class TitleSlideInspectorImpl extends SlideInspectorImpl<TitleSlide> {
 
         try {
             slideService.update(slide);
+            onUpdate();
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Ändern der Farbe", "");
         }

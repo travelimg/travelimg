@@ -52,6 +52,7 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
 
         try {
             slideService.update(slide);
+            onUpdate();
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Ändern des Textes", "");
         }
