@@ -79,15 +79,15 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser 
     }
 
     @Override public GoogleMapsScene getMap() {
-        return this.mapsScene;
+        return null;//this.mapsScene;
     }
 
     @Override public void setMap(GoogleMapsScene map) {
-        this.mapsScene = map;
+        /*this.mapsScene = map;
         this.mapsScene = new GoogleMapsScene();
         this.mapsScene.removeAktiveMarker();
         mapContainer.getChildren().clear();
-        mapContainer.getChildren().add(mapsScene.getMapView());
+        mapContainer.getChildren().add(mapsScene.getMapView());*/
     }
 
     @Override public void refresh() {
@@ -98,11 +98,11 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser 
 
     @FXML
     private void initialize() {
-        mapsScene = new GoogleMapsScene();
+        //mapsScene = new GoogleMapsScene();
         tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService, root);
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
 
-        mapContainer.getChildren().add(mapsScene.getMapView());
+        //mapContainer.getChildren().add(mapsScene.getMapView());
         tagSelectionContainer.getChildren().add(tagSelector);
         addToSlideshowButton.setOnAction(this::handleAddToSlideshow);
 

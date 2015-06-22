@@ -41,7 +41,7 @@ public class MainController {
 
     @FXML
     private void initialize() {
-        root.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+        /*root.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
                                                                         @Override
                                                                         public void changed(ObservableValue<? extends Tab> ov, Tab t,
                                                                                             Tab t1) {
@@ -55,7 +55,7 @@ public class MainController {
                                                                             }
                                                                         }
                                                                     }
-        );
+        );*/
 
     }
 

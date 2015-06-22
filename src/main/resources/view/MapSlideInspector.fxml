@@ -3,11 +3,21 @@
 <?import at.ac.tuwien.qse.sepm.gui.control.InspectorPane?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import at.ac.tuwien.qse.sepm.gui.control.AwesomeMapScene?>
+<?import javafx.scene.control.Button?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.ToggleButton?>
 <InspectorPane fx:id="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
                fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.MapSlideInspectorImpl">
     <children>
         <Label>Beschriftung</Label>
         <TextField fx:id="captionField"/>
-        <Label>TODO: change coordinates</Label>
+
+        <AwesomeMapScene fx:id="map" maxHeight="300"/>
+        <ToggleButton fx:id="chooseLocationButton">
+            <graphic>
+                <FontAwesomeIconView glyphName="PLUS"></FontAwesomeIconView>
+            </graphic>
+        </ToggleButton>
     </children>
 </InspectorPane>
