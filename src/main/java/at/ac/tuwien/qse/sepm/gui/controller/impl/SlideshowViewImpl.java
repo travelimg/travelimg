@@ -41,10 +41,14 @@ public class SlideshowViewImpl implements SlideshowView {
     private Inspector<PhotoSlide> photoSlideInspector;
     @Autowired
     private Inspector<TitleSlide> titleSlideInspector;
+    @Autowired
+    private Inspector<MapSlide> mapSlideInspector;
     @FXML
     private InspectorPane photoSlideInspectorPane;
     @FXML
     private InspectorPane titleSlideInspectorPane;
+    @FXML
+    private InspectorPane mapSlideInspectorPane;
 
     @FXML
     private BorderPane root;
@@ -106,11 +110,14 @@ public class SlideshowViewImpl implements SlideshowView {
         photoSlideInspectorPane.setVisible(!photoSlideInspector.getEntities().isEmpty());
         photoSlideInspectorPane.setManaged(!photoSlideInspector.getEntities().isEmpty());
 
-        /*mapSlideInspector.setEntities(slides.stream()
+        mapSlideInspector.setEntities(slides.stream()
                         .filter(s -> s instanceof MapSlide)
                         .map(s -> (MapSlide)s)
                         .collect(Collectors.toList())
-        );*/
+        );
+
+        mapSlideInspectorPane.setVisible(!mapSlideInspector.getEntities().isEmpty());
+        mapSlideInspectorPane.setManaged(!mapSlideInspector.getEntities().isEmpty());
 
         titleSlideInspector.setEntities(slides.stream()
                         .filter(s -> s instanceof TitleSlide)

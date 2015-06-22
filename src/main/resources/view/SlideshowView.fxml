@@ -21,6 +21,7 @@
         <StackPane>
             <children>
                 <fx:include fx:id="photoSlideInspectorPane" source="PhotoSlideInspector.fxml"/>
+                <fx:include fx:id="mapSlideInspectorPane" source="MapSlideInspector.fxml"/>
                 <fx:include fx:id="titleSlideInspectorPane" source="TitleSlideInspector.fxml"/>
             </children>
         </StackPane>

@@ -5,8 +5,11 @@
 <?import javafx.scene.layout.*?>
 
 <?import at.ac.tuwien.qse.sepm.gui.control.InspectorPane?>
-<InspectorPane prefHeight="405.0" prefWidth="250.0" styleClass="organizer" stylesheets="@style.css"
-      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.MapSlideInspectorImpl">
+<InspectorPane fx:id="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+               fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.MapSlideInspectorImpl">
     <children>
+        <Label>Beschriftung</Label>
+        <TextField fx:id="captionField"/>
+        <Label>TODO: change coordinates</Label>
     </children>
 </InspectorPane>
