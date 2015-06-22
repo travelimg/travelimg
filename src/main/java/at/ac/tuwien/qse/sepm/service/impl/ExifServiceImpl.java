@@ -1,22 +1,30 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.util.IOHandler;
 import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.ImageWriteException;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.common.ImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
 import org.apache.commons.imaging.formats.tiff.constants.GpsTagConstants;
 import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
+import org.apache.commons.imaging.formats.tiff.write.TiffOutputDirectory;
+import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -26,7 +34,11 @@ public class ExifServiceImpl implements ExifService {
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter
             .ofPattern("yyyy:MM:dd HH:mm:ss");
 
-    @Override public Exif getExif(Photo photo) throws ServiceException {
+    @Autowired
+    private IOHandler ioHandler;
+
+    @Override
+    public Exif getExif(Photo photo) throws ServiceException {
         File file = new File(photo.getPath());
         String exposure = "not available";
         double aperture = 0.0;
@@ -93,7 +105,8 @@ public class ExifServiceImpl implements ExifService {
         }
     }
 
-    @Override public void attachDateAndGeoData(Photo photo) throws ServiceException {
+    @Override
+    public void attachDateAndGeoData(Photo photo) throws ServiceException {
         File file = new File(photo.getPath());
         LocalDateTime datetime = photo.getData().getDatetime();
         double latitude = photo.getData().getLatitude();
@@ -126,9 +139,62 @@ public class ExifServiceImpl implements ExifService {
         photo.getData().setLongitude(longitude);
     }
 
-    @Override public void setDateAndGeoData(Photo photo) throws ServiceException {
-        //TODO
-    };
+    @Override
+    public void setDateAndGeoData(Photo photo) throws ServiceException {
+
+        try {
+            Path temp = File.createTempFile("travelimg-temp", "tmp").toPath();
+            InputStream is = new BufferedInputStream(Files.newInputStream(photo.getFile()));
+            OutputStream os = new BufferedOutputStream(Files.newOutputStream(temp));
+
+            TiffOutputSet outputSet = null;
+
+            File jpegImageFile = new File(photo.getPath());
+            // note that metadata might be null if no metadata is found.
+            final ImageMetadata metadata = Imaging.getMetadata(jpegImageFile);
+            final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
+            if (null != jpegMetadata) {
+                // note that exif might be null if no Exif metadata is found.
+                final TiffImageMetadata exif = jpegMetadata.getExif();
+
+                if (null != exif) {
+                    // TiffImageMetadata class is immutable (read-only).
+                    // TiffOutputSet class represents the Exif data to write.
+                    //
+                    // Usually, we want to update existing Exif metadata by
+                    // changing
+                    // the values of a few fields, or adding a field.
+                    // In these cases, it is easiest to use getOutputSet() to
+                    // start with a "copy" of the fields read from the image.
+                    outputSet = exif.getOutputSet();
+                }
+            }
+
+            // if file does not contain any exif metadata, we create an empty
+            // set of exif metadata. Otherwise, we keep all of the other
+            // existing tags.
+            if (null == outputSet) {
+                outputSet = new TiffOutputSet();
+            }
+
+            outputSet.setGPSInDegrees(photo.getData().getLongitude(), photo.getData().getLatitude());
+            TiffOutputDirectory exifDirectory = outputSet.getOrCreateExifDirectory();
+            exifDirectory.removeField(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
+            exifDirectory.add(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL,
+                    dateFormatter.format(photo.getData().getDatetime()));
+            //outputSet.addDirectory(exifDirectory);
+
+            new ExifRewriter().updateExifMetadataLossless(jpegImageFile, os,
+                    outputSet);
+
+            os.close();
+            is.close();
+
+            ioHandler.copyFromTo(temp, photo.getFile());
+        } catch (IOException | ImageReadException | ImageWriteException ex) {
+            logger.error("Failed to set gps and date", ex);
+        }
+    }
 
     private LocalDateTime getDateTime(ImageMetadata metadata) {
         if (metadata == null)

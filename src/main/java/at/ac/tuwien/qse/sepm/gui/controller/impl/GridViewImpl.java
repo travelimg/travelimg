@@ -46,7 +46,7 @@ public class GridViewImpl implements GridView {
     @Autowired
     private Organizer organizer;
     @Autowired
-    private Inspector inspector;
+    private Inspector<Photo> inspector;
     @Autowired
     private Menu menu;
     @Autowired
@@ -83,7 +83,7 @@ public class GridViewImpl implements GridView {
         root.setCenter(grid);
 
         // Selected photos are shown in the inspector.
-        grid.setSelectionChangeAction(inspector::setActivePhotos);
+        grid.setSelectionChangeAction(inspector::setEntities);
 
         // CTRL+A select all photos.
         root.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -94,10 +94,10 @@ public class GridViewImpl implements GridView {
 
         // Updated photos that no longer match the filter are removed from the grid.
         inspector.setUpdateHandler(() -> {
-            inspector.getActivePhotos().stream()
+            inspector.getEntities().stream()
                     .filter(organizer.getFilter().negate())
                     .forEach(grid::removePhoto);
-            inspector.getActivePhotos().stream()
+            inspector.getEntities().stream()
                     .filter(organizer.getFilter())
                     .forEach(grid::updatePhoto);
         });
@@ -196,22 +196,10 @@ public class GridViewImpl implements GridView {
             fullscreen.present(grid.getPhotos(), getSelectedPhoto.get(0));
         }
 
-        @Override public void onImport(Menu sender) {
-            ImportDialog dialog = new ImportDialog(root, photographerService);
-            Optional<List<Photo>> photos = dialog.showForResult();
-            if (!photos.isPresent())
-                return;
-            importService.importPhotos(photos.get(), GridViewImpl.this::handleImportedPhoto,
-                    GridViewImpl.this::handleImportError);
-        }
-
         @Override public void onFlickr(Menu sender) {
             FlickrDialog flickrDialog = new FlickrDialog(root, "Flickr Import", flickrService, exifService, ioHandler);
             Optional<List<Photo>> photos = flickrDialog.showForResult();
             if (!photos.isPresent()) return;
-            importService.importPhotos(photos.get(),
-                    GridViewImpl.this::handleImportedPhoto,
-                    GridViewImpl.this::handleImportError);
         }
 
         @Override public void onJourney(Menu sender) {

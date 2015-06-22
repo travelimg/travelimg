@@ -48,11 +48,23 @@ public class JDBCTitleSlideDAO extends JDBCDAOBase implements SlideDAO<TitleSlid
 
     @Override
     public TitleSlide update(TitleSlide slide) throws DAOException, ValidationException {
+        logger.debug("Updating title slide {}", slide);
 
         slideDAO.update(slide);
 
-        // TODO
-        return slide;
+        SlideValidator.validateID(slide.getId());
+
+        try {
+            jdbcTemplate.update(UPDATE_STATEMENT,
+                    slide.getColor(),
+                    slide.getId()
+            );
+            logger.debug("Successfully updated title slide");
+            return slide;
+        } catch (DataAccessException ex) {
+            logger.error("Failed to update title slide", ex);
+            throw new DAOException("Failed to update title slide", ex);
+        }
     }
 
     @Override

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1"
             stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8"
             fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowViewImpl"
@@ -16,5 +17,13 @@
                     fitToWidth="true" fitToHeight="true"/>
     </center>
 
-    <right><fx:include source="/view/TitleSlideInspector.fxml"></fx:include></right>
+    <right>
+        <StackPane>
+            <children>
+                <fx:include fx:id="photoSlideInspectorPane" source="PhotoSlideInspector.fxml"/>
+                <fx:include fx:id="mapSlideInspectorPane" source="MapSlideInspector.fxml"/>
+                <fx:include fx:id="titleSlideInspectorPane" source="TitleSlideInspector.fxml"/>
+            </children>
+        </StackPane>
+    </right>
 </BorderPane>
