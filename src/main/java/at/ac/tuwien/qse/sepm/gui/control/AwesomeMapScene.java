@@ -7,8 +7,10 @@ import com.lynden.gmapsfx.javascript.object.*;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Worker;
+import javafx.event.EventHandler;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
@@ -41,6 +43,14 @@ public class AwesomeMapScene extends VBox {
             }
         }));
 
+        webEngine.setOnError(new EventHandler<WebErrorEvent>() {
+            @Override
+            public void handle(WebErrorEvent event) {
+                LOGGER.error("Error loading: {}", event, event.getException());
+
+            }
+        });
+
         webEngine.load(getClass().getClassLoader().getResource("html/map.html").toString());
 
         getChildren().add(webView);
@@ -59,24 +69,48 @@ public class AwesomeMapScene extends VBox {
     }
 
     public void center(double latitude, double longitude) {
-        webEngine.executeScript(String.format("document.center(%d, %d)", (int)latitude, (int)longitude));
+        LOGGER.debug("Centering map at ({}, {})", latitude, longitude);
+        callJS(String.format("document.center(%f, %f);", latitude, longitude));
     }
 
     public void clear() {
+        LOGGER.debug("Clearing map");
+        callJS("document.clear();");
+    }
 
+    public void setZoom(int level) {
+        LOGGER.debug("Set zoom level to {}", level);
+        callJS(String.format("document.setZoom(%d);", level));
     }
 
     public void addMarker(double latitude, double longitude) {
-        webEngine.executeScript(String.format("document.addMarker(%d, %d)", (int)latitude, (int)longitude));
+        LOGGER.debug("Adding marker at ({}, {})", latitude, longitude);
+        callJS(String.format("document.addMarker(%f, %f);", latitude, longitude));
+    }
+
+    public void fitToMarkers() {
+        callJS("document.fitToMarkers();");
     }
 
     private void handleDoubleClick(JSObject obj) {
         LOGGER.debug("Registered double click");
 
+        if (doubleClickCallback != null) {
+            doubleClickCallback.accept(null);
+        }
+
     }
 
     private void handleClick(JSObject obj) {
         LOGGER.debug("Registered click");
+
+        if (clickCallback != null) {
+            clickCallback.accept(null);
+        }
+    }
+
+    private void callJS(String script) {
+        webEngine.executeScript(script);
     }
 
 
