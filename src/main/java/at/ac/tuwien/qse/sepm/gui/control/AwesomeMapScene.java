@@ -5,6 +5,8 @@ import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.event.UIEventType;
 import com.lynden.gmapsfx.javascript.object.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
 import org.apache.logging.log4j.LogManager;
@@ -14,38 +16,23 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Consumer;
 
-public class AwesomeMapScene extends VBox implements MapComponentInitializedListener {
+public class AwesomeMapScene extends VBox {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private GoogleMapView view;
-    private Collection<Marker> markers = new ArrayList<>();
+    private final WebEngine webEngine;
+    private final WebView webView;
 
     private Consumer<LatLong> clickCallback = null;
     private Consumer<LatLong> doubleClickCallback = null;
 
     public AwesomeMapScene() {
-        this.view = new GoogleMapView();
-        this.view.addMapInializedListener(this);
-    }
+        webView = new WebView();
+        webEngine = webView.getEngine();
 
-    @Override
-    public void mapInitialized() {
-        if (isInitialized()) {
-            return;
-        }
+        webEngine.load(getClass().getClassLoader().getResource("html/map.html").toString());
 
-        LOGGER.debug("Map initialized");
-
-        try {
-            view.createMap(createMapOptions());
-            getChildren().add(view);
-
-            getMap().addUIEventHandler(UIEventType.click, this::handleClick);
-            getMap().addUIEventHandler(UIEventType.dblclick, this::handleDoubleClick);
-        } catch (JSException ex) {
-            // ignore
-        }
+        getChildren().add(webView);
     }
 
     public void setClickCallback(Consumer<LatLong> clickCallback) {
@@ -57,82 +44,25 @@ public class AwesomeMapScene extends VBox implements MapComponentInitializedList
     }
 
     public void center(double latitude, double longitude) {
-        view.setCenter(latitude, longitude);
+        webEngine.executeScript(String.format("document.center(%d, %d)", (int)latitude, (int)longitude));
     }
 
     public void clear() {
-        if (!isInitialized()) {
-            mapInitialized();
-            return;
-        }
 
-        try {
-            markers.forEach((marker) -> getMap().removeMarker(marker));
-            markers.clear();
-        } catch (JSException ex) {
-            // ignore
-        }
     }
 
     public void addMarker(double latitude, double longitude) {
-        LOGGER.debug("Adding marker at ({}, {})", latitude, longitude);
-
-        if (!isInitialized()) {
-            mapInitialized();
-            return;
-        }
-
-        try {
-            Marker marker = createMarkerAt(latitude, longitude);
-            markers.add(marker);
-
-             getMap().addMarker(marker);
-        } catch (JSException ex) {
-            // ignore
-        }
+        webEngine.executeScript(String.format("document.addMarker(%d, %d)", (int)latitude, (int)longitude));
     }
 
     private void handleDoubleClick(JSObject obj) {
         LOGGER.debug("Registered double click");
 
-        LatLong position = new LatLong((JSObject)obj.getMember("latLng"));
-        doubleClickCallback.accept(position);
     }
 
     private void handleClick(JSObject obj) {
         LOGGER.debug("Registered click");
-
-        LatLong position = new LatLong((JSObject)obj.getMember("latLng"));
-        clickCallback.accept(position);
     }
 
-    private GoogleMap getMap() {
-        return view.getMap();
-    }
 
-    private boolean isInitialized() {
-        return getMap() != null;
-    }
-
-    private MapOptions createMapOptions() {
-        MapOptions options = new MapOptions();
-        options.center(new LatLong(39.7385, -104.9871))
-                .overviewMapControl(false)
-                .scaleControl(false)
-                .streetViewControl(false)
-                .zoomControl(false)
-                .mapTypeControl(false)
-                .zoom(2)
-                .mapMarker(true);
-
-        return options;
-    }
-
-    private Marker createMarkerAt(double latitude, double longitude) {
-        MarkerOptions options = new MarkerOptions()
-                .position(new LatLong(latitude, longitude))
-                .visible(true);
-
-        return new Marker(options);
-    }
 }

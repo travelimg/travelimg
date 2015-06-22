@@ -38,7 +38,7 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
     private void initialize() {
         captionField.textProperty().addListener(this::handleCaptionChange);
 
-        map.setClickCallback(this::handleMapClicked);
+        //map.setClickCallback(this::handleMapClicked);
     }
 
     public void setPreview(Node node) {
@@ -53,7 +53,7 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
             MapSlide slide = getEntities().iterator().next();
             captionField.setText(slide.getCaption());
 
-            map.clear();
+            /*map.clear();*/
             map.addMarker(slide.getLatitude(), slide.getLongitude());
             map.center(slide.getLatitude(), slide.getLongitude());
         }
@@ -72,7 +72,7 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
             ErrorDialog.show(root, "Fehler beim Ändern der Koordinaten", "");
         }
 
-        map.clear();
+        /*map.clear();*/
         map.addMarker(latitude, longitude);
         map.center(latitude, longitude);
     }

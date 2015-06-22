@@ -45,13 +45,13 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
 
         logger.debug("Initializing Map ");
         MapOptions mapOptions = new MapOptions();
-        /*mapOptions.center(new LatLong(39.7385, -104.9871))
+        mapOptions.center(new LatLong(39.7385, -104.9871))
                 .overviewMapControl(true)
                 .scaleControl(false)
                 .streetViewControl(false)
                 .zoomControl(true)
                 .zoom(2)
-                .mapMarker(true);*/
+                .mapMarker(true);
         map = mapView.createMap(mapOptions);
         map.addUIEventHandler(UIEventType.dblclick, (netscape.javascript.JSObject obj) -> {
             LatLong ll = new LatLong((JSObject) obj.getMember("latLng"));

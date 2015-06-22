@@ -13,7 +13,7 @@
         <Label>Beschriftung</Label>
         <TextField fx:id="captionField"/>
 
-        <AwesomeMapScene fx:id="map" maxHeight="300"/>
+        <AwesomeMapScene fx:id="map" maxHeight="300" minHeight="100" maxWidth="300" minWidth="100"/>
         <ToggleButton fx:id="chooseLocationButton">
             <graphic>
                 <FontAwesomeIconView glyphName="PLUS"></FontAwesomeIconView>

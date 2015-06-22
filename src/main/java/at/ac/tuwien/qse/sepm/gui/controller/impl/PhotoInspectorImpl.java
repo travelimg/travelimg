@@ -74,20 +74,23 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser 
 
     @Override public void setEntities(Collection<Photo> photos) {
         super.setEntities(photos);
-        getEntities().forEach(photo -> mapsScene.addMarker(photo));
+
+        if (mapsScene != null)
+            getEntities().forEach(photo -> mapsScene.addMarker(photo));
+
         showDetails(getEntities());
     }
 
     @Override public GoogleMapsScene getMap() {
-        return null;//this.mapsScene;
+        return this.mapsScene;
     }
 
     @Override public void setMap(GoogleMapsScene map) {
-        /*this.mapsScene = map;
-        this.mapsScene = new GoogleMapsScene();
+        this.mapsScene = map;
+        //this.mapsScene = new GoogleMapsScene();
         this.mapsScene.removeAktiveMarker();
         mapContainer.getChildren().clear();
-        mapContainer.getChildren().add(mapsScene.getMapView());*/
+        mapContainer.getChildren().add(mapsScene.getMapView());
     }
 
     @Override public void refresh() {
@@ -98,11 +101,11 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser 
 
     @FXML
     private void initialize() {
-        //mapsScene = new GoogleMapsScene();
+        mapsScene = new GoogleMapsScene();
         tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService, root);
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
 
-        //mapContainer.getChildren().add(mapsScene.getMapView());
+        mapContainer.getChildren().add(mapsScene.getMapView());
         tagSelectionContainer.getChildren().add(tagSelector);
         addToSlideshowButton.setOnAction(this::handleAddToSlideshow);
 
@@ -179,8 +182,10 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser 
         }
 
         // Add the map markers for each photo.
-        mapsScene.removeAktiveMarker();
-        mapsScene.addMarkerList(photos);
+        if (mapsScene != null) {
+            mapsScene.removeAktiveMarker();
+            mapsScene.addMarkerList(photos);
+        }
 
 
         // Show additional details for a single selected photo.

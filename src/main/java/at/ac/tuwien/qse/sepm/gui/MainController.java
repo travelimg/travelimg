@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.gui;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
+import at.ac.tuwien.qse.sepm.gui.controller.impl.InspectorImpl;
 import at.ac.tuwien.qse.sepm.gui.controller.impl.PhotoInspectorImpl;
 import at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowViewImpl;
 import javafx.beans.value.ChangeListener;
@@ -29,7 +30,7 @@ public class MainController {
     @Autowired
     private WorldmapView worldMapView;
     @Autowired
-    private PhotoInspectorImpl photoInspector;
+    private PhotoInspectorImpl inspector;
     @Autowired
     private SlideshowViewImpl slideshowView;
     private EventHandler<javafx.scene.input.MouseEvent> ehandl;
@@ -41,21 +42,19 @@ public class MainController {
 
     @FXML
     private void initialize() {
-        /*root.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+        root.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
                                                                         @Override
                                                                         public void changed(ObservableValue<? extends Tab> ov, Tab t,
                                                                                             Tab t1) {
                                                                             if (t.equals(grid) && t1.equals(world)) {
-                                                                                worldMapView.setMap(
-                                                                                        photoInspector
-                                                                                                .getMap());
+                                                                                worldMapView.setMap(inspector.getMap());
                                                                             }
                                                                             if (t.equals(world) && t1.equals(grid)) {
-                                                                                photoInspector.setMap(worldMapView.getMap());
+                                                                                inspector.setMap(worldMapView.getMap());
                                                                             }
                                                                         }
                                                                     }
-        );*/
+        );
 
     }
 

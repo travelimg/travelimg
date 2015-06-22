@@ -26,12 +26,12 @@ public class WorldmapViewImpl implements WorldmapView {
 
     @Override
     public GoogleMapsScene getMap() {
-        return null;//this.worldMap;
+        return this.worldMap;
     }
 
     @Override
     public void setMap(GoogleMapsScene map) {
-        /*this.worldMap = map;
+        this.worldMap = map;
 
         worldMap.removeAktiveMarker();
         try {
@@ -42,7 +42,7 @@ public class WorldmapViewImpl implements WorldmapView {
         }
         worldMap.setCenter(70.7385, -90.9871);
         worldMap.setZoom(2);
-        border.setCenter(worldMap.getMapView());*/
+        border.setCenter(worldMap.getMapView());
     }
 
     /**
