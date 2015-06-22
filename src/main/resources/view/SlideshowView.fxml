@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1"
             stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8"
             fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowViewImpl"
@@ -17,6 +18,11 @@
     </center>
 
     <right>
-        <fx:include source="PhotoSlideInspector.fxml"/>
+        <StackPane>
+            <children>
+                <fx:include fx:id="photoSlideInspectorPane" source="PhotoSlideInspector.fxml"/>
+                <fx:include fx:id="titleSlideInspectorPane" source="TitleSlideInspector.fxml"/>
+            </children>
+        </StackPane>
     </right>
 </BorderPane>

@@ -18,22 +18,14 @@ public class PhotoSlideInspectorImpl extends SlideInspectorImpl<PhotoSlide> {
 
     @FXML
     private InspectorPane root;
+    @FXML
+    private TextField captionField;
 
     @Autowired
     private SlideService slideService;
 
-    private TextField captionField;
-
     @FXML
     private void initialize() {
-        System.out.println("balu");
-        Label captionLabel = new Label();
-        captionLabel.setText("Beschriftung");
-
-        captionField = new TextField();
-
-        root.getChildren().addAll(captionLabel, captionField);
-
         captionField.textProperty().addListener(this::handleCaptionChange);
     }
 

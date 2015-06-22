@@ -1,10 +1,8 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.PhotoSlide;
-import at.ac.tuwien.qse.sepm.entities.Slide;
-import at.ac.tuwien.qse.sepm.entities.Slideshow;
+import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.PresentationWindow;
+import at.ac.tuwien.qse.sepm.gui.control.InspectorPane;
 import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.SlideshowView;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
@@ -16,7 +14,7 @@ import at.ac.tuwien.qse.sepm.service.SlideshowService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,16 +30,26 @@ public class SlideshowViewImpl implements SlideshowView {
     private static final String NEW_SLIDESHOW_NAME = "Neue Präsentation";
     private static final int NEW_SLIDESHOW_MARKER_ID = -1;
 
-    @Autowired private SlideService slideService;
-    @Autowired private SlideshowService slideShowService;
+    @Autowired
+    private SlideService slideService;
+    @Autowired
+    private SlideshowService slideShowService;
     @Autowired
     private ImageCache imageCache;
 
     @Autowired
     private Inspector<PhotoSlide> photoSlideInspector;
+    @Autowired
+    private Inspector<TitleSlide> titleSlideInspector;
+    @FXML
+    private InspectorPane photoSlideInspectorPane;
+    @FXML
+    private InspectorPane titleSlideInspectorPane;
 
-    @FXML private BorderPane root;
-    @FXML private ScrollPane gridContainer;
+    @FXML
+    private BorderPane root;
+    @FXML
+    private ScrollPane gridContainer;
 
     @Autowired
     private SlideshowOrganizerImpl slideshowOrganizer;
@@ -60,16 +68,10 @@ public class SlideshowViewImpl implements SlideshowView {
         grid.setSlideAddedCallback(this::handleSlideAdded);
 
         grid.setSelectionChangeCallback(() -> {
-            Collection<PhotoSlide> result = new LinkedList<>();
-            for (Slide slide : grid.getSelected()) {
-                if (slide instanceof PhotoSlide) {
-                    result.add((PhotoSlide)slide);
-                }
-            }
-            photoSlideInspector.setEntities(result);
+            setInspectorEntities(grid.getSelected());
         });
 
-                slideshowOrganizer.setSlideshows(slideshows);
+        slideshowOrganizer.setSlideshows(slideshows);
         slideshowOrganizer.getSelectedSlideshowProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 grid.setSlides(newValue.getSlides());
@@ -92,6 +94,32 @@ public class SlideshowViewImpl implements SlideshowView {
             PresentationWindow presentationWindow = new PresentationWindow(selected);
             presentationWindow.present();
         });
+    }
+
+    private void setInspectorEntities(Set<Slide> slides) {
+        photoSlideInspector.setEntities(slides.stream()
+                .filter(s -> s instanceof PhotoSlide)
+                .map(s -> (PhotoSlide) s)
+                .collect(Collectors.toList())
+        );
+
+        photoSlideInspectorPane.setVisible(!photoSlideInspector.getEntities().isEmpty());
+        photoSlideInspectorPane.setManaged(!photoSlideInspector.getEntities().isEmpty());
+
+        /*mapSlideInspector.setEntities(slides.stream()
+                        .filter(s -> s instanceof MapSlide)
+                        .map(s -> (MapSlide)s)
+                        .collect(Collectors.toList())
+        );*/
+
+        titleSlideInspector.setEntities(slides.stream()
+                        .filter(s -> s instanceof TitleSlide)
+                        .map(s -> (TitleSlide)s)
+                        .collect(Collectors.toList())
+        );
+
+        titleSlideInspectorPane.setVisible(!titleSlideInspector.getEntities().isEmpty());
+        titleSlideInspectorPane.setManaged(!titleSlideInspector.getEntities().isEmpty());
     }
 
     @Override
@@ -197,7 +225,6 @@ public class SlideshowViewImpl implements SlideshowView {
 
         return new Slideshow(NEW_SLIDESHOW_MARKER_ID, NEW_SLIDESHOW_PROMPT, durationBetweenPhotos, slides);
     }
-
 
 
 }
