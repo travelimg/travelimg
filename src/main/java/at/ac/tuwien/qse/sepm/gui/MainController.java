@@ -1,7 +1,10 @@
 package at.ac.tuwien.qse.sepm.gui;
 
+import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
+import at.ac.tuwien.qse.sepm.gui.controller.impl.InspectorImpl;
+import at.ac.tuwien.qse.sepm.gui.controller.impl.PhotoInspectorImpl;
 import at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowViewImpl;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -27,7 +30,7 @@ public class MainController {
     @Autowired
     private WorldmapView worldMapView;
     @Autowired
-    private Inspector inspector;
+    private PhotoInspectorImpl inspector;
     @Autowired
     private SlideshowViewImpl slideshowView;
     private EventHandler<javafx.scene.input.MouseEvent> ehandl;

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import java.lang.*?>
-<?import javafx.scene.layout.*?>
-
-<Pane prefHeight="405.0" prefWidth="250.0" styleClass="organizer" stylesheets="@style.css"
-      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.PhotoSlideInspectorImpl">
+<?import at.ac.tuwien.qse.sepm.gui.control.InspectorPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<InspectorPane fx:id="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+               fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.PhotoSlideInspectorImpl">
     <children>
+        <Label>Beschriftung</Label>
+        <TextField fx:id="captionField"/>
     </children>
-</Pane>
+</InspectorPane>

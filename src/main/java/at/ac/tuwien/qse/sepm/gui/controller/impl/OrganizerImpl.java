@@ -39,9 +39,10 @@ public class OrganizerImpl implements Organizer {
 
     private static final Logger LOGGER = LogManager.getLogger(OrganizerImpl.class);
     private final DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy MMM");
+
     @Autowired private PhotographerService photographerService;
     @Autowired private ClusterService clusterService;
-    @Autowired private Inspector inspectorController;
+    @Autowired private Inspector<Photo> inspectorController;
     @Autowired private TagService tagService;
 
     @FXML private BorderPane root;

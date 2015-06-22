@@ -25,4 +25,11 @@ public interface ExifService {
      */
     @Deprecated
     void attachDateAndGeoData(Photo photo) throws ServiceException;
+
+    /**
+     * Sets date and geodata for a given photo
+     * @param photo the photo, must have a valid path
+     * @throws ServiceException
+     */
+    void setDateAndGeoData(Photo photo) throws ServiceException;
 }
