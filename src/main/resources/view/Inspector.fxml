@@ -1,56 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="280.0" styleClass="inspector"
+<?import at.ac.tuwien.qse.sepm.gui.control.InspectorPane?>
+<?import at.ac.tuwien.qse.sepm.gui.control.RatingPicker?>
+<InspectorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="280.0" styleClass="inspector"
             stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
-            fx:controller="at.ac.tuwien.qse.sepm.gui.controller.Inspector">
-    <center>
-        <StackPane>
+            fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.PhotoInspectorImpl">
+    <children>
+        <RatingPicker fx:id="ratingPicker"/>
+        <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0"/>
+        <VBox>
+            <padding>
+                <Insets right="16" left="16" top="16" bottom="16"/>
+            </padding>
             <children>
-                <VBox fx:id="placeholder" styleClass="placeholder" alignment="CENTER">
-                    <children>
-                        <FontAwesomeIconView/>
-                        <Label text="Kein Foto ausgewählt."/>
-                    </children>
+                <VBox fx:id="tagSelectionContainer">
+                    <VBox.margin>
+                        <Insets bottom="5"/>
+                    </VBox.margin>
                 </VBox>
-                <VBox fx:id="details" alignment="TOP_CENTER">
-                    <children>
-                        <VBox fx:id="multiAlert" alignment="CENTER" spacing="16.0" styleClass="alert, warning">
-                            <children>
-                                <Label fx:id="multiCount" styleClass="count" VBox.vgrow="ALWAYS"/>
-                            </children>
-                        </VBox>
-                        <VBox fx:id="ratingPickerContainer"></VBox>
-                        <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0"/>
-                        <VBox fx:id="tagSelectionContainer">
-                            <VBox.margin>
-                                <Insets bottom="5"/>
-                            </VBox.margin>
-                        </VBox>
-                        <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="260">
-                            <columns>
-                                <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
-                                <TableColumn fx:id="exifValue" prefWidth="135.0" text="Wert"/>
-                            </columns>
-                        </TableView>
+                <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="260">
+                    <columns>
+                        <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
+                        <TableColumn fx:id="exifValue" prefWidth="135.0" text="Wert"/>
+                    </columns>
+                </TableView>
 
-                        <VBox>
+                <VBox>
+                    <children>
+                        <Label text="Zu Präsentation hinzufügen:"/>
+                        <HBox>
                             <children>
-                                <Label text="Zu Präsentation hinzufügen:"></Label>
-                                <HBox>
-                                    <children>
-                                        <ComboBox fx:id="slideshowsCombobox" />
-                                        <Button fx:id="addToSlideshowButton" text="Add" styleClass="add"></Button>
-                                    </children>
-                                </HBox>
+                                <ComboBox fx:id="slideshowsCombobox" />
+                                <Button fx:id="addToSlideshowButton" text="Add" styleClass="add"/>
                             </children>
-                        </VBox>
+                        </HBox>
                     </children>
                 </VBox>
             </children>
-        </StackPane>
-    </center>
-</BorderPane>
+        </VBox>
+    </children>
+</InspectorPane>

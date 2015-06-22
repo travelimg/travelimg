@@ -49,11 +49,24 @@ public class JDBCMapSlideDAO extends JDBCDAOBase implements SlideDAO<MapSlide> {
 
     @Override
     public MapSlide update(MapSlide slide) throws DAOException, ValidationException {
+        logger.debug("Updating map slide {}", slide);
 
         slideDAO.update(slide);
 
-        // TODO
-        return slide;
+        SlideValidator.validateID(slide.getId());
+
+        try {
+            jdbcTemplate.update(UPDATE_STATEMENT,
+                    slide.getLatitude(),
+                    slide.getLongitude(),
+                    slide.getId()
+            );
+            logger.debug("Successfully updated map slide");
+            return slide;
+        } catch (DataAccessException ex) {
+            logger.error("Failed to update map slide", ex);
+            throw new DAOException("Failed to update map slide", ex);
+        }
     }
 
     @Override
