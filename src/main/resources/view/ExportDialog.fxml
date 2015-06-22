@@ -3,12 +3,14 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<fx:root xmlns:fx="http://javafx.com/fxml/1" styleClass="dialog,export-dialog" stylesheets="@style.css"
+<fx:root xmlns:fx="http://javafx.com/fxml/1" styleClass="dialog,export-dialog"
+         stylesheets="@style.css"
          type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8">
     <children>
         <BorderPane prefWidth="560.0" maxHeight="Infinity">
             <top>
-                <Label maxWidth="Infinity" styleClass="header" text="Fotos nach Dropbox exportieren"/>
+                <Label maxWidth="Infinity" styleClass="header"
+                       text="Fotos nach Dropbox exportieren"/>
             </top>
             <center>
                 <VBox maxWidth="Infinity" styleClass="body" maxHeight="Infinity">
@@ -16,7 +18,8 @@
                         <Label text="Dropbox Ordner auswählen"/>
                         <HBox prefHeight="0.0" prefWidth="0.0" VBox.vgrow="ALWAYS">
                             <children>
-                                <Button fx:id="browseButton" styleClass="search,raised" HBox.hgrow="ALWAYS">
+                                <Button fx:id="browseButton" styleClass="search,raised"
+                                        HBox.hgrow="ALWAYS">
                                     <graphic>
                                         <FontAwesomeIconView glyphName="FOLDER"/>
                                     </graphic>
@@ -24,7 +27,17 @@
                                         <Insets right="16.0"/>
                                     </HBox.margin>
                                 </Button>
-                                <TextField fx:id="directoryField" HBox.hgrow="ALWAYS"/>
+                                <TextField fx:id="directoryField" HBox.hgrow="ALWAYS">
+                                    <HBox.margin>
+                                        <Insets right="16.0"/>
+                                    </HBox.margin>
+                                </TextField>
+                                <Button fx:id="dropboxButton" styleClass="search,raised"
+                                        HBox.hgrow="ALWAYS">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="DROPBOX"/>
+                                    </graphic>
+                                </Button>
                             </children>
                         </HBox>
                     </children>
@@ -33,13 +46,16 @@
             <bottom>
                 <BorderPane maxWidth="Infinity" styleClass="footer">
                     <left>
-                        <Label fx:id="statusText" text="X Fotos ausgewählt" BorderPane.alignment="CENTER_LEFT"/>
+                        <Label fx:id="statusText" text="X Fotos ausgewählt"
+                               BorderPane.alignment="CENTER_LEFT"/>
                     </left>
                     <right>
                         <HBox spacing="8.0">
                             <children>
-                                <Button fx:id="cancelButton" alignment="CENTER_RIGHT" text="ABBRECHEN"/>
-                                <Button fx:id="exportButton" alignment="CENTER_RIGHT" styleClass="primary"
+                                <Button fx:id="cancelButton" alignment="CENTER_RIGHT"
+                                        text="ABBRECHEN"/>
+                                <Button fx:id="exportButton" alignment="CENTER_RIGHT"
+                                        styleClass="primary"
                                         text="EXPORTIEREN"/>
                             </children>
                         </HBox>

@@ -1,13 +1,17 @@
 package at.ac.tuwien.qse.sepm.gui.dialogs;
 
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
+import at.ac.tuwien.qse.sepm.service.DropboxService;
+import at.ac.tuwien.qse.sepm.service.ServiceException;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -15,7 +19,7 @@ import java.nio.file.Paths;
 
 public class ExportDialog extends ResultDialog<String> {
 
-    private final String dropboxFolder;
+    private String dropboxFolder;
     private final int photoCount;
     @FXML
     private Button browseButton;
@@ -26,26 +30,45 @@ public class ExportDialog extends ResultDialog<String> {
     @FXML
     private Button cancelButton;
     @FXML
+    private Button dropboxButton;
+    @FXML
     private Label statusText;
+    @Autowired
+    private DropboxService dropboxService;
+    @FXML
+    private BorderPane root;
 
     /**
      * {@inheritDoc}
      */
-    public ExportDialog(Node origin, String dropboxFolder, int photoCount) {
+    public ExportDialog(Node origin, int photoCount) {
         super(origin, "Fotos exportieren");
         FXMLLoadHelper.load(this, this, ExportDialog.class, "view/ExportDialog.fxml");
 
-        this.dropboxFolder = dropboxFolder;
         this.photoCount = photoCount;
 
-        directoryField.setText(dropboxFolder);
+
         browseButton.setOnAction(this::handleBrowse);
         exportButton.setOnAction(this::handleExport);
         cancelButton.setOnAction(this::handleCancel);
+        dropboxButton.setOnAction(this::handleDropBox);
+
 
         updateStatus();
         directoryField.textProperty()
                 .addListener((observable, oldValue, newValue) -> updateStatus());
+    }
+
+    private void handleDropBox(Event event) {
+        String dropboxFolder = "";
+
+        try {
+            dropboxFolder = dropboxService.getDropboxFolder();
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Export", "Konnte keinen Dropboxordner finden");
+        }
+        this.dropboxFolder = dropboxFolder;
+        directoryField.setText(dropboxFolder);
     }
 
     private void handleBrowse(Event event) {
