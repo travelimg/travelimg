@@ -10,6 +10,7 @@ import at.ac.tuwien.qse.sepm.gui.dialogs.*;
 import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
+import at.ac.tuwien.qse.sepm.util.IOHandler;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
@@ -50,6 +51,10 @@ public class GridViewImpl implements GridView {
     private Menu menu;
     @Autowired
     private ImageCache imageCache;
+    @Autowired
+    private IOHandler ioHandler;
+    @Autowired
+    private ExifService exifService;
 
     @FXML
     private BorderPane root;
@@ -115,8 +120,9 @@ public class GridViewImpl implements GridView {
 
     private void handlePhotoCreated(Photo photo) {
         Platform.runLater(() -> {
-            // TODO: should we update filter
-            grid.addPhoto(photo);
+            if (organizer.getFilter().test(photo)) {
+                grid.addPhoto(photo);
+            }
         });
     }
 
@@ -191,7 +197,7 @@ public class GridViewImpl implements GridView {
         }
 
         @Override public void onFlickr(Menu sender) {
-            FlickrDialog flickrDialog = new FlickrDialog(root, "Flickr Import", flickrService);
+            FlickrDialog flickrDialog = new FlickrDialog(root, "Flickr Import", flickrService, exifService, ioHandler);
             Optional<List<Photo>> photos = flickrDialog.showForResult();
             if (!photos.isPresent()) return;
             importService.importPhotos(photos.get(),
