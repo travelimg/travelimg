@@ -184,9 +184,9 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
         if (shortDurationButton.isSelected()) {
             return 5.0;
         } else if (mediumDurationButton.isSelected()) {
-            return 10.0;
-        } else {
             return 15.0;
+        } else {
+            return 30.0;
         }
     }
 

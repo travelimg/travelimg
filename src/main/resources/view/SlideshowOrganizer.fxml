@@ -18,8 +18,8 @@
                     <children>
                         <TextField fx:id="slideshowNameTextField"/>
                         <RadioButton fx:id="shortDurationButton" mnemonicParsing="false" text="5 Sekunden" />
-                        <RadioButton fx:id="mediumDurationButton" mnemonicParsing="false" text="10 Sekunden" />
-                        <RadioButton fx:id="longDurationButton" mnemonicParsing="false" text="15 Sekunden" />
+                        <RadioButton fx:id="mediumDurationButton" mnemonicParsing="false" text="15 Sekunden" />
+                        <RadioButton fx:id="longDurationButton" mnemonicParsing="false" text="30 Sekunden" />
                     </children>
                 </VBox>
             </children>
