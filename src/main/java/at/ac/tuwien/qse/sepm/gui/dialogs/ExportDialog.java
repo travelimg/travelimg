@@ -19,7 +19,7 @@ import java.nio.file.Paths;
 
 public class ExportDialog extends ResultDialog<String> {
 
-    private String dropboxFolder;
+    private String exportFolder;
     private final int photoCount;
     @FXML
     private Button browseButton;
@@ -61,19 +61,21 @@ public class ExportDialog extends ResultDialog<String> {
 
     private void handleDropBox(Event event) {
         String dropboxFolder = "";
-
         try {
             dropboxFolder = dropboxService.getDropboxFolder();
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Export", "Konnte keinen Dropboxordner finden");
         }
-        this.dropboxFolder = dropboxFolder;
+        this.exportFolder = dropboxFolder;
         directoryField.setText(dropboxFolder);
     }
 
     private void handleBrowse(Event event) {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Export Ort wählen");
+        if(exportFolder != null) {
+            directoryChooser.setInitialDirectory(new File(exportFolder));
+        }
         File directory = directoryChooser.showDialog(null);
 
         if (directory == null || !directory.exists()) {
@@ -82,15 +84,16 @@ public class ExportDialog extends ResultDialog<String> {
         }
 
         directoryField.setText(directory.getPath());
+        exportFolder = directory.getPath();
     }
 
     private void handleExport(Event event) {
-        Path root = Paths.get(dropboxFolder);
+        Path root = Paths.get(exportFolder);
         Path dest = Paths.get(directoryField.getText());
 
         Path relative = root.relativize(dest);
 
-        setResult(relative.toString());
+        setResult(exportFolder);
 
         close();
     }
