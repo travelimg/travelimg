@@ -190,15 +190,6 @@ public class GridViewImpl implements GridView {
             fullscreen.present(grid.getPhotos(), getSelectedPhoto.get(0));
         }
 
-        @Override public void onImport(Menu sender) {
-            ImportDialog dialog = new ImportDialog(root, photographerService);
-            Optional<List<Photo>> photos = dialog.showForResult();
-            if (!photos.isPresent())
-                return;
-            importService.importPhotos(photos.get(), GridViewImpl.this::handleImportedPhoto,
-                    GridViewImpl.this::handleImportError);
-        }
-
         @Override public void onFlickr(Menu sender) {
             FlickrDialog flickrDialog = new FlickrDialog(root, "Flickr Import", flickrService);
             Optional<List<Photo>> photos = flickrDialog.showForResult();
