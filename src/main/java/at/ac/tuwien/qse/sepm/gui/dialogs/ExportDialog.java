@@ -33,20 +33,21 @@ public class ExportDialog extends ResultDialog<String> {
     private Button dropboxButton;
     @FXML
     private Label statusText;
-    @Autowired
+
+    private Node root;
+
     private DropboxService dropboxService;
-    @FXML
-    private BorderPane root;
 
     /**
      * {@inheritDoc}
      */
-    public ExportDialog(Node origin, int photoCount) {
+    public ExportDialog(Node origin, DropboxService dropboxService, int photoCount) {
         super(origin, "Fotos exportieren");
         FXMLLoadHelper.load(this, this, ExportDialog.class, "view/ExportDialog.fxml");
 
         this.photoCount = photoCount;
-
+        this.dropboxService = dropboxService;
+        this.root = origin;
 
         browseButton.setOnAction(this::handleBrowse);
         exportButton.setOnAction(this::handleExport);
