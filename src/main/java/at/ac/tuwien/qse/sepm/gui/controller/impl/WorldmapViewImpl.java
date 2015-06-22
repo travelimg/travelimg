@@ -2,7 +2,6 @@ package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 
 import at.ac.tuwien.qse.sepm.entities.Place;
-import at.ac.tuwien.qse.sepm.gui.GoogleMapsScene;
 import at.ac.tuwien.qse.sepm.gui.control.AwesomeMapScene;
 import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;

@@ -12,6 +12,7 @@
         function initialize() {
             var latlng = new google.maps.LatLng(37.39822, -121.9643936);
             var markers = [];
+            var lines = [];
 
             var myOptions = {
                 zoom: 2,
@@ -45,9 +46,13 @@
                     markers[i].setMap(null);
                 }
 
-                markers = [];
-            }
+                for (var i = 0; i < lines.length; i++) {
+                    lines[i].setMap(null);
+                }
 
+                markers = [];
+                lines = [];
+            }
 
             document.center = function center(latitude, longitude) {
                 document.map.setCenter(new google.maps.LatLng(latitude, longitude));
@@ -70,6 +75,23 @@
                 }
 
                 document.map.fitBounds(bounds);
+            }
+
+            document.drawPolyline = function drawPolyline(vertices) {
+                var path = [];
+                for (var i = 0; i < vertices.length; i++) {
+                    path.push(new google.maps.LatLng(vertices[i][0], vertices[i][1]));
+                }
+
+                var line = new google.maps.Polyline({
+                    map: document.map,
+                    path: path,
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 1.0,
+                    strokeWeight: 2
+                });
+
+                lines.push(line);
             }
         }
     </script>

@@ -1,16 +1,32 @@
 package at.ac.tuwien.qse.sepm.gui.control;
 
-import com.lynden.gmapsfx.javascript.object.LatLong;
+import com.lynden.gmapsfx.GoogleMapView;
+import com.lynden.gmapsfx.MapComponentInitializedListener;
+import com.lynden.gmapsfx.javascript.event.UIEventType;
+import com.lynden.gmapsfx.javascript.object.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.concurrent.Worker;
 import javafx.event.EventHandler;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
+import javafx.util.Pair;
+import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Element;
+import org.w3c.dom.events.Event;
+import org.w3c.dom.events.EventListener;
+import org.w3c.dom.events.EventTarget;
 
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class AwesomeMapScene extends VBox {
@@ -76,11 +92,29 @@ public class AwesomeMapScene extends VBox {
 
     public void addMarker(double latitude, double longitude) {
         LOGGER.debug("Adding marker at ({}, {})", latitude, longitude);
-        callJS(String.format(Locale.US,"document.addMarker(%f, %f);", latitude, longitude));
+        callJS(String.format("document.addMarker(%f, %f);", latitude, longitude));
     }
 
     public void fitToMarkers() {
         callJS("document.fitToMarkers();");
+    }
+
+    /**
+     * Draw a polyline path using a list of double pairs representing the vertices of the path.
+     * @param vertices A ordered path of vertices which to draw.
+     */
+    public void drawPolyline(List<Pair<Double, Double>> vertices) {
+
+        Optional<String> jsVertices = vertices.stream()
+                .map(v -> String.format("[%f, %f]", v.getKey(), v.getValue()))
+                .reduce((v1, v2) -> v1 + ", " + v2);
+
+        if (jsVertices.isPresent()) {
+            LOGGER.debug("Drawing polyline: {}", jsVertices.get());
+            callJS("document.drawPolyline([" + jsVertices.get() + "]);");
+        } else {
+            LOGGER.debug("Failed to draw polyline: {}", vertices);
+        }
     }
 
     private void handleDoubleClick(JSObject obj) {
