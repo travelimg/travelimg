@@ -16,15 +16,15 @@
                         <Label text="Dropbox Ordner auswählen"/>
                         <HBox prefHeight="0.0" prefWidth="0.0" VBox.vgrow="ALWAYS">
                             <children>
-                                <Button fx:id="browseButton" styleClass="search,raised" HBox.hgrow="ALWAYS">
+                                <TextField fx:id="directoryField" HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="browseButton" styleClass="btn" HBox.hgrow="ALWAYS">
                                     <graphic>
                                         <FontAwesomeIconView glyphName="FOLDER"/>
                                     </graphic>
                                     <HBox.margin>
-                                        <Insets right="16.0"/>
+                                        <Insets left="16.0"/>
                                     </HBox.margin>
                                 </Button>
-                                <TextField fx:id="directoryField" HBox.hgrow="ALWAYS"/>
                             </children>
                         </HBox>
                     </children>
@@ -38,8 +38,8 @@
                     <right>
                         <HBox spacing="8.0">
                             <children>
-                                <Button fx:id="cancelButton" alignment="CENTER_RIGHT" text="ABBRECHEN"/>
-                                <Button fx:id="exportButton" alignment="CENTER_RIGHT" styleClass="primary"
+                                <Button fx:id="cancelButton" alignment="CENTER_RIGHT" text="ABBRECHEN" styleClass="btn"/>
+                                <Button fx:id="exportButton" alignment="CENTER_RIGHT" styleClass="btn,primary"
                                         text="EXPORTIEREN"/>
                             </children>
                         </HBox>

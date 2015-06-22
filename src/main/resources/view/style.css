@@ -75,67 +75,6 @@
     -fx-padding: 0;
 }
 
-/* input fields */
-.combo-box {
-    -fx-border-color: -fx-text;
-    -fx-border-style: solid;
-    -fx-border-width: 0 0 2px 0;
-    -fx-background-color: transparent;
-    -fx-background-radius: 0;
-    -fx-font-size: 16px;
-    -fx-padding: 11px 0 0 0;
-}
-.combo-box:focused {
-    -fx-border-color: -fx-accent;
-}
-.combo-box .text-input {
-    -fx-padding: 0 0 4px 0;
-    -fx-border-width: 0;
-}
-.combo-box .combo-box-popup {
-    -fx-background-color: -fx-default;
-    -fx-border-width: 0;
-    -fx-effect: -fx-dropshadow-3;
-    -fx-background-insets: 0;
-    -fx-padding: 0px;
-}
-.combo-box .list-cell {
-    -fx-padding: 0;
-    -fx-padding: 6px 20px 6px 10px;
-    -fx-text-fill: -fx-text;
-}
-.combo-box .list-cell:hover {
-    -fx-background-color: -fx-default-hover;
-}
-.combo-box .list-cell:focused {
-    -fx-background-color: -fx-default-focus;
-}
-.combo-box .list-cell:selected {
-    -fx-background-color: -fx-default-press;
-}
-.combo-box .arrow-button {
-    -fx-background-color: transparent;
-    -fx-padding: 11px 8px;
-    -fx-background-radius: 3px;
-    -fx-font-size: 14px;
-    -fx-min-width: 64px;
-}
-.combo-box .arrow-button:hover {
-    -fx-background-color: -fx-default-hover;
-}
-.combo-box .arrow-button:focused {
-    -fx-background-color: -fx-default-focus;
-}
-.combo-box .arrow-button:pressed {
-    -fx-background-color: -fx-default-press;
-}
-.combo-box .arrow {
-    -fx-background-color: -fx-text;
-}
-.combo-box:focused .arrow {
-    -fx-background-color: -fx-primary;
-}
-
 /* lists */
 .list-view, .list-view * {
     -fx-border-color: transparent;
@@ -499,8 +438,8 @@
 }
 .dialog .label {
     -fx-font-size: 14px;
-    -fx-padding: 8px 0 0 0;
-    -fx-text-fill: -tmg-text-light;
+    -fx-padding: 8px 0 4px 0;
+    -fx-text-fill: -tmg-text;
 }
 .dialog .header {
     -fx-padding: 24px;
@@ -624,6 +563,7 @@
     -fx-background-radius: 3px;
     -fx-font-size: 14px;
     -fx-text-fill: -tmg-text;
+    -fx-min-width: 64px;
 }
 .btn:hover {
     -fx-background-color: -tmg-control-hover;
@@ -737,23 +677,33 @@
     -fx-background-color: -tmg-secondary;
 }
 
-.text-field {
+.text-field,
+.combo-box,
+.date-picker {
     -fx-background-color: transparent;
     -fx-background-radius: 0;
     -fx-border-color: -tmg-text-dark;
     -fx-border-style: solid;
     -fx-border-width: 0 0 2px 0;
     -fx-font-size: 14px;
-    -fx-padding: 8px 0 4px 0;
-    -fx-text-fill: -tmg-text;
+    -fx-padding: 8px 0 0 0;
+    -fx-text-fill: -tmg-text-light;
 }
-.text-field:focused {
+.text-field {
+    -fx-padding: 8px 0 4px 0;
+}
+.text-field:focused,
+.combo-box:focused,
+.date-picker:focused {
     -fx-border-color: -tmg-primary;
     -fx-text-fill: -tmg-text-bright;
 }
-.date-picker {
-    -fx-background-color: transparent;
+.combo-box > .text-field,
+.date-picker > .text-field {
+    -fx-border-width: 0;
+    -fx-padding: 0;
 }
+.combo-box .arrow-button,
 .date-picker .arrow-button {
     -fx-background-color: transparent;
     -fx-text-fill: -tmg-text;
@@ -761,19 +711,17 @@
     -fx-background-radius: 3px;
     -fx-font-size: 14px;
     -fx-min-width: 64px;
-    -fx-border-color: -tmg-text-dark;
-    -fx-border-style: solid;
-    -fx-border-width: 0 0 2px 0;
+    -fx-border-width: 0;
 }
-.date-picker:focused .arrow-button {
-    -fx-border-color: -tmg-primary;
-}
+.combo-box .arrow-button .arrow,
 .date-picker .arrow-button .arrow {
     -fx-background-color: -tmg-text;
 }
+.combo-box .arrow-button:hover .arrow,
 .date-picker .arrow-button:hover .arrow {
     -fx-background-color: -tmg-text-light;
 }
+.combo-box .arrow-button:hover .pressed,
 .date-picker .arrow-button:pressed .arrow {
     -fx-background-color: -tmg-text-bright;
 }
@@ -828,4 +776,25 @@
     -fx-background-color: -tmg-bg2-dark;
 }
 
-   
+
+.combo-box .combo-box-popup {
+    -fx-background-color: -fx-default;
+    -fx-border-width: 0;
+    -fx-effect: -fx-dropshadow-3;
+    -fx-background-insets: 0;
+    -fx-padding: 0px;
+}
+.combo-box .list-cell {
+    -fx-padding: 0;
+    -fx-padding: 6px 20px 6px 10px;
+    -fx-text-fill: -fx-text;
+}
+.combo-box .list-cell:hover {
+    -fx-background-color: -tmg-control-hover;
+}
+.combo-box .list-cell:focused {
+    -fx-background-color: -tmg-control-hover;
+}
+.combo-box .list-cell:selected {
+    -fx-background-color: -tmg-control-pressed;
+}
