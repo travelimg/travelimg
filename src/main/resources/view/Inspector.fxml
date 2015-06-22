@@ -11,27 +11,34 @@
     <children>
         <RatingPicker fx:id="ratingPicker"/>
         <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0"/>
-        <VBox fx:id="tagSelectionContainer">
-            <VBox.margin>
-                <Insets bottom="5"/>
-            </VBox.margin>
-        </VBox>
-        <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="260">
-            <columns>
-                <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
-                <TableColumn fx:id="exifValue" prefWidth="135.0" text="Wert"/>
-            </columns>
-        </TableView>
-
         <VBox>
+            <padding>
+                <Insets right="16" left="16" top="16" bottom="16"/>
+            </padding>
             <children>
-                <Label text="Zu Präsentation hinzufügen:"/>
-                <HBox>
+                <VBox fx:id="tagSelectionContainer">
+                    <VBox.margin>
+                        <Insets bottom="5"/>
+                    </VBox.margin>
+                </VBox>
+                <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="260">
+                    <columns>
+                        <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
+                        <TableColumn fx:id="exifValue" prefWidth="135.0" text="Wert"/>
+                    </columns>
+                </TableView>
+
+                <VBox>
                     <children>
-                        <ComboBox fx:id="slideshowsCombobox" />
-                        <Button fx:id="addToSlideshowButton" text="Add" styleClass="add"/>
+                        <Label text="Zu Präsentation hinzufügen:"/>
+                        <HBox>
+                            <children>
+                                <ComboBox fx:id="slideshowsCombobox" />
+                                <Button fx:id="addToSlideshowButton" text="Add" styleClass="add"/>
+                            </children>
+                        </HBox>
                     </children>
-                </HBox>
+                </VBox>
             </children>
         </VBox>
     </children>

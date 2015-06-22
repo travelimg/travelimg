@@ -126,8 +126,22 @@
     -google-map-bg: rgb(233, 229, 220);
 }
 
+* {
+    -fx-text-fill: -tmg-text;
+}
+
 .border-pane, .scroll-pane {
     -fx-padding: 0;
+    -fx-background-color: transparent;
+}
+
+.flow-pane,
+.list-view,
+.list-view *,
+.table-view,
+.table-view * {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
 }
 
 /* lists */
@@ -642,6 +656,7 @@
 .inspector-pane .placeholder {
     -fx-spacing: 16px;
     -fx-alignment: center;
+    -fx-padding: 80px 0 0 0;
 }
 .inspector-pane .placeholder .label {
     -fx-text-fill: -tmg-text;
@@ -834,5 +849,23 @@
     -fx-background-color: -tmg-control-hover;
 }
 .combo-box .list-cell:selected {
+    -fx-background-color: -tmg-control-pressed;
+}
+
+.organizer, .organizer .list-view {
+    -fx-background-color: -tmg-bg1;
+}
+
+.scroll-bar, .scroll-bar * {
+    -fx-background-color: transparent;
+}
+.scroll-bar > .thumb {
+    -fx-background-color: -tmg-control-hover;
+    -fx-padding: 4px;
+}
+.scroll-bar > .thumb:hover {
+    -fx-background-color: -tmg-control-pressed;
+}
+.scroll-bar > .thumb:pressed {
     -fx-background-color: -tmg-control-pressed;
 }
