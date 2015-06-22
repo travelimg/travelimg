@@ -168,6 +168,7 @@ public class FullscreenWindow extends StackPane {
     }
 
     private void loadImage() {
+
         if (photos.size() == 0 || photos.size() <= activeIndex) {
             // out of bounds
             return;
