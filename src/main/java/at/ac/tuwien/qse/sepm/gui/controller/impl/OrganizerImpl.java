@@ -138,6 +138,8 @@ public class OrganizerImpl implements Organizer {
         filterContainer.getChildren()
                 .addAll(buttonBox, ratingListView, categoryListView, photographerListView,
                         journeyListView, placeListView);
+        filter = new PhotoFilter();
+        resetFilter();
     }
 
     // This Method let's the User switch to the folder-view
@@ -147,7 +149,7 @@ public class OrganizerImpl implements Organizer {
 
         Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
         findFiles(rootDirectories.toFile(), null);
-
+        filter = new PhotoPathFilter();
         filterContainer.getChildren().addAll(buttonBox, filesTree);
 
         VBox.setVgrow(filesTree, Priority.ALWAYS);
@@ -173,7 +175,7 @@ public class OrganizerImpl implements Organizer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        filter = new PhotoPathFilter();
+
     }
 
     private void handleFilterChange() {
