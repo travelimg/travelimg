@@ -4,6 +4,9 @@ import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.event.UIEventType;
 import com.lynden.gmapsfx.javascript.object.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.concurrent.Worker;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -26,13 +29,25 @@ public class AwesomeMapScene extends VBox {
     private Consumer<LatLong> clickCallback = null;
     private Consumer<LatLong> doubleClickCallback = null;
 
+    private BooleanProperty loaded = new SimpleBooleanProperty(false);
+
     public AwesomeMapScene() {
         webView = new WebView();
         webEngine = webView.getEngine();
 
+        webEngine.getLoadWorker().stateProperty().addListener((observable -> {
+            if (webEngine.getLoadWorker().getState() == Worker.State.SUCCEEDED) {
+                loaded.set(true);
+            }
+        }));
+
         webEngine.load(getClass().getClassLoader().getResource("html/map.html").toString());
 
         getChildren().add(webView);
+    }
+
+    public BooleanProperty getLoaded() {
+        return loaded;
     }
 
     public void setClickCallback(Consumer<LatLong> clickCallback) {
