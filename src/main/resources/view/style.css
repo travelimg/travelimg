@@ -1,36 +1,5 @@
 
 .root {
-    -fx-overlay: rgba(0, 0, 0, 0.6);
-    -fx-background: #f9f9f9;
-    -fx-background-alt: #9E9E9E;
-    -fx-text: #757575;
-    -fx-text-muted: #BDBDBD;
-    -fx-default: white;
-    -fx-default-focus: #f5f5f5;
-    -fx-default-hover: #eeeeee;
-    -fx-default-press: #dddddd;
-    -fx-default-disabled: #cccccc;
-    -fx-dropshadow-1: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 5, 0, 0, 1);
-    -fx-dropshadow-2: dropshadow(gaussian, rgba(0, 0, 0, 0.40), 7, 0, 0, 2);
-    -fx-dropshadow-3: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 9, 0, 0, 3);
-    -fx-dropshadow-4: dropshadow(gaussian, rgba(0, 0, 0, 0.50), 11, 0, 0, 4);
-
-    -fx-primary: #333333;
-    -fx-primary-focus: #444444;
-    -fx-primary-hover: #444444;
-    -fx-primary-press: #222222;
-    -fx-primary-light-focus: #FFEBEE;
-    -fx-primary-light-hover: #FFEBEE;
-    -fx-primary-light-press: #FFCDD2;
-    -fx-danger: #FFA726;
-
-    -fx-accent: #E91E63;
-    -fx-accent-light: #EC407A;
-    -fx-accent-dark: #D81B60;
-
-    -fx-indetermined: #2196F3;
-    -fx-indetermined-light: #42A5F5;
-    -fx-indetermined-dark: #1E88E5;
 
     -tmg-bg0: rgb(20, 20, 20);
     -tmg-bg0-dark: rgb(13, 13, 13);
@@ -83,7 +52,7 @@
 }
 .list-view {
     -fx-table-cell-border-width: 0;
-    -fx-background-color: -fx-default;
+    -fx-background-color: transparent;
     -fx-font-size: 16px;
 }
 .list-cell {
@@ -92,60 +61,23 @@
     -fx-background-color: transparent;
 }
 .list-cell:focused {
-    -fx-background-color: -fx-default-focus;
+    -fx-background-color: -tmg-control-hover;
 }
 .list-cell:hover {
-    -fx-background-color: -fx-default-hover;
+    -fx-background-color: -tmg-control-hover;
 }
 .list-cell:pressed {
-    -fx-background-color: -fx-default-press;
+    -fx-background-color: -tmg-control-pressed;
 }
 .list-cell:selected {
-    -fx-background-color: -fx-default-focus;
-    -fx-text-fill: black;
+    -fx-background-color: -tmg-primary;
+    -fx-text-fill: -tmg-text-bright;
 }
 .list-cell:empty {
     -fx-background-color: transparent;
 }
 .section {
     -fx-padding: 24px;
-}
-
-/* raised button */
-.button.raised {
-    -fx-background-color: -fx-default;
-    -fx-effect: -fx-dropshadow-1;
-}
-.button.raised:focused {
-    -fx-background-color: -fx-default-focus;
-    -fx-effect: -fx-dropshadow-3;
-}
-.button.raised:hover {
-    -fx-background-color: -fx-default-hover;
-}
-.button.raised:pressed {
-    -fx-effect: -fx-dropshadow-3;
-    -fx-background-color: -fx-default-press;
-}
-.button.raised:disabled {
-    -fx-effect: none;
-    -fx-background-color: -fx-default-disabled;
-}
-.button.raised.primary {
-    -fx-text-fill: white;
-    -fx-background-color: -fx-primary;
-}
-.button.raised.primary:focused {
-    -fx-background-color: -fx-primary-focus;
-}
-.button.raised.primary:hover {
-    -fx-background-color: -fx-primary-hover;
-}
-.button.raised.primary:pressed {
-    -fx-background-color: -fx-primary-press;
-}
-.button.raised.primary .glyph-icon {
-    -fx-fill: white;
 }
 
 .image-grid {
@@ -167,7 +99,7 @@
     -fx-opacity: 1.0;
 }
 .photo-tile.selected .overlay {
-    -fx-background-color: -fx-indetermined;
+    -fx-background-color: -tmg-secondary;
     -fx-opacity: 1.0;
 }
 .photo-tile .overlay .glyph-icon {
@@ -486,7 +418,7 @@
     -fx-border-insets: 0;
 }
 .menu {
-    -fx-background-color: -fx-primary;
+    -fx-background-color: -tmg-bg2;
 }
 .menu .action {
     -fx-padding: 10px 20px;
@@ -540,7 +472,7 @@
     -fx-fill: -tmg-text-light;
 }
 .page-selector .page-button.selected .glyph-icon {
-    -fx-fill: -fx-accent;
+    -fx-fill: -tmg-primary;
     -fx-opacity: 1.0;
 }
 
@@ -738,7 +670,7 @@
     -fx-padding: 11px 8px;
     -fx-background-radius: 3px;
     -fx-font-size: 14px;
-    -fx-text-fill: -fx-text;
+    -fx-text-fill: -tmg-text;
 }
 .toggle-button:hover {
     -fx-background-color: -tmg-bg2-light;
@@ -750,51 +682,66 @@
     -fx-background-color: -tmg-bg2-dark;
 }
 
+
+.tree-view * {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+}
 .tree-view {
-    -fx-border-color: -fx-text;
+    -fx-border-color: -tmg-text;
     -fx-border-style: solid;
     -fx-border-width: 0 0 2px 0;
-    -fx-background-color: -fx-primary;
+    -fx-background-color: -tmg-bg1;
     -fx-background-radius: 0;
     -fx-font-size: 16px;
     -fx-padding: 11px 0 0 0;
 }
 .tree-view:focused {
-    -fx-border-color: -fx-accent;
+    -fx-border-color: -tmg-primary;
 }
 .tree-view .text-input {
     -fx-padding: 0 0 4px 0;
     -fx-border-width: 0;
 }
-
 .tree-view .tree-cell {
-    -fx-padding: 0;
-    -fx-padding: 6px 20px 6px 10px;
-    -fx-text-fill: white;
-    -fx-background-color: -fx-primary;
+    -fx-background-color: -tmg-bg1;
+    -fx-padding: 4px 8px;
+    -fx-text-fill: -tmg-text;
 }
 .tree-view .tree-cell:hover {
-    -fx-background-color: -tmg-bg2-light;
-}
-.tree-view .tree-cell:focused {
-    -fx-background-color: -tmg-bg2-light;
+    -fx-background-color: -tmg-bg1-light;
+    -fx-text-fill: -tmg-text-light;
 }
 .tree-view .tree-cell:selected {
-    -fx-background-color: -tmg-bg2-dark;
+    -fx-background-color: -tmg-primary;
+    -fx-text-fill: -tmg-text-bright;
+}
+.tree-view .tree-cell .glyph-icon {
+    -fx-fill: -tmg-text;
+}
+.tree-view .tree-cell:hover .glyph-icon {
+    -fx-fill: -tmg-text-light;
+}
+.tree-view .tree-cell:selected .glyph-icon {
+    -fx-fill: -tmg-text-bright;
 }
 
-
 .combo-box .combo-box-popup {
-    -fx-background-color: -fx-default;
+    -fx-background-color: -tmg-bg2;
     -fx-border-width: 0;
-    -fx-effect: -fx-dropshadow-3;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 9, 0, 0, 3);
     -fx-background-insets: 0;
     -fx-padding: 0px;
 }
 .combo-box .list-cell {
     -fx-padding: 0;
     -fx-padding: 6px 20px 6px 10px;
-    -fx-text-fill: -fx-text;
+    -fx-text-fill: -tmg-text;
 }
 .combo-box .list-cell:hover {
     -fx-background-color: -tmg-control-hover;
