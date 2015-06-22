@@ -1,16 +1,61 @@
 
 .root {
 
-    -tmg-bg0: rgb(20, 20, 20);
+    /* CONTRAST DARK THEME */
+    -tmg-bg0-dark: rgb(20, 20, 20);
+    -tmg-bg0: rgb(30, 30, 30);
+    -tmg-bg0-light: rgb(40, 40, 40);
+    -tmg-bg1-dark: rgb(40, 40, 40);
+    -tmg-bg1: rgb(50, 50, 50);
+    -tmg-bg1-light: rgb(60, 60, 60);
+    -tmg-bg2-dark: rgb(60, 60, 60);
+    -tmg-bg2: rgb(70, 70, 70);
+    -tmg-bg2-light: rgb(80, 80, 80);
+    -tmg-bg3-dark: rgb(80, 80, 80);
+    -tmg-bg3: rgb(90, 90, 90);
+    -tmg-bg3-light: rgb(100, 100, 100);
+
+    -tmg-text: rgba(255, 255, 255, 0.7);
+    -tmg-text-light: rgba(255, 255, 255, 0.85);
+    -tmg-text-bright: rgba(255, 255, 255, 1);
+    -tmg-text-dark: rgba(255, 255, 255, 0.4);
+
+    -tmg-primary: rgba(233, 30, 90, 1);
+    -tmg-secondary: rgba(33, 150, 243, 1);
+    -tmg-danger: #FFA726;
+
+    -tmg-control: transparent;
+    -tmg-control-hover: rgba(255, 255, 255, 0.05);
+    -tmg-control-pressed: rgba(255, 255, 255, 0.1);
+    -tmg-control-primary: transparent;
+    -tmg-control-primary-hover: rgba(233, 30, 90, 0.08);
+    -tmg-control-primary-pressed: rgba(233, 30, 90, 0.16);
+
+    -tmg-overlay: rgba(0, 0, 0, 0.5);
+    -tmg-overlay-dark: rgba(0, 0, 0, 0.75);
+
+    -tmg-highlight: rgba(255, 255, 255, 0.5);
+
+    -tmg-slide-tile-width: 200px;
+    -tmg-slide-tile-height: 200px;
+
+    -google-map-marker: rgb(247, 92, 87);
+    -google-map-bg: rgb(233, 229, 220);
+
+
+    /* DARK THEME */
     -tmg-bg0-dark: rgb(13, 13, 13);
+    -tmg-bg0: rgb(20, 20, 20);
     -tmg-bg0-light: rgb(27, 27, 27);
-    -tmg-bg1: rgb(35, 35, 35);
     -tmg-bg1-dark: rgb(27, 27, 27);
+    -tmg-bg1: rgb(35, 35, 35);
     -tmg-bg1-light: rgb(42, 42, 42);
-    -tmg-bg2: rgb(50, 50, 50);
     -tmg-bg2-dark: rgb(42, 42, 42);
+    -tmg-bg2: rgb(50, 50, 50);
     -tmg-bg2-light: rgb(57, 57, 57);
+    -tmg-bg3-dark: rgb(57, 57, 57);
     -tmg-bg3: rgb(65, 65, 65);
+    -tmg-bg3-light: rgb(72, 72, 72);
 
     -tmg-text: rgba(255, 255, 255, 0.5);
     -tmg-text-light: rgba(255, 255, 255, 0.75);
@@ -27,6 +72,47 @@
     -tmg-control-primary: transparent;
     -tmg-control-primary-hover: rgba(233, 30, 90, 0.08);
     -tmg-control-primary-pressed: rgba(233, 30, 90, 0.16);
+
+    -tmg-overlay: rgba(0, 0, 0, 0.5);
+    -tmg-overlay-dark: rgba(0, 0, 0, 0.75);
+
+    -tmg-highlight: rgba(255, 255, 255, 0.5);
+
+    -tmg-slide-tile-width: 200px;
+    -tmg-slide-tile-height: 200px;
+
+    -google-map-marker: rgb(247, 92, 87);
+    -google-map-bg: rgb(233, 229, 220);
+
+    /* HIGH CONTRAST DARK THEME */
+    -tmg-bg0-dark: rgb(20, 20, 20);
+    -tmg-bg0: rgb(35, 35, 35);
+    -tmg-bg0-light: rgb(50, 50, 50);
+    -tmg-bg1-dark: rgb(50, 50, 50);
+    -tmg-bg1: rgb(65, 65, 65);
+    -tmg-bg1-light: rgb(80, 80, 80);
+    -tmg-bg2-dark: rgb(80, 80, 80);
+    -tmg-bg2: rgb(95, 95, 95);
+    -tmg-bg2-light: rgb(110, 110, 110);
+    -tmg-bg3-dark: rgb(110, 110, 110);
+    -tmg-bg3: rgb(125, 125, 125);
+    -tmg-bg3-light: rgb(140, 140, 140);
+
+    -tmg-text: rgba(255, 255, 255, 0.8);
+    -tmg-text-light: rgba(255, 255, 255, 0.9);
+    -tmg-text-bright: rgba(255, 255, 255, 1);
+    -tmg-text-dark: rgba(255, 255, 255, 0.5);
+
+    -tmg-primary: rgba(233, 30, 90, 1);
+    -tmg-secondary: rgba(33, 150, 243, 1);
+    -tmg-danger: #FFA726;
+
+    -tmg-control: transparent;
+    -tmg-control-hover: rgba(255, 255, 255, 0.08);
+    -tmg-control-pressed: rgba(255, 255, 255, 0.15);
+    -tmg-control-primary: transparent;
+    -tmg-control-primary-hover: rgba(233, 30, 90, 0.1);
+    -tmg-control-primary-pressed: rgba(233, 30, 90, 0.2);
 
     -tmg-overlay: rgba(0, 0, 0, 0.5);
     -tmg-overlay-dark: rgba(0, 0, 0, 0.75);
@@ -465,7 +551,6 @@
 .page-selector .page-button .glyph-icon {
     -glyph-size: 13px;
     -fx-fill: -tmg-text;
-    -fx-opacity: 0.25;
 }
 .page-selector .page-button:hover .glyph-icon {
     -glyph-size: 13px;
@@ -473,7 +558,6 @@
 }
 .page-selector .page-button.selected .glyph-icon {
     -fx-fill: -tmg-primary;
-    -fx-opacity: 1.0;
 }
 
 .status {
