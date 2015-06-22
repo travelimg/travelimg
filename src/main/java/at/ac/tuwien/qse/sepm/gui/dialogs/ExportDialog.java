@@ -72,16 +72,8 @@ public class ExportDialog extends ResultDialog<String> {
     }
 
     private void handleBrowse(Event event) {
-
-        // DirectoryChooser throws an exception if the directory does not exist.
-        File currentDirectory = new File(directoryField.getText());
-        if (!currentDirectory.exists()) {
-            currentDirectory = new File(dropboxFolder);
-        }
-
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Export Ort wählen");
-        directoryChooser.setInitialDirectory(currentDirectory);
         File directory = directoryChooser.showDialog(null);
 
         if (directory == null || !directory.exists()) {
