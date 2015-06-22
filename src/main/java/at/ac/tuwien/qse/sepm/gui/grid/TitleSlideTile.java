@@ -18,7 +18,6 @@ public class TitleSlideTile extends SlideTileBase<TitleSlide> {
         getChildren().add(0, icon);
 
         Color color = ColorUtils.fromInt(slide.getColor());
-        System.out.println("Color: " + color);
         background.setStyle(String.format("-fx-background-color: rgb(%d, %d, %d)",
                 (int)(color.getRed() * 255),
                 (int)(color.getGreen() * 255),
