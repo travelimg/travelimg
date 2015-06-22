@@ -14,7 +14,7 @@ public class MapSlideView extends SlideView {
 
         getChildren().add(mapScene);
 
-        mapScene.getLoaded().addListener((observable) -> addMarker());
+        mapScene.setOnLoaded(() -> addMarker());
     }
 
     private void addMarker() {

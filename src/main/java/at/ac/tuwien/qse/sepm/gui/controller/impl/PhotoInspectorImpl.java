@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser {
+public class PhotoInspectorImpl extends InspectorImpl<Photo> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -80,14 +80,6 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser 
         getEntities().forEach(photo -> mapScene.addMarker(photo.getData().getLatitude(), photo.getData().getLongitude()));
 
         showDetails(getEntities());
-    }
-
-    @Override public GoogleMapsScene getMap() {
-        return null;//this.mapsScene;
-    }
-
-    @Override public void setMap(GoogleMapsScene map) {
-
     }
 
     @Override public void refresh() {

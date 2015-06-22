@@ -25,7 +25,12 @@
 
             document.map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
 
+            google.maps.event.addListener(document.map, 'tilesloaded', function() {
+                alert("map-loaded");
+            });
+
             document.setZoom = function setZoom(level) {
+
                 if (level < 0) {
                     level = 0;
                 } else if (level > 20) {

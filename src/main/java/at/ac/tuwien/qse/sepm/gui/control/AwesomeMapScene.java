@@ -11,11 +11,16 @@ import javafx.event.EventHandler;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebErrorEvent;
+import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Element;
+import org.w3c.dom.events.Event;
+import org.w3c.dom.events.EventListener;
+import org.w3c.dom.events.EventTarget;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,23 +36,22 @@ public class AwesomeMapScene extends VBox {
     private Consumer<LatLong> clickCallback = null;
     private Consumer<LatLong> doubleClickCallback = null;
 
-    private BooleanProperty loaded = new SimpleBooleanProperty(false);
+    private Runnable onLoadedCallback = null;
 
     public AwesomeMapScene() {
         webView = new WebView();
         webEngine = webView.getEngine();
 
-        webEngine.getLoadWorker().stateProperty().addListener((observable -> {
-            if (webEngine.getLoadWorker().getState() == Worker.State.SUCCEEDED) {
-                loaded.set(true);
-            }
-        }));
-
-        webEngine.setOnError(new EventHandler<WebErrorEvent>() {
+        webEngine.setOnAlert(new EventHandler<WebEvent<String>>() {
             @Override
-            public void handle(WebErrorEvent event) {
-                LOGGER.error("Error loading: {}", event, event.getException());
+            public void handle(WebEvent<String> event) {
+                LOGGER.debug("Got alert {}", event);
 
+                if (event.getData().equals("map-loaded")) {
+                    if (onLoadedCallback != null) {
+                        onLoadedCallback.run();
+                    }
+                }
             }
         });
 
@@ -56,8 +60,8 @@ public class AwesomeMapScene extends VBox {
         getChildren().add(webView);
     }
 
-    public BooleanProperty getLoaded() {
-        return loaded;
+    public void setOnLoaded(Runnable callback) {
+        this.onLoadedCallback = callback;
     }
 
     public void setClickCallback(Consumer<LatLong> clickCallback) {

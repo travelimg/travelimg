@@ -3,8 +3,7 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.*?>
 <TabPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root"
-         stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8"
-         fx:controller="at.ac.tuwien.qse.sepm.gui.MainController">
+         stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8">
 
     <Tab fx:id="grid" text="" closable="false">
         <graphic>
