@@ -112,6 +112,7 @@ public class PaginatedImageGrid extends StackPane {
         }
 
         return activePageProperty.get().getActivePhoto();
+
     }
 
     public boolean containsPhoto(Photo photo) {
