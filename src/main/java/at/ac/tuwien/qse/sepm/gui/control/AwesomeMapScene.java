@@ -13,6 +13,7 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
+import javafx.util.Pair;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
 import org.apache.logging.log4j.LogManager;
@@ -24,6 +25,8 @@ import org.w3c.dom.events.EventTarget;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class AwesomeMapScene extends VBox {
@@ -94,6 +97,24 @@ public class AwesomeMapScene extends VBox {
 
     public void fitToMarkers() {
         callJS("document.fitToMarkers();");
+    }
+
+    /**
+     * Draw a polyline path using a list of double pairs representing the vertices of the path.
+     * @param vertices A ordered path of vertices which to draw.
+     */
+    public void drawPolyline(List<Pair<Double, Double>> vertices) {
+
+        Optional<String> jsVertices = vertices.stream()
+                .map(v -> String.format("[%f, %f]", v.getKey(), v.getValue()))
+                .reduce((v1, v2) -> v1 + ", " + v2);
+
+        if (jsVertices.isPresent()) {
+            LOGGER.debug("Drawing polyline: {}", jsVertices.get());
+            callJS("document.drawPolyline([" + jsVertices.get() + "]);");
+        } else {
+            LOGGER.debug("Failed to draw polyline: {}", vertices);
+        }
     }
 
     private void handleDoubleClick(JSObject obj) {
