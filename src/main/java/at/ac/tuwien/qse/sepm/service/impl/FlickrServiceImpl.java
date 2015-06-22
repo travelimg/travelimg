@@ -227,6 +227,7 @@ public class FlickrServiceImpl implements FlickrService {
                         at.ac.tuwien.qse.sepm.entities.Photo downloaded = createPhotoWithGeoData(id, format);
                         logger.debug("Downloaded photo {}", downloaded);
                         callback.accept(downloaded);
+                        progressCallback.accept((double)nrOfDownloadedPhotos/(double)nrOfPhotosToDownload);
                         nrOfDownloadedPhotos++;
                     } else {
                         logger.debug("Can't get original secret for photo.");
