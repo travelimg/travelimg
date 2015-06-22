@@ -49,10 +49,15 @@
     -tmg-text-dark: rgba(255, 255, 255, 0.25);
 
     -tmg-primary: rgba(233, 30, 90, 1);
-    -tmg-primary-weaker: rgba(233, 30, 90, 0.1);
-    -tmg-primary-weak: rgba(233, 30, 90, 0.2);
     -tmg-secondary: rgba(33, 150, 243, 1);
     -tmg-danger: #FFA726;
+
+    -tmg-control: transparent;
+    -tmg-control-hover: rgba(255, 255, 255, 0.05);
+    -tmg-control-pressed: rgba(255, 255, 255, 0.1);
+    -tmg-control-primary: transparent;
+    -tmg-control-primary-hover: rgba(233, 30, 90, 0.08);
+    -tmg-control-primary-pressed: rgba(233, 30, 90, 0.16);
 
     -tmg-overlay: rgba(0, 0, 0, 0.5);
     -tmg-overlay-dark: rgba(0, 0, 0, 0.75);
@@ -489,13 +494,13 @@
 }
 
 .dialog {
-    -fx-background-color: -tmg-bg0;
+    -fx-background-color: -tmg-bg1;
     -fx-font-size: 16px;
 }
 .dialog .label {
     -fx-font-size: 14px;
-    -fx-padding: 5px 0;
-    -fx-text-fill: -tmg-text;
+    -fx-padding: 8px 0 0 0;
+    -fx-text-fill: -tmg-text-light;
 }
 .dialog .header {
     -fx-padding: 24px;
@@ -514,15 +519,15 @@
     -fx-padding: 0 24px 24px 24px;
 }
 .dialog .note {
-    -fx-background-color: -tmg-bg1;
+    -fx-background-color: -tmg-bg2;
     -fx-padding: 16px;
 }
 .dialog .note .label {
-    -fx-text-fill: -tmg-text;
+    -fx-text-fill: -tmg-text-light;
 }
 .dialog .note .glyph-icon {
     -glyph-size: 50;
-    -fx-fill: -tmg-bg0;
+    -fx-fill: -tmg-bg1;
 }
 
 .menu, .menu * {
@@ -618,37 +623,45 @@
     -fx-padding: 11px 8px;
     -fx-background-radius: 3px;
     -fx-font-size: 14px;
+    -fx-text-fill: -tmg-text;
 }
 .btn:hover {
-    -fx-background-color: -tmg-bg2-light;
-}
-.btn:focused {
-    -fx-background-color: -tmg-bg2-light;
+    -fx-background-color: -tmg-control-hover;
+    -fx-text-fill: -tmg-text-light;
 }
 .btn:pressed {
-    -fx-background-color: -tmg-bg2-dark;
+    -fx-background-color: -tmg-control-pressed;
+    -fx-text-fill: -tmg-text-bright;
 }
 .btn .glyph-icon {
     -glyph-size: 20;
     -fx-fill: -tmg-text;
 }
+.btn:hover .glyph-icon {
+    -fx-fill: -tmg-text-light;
+}
+.btn:pressed .glyph-icon {
+    -fx-fill: -tmg-text-bright;
+}
 .btn.primary {
     -fx-text-fill: -tmg-primary;
-}
-.btn.primary:focused {
-    -fx-background-color: -tmg-primary-weaker;
+    -fx-background-color: -tmg-control-primary;
 }
 .btn.primary:hover {
-    -fx-background-color: -tmg-primary-weaker;
+    -fx-background-color: -tmg-control-primary-hover;
 }
 .btn.primary:pressed {
-    -fx-background-color: -tmg-primary-weak;
+    -fx-background-color: -tmg-control-primary-pressed;
 }
 .btn.primary .glyph-icon {
-    -fx-fill: -fx-primary;
+    -glyph-size: 20;
+    -fx-fill: -tmg-primary;
 }
 .btn:disabled {
-    -fx-opacity: 0.5;
+    -fx-text-fill: -tmg-text-dark;
+}
+.btn.primary:disabled {
+    -fx-text-fill: -tmg-text-dark;
 }
 
 .tooltip {
@@ -731,12 +744,38 @@
     -fx-border-style: solid;
     -fx-border-width: 0 0 2px 0;
     -fx-font-size: 14px;
-    -fx-padding: 11px 0 4px 0;
+    -fx-padding: 8px 0 4px 0;
     -fx-text-fill: -tmg-text;
 }
 .text-field:focused {
     -fx-border-color: -tmg-primary;
     -fx-text-fill: -tmg-text-bright;
+}
+.date-picker {
+    -fx-background-color: transparent;
+}
+.date-picker .arrow-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -tmg-text;
+    -fx-padding: 11px 8px;
+    -fx-background-radius: 3px;
+    -fx-font-size: 14px;
+    -fx-min-width: 64px;
+    -fx-border-color: -tmg-text-dark;
+    -fx-border-style: solid;
+    -fx-border-width: 0 0 2px 0;
+}
+.date-picker:focused .arrow-button {
+    -fx-border-color: -tmg-primary;
+}
+.date-picker .arrow-button .arrow {
+    -fx-background-color: -tmg-text;
+}
+.date-picker .arrow-button:hover .arrow {
+    -fx-background-color: -tmg-text-light;
+}
+.date-picker .arrow-button:pressed .arrow {
+    -fx-background-color: -tmg-text-bright;
 }
 
 .toggle-button {
