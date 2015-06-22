@@ -120,8 +120,9 @@ public class GridViewImpl implements GridView {
 
     private void handlePhotoCreated(Photo photo) {
         Platform.runLater(() -> {
-            // TODO: should we update filter
-            grid.addPhoto(photo);
+            if (organizer.getFilter().test(photo)) {
+                grid.addPhoto(photo);
+            }
         });
     }
 
