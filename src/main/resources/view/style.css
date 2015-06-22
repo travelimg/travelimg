@@ -869,3 +869,15 @@
 .scroll-bar > .thumb:pressed {
     -fx-background-color: -tmg-control-pressed;
 }
+
+.check-list-view .list-cell:focused {
+    -fx-background-color: transparent;
+}
+.check-list-view .check-box {
+    -fx-padding: 0;
+    -fx-background-color: -tmg-bg0;
+}
+.check-list-view .check-box:selected {
+    -fx-padding: 0;
+    -fx-background-color: -tmg-primary;
+}
