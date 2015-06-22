@@ -103,7 +103,7 @@
     -tmg-text-bright: rgba(255, 255, 255, 1);
     -tmg-text-dark: rgba(255, 255, 255, 0.5);
 
-    -tmg-primary: rgba(233, 30, 90, 1);
+    -tmg-primary: rgba(236, 64, 122, 1);
     -tmg-secondary: rgba(33, 150, 243, 1);
     -tmg-danger: #FFA726;
 
@@ -111,8 +111,8 @@
     -tmg-control-hover: rgba(255, 255, 255, 0.08);
     -tmg-control-pressed: rgba(255, 255, 255, 0.15);
     -tmg-control-primary: transparent;
-    -tmg-control-primary-hover: rgba(233, 30, 90, 0.1);
-    -tmg-control-primary-pressed: rgba(233, 30, 90, 0.2);
+    -tmg-control-primary-hover: rgba(236, 64, 122, 0.1);
+    -tmg-control-primary-pressed: rgba(236, 64, 122, 0.2);
 
     -tmg-overlay: rgba(0, 0, 0, 0.5);
     -tmg-overlay-dark: rgba(0, 0, 0, 0.75);
