@@ -42,11 +42,11 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser 
     @FXML
     private VBox mapContainer;
 
-    @FXML
+    /*@FXML
     private TableColumn<String, String> exifName;
 
     @FXML
-    private TableColumn<String, String> exifValue;
+    private TableColumn<String, String> exifValue;*/
 
     @FXML
     private ComboBox<Slideshow> slideshowsCombobox;
@@ -54,8 +54,8 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser 
     @FXML
     private Button addToSlideshowButton;
 
-    @FXML
-    private TableView<Pair<String, String>> exifTable;
+    //@FXML
+    //private TableView<Pair<String, String>> exifTable;
     private TagSelector tagSelector;
     private GoogleMapsScene mapsScene;
     private Runnable updateHandler;
@@ -162,8 +162,8 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser 
         // Depending on the number of photos selected show different elements.
         boolean noneActive = photos.size() == 0;
         boolean singleActive = photos.size() == 1;
-        exifTable.setVisible(singleActive);
-        exifTable.setManaged(singleActive);
+        /*exifTable.setVisible(singleActive);
+        exifTable.setManaged(singleActive);*/
         tagSelectionContainer.setVisible(singleActive);
         tagSelectionContainer.setManaged(singleActive);
 
@@ -193,7 +193,9 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser 
             Photo photo = photos.iterator().next();
             tagSelector.showCurrentlySetTags(photo);
 
-            try {
+
+
+            /*try {
                 Exif exif = exifService.getExif(photo);
 
                 List<Pair<String, String>> exifList = new ArrayList<Pair<String, String>>() {{
@@ -210,12 +212,12 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser 
 
                 ObservableList<Pair<String, String>> exifData = FXCollections.observableArrayList(exifList);
 
-                exifName.setCellValueFactory(new PropertyValueFactory<>("Key"));
-                exifValue.setCellValueFactory(new PropertyValueFactory<>("Value"));
-                exifTable.setItems(exifData);
+                /*exifName.setCellValueFactory(new PropertyValueFactory<>("Key"));
+                exifValue.setCellValueFactory(new PropertyValueFactory<>("Value"));*
+                //exifTable.setItems(exifData);
             } catch (ServiceException e) {
                 ErrorDialog.show(root, "Fehler beim Laden der Exif Daten", "Fehlermeldung: " + e.getMessage());
-            }
+            }*/
         }
     }
 
