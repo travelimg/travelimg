@@ -201,8 +201,15 @@
     -fx-padding: 6px;
 }
 
-
-
+.slide-grid * {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+}
 .slide-grid {
     -fx-background-color: -tmg-bg0;
     -fx-vgap: 32px;
