@@ -190,15 +190,6 @@ public class GridViewImpl implements GridView {
             fullscreen.present(grid.getPhotos(), getSelectedPhoto.get(0));
         }
 
-        @Override public void onImport(Menu sender) {
-            ImportDialog dialog = new ImportDialog(root, photographerService);
-            Optional<List<Photo>> photos = dialog.showForResult();
-            if (!photos.isPresent())
-                return;
-            importService.importPhotos(photos.get(), GridViewImpl.this::handleImportedPhoto,
-                    GridViewImpl.this::handleImportError);
-        }
-
         @Override public void onFlickr(Menu sender) {
             FlickrDialog flickrDialog = new FlickrDialog(root, "Flickr Import", flickrService);
             Optional<List<Photo>> photos = flickrDialog.showForResult();
@@ -235,14 +226,8 @@ public class GridViewImpl implements GridView {
 
         @Override public void onExport(Menu sender) {
             Collection<Photo> selection = grid.getSelected();
-            String dropboxFolder = "";
-            try {
-                dropboxFolder = dropboxService.getDropboxFolder();
-            } catch (ServiceException ex) {
-                ErrorDialog.show(root, "Fehler beim Export", "Konnte keinen Dropboxordner finden");
-            }
 
-            ExportDialog dialog = new ExportDialog(root, dropboxFolder, selection.size());
+            ExportDialog dialog = new ExportDialog(root, dropboxService, selection.size());
 
             Optional<String> destinationPath = dialog.showForResult();
             if (!destinationPath.isPresent()) return;
