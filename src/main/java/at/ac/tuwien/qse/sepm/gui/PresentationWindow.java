@@ -38,6 +38,7 @@ public class PresentationWindow extends StackPane {
 
     private Stage stage;
     private Scene scene;
+    private boolean isPaused=false;
 
     private int activeIndex = 0;
     private Timeline timeline = null;
@@ -76,6 +77,16 @@ public class PresentationWindow extends StackPane {
                 }
                 if (keyEvent.getCode() == KeyCode.ESCAPE) {
                     close();
+                }
+                if (keyEvent.getCode()==KeyCode.SPACE) {
+                    if(!isPaused) {
+                        timeline.pause();
+                        isPaused=true;
+                    }
+                    else {
+                        timeline.play();
+                        isPaused=false;
+                    }
                 }
             }
         });
