@@ -3,27 +3,32 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<fx:root xmlns:fx="http://javafx.com/fxml/1" styleClass="dialog,export-dialog" stylesheets="@style.css"
+<fx:root xmlns:fx="http://javafx.com/fxml/1" styleClass="dialog,export-dialog"
+         stylesheets="@style.css"
          type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8">
     <children>
         <BorderPane prefWidth="560.0" maxHeight="Infinity">
             <top>
-                <Label maxWidth="Infinity" styleClass="header" text="Fotos nach Dropbox exportieren"/>
+                <Label maxWidth="Infinity" styleClass="header"
+                       text="Fotos nach Ordner exportieren"/>
             </top>
             <center>
                 <VBox maxWidth="Infinity" styleClass="body" maxHeight="Infinity">
                     <children>
-                        <Label text="Dropbox Ordner auswählen"/>
-                        <HBox prefHeight="0.0" prefWidth="0.0" VBox.vgrow="ALWAYS">
+                        <Label text="Ordner auswählen"/>
+                        <HBox prefHeight="0.0" prefWidth="0.0" VBox.vgrow="ALWAYS" spacing="8">
                             <children>
                                 <TextField fx:id="directoryField" HBox.hgrow="ALWAYS"/>
                                 <Button fx:id="browseButton" styleClass="btn" HBox.hgrow="ALWAYS">
                                     <graphic>
                                         <FontAwesomeIconView glyphName="FOLDER"/>
                                     </graphic>
-                                    <HBox.margin>
-                                        <Insets left="16.0"/>
-                                    </HBox.margin>
+                                </Button>
+                                <Button fx:id="dropboxButton" styleClass="btn"
+                                        HBox.hgrow="ALWAYS">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="DROPBOX"/>
+                                    </graphic>
                                 </Button>
                             </children>
                         </HBox>
@@ -39,8 +44,7 @@
                         <HBox spacing="8.0">
                             <children>
                                 <Button fx:id="cancelButton" alignment="CENTER_RIGHT" text="ABBRECHEN" styleClass="btn"/>
-                                <Button fx:id="exportButton" alignment="CENTER_RIGHT" styleClass="btn,primary"
-                                        text="EXPORTIEREN"/>
+                                <Button fx:id="exportButton" alignment="CENTER_RIGHT" styleClass="btn,primary" text="EXPORTIEREN"/>
                             </children>
                         </HBox>
                     </right>
