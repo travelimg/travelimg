@@ -1,31 +1,18 @@
 package at.ac.tuwien.qse.sepm.gui.control;
 
-import com.lynden.gmapsfx.GoogleMapView;
-import com.lynden.gmapsfx.MapComponentInitializedListener;
-import com.lynden.gmapsfx.javascript.event.UIEventType;
-import com.lynden.gmapsfx.javascript.object.*;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.concurrent.Worker;
+import com.lynden.gmapsfx.javascript.object.LatLong;
 import javafx.event.EventHandler;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javafx.util.Pair;
-import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.w3c.dom.Element;
-import org.w3c.dom.events.Event;
-import org.w3c.dom.events.EventListener;
-import org.w3c.dom.events.EventTarget;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -92,7 +79,7 @@ public class AwesomeMapScene extends VBox {
 
     public void addMarker(double latitude, double longitude) {
         LOGGER.debug("Adding marker at ({}, {})", latitude, longitude);
-        callJS(String.format("document.addMarker(%f, %f);", latitude, longitude));
+        callJS(String.format(Locale.US, "document.addMarker(%f, %f);", latitude, longitude));
     }
 
     public void fitToMarkers() {
