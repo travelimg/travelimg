@@ -69,6 +69,7 @@ public class ExportDialog extends ResultDialog<String> {
         }
         this.exportFolder = dropboxFolder;
         directoryField.setText(dropboxFolder);
+        handleBrowse(event);
     }
 
     private void handleBrowse(Event event) {
