@@ -748,7 +748,7 @@
     -fx-padding: 11px 8px;
     -fx-background-radius: 3px;
     -fx-font-size: 14px;
-    -fx-text-fill: -fx-text;
+    -fx-text-fill: -fx-default;
 }
 .toggle-button:hover {
     -fx-background-color: -tmg-bg2-light;
