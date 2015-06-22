@@ -63,7 +63,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     @FXML
     private FlowPane photosFlowPane;
     @FXML
-    private Button downloadButton, importButton, stopButton;
+    private Button downloadButton, importButton, stopButton, cancelButton;
     @FXML
     private Pane mapContainer;
     @FXML
@@ -139,6 +139,11 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
         stopButton.setTooltip(new Tooltip("Abbrechen"));
         datePicker.setValue(LocalDate.now());
         datePicker.setTooltip(new Tooltip("Wählen Sie ein Datum für die Fotos aus"));
+
+        cancelButton.setOnAction(e -> close());
+        importButton.setOnAction(e -> handleImport());
+        downloadButton.setOnAction(e -> handleDownload());
+        stopButton.setOnAction(e -> handleStop());
     }
 
 
@@ -188,15 +193,13 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
         downloadButton.setText("Fotos herunterladen");
     }
 
-    @FXML
-    public void handleOnDownloadButtonClicked() {
+    public void handleDownload() {
         downloadButton.setDisable(true);
         progress.setVisible(true);
         downloadPhotos();
     }
 
-    @FXML
-    public void handleOnImportButtonClicked() {
+    public void handleImport() {
         ArrayList<Photo> photos = new ArrayList<Photo>();
         for (ImageTile i : selectedImages) {
             Photo p = i.getPhoto();
@@ -209,8 +212,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
         close();
     }
 
-    @FXML
-    public void handleOnStopButtonClicked() {
+    public void handleStop() {
         ConfirmationDialog confirmationDialog = new ConfirmationDialog(borderPane, "Download abbrechen", "Download abbrechen?");
         Optional<Boolean> confirmed = confirmationDialog.showForResult();
         if (!confirmed.isPresent() || !confirmed.get()) return;

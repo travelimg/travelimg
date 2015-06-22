@@ -4,80 +4,80 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<fx:root fx:id="root" prefWidth="800" prefHeight="525" styleClass="dialog,import-dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root fx:id="root" styleClass="dialog,import-dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <BorderPane fx:id="borderPane">
+        <BorderPane>
+            <top>
+                <Label maxWidth="Infinity" styleClass="header" text="Fotos von Flickr importieren"/>
+            </top>
             <center>
-                <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="440" vbarPolicy="AS_NEEDED">
-                    <content>
-                        <FlowPane fx:id="photosFlowPane" hgap="15" maxHeight="440" styleClass="image-grid" vgap="15">
-                            <padding>
-                                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                            </padding>
-
-                        </FlowPane>
-                    </content>
-                </ScrollPane>
-            </center>
-
-            <right>
-                <VBox spacing="5.0">
-                   <children>
-                       <VBox>
-                           <children>
-                               <Label text=" Doppelklick um Ort zu wählen" />
-                               <VBox fx:id="mapContainer" maxHeight="200" />
-                               <Label text=" Suchbegriffe" />
-                               <ScrollPane hbarPolicy="NEVER" prefHeight="150">
-                                   <content>
-                                       <FlowPane fx:id="keywordsFlowPane" hgap="10" prefWidth="200" vgap="10">
+                <VBox styleClass="body">
+                    <BorderPane fx:id="borderPane">
+                        <center>
+                            <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="300" maxWidth="300" vbarPolicy="AS_NEEDED">
+                                <content>
+                                    <FlowPane fx:id="photosFlowPane" hgap="15" maxHeight="440" styleClass="image-grid" vgap="15">
+                                        <padding>
+                                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                        </padding>
 
                                     </FlowPane>
-                                   </content>
-                               </ScrollPane>
-                               <TextField fx:id="keywordTextField" promptText="Neuer Suchbegriff" />
-                           </children>
-                       </VBox>
-                   </children>
+                                </content>
+                            </ScrollPane>
+                        </center>
 
+                        <right>
+                            <VBox spacing="5.0" maxWidth="300" maxHeight="300" >
+                               <children>
+                                   <Label text=" Doppelklick um Ort zu wählen" />
+                                   <VBox fx:id="mapContainer" maxHeight="200" />
+                                   <Label text=" Suchbegriffe" />
+                                   <ScrollPane hbarPolicy="NEVER" prefHeight="100">
+                                       <content>
+                                           <FlowPane fx:id="keywordsFlowPane" hgap="10" vgap="10">
+                                        </FlowPane>
+                                       </content>
+                                   </ScrollPane>
+                                   <TextField fx:id="keywordTextField" promptText="Neuer Suchbegriff" />
+                               </children>
+                           </VBox>
+                        </right>
 
+                        <bottom>
+                            <VBox spacing="5.0">
+                               <children>
+                                   <Button fx:id="downloadButton" styleClass="btn,primary" text="Fotos herunterladen" />
+                                   <HBox fx:id="progress" spacing="2.0" visible="false" alignment="CENTER">
+                                       <children>
+                                               <Button fx:id="stopButton" styleClass="btn,stop">
+                                                    <graphic>
+                                                        <FontAwesomeIconView/>
+                                                    </graphic>
+                                               </Button>
+                                               <ProgressBar fx:id="progressBar" progress="0.0" />
+                                       </children>
+                                   </HBox>
+                               </children>
+                            </VBox>
+                        </bottom>
+                    </BorderPane>
                 </VBox>
-            </right>
-
+            </center>
             <bottom>
-
-                <HBox alignment="BOTTOM_LEFT" prefHeight="78.0" prefWidth="807.0" spacing="290.0">
-                    <children>
-                        <HBox spacing="10.0">
-                           <children>
-                               <Button fx:id="importButton" disable="true" onAction="#handleOnImportButtonClicked" styleClass="primary" text="Fotos importieren" />
-                               <DatePicker fx:id="datePicker" editable="false" style="-fx-background-color: transparent;" />
-                           </children>
+                <BorderPane maxWidth="Infinity" styleClass="footer">
+                    <left>
+                        <DatePicker fx:id="datePicker" editable="false" />
+                    </left>
+                    <right>
+                        <HBox maxWidth="Infinity" spacing="8.0" BorderPane.alignment="CENTER_RIGHT">
+                            <children>
+                                <Button fx:id="cancelButton" alignment="CENTER_RIGHT" text="ABBRECHEN" styleClass="btn"/>
+                                <Button fx:id="importButton" alignment="CENTER_RIGHT" text="FOTOS IMPORTIEREN" styleClass="btn,primary" />
+                            </children>
                         </HBox>
-                        <VBox spacing="5.0">
-                           <children>
-                               <Button fx:id="downloadButton" onAction="#handleOnDownloadButtonClicked" styleClass="primary" text="Fotos herunterladen" />
-                               <HBox fx:id="progress" spacing="2.0" visible="false" alignment="CENTER">
-                                   <children>
-                                           <Button fx:id="stopButton" onAction="#handleOnStopButtonClicked" styleClass="stop">
-                                                <graphic>
-                                                    <FontAwesomeIconView/>
-                                                </graphic>
-                                           </Button>
-                                           <ProgressBar fx:id="progressBar" progress="0.0" />
-                                   </children>
-                               </HBox>
-                           </children>
-                        </VBox>
-                    </children>
-               <padding>
-                  <Insets top="10.0" />
-               </padding>
-                </HBox>
-
-
+                    </right>
+                </BorderPane>
             </bottom>
-
         </BorderPane>
     </children>
 </fx:root>
