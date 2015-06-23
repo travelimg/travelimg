@@ -1,7 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui.control;
 
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
-import at.ac.tuwien.qse.sepm.gui.util.ImageCacheImpl;
 import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import javafx.geometry.Insets;
 import javafx.scene.control.ProgressIndicator;
@@ -13,7 +12,7 @@ import java.nio.file.Path;
 
 public class SmartImage extends StackPane {
 
-    private static final ImageCache cache = new ImageCacheImpl();
+    private static final ImageCache cache = new ImageCache();
 
     private final ProgressIndicator progress = new ProgressIndicator();
     private final ImageView imageView = new ImageView();
@@ -57,6 +56,10 @@ public class SmartImage extends StackPane {
                 indicateLoaded();
             }
         });
+    }
+
+    public void setPreserveRatio(boolean preserve) {
+        imageView.setPreserveRatio(preserve);
     }
 
     public void cancel() {

@@ -3,25 +3,14 @@ package at.ac.tuwien.qse.sepm.gui.control;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.gui.FullscreenWindow;
-import at.ac.tuwien.qse.sepm.gui.util.ImageCacheImpl;
 import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -54,7 +43,7 @@ public class ImageTile extends StackPane {
             imageView.setImage(photos.get(randomPos).getFile());
 
             setOnMouseClicked((event) -> {
-                FullscreenWindow fw = new FullscreenWindow(new ImageCacheImpl());
+                FullscreenWindow fw = new FullscreenWindow();
                 fw.present(photos, photos.get(0));
             });
 
@@ -84,5 +73,4 @@ public class ImageTile extends StackPane {
         setOnMouseClicked(null);
         getChildren().clear();
     }
-
 }

@@ -3,7 +3,6 @@ package at.ac.tuwien.qse.sepm.gui;
 import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.control.*;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
-import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.JourneyFilter;
@@ -45,17 +44,9 @@ public class HighlightsViewController {
     @Autowired
     private WikipediaService wikipediaService;
     private WikipediaInfoPane wikipediaInfoPane;
-    private ImageCache imageCache;
 
     // photos for currently selected journey
     private List<Photo> photos = new ArrayList<>();
-
-
-    @Autowired
-    public void setImageCache(ImageCache imageCache) {
-        this.imageCache = imageCache;
-    }
-
 
     @FXML
     private void initialize() {
