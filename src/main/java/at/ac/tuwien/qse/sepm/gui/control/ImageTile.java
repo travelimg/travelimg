@@ -59,6 +59,7 @@ public class ImageTile extends StackPane {
     }
 
     public void setPhotos(List<Photo> photos) {
+        handleSizeChange(null);
         this.photos.clear();
         this.photos.addAll(photos);
 
