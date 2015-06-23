@@ -1,24 +1,20 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.*;
+import at.ac.tuwien.qse.sepm.gui.control.JourneyPlaceList;
 import at.ac.tuwien.qse.sepm.gui.control.TravelRouteMap;
 import at.ac.tuwien.qse.sepm.gui.control.WikipediaInfoPane;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.JourneyFilter;
+import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.StrokeLineCap;
-import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,27 +23,23 @@ import java.net.MalformedURLException;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class HighlightsViewController {
 
     private static final Logger LOGGER = LogManager.getLogger();
     List<Button> tagButtons = new ArrayList<>();
     @FXML
-    private BorderPane root, left, FotoContainer, treeBoarder, timeLine;
+    private BorderPane root;
     @FXML
-    private VBox journeys, tree, tagheartContainer;
-    @FXML
-    private HBox titleHBox, tagContainer, wikipediaInfoPaneContainer, firstFourTagsHBox;
-    @FXML
-    private ScrollPane scrollPhotoView, treeScroll;
-    @FXML
-    private Label titleLabel;
+    private HBox wikipediaInfoPaneContainer;
     @FXML
     private Button tag1, tag2, tag3, tag4, tag5, good;
     @FXML
-    private StrokeLineCap lineCap;
-    @FXML
     private TravelRouteMap travelRouteMap;
+
+    @FXML
+    private JourneyPlaceList journeyPlaceList;
 
     @Autowired
     private ClusterService clusterService;
@@ -57,15 +49,12 @@ public class HighlightsViewController {
     private TagService tagService;
     @Autowired
     private WikipediaService wikipediaService;
-    private ListView<Journey> journeysListView = new ListView<>();
-    private HashMap<Place, List<Tag>> placesAndTags = new HashMap<>();
-    private List<Photo> currentPhotosOfSelectedJourney = new ArrayList<>();
-    private List<Photo> goodPhotosList = new ArrayList<>();
     private List<Button> buttonAr = new LinkedList<>();
-    private Label noJourneysAvailableLabel = new Label("Keine Reisen gefunden. Bitte fügen Sie eine neue ein.");
     private WikipediaInfoPane wikipediaInfoPane;
     private ImageCache imageCache;
-    private Line redLine;
+
+    // photos for currently selected journey
+    private List<Photo> photos = new ArrayList<>();
 
 
     @Autowired
@@ -81,151 +70,62 @@ public class HighlightsViewController {
         buttonAr.add(tag3);
         buttonAr.add(tag4);
         tagButtons.addAll(Arrays.asList(tag1, tag2, tag3, tag4, tag5));
-        redLine = new Line(100, 50, 100, 500);
-        redLine.setStroke(Color.DARKGRAY);
-        redLine.setStrokeWidth(2);
-        redLine.setStrokeLineCap(StrokeLineCap.ROUND);
-
-        redLine.getStrokeDashArray().addAll(2D, 21D);
-        redLine.setStrokeDashOffset(30);
 
         wikipediaInfoPane = new WikipediaInfoPane(wikipediaService);
         wikipediaInfoPaneContainer.getChildren().add(wikipediaInfoPane);
 
-        journeysListView.setCellFactory(new Callback<ListView<Journey>, ListCell<Journey>>() {
-
-            public ListCell<Journey> call(ListView<Journey> param) {
-                final ListCell<Journey> cell = new ListCell<Journey>() {
-                    @Override
-                    public void updateItem(Journey item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (item != null) {
-                            setText(item.getName());
-                        }
-                    }
-                }; // ListCell
-                return cell;
-            }
-        }); // setCellFactory
-
-        journeysListView.setOnMouseClicked(event -> {
-            handleJourneySelected(journeysListView.getSelectionModel().getSelectedItem());
-        });
-        noJourneysAvailableLabel.setWrapText(true);
+        journeyPlaceList.setOnJourneySelected(this::handleJourneySelected);
+        journeyPlaceList.setOnPlaceSelected(this::handlePlaceSelected);
 
         reloadJourneys();
     }
 
     public void reloadJourneys() {
-        //photoView.getChildren().clear();
-        tree.getChildren().clear();
-        Label lab2 = new Label();
-        lab2.setText("Bitte eine Reise auswählen");
-        //.getChildren().add(lab2);
 
-        journeys.getChildren().clear();
-        journeysListView.getItems().clear();
         try {
-            List<Journey> listOfJourneys = clusterService.getAllJourneys();
-            if (listOfJourneys.size() > 0) {
-                journeysListView.getItems().addAll(listOfJourneys);
-                journeys.getChildren().add(journeysListView);
-            } else {
-                journeys.getChildren().add(noJourneysAvailableLabel);
+            for (Journey journey : clusterService.getAllJourneys()) {
+                List<Place> places = clusterService.getPlacesByJourneyChronological(journey);
+                journeyPlaceList.addJourney(journey, places);
             }
-        } catch (ServiceException e) {
-            journeys.getChildren().add(noJourneysAvailableLabel);
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Laden der Reisen", "");
         }
     }
 
     private void handleJourneySelected(Journey journey) {
-
+        // load photos for the selected journey
         try {
             JourneyFilter filter = new JourneyFilter();
             filter.getIncludedJourneys().add(journey);
 
-            List<Photo> allPhotos = photoService.getAllPhotos();
-
-            currentPhotosOfSelectedJourney = allPhotos.stream()
+            photos = photoService.getAllPhotos().stream()
                     .filter(filter)
                     .collect(Collectors.toList());
-            /*
-                CLEAR THE HASHMAPS
-             */
-            placesAndTags.clear();
-
-            HBox placesTitleHBox = new HBox();
-            Label placesTitleLabel = new Label("Orte");
-            placesTitleLabel.setStyle("-fx-background-color: #333333; -fx-font-size: 18; -fx-text-fill: white; -fx-padding: 5 0 5 10px;");
-            placesTitleLabel.setPrefWidth(259);
-            placesTitleLabel.setPrefHeight(20);
-
-            Button back = new Button("<");
-            back.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    clearMap();
-                    left.setTop(titleHBox);
-                    left.setCenter(journeys);
-                }
-            });
-
-            placesTitleHBox.getChildren().add(back);
-            placesTitleHBox.getChildren().add(placesTitleLabel);
-            left.setTop(placesTitleHBox);
-
-            Set<Place> places = clusterService.getPlacesByJourney(journey);
-
-
-            /*
-                merge Places with Photos
-                output is a HashSet
-             */
-            Map<Place, List<Photo>> photosByPlace = getPhotosByPlace(places, allPhotos);
-            List<Place> orderedPlaces = orderPlacesByVisitingDate(places, photosByPlace);
-
-            VBox v = new VBox();
-            v.setSpacing(5.0);
-            v.setStyle("-fx-font-size: 16;");
-            v.setPadding(new Insets(5.0, 0.0, 0.0, 10.0));
-            final ToggleGroup group = new ToggleGroup();
-            RadioButton rbAll = new RadioButton("Alle Orte");
-            rbAll.setToggleGroup(group);
-            rbAll.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    travelRouteMap.clear();
-                    travelRouteMap.drawJourney(new ArrayList<>(places));
-
-                    setGoodPhotos(null);
-                    setMostUsedTagsWithPhotos(null);
-                }
-            });
-            v.getChildren().add(rbAll);
-            rbAll.setSelected(true);
-
-            travelRouteMap.clear();
-            travelRouteMap.drawJourney(orderedPlaces);
-
-            setGoodPhotos(null);
-            setMostUsedTagsWithPhotos(null);
-            //reloadImages();
-
-            for (Place place : orderedPlaces) {
-                RadioButton button = new RadioButton(place.getCity());
-                button.setToggleGroup(group);
-                button.setOnAction((event) -> {
-                    handlePlaceSelected(orderedPlaces, place, orderedPlaces.indexOf(place));
-                });
-
-                v.getChildren().add(button);
-            }
-            left.setCenter(v);
-
-
-        } catch (ServiceException e) {
-            e.printStackTrace();
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Laden der Fotos", "");
+            return;
         }
+
+        // draw the journey on the map
+        List<Place> places = journeyPlaceList.getPlacesForJourney(journey);
+        travelRouteMap.clear();
+        travelRouteMap.drawJourney(places);
+
+        // TODO: show tags and good photos for entire journey
+    }
+
+    private void handlePlaceSelected(Place place) {
+        wikipediaInfoPane.showDefaultWikiInfo(place);
+
+        // draw journey until given place
+        List<Place> places = journeyPlaceList.getPlacesForJourney(journeyPlaceList.getSelectedJourney());
+        List<Place> placesUntil = places.subList(0, places.indexOf(place) + 1);
+
+        travelRouteMap.clear();
+        travelRouteMap.drawJourney(placesUntil);
+
+        setGoodPhotos(place);
+        setMostUsedTagsWithPhotos(place);
     }
 
     private Map<Place, List<Photo>> getPhotosByPlace(Set<Place> places, List<Photo> photos) {
@@ -262,20 +162,25 @@ public class HighlightsViewController {
         return orderedPlaces;
     }
 
-    private void handlePlaceSelected(List<Place> places, Place place, int pos) {
-        wikipediaInfoPane.showDefaultWikiInfo(place);
-        drawJourneyUntil(places, pos);
-        setGoodPhotos(place);
-        setMostUsedTagsWithPhotos(place);
-    }
-
     @FXML
     private void bt_heartPress() {
-        if (!goodPhotosList.isEmpty()) {
+        List<Photo> goodPhotos = photos.stream()
+                .filter(new GoodPhotoFilter())
+                .collect(Collectors.toList());
+
+        if (!goodPhotos.isEmpty()) {
             FullscreenWindow fw = new FullscreenWindow(this.imageCache);
-            fw.present(goodPhotosList, goodPhotosList.get(0));
+            fw.present(goodPhotos, goodPhotos.get(0));
         }
     }
+
+    private Stream<Photo> getGoodPhotos() {
+        // todo use filter
+        return photos.stream()
+                .filter(p -> p.getData().getRating() == Rating.GOOD);
+    }
+
+
 
     /**
      * Sets the good rated photos for the heart button based on a filter.
@@ -283,23 +188,23 @@ public class HighlightsViewController {
      * @param place
      */
     private void setGoodPhotos(Place place) {
-        //TODO we should use our own photofilter.
         good.setText("");
+
+        PhotoFilter filter;
         if (place == null) {
-            goodPhotosList = currentPhotosOfSelectedJourney.stream()
-                    .filter(p -> p.getData().getRating().equals(Rating.GOOD))
-                    .collect(Collectors.toList());
+            filter = new GoodPhotoFilter();
         } else {
-            goodPhotosList = currentPhotosOfSelectedJourney.stream()
-                    .filter(p -> p.getData().getPlace().getId().equals(place.getId())
-                            && p.getData().getRating().equals(Rating.GOOD))
-                    .collect(Collectors.toList());
+            filter = new GoodPhotoForPlaceFilter(place);
         }
 
-        if (goodPhotosList.isEmpty()) {
+        List<Photo> goodPhotos = photos.stream()
+                    .filter(filter)
+                    .collect(Collectors.toList());
+
+        if (goodPhotos.isEmpty()) {
             good.setStyle("-fx-background-image: none;");
         } else {
-            setBackroundImageForButton(goodPhotosList.get(0).getPath(), good);
+            setBackroundImageForButton(goodPhotos.get(0).getPath(), good);
         }
     }
 
@@ -313,9 +218,9 @@ public class HighlightsViewController {
         });
 
         if (place == null) {
-            filteredByPlace = currentPhotosOfSelectedJourney;
+            filteredByPlace = photos;
         } else {
-            filteredByPlace = currentPhotosOfSelectedJourney.stream()
+            filteredByPlace = photos.stream()
                     .filter(p -> p.getData().getPlace().getId().equals(place.getId()))
                     .collect(Collectors.toList());
         }
@@ -373,14 +278,31 @@ public class HighlightsViewController {
         }
     }
 
-    private void drawJourneyUntil(List<Place> places, int pos) {
-        List<Place> placesUntil = places.subList(0, pos + 1);
-        travelRouteMap.drawJourney(placesUntil);
+    private class GoodPhotoFilter extends PhotoFilter {
+
+        public GoodPhotoFilter() {
+            getIncludedRatings().add(Rating.GOOD);
+        }
+
+        @Override
+        public boolean test(Photo photo) {
+            // TODO: don't override
+            return photo.getData().getRating() == Rating.GOOD;
+        }
     }
 
-    private void clearMap() {
-        if (travelRouteMap != null) {
-            travelRouteMap.clear();
+    private class GoodPhotoForPlaceFilter extends GoodPhotoFilter {
+        private final Place place;
+
+        public GoodPhotoForPlaceFilter(Place place) {
+            super();
+            this.place = place;
+        }
+
+        @Override
+        public boolean test(Photo photo) {
+            // TODO: don't override
+            return super.test(photo) && photo.getData().getPlace().equals(place) ;
         }
     }
 }

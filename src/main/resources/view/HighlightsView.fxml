@@ -1,52 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.text.*?>
-<?import java.lang.*?>
+<?import at.ac.tuwien.qse.sepm.gui.control.JourneyPlaceList?>
+<?import at.ac.tuwien.qse.sepm.gui.control.TravelRouteMap?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.VBox?>
-
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<?import at.ac.tuwien.qse.sepm.gui.control.TravelRouteMap?>
 <BorderPane fx:id="root" stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.HighlightsViewController">
     <left>
-        <BorderPane fx:id="left" prefWidth="240.0">
-            <top>
-                <HBox fx:id="titleHBox">
-                        <Label fx:id="titleLabel" prefHeight="20.0" prefWidth="259.0" style="-fx-background-color: #333333; -fx-font-size: 18; -fx-text-fill: white; -fx-padding: 5 0 5 10px;" text="Reisen" />
-                </HBox>
-            </top>
-            <center>
-                <VBox fx:id="journeys" spacing="5.0" style="-fx-font-size: 16;">
-                <padding>
-                    <Insets left="10.0" top="5.0" />
-                </padding>
-            </VBox>
-
-            </center>
-            <bottom>
-                <BorderPane fx:id="timeline">
-                    <center>
-                        <ScrollPane fx:id="treeScroll"  hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
-                            <VBox fx:id="tree" spacing="5.0" style="-fx-font-size: 16;">
-                                <children>
-
-                                </children>
-                                <padding>
-                                    <Insets left="10.0" top="5.0" />
-                                </padding>
-                            </VBox>
-                        </ScrollPane>
-                    </center>
-                </BorderPane>
-            </bottom>
-            <padding>
-                <Insets top="5.0" />
-            </padding>
-        </BorderPane>
+        <JourneyPlaceList fx:id="journeyPlaceList"/>
     </left>
     <center>
         <VBox spacing="2.0">
