@@ -1,11 +1,10 @@
 package at.ac.tuwien.qse.sepm.gui.control;
 
+import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
-import javafx.util.Pair;
-import netscape.javascript.JSObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -73,13 +72,13 @@ public class AwesomeMapScene extends VBox {
     }
 
     /**
-     * Draw a polyline path using a list of double pairs representing the vertices of the path.
+     * Draw a polyline path using a list of vertices on the path.
      * @param vertices A ordered path of vertices which to draw.
      */
-    public void drawPolyline(List<Pair<Double, Double>> vertices) {
+    public void drawPolyline(List<LatLong> vertices) {
 
         Optional<String> jsVertices = vertices.stream()
-                .map(v -> String.format("[%f, %f]", v.getKey(), v.getValue()))
+                .map(v -> String.format("[%f, %f]", v.getLatitude(), v.getLongitude()))
                 .reduce((v1, v2) -> v1 + ", " + v2);
 
         if (jsVertices.isPresent()) {
@@ -133,7 +132,7 @@ public class AwesomeMapScene extends VBox {
             try {
                 double latitude = Double.parseDouble(latLng[0].trim());
                 double longitude = Double.parseDouble(latLng[1].trim());
-                
+
                 if (type.equals("double-click") && doubleClickCallback != null) {
                     doubleClickCallback.accept(new LatLong(latitude, longitude));
                 } else if (type.equals("click") && clickCallback != null) {
@@ -144,23 +143,4 @@ public class AwesomeMapScene extends VBox {
             }
         }
     }
-
-    public static class LatLong {
-        private double latitude;
-        private double longitude;
-
-        public LatLong(double latitude, double longitude) {
-            this.latitude = latitude;
-            this.longitude = longitude;
-        }
-
-        public double getLatitude() {
-            return latitude;
-        }
-
-        public double getLongitude() {
-            return longitude;
-        }
-    }
-
 }
