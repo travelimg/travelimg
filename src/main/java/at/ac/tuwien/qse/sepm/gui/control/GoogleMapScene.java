@@ -74,6 +74,10 @@ public class GoogleMapScene extends VBox {
         callJS("document.fitToMarkers();");
     }
 
+    public void fitToLastTwoMarkers() {
+        callJS("document.fitToLastTwoMarkers();");
+    }
+
     /**
      * Draw a polyline path using a list of vertices on the path.
      * @param vertices A ordered path of vertices which to draw.

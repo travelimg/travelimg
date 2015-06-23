@@ -107,6 +107,31 @@
                 }
             }
 
+            document.fitToLastTwoMarkers = function fitToLastTwoMarkers() {
+                var posToStart = markers.length - 2;
+                if(posToStart<0){
+                    posToStart = markers.length - 1;
+                }
+
+                if(posToStart>=0){
+                    var bounds = new google.maps.LatLngBounds();
+
+                    for (var i = posToStart; i < markers.length; i++) {
+                        bounds.extend(markers[i].position);
+                    }
+
+                    document.map.fitBounds(bounds);
+
+                    var minDistance = 0.002;
+                    var distance = google.maps.geometry.spherical.computeDistanceBetween (bounds.getNorthEast(), bounds.getSouthWest());
+
+                    if(distance<minDistance){
+                        document.map.setZoom(16);
+                    }
+                }
+
+            }
+
             document.drawPolyline = function drawPolyline(vertices) {
                 var path = [];
                 var image = 'red_circle.png';
