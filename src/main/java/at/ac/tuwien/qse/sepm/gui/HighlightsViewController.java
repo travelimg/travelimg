@@ -174,14 +174,6 @@ public class HighlightsViewController {
         }
     }
 
-    private Stream<Photo> getGoodPhotos() {
-        // todo use filter
-        return photos.stream()
-                .filter(p -> p.getData().getRating() == Rating.GOOD);
-    }
-
-
-
     /**
      * Sets the good rated photos for the heart button based on a filter.
      *
