@@ -33,21 +33,23 @@ public class ImageTile extends StackPane {
     private static final Logger logger = LogManager.getLogger();
 
     public ImageTile(){
-        getChildren().add(imageView);
         setAlignment(overlay, Pos.CENTER);
         getStyleClass().add("imageTile");
         overlay.getStyleClass().add("overlay");
         taggingIndicator.getStyleClass().add("tagging");
         overlay.setCenter(taggingIndicator);
-        getChildren().add(overlay);
-        overlay.setVisible(false);
     }
 
     public void setPhotos(List<Photo> photos){
         this.photos = photos;
         if(photos.size()>0){
+            getChildren().add(imageView);
             Random rand = new Random();
-            int randomPos = rand.nextInt(photos.size()-1);
+            int randomPos = 0;
+            if(photos.size()>1){
+                randomPos = rand.nextInt(photos.size()-1);
+            }
+
             try {
                 imageView.setImage(new Image(new FileInputStream(new File(photos.get(randomPos).getPath())), 300, 200, true,
                         true));
@@ -59,6 +61,7 @@ public class ImageTile extends StackPane {
     }
 
     public void setTag(Tag tag){
+        getChildren().add(overlay);
         FontAwesomeIconView taggingIndicatorIcon = new FontAwesomeIconView();
         taggingIndicatorIcon.setGlyphName("TAGS");
         taggingIndicator.setGraphic(taggingIndicatorIcon);
@@ -67,6 +70,7 @@ public class ImageTile extends StackPane {
     }
 
     public void setGood(){
+        getChildren().add(overlay);
         FontAwesomeIconView taggingIndicatorIcon = new FontAwesomeIconView();
         taggingIndicatorIcon.setGlyphName("HEART");
         taggingIndicator.setGraphic(taggingIndicatorIcon);
@@ -97,7 +101,7 @@ public class ImageTile extends StackPane {
     public void clearImageTile(){
         setOnMouseEntered(null);
         setOnMouseClicked(null);
-        overlay.setVisible(false);
+        getChildren().clear();
     }
 
 }
