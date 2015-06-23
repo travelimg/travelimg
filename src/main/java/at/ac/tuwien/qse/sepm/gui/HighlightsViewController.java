@@ -1,7 +1,10 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.*;
-import at.ac.tuwien.qse.sepm.gui.control.*;
+import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
+import at.ac.tuwien.qse.sepm.gui.control.ImageTile;
+import at.ac.tuwien.qse.sepm.gui.control.JourneyPlaceList;
+import at.ac.tuwien.qse.sepm.gui.control.WikipediaInfoPane;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.*;
@@ -120,10 +123,9 @@ public class HighlightsViewController {
         List<Place> places = journeyPlaceList.getPlacesForJourney(journeyPlaceList.getSelectedJourney());
         googleMapScene.clear();
         List<Place> placesUntil;
-        if(place==null){
+        if (place == null) {
             placesUntil = places;
-        }
-        else{
+        } else {
             placesUntil = places.subList(0, places.indexOf(place) + 1);
             wikipediaInfoPane.showDefaultWikiInfo(place);
         }
@@ -143,8 +145,8 @@ public class HighlightsViewController {
 
         places.forEach(place -> {
             photosByPlace.put(place, photos.stream()
-                .filter(p -> p.getData().getPlace().equals(place))
-                .collect(Collectors.toList())
+                            .filter(p -> p.getData().getPlace().equals(place))
+                            .collect(Collectors.toList())
             );
         });
 
@@ -187,8 +189,8 @@ public class HighlightsViewController {
         }
 
         List<Photo> goodPhotos = photos.stream()
-                    .filter(filter)
-                    .collect(Collectors.toList());
+                .filter(filter)
+                .collect(Collectors.toList());
 
         good.clearImageTile();
         good.setPhotos(goodPhotos);
@@ -231,8 +233,8 @@ public class HighlightsViewController {
         while (nrOfPhotos > 0) {
             ImageTile tagImageTile = tagImageTiles.get(5 - nrOfPhotos);
             tagImageTile.clearImageTile();
-            if(i < filteredByPlace.size()){
-                tagImageTile.setPhotos(filteredByPlace.subList(i,i+1));
+            if (i < filteredByPlace.size()) {
+                tagImageTile.setPhotos(filteredByPlace.subList(i, i + 1));
             }
             nrOfPhotos--;
             i++;
@@ -256,7 +258,7 @@ public class HighlightsViewController {
                     .collect(Collectors.toList());
 
             googleMapScene.drawPolyline(path);
-            LatLong position = new LatLong(places.get(places.size()-1).getLatitude(), places.get(places.size()-1).getLongitude());
+            LatLong position = new LatLong(places.get(places.size() - 1).getLatitude(), places.get(places.size() - 1).getLongitude());
             googleMapScene.addMarker(position);
         }
     }
@@ -285,7 +287,7 @@ public class HighlightsViewController {
         @Override
         public boolean test(Photo photo) {
             // TODO: don't override
-            return super.test(photo) && photo.getData().getPlace().equals(place) ;
+            return super.test(photo) && photo.getData().getPlace().equals(place);
         }
     }
 }
