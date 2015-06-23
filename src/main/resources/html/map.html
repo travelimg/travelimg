@@ -88,6 +88,8 @@
                 });
 
                 markers.push(marker);
+                document.setZoom(document.map.getZoom()-1);
+                document.setZoom(document.map.getZoom()+1);
             }
 
             document.fitToMarkers = function fitToMarkers() {
@@ -154,6 +156,8 @@
                 });
 
                 lines.push(line);
+                document.setZoom(document.map.getZoom()-1);
+                document.setZoom(document.map.getZoom()+1);
                 document.fitToMarkers();
             }
         }
