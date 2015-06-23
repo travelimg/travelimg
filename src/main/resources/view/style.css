@@ -881,3 +881,8 @@
     -fx-padding: 0;
     -fx-background-color: -tmg-primary;
 }
+
+.imageTile:hover .overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+    -fx-opacity: 1.0;
+}
