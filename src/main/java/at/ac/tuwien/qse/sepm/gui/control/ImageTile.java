@@ -12,8 +12,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Group;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 
 import java.util.List;
@@ -22,20 +23,24 @@ import java.util.Random;
 public class ImageTile extends StackPane {
 
     private final SmartImage imageView = new SmartImage(ImageSize.LARGE);
-    private final BorderPane overlay = new BorderPane();
 
-    private final Label taggingIndicator = new Label();
+    private final Label name = new Label();
+    private final FontAwesomeIconView overLayIcon = new FontAwesomeIconView();
     private final FontAwesomeIconView placeHolder = new FontAwesomeIconView(FontAwesomeIcon.CAMERA);
 
     private ObservableList<Photo> photos = FXCollections.observableArrayList();
     private ListProperty<Photo> photosProperty = new SimpleListProperty<>(photos);
 
     public ImageTile() {
-        setAlignment(overlay, Pos.CENTER);
         getStyleClass().add("imageTile");
-        overlay.getStyleClass().add("overlay");
-        taggingIndicator.getStyleClass().add("tagging");
-        overlay.setCenter(taggingIndicator);
+
+        Group overlay = new Group();
+        HBox overlayBox = new HBox();
+        overlayBox.getStyleClass().add("hoverlay");
+        overlayBox.getChildren().addAll(overLayIcon, name);
+        overlay.getChildren().add(overlayBox);
+
+        StackPane.setAlignment(overlay, Pos.CENTER);
 
         placeHolder.setGlyphSize(ImageSize.LARGE.pixels() * 0.6);
 
@@ -47,11 +52,13 @@ public class ImageTile extends StackPane {
         getChildren().add(imageView);
         getChildren().add(overlay);
 
+        setAlignment(overlay, Pos.CENTER);
+
         setOnMouseEntered((event) -> setCursor(Cursor.HAND));
         setOnMouseExited((event -> setCursor(Cursor.DEFAULT)));
 
         imageView.visibleProperty().bind(photosProperty.emptyProperty().not());
-        overlay.visibleProperty().bind(photosProperty.emptyProperty().not());
+        overlay.visibleProperty().bind(photosProperty.emptyProperty().not().and(name.textProperty().isNotEmpty()));
         placeHolder.visibleProperty().bind(photosProperty.emptyProperty());
 
         heightProperty().addListener(this::handleSizeChange);
@@ -80,26 +87,25 @@ public class ImageTile extends StackPane {
     }
 
     public void setTag(Tag tag) {
-        FontAwesomeIconView taggingIndicatorIcon = new FontAwesomeIconView();
-        taggingIndicatorIcon.setGlyphName("TAGS");
-        taggingIndicator.setGraphic(taggingIndicatorIcon);
-        taggingIndicator.setText(tag.getName());
+        name.setText(tag.getName());
+        overLayIcon.setGlyphName("TAGS");
+        overLayIcon.setGlyphSize(30);
     }
 
     public void setGood() {
-        FontAwesomeIconView taggingIndicatorIcon = new FontAwesomeIconView();
-        taggingIndicatorIcon.setGlyphName("HEART");
-        taggingIndicator.setGraphic(taggingIndicatorIcon);
-        taggingIndicator.setText("Favorites");
+        name.setText("Favorites");
+        overLayIcon.setGlyphName("HEART");
+        overLayIcon.setGlyphSize(30);
     }
 
     public void clearImageTile() {
         photos.clear();
+        name.setText("");
     }
 
     private void handleSizeChange(Object observable) {
         // fit image to available size
-        imageView.fitToSize(overlay.getWidth(), overlay.getHeight());
-        placeHolder.setGlyphSize(Math.min(overlay.getWidth(), overlay.getHeight()) * 0.6);
+        imageView.fitToSize(getWidth(), getHeight());
+        placeHolder.setGlyphSize(Math.min(getWidth(), getHeight()) * 0.6);
     }
 }

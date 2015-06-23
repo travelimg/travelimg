@@ -886,3 +886,23 @@
     -fx-background-color: rgba(0, 0, 0, 0.5);
     -fx-opacity: 1.0;
 }
+
+.highlights .hoverlay {
+    -fx-padding: 15px;
+    -fx-font-size: 25px;
+    -fx-fill: -tmg-text-bright;
+    -fx-background-color: -tmg-overlay;
+    -fx-background-radius: 10 10 10 10;
+}
+
+.highlights HBox.hoverlay {
+    -fx-spacing: 10px;
+}
+
+.highlights .hoverlay .glyph-icon {
+    -fx-fill: -tmg-text-bright;
+}
+
+.highlights .hoverlay:hover {
+    -fx-background-color: -tmg-overlay-dark;
+}
