@@ -111,19 +111,23 @@ public class HighlightsViewController {
         googleMapScene.clear();
         drawJourney(places);
 
-        // TODO: show tags and good photos for entire journey
+        handlePlaceSelected(null);
     }
 
     private void handlePlaceSelected(Place place) {
-        wikipediaInfoPane.showDefaultWikiInfo(place);
+        List<Place> places = journeyPlaceList.getPlacesForJourney(journeyPlaceList.getSelectedJourney());
+        googleMapScene.clear();
+        List<Place> placesUntil;
+        if(place==null){
+            placesUntil = places;
+        }
+        else{
+            placesUntil = places.subList(0, places.indexOf(place) + 1);
+            wikipediaInfoPane.showDefaultWikiInfo(place);
+        }
 
         // draw journey until given place
-        List<Place> places = journeyPlaceList.getPlacesForJourney(journeyPlaceList.getSelectedJourney());
-        List<Place> placesUntil = places.subList(0, places.indexOf(place) + 1);
-
-        googleMapScene.clear();
         drawJourney(placesUntil);
-
         setGoodPhotos(place);
         setMostUsedTagsWithPhotos(place);
     }
