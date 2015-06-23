@@ -7,7 +7,7 @@
         <JourneyPlaceList fx:id="journeyPlaceList" prefWidth="240"/>
     </left>
     <center>
-        <GridPane fx:id="gridPane" style="-fx-background-color: #FFA726">
+        <GridPane fx:id="gridPane" style="-fx-background-color: #FFA726" hgap="10" vgap="10">
             <children>
                 <HBox fx:id="wikipediaInfoPaneContainer" GridPane.rowSpan="2" GridPane.columnIndex="0"
                       GridPane.rowIndex="0" />
