@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui.control;
 
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebEvent;
@@ -33,6 +34,8 @@ public class GoogleMapScene extends VBox {
         webEngine.load(getClass().getClassLoader().getResource("html/map.html").toString());
 
         getChildren().add(webView);
+        
+        setVgrow(webView, Priority.ALWAYS);
     }
 
     public void setOnLoaded(Runnable callback) {
