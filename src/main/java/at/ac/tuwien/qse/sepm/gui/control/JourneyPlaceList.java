@@ -44,6 +44,7 @@ public class JourneyPlaceList extends VBox {
 
     private Consumer<Journey> journeySelectedCallback = null;
     private Consumer<Place> placeSelectedCallback = null;
+    private Consumer<Journey> allPlacesSelectedCallback = null;
 
     public JourneyPlaceList() {
         FXMLLoadHelper.load(this, this, JourneyPlaceList.class, "view/control/JourneyPlaceList.fxml");
@@ -91,6 +92,10 @@ public class JourneyPlaceList extends VBox {
 
     public void setOnPlaceSelected(Consumer<Place> callback) {
         this.placeSelectedCallback = callback;
+    }
+
+    public void setOnAllPlacesSelected(Consumer<Journey> callback) {
+        this.allPlacesSelectedCallback = callback;
     }
 
     public Journey getSelectedJourney() {
@@ -146,6 +151,8 @@ public class JourneyPlaceList extends VBox {
     private class AllPlacesEntry extends Button {
         public AllPlacesEntry() {
             super("Alle Orte");
+
+            setOnAction((event) -> allPlacesSelectedCallback.accept(selectedJourney.get()));
         }
     }
 

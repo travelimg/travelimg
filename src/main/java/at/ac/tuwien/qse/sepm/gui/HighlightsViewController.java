@@ -58,6 +58,7 @@ public class HighlightsViewController {
 
         journeyPlaceList.setOnJourneySelected(this::handleJourneySelected);
         journeyPlaceList.setOnPlaceSelected(this::handlePlaceSelected);
+        journeyPlaceList.setOnAllPlacesSelected(this::handleAllPlacesSelected);
 
         // give each row and each column in the grid the same size
         ColumnConstraints column1 = new ColumnConstraints();
@@ -131,6 +132,10 @@ public class HighlightsViewController {
         drawJourney(placesUntil);
         setGoodPhotos(place);
         setMostUsedTagsWithPhotos(place);
+    }
+
+    private void handleAllPlacesSelected(Journey journey) {
+        LOGGER.debug("All places selected");
     }
 
     private Map<Place, List<Photo>> getPhotosByPlace(Set<Place> places, List<Photo> photos) {
