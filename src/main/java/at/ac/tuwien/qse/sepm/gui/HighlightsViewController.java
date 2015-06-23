@@ -53,6 +53,7 @@ public class HighlightsViewController {
         tagImageTiles.addAll(Arrays.asList(tag1, tag2, tag3, tag4, tag5));
 
         wikipediaInfoPane = new WikipediaInfoPane(wikipediaService);
+        HBox.setHgrow(wikipediaInfoPane, Priority.ALWAYS);
         wikipediaInfoPaneContainer.getChildren().add(wikipediaInfoPane);
 
         journeyPlaceList.setOnJourneySelected(this::handleJourneySelected);
