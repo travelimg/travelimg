@@ -18,7 +18,7 @@ public class MapSlideTile extends SlideTileBase<MapSlide> {
         getChildren().add(0, image);
 
         image.setPreserveRatio(false);
-        image.setFitWidth(ImageSize.inPixels(ImageSize.MEDIUM));
-        image.setFitHeight(ImageSize.inPixels(ImageSize.MEDIUM));
+        image.setFitWidth(ImageSize.MEDIUM.pixels());
+        image.setFitHeight(ImageSize.MEDIUM.pixels());
     }
 }

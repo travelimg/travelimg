@@ -46,7 +46,7 @@ public class ImageCacheImpl implements ImageCache {
             image = new Image(url, true);
         else {
             int width, height;
-            width = height = ImageSize.inPixels(size);
+            width = height = size.pixels();
             image = new Image(url, width, height, false, false, true);
         }
 

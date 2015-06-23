@@ -244,7 +244,7 @@ public class PaginatedImageGrid extends StackPane {
      */
     private void handleSizeChange(Object observable) {
         // estimate tile size
-        int size = ImageSize.inPixels(ImageSize.MEDIUM);
+        int size = ImageSize.MEDIUM.pixels();
         int tileSize = PADDING + GAP + size;
 
         int photosPerRow = (int) getWidth() / tileSize;

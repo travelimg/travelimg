@@ -7,10 +7,12 @@ public enum ImageSize {
     LARGE,
     ORIGINAL;
 
-    public static int inPixels(ImageSize size) {
-        if (size == SMALL) return 100;
-        else if (size == MEDIUM) return 150;
-        else if (size == LARGE) return 300;
-        else return 1; // placeholder
+    public int pixels() {
+        switch (this) {
+            case SMALL: return 100;
+            case MEDIUM: return 150;
+            case LARGE: return 300;
+            default: return 1; // placeholder
+        }
     }
 }
