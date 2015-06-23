@@ -27,11 +27,9 @@ import java.util.Random;
 
 public class ImageTile extends StackPane {
 
-    private static final Logger logger = LogManager.getLogger();
     private final SmartImage imageView = new SmartImage(ImageSize.LARGE);
     private final BorderPane overlay = new BorderPane();
     private final Label taggingIndicator = new Label();
-    private List<Photo> photos = new ArrayList<>();
 
     public ImageTile() {
         setAlignment(overlay, Pos.CENTER);
@@ -39,10 +37,12 @@ public class ImageTile extends StackPane {
         overlay.getStyleClass().add("overlay");
         taggingIndicator.getStyleClass().add("tagging");
         overlay.setCenter(taggingIndicator);
+
+        setOnMouseEntered((event) -> setCursor(Cursor.HAND));
+        setOnMouseExited((event -> setCursor(Cursor.DEFAULT)));
     }
 
     public void setPhotos(List<Photo> photos) {
-        this.photos = photos;
         if (photos.size() > 0) {
             getChildren().add(imageView);
             Random rand = new Random();
@@ -52,7 +52,12 @@ public class ImageTile extends StackPane {
             }
 
             imageView.setImage(photos.get(randomPos).getFile());
-            addEvents(photos);
+
+            setOnMouseClicked((event) -> {
+                FullscreenWindow fw = new FullscreenWindow(new ImageCacheImpl());
+                fw.present(photos, photos.get(0));
+            });
+
         }
     }
 
@@ -72,29 +77,6 @@ public class ImageTile extends StackPane {
         taggingIndicator.setGraphic(taggingIndicatorIcon);
         taggingIndicator.setText("Favorites");
         overlay.setVisible(true);
-    }
-
-    private void addEvents(List<Photo> photos) {
-
-        setOnMouseEntered(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                setCursor(Cursor.HAND);
-            }
-        });
-        setOnMouseExited(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                setCursor(Cursor.DEFAULT);
-            }
-        });
-        setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                FullscreenWindow fw = new FullscreenWindow(new ImageCacheImpl());
-                fw.present(photos, photos.get(0));
-            }
-        });
     }
 
     public void clearImageTile() {
