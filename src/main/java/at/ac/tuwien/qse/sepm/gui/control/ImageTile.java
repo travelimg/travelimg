@@ -69,8 +69,6 @@ public class ImageTile extends StackPane {
     }
 
     public void clearImageTile() {
-        setOnMouseEntered(null);
-        setOnMouseClicked(null);
         getChildren().clear();
     }
 }
