@@ -56,20 +56,6 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
-    public Set<Place> getPlacesByJourney(Journey journey) throws ServiceException {
-        Set<Place> places = new HashSet<>();
-
-        try {
-            for (Photo p : photoDAO.readPhotosByJourney(journey)) {
-                places.add(p.getData().getPlace());
-            }
-        } catch (DAOException e) {
-            throw new ServiceException("Failed to read Photos by journey");
-        }
-        return places;
-    }
-
-    @Override
     public List<Place> getPlacesByJourneyChronological(Journey journey) throws ServiceException {
         List<Photo> photos;
 

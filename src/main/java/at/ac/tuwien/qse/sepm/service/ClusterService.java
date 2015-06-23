@@ -25,15 +25,6 @@ public interface ClusterService {
     List<Place> getAllPlaces() throws ServiceException;
 
     /**
-     * Read and return places of a journey.
-     *
-     * @param journey the journey containing its id.
-     * @return the places
-     * @throws ServiceException propagates DAOExceptions
-     */
-    Set<Place> getPlacesByJourney(Journey journey) throws ServiceException;
-
-    /**
      * Read and return a list of places of a journey sorted in chronological (visiting) order.
      *
      * @param journey The journey for which the places are desired.
