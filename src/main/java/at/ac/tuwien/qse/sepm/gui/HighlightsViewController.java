@@ -114,24 +114,24 @@ public class HighlightsViewController {
         // draw the journey on the map
         List<Place> places = journeyPlaceList.getPlacesForJourney(journey);
         googleMapScene.clear();
-        drawJourney(places);
-
         handlePlaceSelected(null);
     }
 
     private void handlePlaceSelected(Place place) {
         List<Place> places = journeyPlaceList.getPlacesForJourney(journeyPlaceList.getSelectedJourney());
         googleMapScene.clear();
-        List<Place> placesUntil;
-        if (place == null) {
-            placesUntil = places;
-        } else {
-            placesUntil = places.subList(0, places.indexOf(place) + 1);
+
+        if(place==null){
+            // draw journey for all places
+            drawJourney(places, true);
+        }
+        else{
+            List<Place> placesUntil = places.subList(0, places.indexOf(place) + 1);
+            // draw journey until place
+            drawJourney(placesUntil, false);
             wikipediaInfoPane.showDefaultWikiInfo(place);
         }
 
-        // draw journey until given place
-        drawJourney(placesUntil);
         setGoodPhotos(place);
         setMostUsedTagsWithPhotos(place);
     }
@@ -241,24 +241,25 @@ public class HighlightsViewController {
         }
     }
 
-    public void drawJourney(List<Place> places) {
+    public void drawJourney(List<Place> places, boolean allPlaces) {
         googleMapScene.clear();
 
         if (places.isEmpty()) {
             return;
         }
 
-        if (places.size() == 1) {
-            Place place = places.get(0);
-            LatLong position = new LatLong(place.getLatitude(), place.getLongitude());
-            googleMapScene.addMarker(position);
-        } else {
-            List<LatLong> path = places.stream()
-                    .map(p -> new LatLong(p.getLatitude(), p.getLongitude()))
-                    .collect(Collectors.toList());
+        List<LatLong> path = places.stream()
+                .map(p -> new LatLong(p.getLatitude(), p.getLongitude()))
+                .collect(Collectors.toList());
 
-            googleMapScene.drawPolyline(path);
-            LatLong position = new LatLong(places.get(places.size() - 1).getLatitude(), places.get(places.size() - 1).getLongitude());
+        googleMapScene.drawPolyline(path);
+
+        if(allPlaces){
+            googleMapScene.fitToMarkers();
+        }
+        else{
+            googleMapScene.fitToLastTwoMarkers();
+            LatLong position = new LatLong(places.get(places.size()-1).getLatitude(), places.get(places.size()-1).getLongitude());
             googleMapScene.addMarker(position);
         }
     }

@@ -156,9 +156,9 @@
                 });
 
                 lines.push(line);
+                document.fitToMarkers();
                 document.setZoom(document.map.getZoom()-1);
                 document.setZoom(document.map.getZoom()+1);
-                document.fitToMarkers();
             }
         }
     </script>
