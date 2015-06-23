@@ -14,6 +14,7 @@ public class ImageCacheImpl implements ImageCache {
 
     private LRUCache<Path, Image> smallCache = new LRUCache<>(500);
     private LRUCache<Path, Image> mediumCache = new LRUCache<>(300);
+    private LRUCache<Path, Image> largeCache = new LRUCache<>(50);
     private LRUCache<Path, Image> originalCache = new LRUCache<>(5);
 
     @Override
@@ -56,6 +57,7 @@ public class ImageCacheImpl implements ImageCache {
     private LRUCache<Path, Image> getCacheForSize(ImageSize size) {
         if (size == ImageSize.SMALL) return smallCache;
         if (size == ImageSize.MEDIUM) return mediumCache;
+        if (size == ImageSize.LARGE) return largeCache;
         return originalCache;
     }
 }
