@@ -48,8 +48,6 @@ public class WikipediaInfoPane extends VBox {
 
         categoryName.setCellValueFactory(new PropertyValueFactory<>("Key"));
         categoryValue.setCellValueFactory(new PropertyValueFactory<>("Value"));
-
-        //showDefaultWikiInfo();
     }
 
 
@@ -98,10 +96,10 @@ public class WikipediaInfoPane extends VBox {
             infoList.add(new Pair<String, String>("Höhe", info.getElevation().toString() + "m"));
         }
         if (info.getUtcOffset() != null) {
-            infoList.add(new Pair<String, String>("Zeitzone", info.getUtcOffset().toString()));
+            infoList.add(new Pair<String, String>("Zeitzone", info.getUtcOffset()));
         }
         if (info.getCurrency() != null) {
-            infoList.add(new Pair<String, String>("Währung", info.getCurrency().toString()));
+            infoList.add(new Pair<String, String>("Währung", info.getCurrency()));
         }
         if (info.getLanguage() != null) {
             infoList.add(new Pair<String, String>("Sprache(n)", info.getLanguage()));
