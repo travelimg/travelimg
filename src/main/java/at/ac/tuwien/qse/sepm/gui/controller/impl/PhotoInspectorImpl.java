@@ -9,6 +9,7 @@ import at.ac.tuwien.qse.sepm.gui.control.TagSelector;
 import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.SlideshowView;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
+import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -77,7 +78,7 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
     @Override public void setEntities(Collection<Photo> photos) {
         super.setEntities(photos);
 
-        getEntities().forEach(photo -> mapScene.addMarker(photo.getData().getLatitude(), photo.getData().getLongitude()));
+        getEntities().forEach(photo -> mapScene.addMarker(new LatLong(photo.getData().getLatitude(), photo.getData().getLongitude())));
 
         showDetails(getEntities());
     }
@@ -170,7 +171,7 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
 
         // Add the map markers for each photo.
         mapScene.clear();
-        photos.forEach((photo) -> mapScene.addMarker(photo.getData().getLatitude(), photo.getData().getLongitude()));
+        photos.forEach((photo) -> mapScene.addMarker(new LatLong(photo.getData().getLatitude(), photo.getData().getLongitude())));
         mapScene.fitToMarkers();
 
         // Show additional details for a single selected photo.

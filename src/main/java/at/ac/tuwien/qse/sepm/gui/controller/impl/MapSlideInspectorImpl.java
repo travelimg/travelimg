@@ -54,8 +54,8 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
             captionField.setText(slide.getCaption());
 
             map.clear();
-            map.addMarker(slide.getLatitude(), slide.getLongitude());
-            map.center(slide.getLatitude(), slide.getLongitude());
+            map.addMarker(new LatLong(slide.getLatitude(), slide.getLongitude()));
+            map.center(new LatLong(slide.getLatitude(), slide.getLongitude()));
         }
     }
 
@@ -73,8 +73,8 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
         }
 
         map.clear();
-        map.addMarker(latitude, longitude);
-        map.center(latitude, longitude);
+        map.addMarker(new LatLong(latitude, longitude));
+        map.center(new LatLong(latitude, longitude));
     }
 
     private void handleCaptionChange(Observable observable) {

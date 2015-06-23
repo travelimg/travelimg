@@ -47,9 +47,9 @@ public class AwesomeMapScene extends VBox {
         this.doubleClickCallback = doubleClickCallback;
     }
 
-    public void center(double latitude, double longitude) {
-        LOGGER.debug("Centering map at ({}, {})", latitude, longitude);
-        callJS(String.format("document.center(%f, %f);", latitude, longitude));
+    public void center(LatLong position) {
+        LOGGER.debug("Centering map at ({}, {})", position.getLatitude(), position.getLongitude());
+        callJS(String.format("document.center(%f, %f);", position.getLatitude(), position.getLongitude()));
     }
 
     public void clear() {
@@ -62,9 +62,9 @@ public class AwesomeMapScene extends VBox {
         callJS(String.format("document.setZoom(%d);", level));
     }
 
-    public void addMarker(double latitude, double longitude) {
-        LOGGER.debug("Adding marker at ({}, {})", latitude, longitude);
-        callJS(String.format(Locale.US, "document.addMarker(%f, %f);", latitude, longitude));
+    public void addMarker(LatLong position) {
+        LOGGER.debug("Adding marker at ({}, {})", position.getLatitude(), position.getLongitude());
+        callJS(String.format(Locale.US, "document.addMarker(%f, %f);", position.getLatitude(), position.getLongitude()));
     }
 
     public void fitToMarkers() {

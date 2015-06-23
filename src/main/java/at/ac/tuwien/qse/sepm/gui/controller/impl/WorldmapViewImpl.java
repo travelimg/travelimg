@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.gui.control.AwesomeMapScene;
 import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
+import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.ClusterService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import javafx.fxml.FXML;
@@ -41,7 +42,7 @@ public class WorldmapViewImpl implements WorldmapView {
             return;
         }
 
-        places.forEach((place) -> mapScene.addMarker(place.getLatitude(), place.getLongitude()));
+        places.forEach((place) -> mapScene.addMarker(new LatLong(place.getLatitude(), place.getLongitude())));
         mapScene.fitToMarkers();
     }
 }

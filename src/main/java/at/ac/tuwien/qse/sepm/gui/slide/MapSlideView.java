@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.gui.slide;
 
 import at.ac.tuwien.qse.sepm.entities.MapSlide;
 import at.ac.tuwien.qse.sepm.gui.control.AwesomeMapScene;
+import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 
 public class MapSlideView extends SlideView {
 
@@ -14,10 +15,10 @@ public class MapSlideView extends SlideView {
 
         getChildren().add(mapScene);
 
-        mapScene.setOnLoaded(() -> addMarker());
+        mapScene.setOnLoaded(this::addMarker);
     }
 
     private void addMarker() {
-        mapScene.addMarker(slide.getLatitude(), slide.getLongitude());
+        mapScene.addMarker(new LatLong(slide.getLatitude(), slide.getLongitude()));
     }
 }
