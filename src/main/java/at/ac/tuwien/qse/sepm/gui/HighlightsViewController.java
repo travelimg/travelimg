@@ -111,15 +111,11 @@ public class HighlightsViewController {
             return;
         }
 
-        // draw the journey on the map
-        List<Place> places = journeyPlaceList.getPlacesForJourney(journey);
-        googleMapScene.clear();
         handlePlaceSelected(null);
     }
 
     private void handlePlaceSelected(Place place) {
         List<Place> places = journeyPlaceList.getPlacesForJourney(journeyPlaceList.getSelectedJourney());
-        googleMapScene.clear();
 
         if(place==null){
             // draw journey for all places
@@ -137,6 +133,7 @@ public class HighlightsViewController {
     }
 
     private void handleAllPlacesSelected(Journey journey) {
+        handlePlaceSelected(null);
         LOGGER.debug("All places selected");
     }
 
