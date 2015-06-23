@@ -8,7 +8,7 @@ public enum ImageSize {
 
     public static int inPixels(ImageSize size) {
         if (size == SMALL) return 100;
-        else if (size == MEDIUM) return 200;
+        else if (size == MEDIUM) return 150;
         else return 1; // placeholder
     }
 }

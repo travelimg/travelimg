@@ -1,93 +1,48 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.gui.GoogleMapsScene;
+import at.ac.tuwien.qse.sepm.entities.Place;
+import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
-import at.ac.tuwien.qse.sepm.service.PhotoService;
+import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
+import at.ac.tuwien.qse.sepm.gui.util.LatLong;
+import at.ac.tuwien.qse.sepm.service.ClusterService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import javafx.fxml.FXML;
 import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class WorldmapViewImpl implements WorldmapView {
-    private static final org.apache.logging.log4j.Logger logger = LogManager
-            .getLogger(WorldmapViewImpl.class);
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @FXML
-    private BorderPane border;
-    private GoogleMapsScene worldMap;
+    private BorderPane root;
+    @FXML
+    private GoogleMapScene mapScene;
+
     @Autowired
-    private PhotoService photoService;
+    private ClusterService clusterService;
 
-    @Override
-    public GoogleMapsScene getMap() {
-        return this.worldMap;
+    @FXML
+    private void initialize() {
+        mapScene.setOnLoaded(this::showPlaces);
     }
 
-    @Override
-    public void setMap(GoogleMapsScene map) {
-        this.worldMap = map;
-
-        worldMap.removeAktiveMarker();
+    private void showPlaces() {
+        List<Place> places;
         try {
-            worldMap.addMarkerList(deleteDouble(photoService.getAllPhotos()));
-
-        } catch (ServiceException e) {
-            logger.debug(e);
+            places = clusterService.getAllPlaces();
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Laden aller Orte", "");
+            return;
         }
-        worldMap.setCenter(70.7385, -90.9871);
-        worldMap.setZoom(2);
-        border.setCenter(worldMap.getMapView());
+
+        places.forEach((place) -> mapScene.addMarker(new LatLong(place.getLatitude(), place.getLongitude())));
+        mapScene.fitToMarkers();
     }
-
-    /**
-     * checks whether a marker representing a photo and is already available
-     *
-     * @param list List of photos which should be displayed as a marker
-     * @param p    a photo to be added
-     * @return true if the Photo is entitled to be added
-     */
-    private boolean checkDouble(List<Photo> list, Photo p) {
-
-        for (Photo photo : list) {
-            if (p.getData().getLatitude() == photo.getData().getLatitude() && p.getData().getLongitude() == photo.getData().getLongitude()) {
-                logger.debug("Marker already exists");
-                return true;
-
-            }
-
-            if (Math.abs(p.getData().getLatitude() - photo.getData().getLatitude()) < 1 && Math.abs(p.getData().getLongitude() - photo.getData().getLongitude()) < 1) {
-                logger.debug("Marker with similar coordinates already exists");
-                return true;
-            }
-
-        }
-        logger.debug("set Marker ");
-        return false;
-    }
-
-    /**
-     * delete Photos where Long and Lat is similar to display a new Marker
-     *
-     * @param l List of Photos to be set as Marker
-     * @return List of photos which should be displayed as a marker
-     */
-    private List<Photo> deleteDouble(List<Photo> l) {
-        List<Photo> list = new ArrayList<Photo>();
-        for (Photo p : l) {
-            if (list.size() == 0) {
-                list.add(p);
-            } else if (!checkDouble(list, p)) {
-                list.add(p);
-            }
-        }
-        return list;
-    }
-
-
 }

@@ -1,38 +1,37 @@
 package at.ac.tuwien.qse.sepm.gui.controller;
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.gui.MapUser;
-
 import java.util.Collection;
 
 /**
- * Controller for view that allows viewing and modifying meta-data of one or multiple photos.
+ * GUI component for viewing and editing the details of one or more entities.
+ *
+ * @param <E> type of entities that can be inspected
  */
-public interface Inspector extends MapUser {
+public interface Inspector<E> {
 
     /**
-     * Get the photos the inspector currently operates on.
+     * Get the entities the inspector currently operates on.
      *
-     * @return collection of photos
+     * @return collection of entities
      */
-    Collection<Photo> getActivePhotos();
+    Collection<E> getEntities();
 
     /**
-     * Set the photos the inspector should operate on.
+     * Set the entities the inspector should operate on.
      *
-     * @param photos photos that should be operated on
+     * @param entities entities that should be operated on
      */
-    void setActivePhotos(Collection<Photo> photos);
+    void setEntities(Collection<E> entities);
 
     /**
-     * Set a function that is invoked when the active photos are modified.
+     * Set a function that is invoked when the entities are modified.
      *
-     * @param updateHandler
+     * @param updateHandler function when the entities are modified
      */
     void setUpdateHandler(Runnable updateHandler);
 
     /**
-     * Reloads data.
+     * Synchronizes the view to match the data available to the inspector.
      */
     void refresh();
 }
