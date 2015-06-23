@@ -89,23 +89,6 @@ public class AwesomeMapScene extends VBox {
         }
     }
 
-    private void handleDoubleClick(JSObject obj) {
-        LOGGER.debug("Registered double click");
-
-        if (doubleClickCallback != null) {
-            doubleClickCallback.accept(null);
-        }
-
-    }
-
-    private void handleClick(JSObject obj) {
-        LOGGER.debug("Registered click");
-
-        if (clickCallback != null) {
-            clickCallback.accept(null);
-        }
-    }
-
     private void callJS(String script) {
         webEngine.executeScript(script);
     }
