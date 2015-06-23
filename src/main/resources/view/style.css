@@ -882,9 +882,12 @@
     -fx-background-color: -tmg-primary;
 }
 
-.imageTile:hover .overlay {
-    -fx-background-color: rgba(0, 0, 0, 0.5);
-    -fx-opacity: 1.0;
+.imageTile .smart-image {
+    -fx-background-color: rgba(255, 255, 255, 0);
+}
+
+.imageTile .glyph-icon {
+    -fx-fill: -tmg-text-dark;
 }
 
 .highlights .hoverlay {
@@ -919,4 +922,8 @@
 }
 .wikipedia #descriptionText {
     -fx-padding: 20 0 0 00;
+}
+
+.journey-places-list {
+    -fx-background-color: -tmg-bg1;
 }
