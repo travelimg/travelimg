@@ -1,12 +1,10 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.*;
-import at.ac.tuwien.qse.sepm.gui.control.ImageTile;
-import at.ac.tuwien.qse.sepm.gui.control.JourneyPlaceList;
-import at.ac.tuwien.qse.sepm.gui.control.TravelRouteMap;
-import at.ac.tuwien.qse.sepm.gui.control.WikipediaInfoPane;
+import at.ac.tuwien.qse.sepm.gui.control.*;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
+import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.JourneyFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
@@ -31,7 +29,7 @@ public class HighlightsViewController {
     @FXML
     private ImageTile tag1, tag2, tag3, tag4, tag5, good;
     @FXML
-    private TravelRouteMap travelRouteMap;
+    private GoogleMapScene googleMapScene;
 
     @FXML
     private JourneyPlaceList journeyPlaceList;
@@ -119,8 +117,8 @@ public class HighlightsViewController {
 
         // draw the journey on the map
         List<Place> places = journeyPlaceList.getPlacesForJourney(journey);
-        travelRouteMap.clear();
-        travelRouteMap.drawJourney(places);
+        googleMapScene.clear();
+        drawJourney(places);
 
         // TODO: show tags and good photos for entire journey
     }
@@ -132,8 +130,8 @@ public class HighlightsViewController {
         List<Place> places = journeyPlaceList.getPlacesForJourney(journeyPlaceList.getSelectedJourney());
         List<Place> placesUntil = places.subList(0, places.indexOf(place) + 1);
 
-        travelRouteMap.clear();
-        travelRouteMap.drawJourney(placesUntil);
+        googleMapScene.clear();
+        drawJourney(placesUntil);
 
         setGoodPhotos(place);
         setMostUsedTagsWithPhotos(place);
@@ -237,6 +235,26 @@ public class HighlightsViewController {
             }
             nrOfPhotos--;
             i++;
+        }
+    }
+
+    public void drawJourney(List<Place> places) {
+        googleMapScene.clear();
+
+        if (places.isEmpty()) {
+            return;
+        }
+
+        if (places.size() == 1) {
+            Place place = places.get(0);
+            LatLong position = new LatLong(place.getLatitude(), place.getLongitude());
+            googleMapScene.addMarker(position);
+        } else {
+            List<LatLong> path = places.stream()
+                    .map(p -> new LatLong(p.getLatitude(), p.getLongitude()))
+                    .collect(Collectors.toList());
+
+            googleMapScene.drawPolyline(path);
         }
     }
 

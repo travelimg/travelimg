@@ -2,8 +2,7 @@
 
 <?import at.ac.tuwien.qse.sepm.gui.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane fx:id="root" stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.HighlightsViewController">
+<BorderPane fx:id="root" stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.HighlightsViewController">
     <left>
         <JourneyPlaceList fx:id="journeyPlaceList" prefWidth="240"/>
     </left>
@@ -12,7 +11,7 @@
             <children>
                 <HBox fx:id="wikipediaInfoPaneContainer" GridPane.rowSpan="2" GridPane.columnIndex="0"
                       GridPane.rowIndex="0" />
-                <TravelRouteMap fx:id="travelRouteMap" GridPane.rowSpan="2" GridPane.columnSpan="2"
+                <GoogleMapScene fx:id="googleMapScene" GridPane.rowSpan="2" GridPane.columnSpan="2"
                                 GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.fillWidth="true"/>
                 <ImageTile fx:id="tag1" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
                 <ImageTile fx:id="good" styleClass="good" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
