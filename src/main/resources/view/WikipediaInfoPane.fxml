@@ -3,15 +3,14 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 <fx:root fx:id="root"
          stylesheets="@style.css" type="javafx.scene.layout.VBox"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
          styleClass="wikipedia">
     <children>
 
-        <Label fx:id="placeLabel" text="Place" />
-        <Label fx:id="countryLabel" text="Country" />
+        <Label fx:id="placeLabel" text="Place"/>
+        <Label fx:id="countryLabel" text="Country"/>
 
         <Label fx:id="descriptionText" wrapText="true"/>
 
