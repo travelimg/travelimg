@@ -1,7 +1,5 @@
 package at.ac.tuwien.qse.sepm.gui.control;
 
-import com.lynden.gmapsfx.javascript.object.LatLong;
-import javafx.event.EventHandler;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebEvent;
@@ -32,19 +30,7 @@ public class AwesomeMapScene extends VBox {
         webView = new WebView();
         webEngine = webView.getEngine();
 
-        webEngine.setOnAlert(new EventHandler<WebEvent<String>>() {
-            @Override
-            public void handle(WebEvent<String> event) {
-                LOGGER.debug("Got alert {}", event);
-
-                if (event.getData().equals("map-loaded")) {
-                    if (onLoadedCallback != null) {
-                        onLoadedCallback.run();
-                    }
-                }
-            }
-        });
-
+        webEngine.setOnAlert(this::handleAlert);
         webEngine.load(getClass().getClassLoader().getResource("html/map.html").toString());
 
         getChildren().add(webView);
@@ -125,5 +111,56 @@ public class AwesomeMapScene extends VBox {
         webEngine.executeScript(script);
     }
 
+    private void handleAlert(WebEvent<String> event) {
+        LOGGER.debug("Got alert {}", event);
+
+        String data = event.getData();
+
+        if (data.equals("map-loaded")) {
+            if (onLoadedCallback != null) {
+                onLoadedCallback.run();
+            }
+        } else if (data.contains("click")) {
+            String type = data.substring(0, data.indexOf("("));
+            String params = data.substring(data.indexOf("(") + 1, data.indexOf(")"));
+
+            String latLng[] = params.split(",");
+
+            if (latLng.length != 2) {
+                return;
+            }
+
+            try {
+                double latitude = Double.parseDouble(latLng[0].trim());
+                double longitude = Double.parseDouble(latLng[1].trim());
+                
+                if (type.equals("double-click") && doubleClickCallback != null) {
+                    doubleClickCallback.accept(new LatLong(latitude, longitude));
+                } else if (type.equals("click") && clickCallback != null) {
+                    clickCallback.accept(new LatLong(latitude, longitude));
+                }
+            } catch (NumberFormatException ex) {
+                LOGGER.debug("Failed to parse click event from map");
+            }
+        }
+    }
+
+    public static class LatLong {
+        private double latitude;
+        private double longitude;
+
+        public LatLong(double latitude, double longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+
+        public double getLatitude() {
+            return latitude;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
+    }
 
 }

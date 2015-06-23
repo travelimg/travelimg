@@ -27,6 +27,22 @@
             document.map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
 
             google.maps.event.addListener(document.map, 'tilesloaded', function() {
+
+                google.maps.event.addListener(document.map, "click", function(event) {
+                    var lat = event.latLng.lat();
+                    var lng = event.latLng.lng();
+
+                    alert("click(" + lat + ", " + lng + ")");
+                });
+
+                google.maps.event.addListener(document.map, "dblclick", function(event) {
+                    var lat = event.latLng.lat();
+                    var lng = event.latLng.lng();
+
+                    alert("double-click(" + lat + ", " + lng + ")");
+                });
+
+
                 alert("map-loaded");
             });
 
