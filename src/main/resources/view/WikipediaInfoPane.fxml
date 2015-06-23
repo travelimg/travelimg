@@ -1,43 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.*?>
-<?import javafx.geometry.*?>
-<?import java.lang.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-<fx:root fx:id="root" prefHeight="300.0" prefWidth="330.0" stylesheets="@style.css" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-<children>
-      <Group>
-         <children>
-          <Label fx:id="placeLabel" prefHeight="36.0" prefWidth="304.0" text="Place">
-               <font>
-                  <Font size="25.0" />
-               </font>
-            </Label>
-          <Label fx:id="countryLabel" prefHeight="25.0" prefWidth="301.0" text="Country" translateY="30.0">
-               <font>
-                  <Font size="16.0" />
-               </font>
-            </Label>
-         </children>
-         <VBox.margin>
-            <Insets left="20.0" top="20.0" />
-         </VBox.margin>
-      </Group>
-      <Text fx:id="descriptionText" boundsType="VISUAL" strokeType="OUTSIDE" strokeWidth="0.0" text="Text TextText Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text Text Text " wrappingWidth="306.248046875">
-         <VBox.margin>
-            <Insets bottom="10.0" left="15.0" top="15.0" />
-         </VBox.margin></Text>
-    <TableView fx:id="infoTable" prefWidth="100.0">
-    <columns>
-        <TableColumn fx:id="categoryName" />
-        <TableColumn fx:id="categoryValue" />
-    </columns>
-         <VBox.margin>
-            <Insets />
-         </VBox.margin>
-    </TableView>
-</children>
+<?import javafx.scene.Group?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<fx:root fx:id="root"
+         stylesheets="@style.css" type="javafx.scene.layout.VBox"
+         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <Group>
+            <children>
+                <Label fx:id="placeLabel" text="Place">
+                    <font>
+                        <Font size="25.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="countryLabel" text="Country" translateY="30.0">
+                    <font>
+                        <Font size="16.0"/>
+                    </font>
+                </Label>
+            </children>
+            <VBox.margin>
+                <Insets left="20.0" top="20.0"/>
+            </VBox.margin>
+        </Group>
+        <Text fx:id="descriptionText" boundsType="VISUAL" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="200">
+            <VBox.margin>
+                <Insets bottom="10.0" left="15.0" top="15.0"/>
+            </VBox.margin>
+        </Text>
+        <TableView fx:id="infoTable">
+            <columns>
+                <TableColumn fx:id="categoryName"/>
+                <TableColumn fx:id="categoryValue"/>
+            </columns>
+            <VBox.margin>
+                <Insets/>
+            </VBox.margin>
+        </TableView>
+    </children>
 </fx:root>
