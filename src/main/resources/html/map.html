@@ -109,8 +109,15 @@
 
             document.drawPolyline = function drawPolyline(vertices) {
                 var path = [];
+                var image = 'red_circle.png';
                 for (var i = 0; i < vertices.length; i++) {
                     path.push(new google.maps.LatLng(vertices[i][0], vertices[i][1]));
+                    var marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(vertices[i][0], vertices[i][1]),
+                        map: document.map,
+                        icon: image
+                    });
+                    markers.push(marker);
                 }
 
                 var line = new google.maps.Polyline({
@@ -122,6 +129,7 @@
                 });
 
                 lines.push(line);
+                document.fitToMarkers();
             }
         }
     </script>
