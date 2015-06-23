@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import at.ac.tuwien.qse.sepm.gui.control.JourneyPlaceList?>
-<?import at.ac.tuwien.qse.sepm.gui.control.TravelRouteMap?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
