@@ -5,6 +5,7 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import at.ac.tuwien.qse.sepm.gui.control.ImageTile?>
 <BorderPane fx:id="root" stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.HighlightsViewController">
     <left>
         <JourneyPlaceList fx:id="journeyPlaceList"/>
@@ -19,15 +20,9 @@
                             <children>
                                 <VBox fx:id="tagheartContainer" spacing="2.0">
                                     <children>
-                                        <Button fx:id="tag5" text="Tag5" prefHeight="200" prefWidth="300"></Button>
-                                        <Button fx:id="good" prefHeight="200" prefWidth="300" styleClass="good" onAction="#bt_heartPress">
-                                            <tooltip>
-                                                <Tooltip text="Gutes Foto"/>
-                                            </tooltip>
-                                            <graphic>
-                                                <FontAwesomeIconView glyphName="HEART" scaleX="6" scaleY="6"/>
-                                            </graphic>
-                                        </Button>
+                                        <ImageTile fx:id="tag5" prefHeight="200" prefWidth="300"></ImageTile>
+                                        <ImageTile fx:id="good" prefHeight="200" prefWidth="300" styleClass="good">
+                                        </ImageTile>
                                     </children>
                                 </VBox>
                                 <TravelRouteMap fx:id="travelRouteMap" prefHeight="400" prefWidth="600"/>
@@ -39,10 +34,10 @@
                     <children>
                         <HBox fx:id="firstFourTagsHBox" spacing="2.0">
                             <children>
-                                <Button fx:id="tag1" text="Tag1" prefHeight="200" prefWidth="300" ></Button>
-                                <Button fx:id="tag2" text="Tag2" prefHeight="200" prefWidth="300" ></Button>
-                                <Button fx:id="tag3" text="Tag3" prefHeight="200" prefWidth="300" ></Button>
-                                <Button fx:id="tag4" text="Tag4" prefHeight="200" prefWidth="300" ></Button>
+                                <ImageTile fx:id="tag1"  prefHeight="200" prefWidth="300" ></ImageTile>
+                                <ImageTile fx:id="tag2"  prefHeight="200" prefWidth="300" ></ImageTile>
+                                <ImageTile fx:id="tag3"  prefHeight="200" prefWidth="300" ></ImageTile>
+                                <ImageTile fx:id="tag4"  prefHeight="200" prefWidth="300" ></ImageTile>
                             </children>
                         </HBox>
                     </children>

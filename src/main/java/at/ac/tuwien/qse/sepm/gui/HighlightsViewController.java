@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.*;
+import at.ac.tuwien.qse.sepm.gui.control.ImageTile;
 import at.ac.tuwien.qse.sepm.gui.control.JourneyPlaceList;
 import at.ac.tuwien.qse.sepm.gui.control.TravelRouteMap;
 import at.ac.tuwien.qse.sepm.gui.control.WikipediaInfoPane;
@@ -9,32 +10,26 @@ import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.JourneyFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.net.MalformedURLException;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class HighlightsViewController {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    List<Button> tagButtons = new ArrayList<>();
+    List<ImageTile> tagImageTiles = new ArrayList<>();
     @FXML
     private BorderPane root;
     @FXML
     private HBox wikipediaInfoPaneContainer;
     @FXML
-    private Button tag1, tag2, tag3, tag4, tag5, good;
+    private ImageTile tag1, tag2, tag3, tag4, tag5, good;
     @FXML
     private TravelRouteMap travelRouteMap;
 
@@ -49,7 +44,6 @@ public class HighlightsViewController {
     private TagService tagService;
     @Autowired
     private WikipediaService wikipediaService;
-    private List<Button> buttonAr = new LinkedList<>();
     private WikipediaInfoPane wikipediaInfoPane;
     private ImageCache imageCache;
 
@@ -65,11 +59,7 @@ public class HighlightsViewController {
 
     @FXML
     private void initialize() {
-        buttonAr.add(tag1);
-        buttonAr.add(tag2);
-        buttonAr.add(tag3);
-        buttonAr.add(tag4);
-        tagButtons.addAll(Arrays.asList(tag1, tag2, tag3, tag4, tag5));
+        tagImageTiles.addAll(Arrays.asList(tag1, tag2, tag3, tag4, tag5));
 
         wikipediaInfoPane = new WikipediaInfoPane(wikipediaService);
         wikipediaInfoPaneContainer.getChildren().add(wikipediaInfoPane);
@@ -162,25 +152,12 @@ public class HighlightsViewController {
         return orderedPlaces;
     }
 
-    @FXML
-    private void bt_heartPress() {
-        List<Photo> goodPhotos = photos.stream()
-                .filter(new GoodPhotoFilter())
-                .collect(Collectors.toList());
-
-        if (!goodPhotos.isEmpty()) {
-            FullscreenWindow fw = new FullscreenWindow(this.imageCache);
-            fw.present(goodPhotos, goodPhotos.get(0));
-        }
-    }
-
     /**
-     * Sets the good rated photos for the heart button based on a filter.
+     * Sets the good rated photos for the heart imagetile based on a filter.
      *
      * @param place
      */
     private void setGoodPhotos(Place place) {
-        good.setText("");
 
         PhotoFilter filter;
         if (place == null) {
@@ -193,21 +170,14 @@ public class HighlightsViewController {
                     .filter(filter)
                     .collect(Collectors.toList());
 
-        if (goodPhotos.isEmpty()) {
-            good.setStyle("-fx-background-image: none;");
-        } else {
-            setBackroundImageForButton(goodPhotos.get(0).getPath(), good);
-        }
+        good.clearImageTile();
+        good.setPhotos(goodPhotos);
+        good.setGood();
     }
 
     private void setMostUsedTagsWithPhotos(Place place) {
         //TODO we should use our own photofilter.
         List<Photo> filteredByPlace;
-
-        tagButtons.forEach(button -> {
-            button.setStyle("-fx-background-image: none;");
-            button.setText("");
-        });
 
         if (place == null) {
             filteredByPlace = photos;
@@ -222,22 +192,13 @@ public class HighlightsViewController {
             for (int i = 0; i < mostUsedTags.size(); i++) {
                 Tag t = mostUsedTags.get(i);
                 List<Photo> filteredByTags = filteredByPlace.stream().filter(p -> p.getData().getTags().contains(t)).collect(Collectors.toList());
-                Button tagButton = tagButtons.get(i);
-                tagButton.setText(t.getName());
-                setBackroundImageForButton(filteredByTags.get(0).getPath(), tagButton);
-                tagButton.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        if (filteredByTags.size() != 0) {
-                            FullscreenWindow fw = new FullscreenWindow(imageCache);
-                            fw.present(filteredByTags, filteredByTags.get(0));
-                        }
-                    }
-                });
-
+                ImageTile tagImageTile = tagImageTiles.get(i);
+                tagImageTile.clearImageTile();
+                tagImageTile.setPhotos(filteredByTags);
+                tagImageTile.setTag(t);
             }
-            int remainingEmptyTagButtons = 5 - mostUsedTags.size();
-            fillWithPhotos(remainingEmptyTagButtons, filteredByPlace);
+            int remainingEmptyTagImageTiles = 5 - mostUsedTags.size();
+            fillWithPhotos(remainingEmptyTagImageTiles, filteredByPlace);
 
         } catch (ServiceException e) {
             fillWithPhotos(5, filteredByPlace);
@@ -247,26 +208,14 @@ public class HighlightsViewController {
 
     private void fillWithPhotos(int nrOfPhotos, List<Photo> filteredByPlace) {
         int i = 0;
-        while (nrOfPhotos > 0 && i < filteredByPlace.size()) {
-            Button tagButton = tagButtons.get(5 - nrOfPhotos);
-            setBackroundImageForButton(filteredByPlace.get(i).getPath(), tagButton);
+        while (nrOfPhotos > 0) {
+            ImageTile tagImageTile = tagImageTiles.get(5 - nrOfPhotos);
+            tagImageTile.clearImageTile();
+            if(i < filteredByPlace.size()){
+                tagImageTile.setPhotos(filteredByPlace.subList(i,i+1));
+            }
             nrOfPhotos--;
             i++;
-        }
-    }
-
-    /**
-     * Sets an image as the background of the button
-     *
-     * @param path   the path to the image
-     * @param button
-     */
-    private void setBackroundImageForButton(String path, Button button) {
-        try {
-            button.setStyle("-fx-background-image: url('" + Paths.get(path).toUri().toURL().toString() + "');" +
-                    "-fx-background-size: 100% 100%;");
-        } catch (MalformedURLException e) {
-            LOGGER.error("Failed to convert photo path to URL", e);
         }
     }
 
