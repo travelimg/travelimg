@@ -10,9 +10,9 @@ import at.ac.tuwien.qse.sepm.gui.dialogs.*;
 import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
+import at.ac.tuwien.qse.sepm.util.IOHandler;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -45,11 +46,15 @@ public class GridViewImpl implements GridView {
     @Autowired
     private Organizer organizer;
     @Autowired
-    private Inspector inspector;
+    private Inspector<Photo> inspector;
     @Autowired
     private Menu menu;
     @Autowired
     private ImageCache imageCache;
+    @Autowired
+    private IOHandler ioHandler;
+    @Autowired
+    private ExifService exifService;
 
     @FXML
     private BorderPane root;
@@ -78,7 +83,7 @@ public class GridViewImpl implements GridView {
         root.setCenter(grid);
 
         // Selected photos are shown in the inspector.
-        grid.setSelectionChangeAction(inspector::setActivePhotos);
+        grid.setSelectionChangeAction(inspector::setEntities);
 
         // CTRL+A select all photos.
         root.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -89,10 +94,10 @@ public class GridViewImpl implements GridView {
 
         // Updated photos that no longer match the filter are removed from the grid.
         inspector.setUpdateHandler(() -> {
-            inspector.getActivePhotos().stream()
+            inspector.getEntities().stream()
                     .filter(organizer.getFilter().negate())
                     .forEach(grid::removePhoto);
-            inspector.getActivePhotos().stream()
+            inspector.getEntities().stream()
                     .filter(organizer.getFilter())
                     .forEach(grid::updatePhoto);
         });
@@ -115,8 +120,9 @@ public class GridViewImpl implements GridView {
 
     private void handlePhotoCreated(Photo photo) {
         Platform.runLater(() -> {
-            // TODO: should we update filter
-            grid.addPhoto(photo);
+            if (organizer.getFilter().test(photo)) {
+                grid.addPhoto(photo);
+            }
         });
     }
 
@@ -185,25 +191,15 @@ public class GridViewImpl implements GridView {
 
         @Override public void onPresent(Menu sender) {
             FullscreenWindow fullscreen = new FullscreenWindow(imageCache);
-            fullscreen.present(grid.getPhotos(), grid.getActivePhoto());
-        }
-
-        @Override public void onImport(Menu sender) {
-            ImportDialog dialog = new ImportDialog(root, photographerService);
-            Optional<List<Photo>> photos = dialog.showForResult();
-            if (!photos.isPresent())
-                return;
-            importService.importPhotos(photos.get(), GridViewImpl.this::handleImportedPhoto,
-                    GridViewImpl.this::handleImportError);
+            List<Photo> getSelectedPhoto = new ArrayList<>();
+            getSelectedPhoto.addAll(grid.getSelected());
+            fullscreen.present(grid.getPhotos(), getSelectedPhoto.get(0));
         }
 
         @Override public void onFlickr(Menu sender) {
-            FlickrDialog flickrDialog = new FlickrDialog(root, "Flickr Import", flickrService);
+            FlickrDialog flickrDialog = new FlickrDialog(root, "Flickr Import", flickrService, exifService, ioHandler);
             Optional<List<Photo>> photos = flickrDialog.showForResult();
             if (!photos.isPresent()) return;
-            importService.importPhotos(photos.get(),
-                    GridViewImpl.this::handleImportedPhoto,
-                    GridViewImpl.this::handleImportError);
         }
 
         @Override public void onJourney(Menu sender) {
@@ -233,14 +229,8 @@ public class GridViewImpl implements GridView {
 
         @Override public void onExport(Menu sender) {
             Collection<Photo> selection = grid.getSelected();
-            String dropboxFolder = "";
-            try {
-                dropboxFolder = dropboxService.getDropboxFolder();
-            } catch (ServiceException ex) {
-                ErrorDialog.show(root, "Fehler beim Export", "Konnte keinen Dropboxordner finden");
-            }
 
-            ExportDialog dialog = new ExportDialog(root, dropboxFolder, selection.size());
+            ExportDialog dialog = new ExportDialog(root, dropboxService, selection.size());
 
             Optional<String> destinationPath = dialog.showForResult();
             if (!destinationPath.isPresent()) return;

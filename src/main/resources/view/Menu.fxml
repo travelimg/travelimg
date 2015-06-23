@@ -9,14 +9,6 @@
    <left>
         <HBox styleClass="left" BorderPane.alignment="CENTER">
             <children>
-                <Button fx:id="importButton" maxHeight="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="FOLDER" />
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="Von Speichermedium importieren" />
-                    </tooltip>
-                </Button>
                 <Button fx:id="flickrButton" maxHeight="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
                     <graphic>
                         <FontAwesomeIconView glyphName="FLICKR" />
@@ -27,7 +19,7 @@
                 </Button>
                 <Button fx:id="journeyButton" maxHeight="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
                     <graphic>
-                        <FontAwesomeIconView glyphName="PLUS" />
+                        <FontAwesomeIconView glyphName="PLANE" />
                     </graphic>
                     <tooltip>
                         <Tooltip text="Reise hinzufügen" />
@@ -60,7 +52,7 @@
                </Button>
                <Button fx:id="exportButton" maxHeight="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
                    <graphic>
-                       <FontAwesomeIconView glyphName="DROPBOX" />
+                       <FontAwesomeIconView glyphName="UPLOAD" />
                    </graphic>
                    <tooltip>
                        <Tooltip text="Export" />

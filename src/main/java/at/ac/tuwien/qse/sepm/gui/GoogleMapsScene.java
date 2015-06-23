@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -167,7 +168,7 @@ public class GoogleMapsScene implements MapComponentInitializedListener {
      *
      * @param list list of photos to be displayed on the map
      */
-    public void addMarkerList(List<Photo> list) {
+    public void addMarkerList(Collection<Photo> list) {
         try {
             if (aktivMarker.size() != 0) {
                 removeAktiveMarker();

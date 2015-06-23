@@ -23,12 +23,10 @@ import org.apache.logging.log4j.Logger;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class SlideGrid extends TilePane {
 
@@ -39,6 +37,7 @@ public class SlideGrid extends TilePane {
 
     private Consumer<Slide> slideChangedCallback = null;
     private BiConsumer<Slide, Integer> slideAddedCallback = null;
+    private Runnable selectionChangeCallback = null;
 
     public SlideGrid() {
         getStyleClass().add("slide-grid");
@@ -77,13 +76,25 @@ public class SlideGrid extends TilePane {
         slides.forEach(this::addSlide);
     }
 
+    public void setSelectionChangeCallback(Runnable selectionChangeCallback) {
+        this.selectionChangeCallback = selectionChangeCallback;
+    }
+
     public void setSlideChangedCallback(Consumer<Slide> slideChangedCallback) {
         this.slideChangedCallback = slideChangedCallback;
+    }
+
+    public Set<Slide> getSelected() {
+        return nodes.stream()
+                .filter(n -> n.getTile().isSelected())
+                .map(n -> n.getTile().getSlide())
+                .collect(Collectors.toSet());
     }
 
     public void deselectAll() {
         LOGGER.debug("deselecting all items");
         nodes.forEach(n -> n.getTile().deselect());
+        onSelectionChange();
     }
 
     public void setSlideAddedCallback(BiConsumer<Slide, Integer> slideAddedCallback) {
@@ -203,5 +214,11 @@ public class SlideGrid extends TilePane {
             deselectAll();
             tile.select();
         }
+        onSelectionChange();
+    }
+
+    private void onSelectionChange() {
+        if (selectionChangeCallback == null) return;
+        selectionChangeCallback.run();
     }
 }

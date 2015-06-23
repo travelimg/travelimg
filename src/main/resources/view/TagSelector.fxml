@@ -23,5 +23,5 @@
             </graphic>
         </Button>
     </HBox>
-    <CheckListView fx:id="tagList" prefWidth="240.0"/>
+    <CheckListView fx:id="tagList" prefWidth="240.0" styleClass="check-list-view"/>
 </fx:root>
