@@ -76,7 +76,6 @@
     <bean id="slideshowService" class="at.ac.tuwien.qse.sepm.service.impl.SlideshowServiceImpl"></bean>
 
     <!-- GUI controller beans -->
-    <bean id="mainController" class="at.ac.tuwien.qse.sepm.gui.MainController"></bean>
     <bean id="gridViewController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.GridViewImpl"></bean>
     <bean id="worldmapViewController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.WorldmapViewImpl"></bean>
     <bean id="organizerController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.OrganizerImpl"></bean>

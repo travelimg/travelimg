@@ -1,7 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui.util;
 
 import at.ac.tuwien.qse.sepm.entities.Place;
-import at.ac.tuwien.qse.sepm.gui.GoogleMapsScene;
 import com.lynden.gmapsfx.javascript.object.LatLong;
 
 import java.util.List;

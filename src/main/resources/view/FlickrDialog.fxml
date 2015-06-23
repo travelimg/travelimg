@@ -4,6 +4,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene?>
 <fx:root fx:id="root" styleClass="dialog,import-dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <BorderPane>
@@ -25,7 +26,7 @@
                         <VBox spacing="5.0" maxWidth="300" maxHeight="300">
                             <children>
                                 <Label text="Doppelklick um Ort zu wählen" />
-                                <VBox fx:id="mapContainer" maxHeight="200" />
+                                <GoogleMapScene fx:id="mapScene" maxHeight="200"/>
                                 <Label text="Suchbegriffe" />
                                 <ScrollPane hbarPolicy="NEVER" prefHeight="100" style="-fx-background-color: -tmg-bg0">
                                     <content>

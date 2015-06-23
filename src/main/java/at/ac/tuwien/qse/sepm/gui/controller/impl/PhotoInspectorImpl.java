@@ -1,23 +1,19 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 import at.ac.tuwien.qse.sepm.entities.*;
-import at.ac.tuwien.qse.sepm.gui.*;
+import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.control.InspectorPane;
 import at.ac.tuwien.qse.sepm.gui.control.RatingPicker;
 import at.ac.tuwien.qse.sepm.gui.control.TagSelector;
-import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.SlideshowView;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
+import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.*;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
-import javafx.util.Pair;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser {
+public class PhotoInspectorImpl extends InspectorImpl<Photo> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -39,8 +35,6 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser 
     @FXML
     private RatingPicker ratingPicker;
 
-    @FXML
-    private VBox mapContainer;
 
     /*@FXML
     private TableColumn<String, String> exifName;
@@ -57,7 +51,10 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser 
     //@FXML
     //private TableView<Pair<String, String>> exifTable;
     private TagSelector tagSelector;
-    private GoogleMapsScene mapsScene;
+
+    @FXML
+    private GoogleMapScene mapScene;
+
     private Runnable updateHandler;
 
     @Autowired
@@ -75,22 +72,9 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser 
     @Override public void setEntities(Collection<Photo> photos) {
         super.setEntities(photos);
 
-        if (mapsScene != null)
-            getEntities().forEach(photo -> mapsScene.addMarker(photo));
+        getEntities().forEach(photo -> mapScene.addMarker(new LatLong(photo.getData().getLatitude(), photo.getData().getLongitude())));
 
         showDetails(getEntities());
-    }
-
-    @Override public GoogleMapsScene getMap() {
-        return this.mapsScene;
-    }
-
-    @Override public void setMap(GoogleMapsScene map) {
-        this.mapsScene = map;
-        //this.mapsScene = new GoogleMapsScene();
-        this.mapsScene.removeAktiveMarker();
-        mapContainer.getChildren().clear();
-        mapContainer.getChildren().add(mapsScene.getMapView());
     }
 
     @Override public void refresh() {
@@ -101,11 +85,9 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser 
 
     @FXML
     private void initialize() {
-        mapsScene = new GoogleMapsScene();
         tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService, root);
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
 
-        mapContainer.getChildren().add(mapsScene.getMapView());
         tagSelectionContainer.getChildren().add(tagSelector);
         addToSlideshowButton.setOnAction(this::handleAddToSlideshow);
 
@@ -182,11 +164,9 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> implements MapUser 
         }
 
         // Add the map markers for each photo.
-        if (mapsScene != null) {
-            mapsScene.removeAktiveMarker();
-            mapsScene.addMarkerList(photos);
-        }
-
+        mapScene.clear();
+        photos.forEach((photo) -> mapScene.addMarker(new LatLong(photo.getData().getLatitude(), photo.getData().getLongitude())));
+        mapScene.fitToMarkers();
 
         // Show additional details for a single selected photo.
         if (singleActive) {

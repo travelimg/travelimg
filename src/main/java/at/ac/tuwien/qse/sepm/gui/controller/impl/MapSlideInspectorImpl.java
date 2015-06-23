@@ -3,10 +3,10 @@ package at.ac.tuwien.qse.sepm.gui.controller.impl;
 import at.ac.tuwien.qse.sepm.entities.MapSlide;
 import at.ac.tuwien.qse.sepm.gui.control.InspectorPane;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
-import at.ac.tuwien.qse.sepm.gui.control.AwesomeMapScene;
+import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
+import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
-import com.lynden.gmapsfx.javascript.object.LatLong;
 import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -27,7 +27,7 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
     @FXML
     private TextField captionField;
     @FXML
-    private AwesomeMapScene map;
+    private GoogleMapScene map;
     @FXML
     private ToggleButton chooseLocationButton;
 
@@ -38,7 +38,7 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
     private void initialize() {
         captionField.textProperty().addListener(this::handleCaptionChange);
 
-        //map.setClickCallback(this::handleMapClicked);
+        map.setClickCallback(this::handleMapClicked);
     }
 
     public void setPreview(Node node) {
@@ -53,9 +53,9 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
             MapSlide slide = getEntities().iterator().next();
             captionField.setText(slide.getCaption());
 
-            /*map.clear();*/
-            map.addMarker(slide.getLatitude(), slide.getLongitude());
-            map.center(slide.getLatitude(), slide.getLongitude());
+            map.clear();
+            map.addMarker(new LatLong(slide.getLatitude(), slide.getLongitude()));
+            map.center(new LatLong(slide.getLatitude(), slide.getLongitude()));
         }
     }
 
@@ -72,9 +72,9 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
             ErrorDialog.show(root, "Fehler beim Ändern der Koordinaten", "");
         }
 
-        /*map.clear();*/
-        map.addMarker(latitude, longitude);
-        map.center(latitude, longitude);
+        map.clear();
+        map.addMarker(new LatLong(latitude, longitude));
+        map.center(new LatLong(latitude, longitude));
     }
 
     private void handleCaptionChange(Observable observable) {
