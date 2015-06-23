@@ -39,6 +39,10 @@ public class ImageTile extends StackPane {
 
         placeHolder.setGlyphSize(ImageSize.LARGE.pixels() * 0.6);
 
+        setMinHeight(0);
+        setMinWidth(0);
+        imageView.setPreserveRatio(true);
+
         getChildren().add(placeHolder);
         getChildren().add(imageView);
         getChildren().add(overlay);
@@ -49,6 +53,9 @@ public class ImageTile extends StackPane {
         imageView.visibleProperty().bind(photosProperty.emptyProperty().not());
         overlay.visibleProperty().bind(photosProperty.emptyProperty().not());
         placeHolder.visibleProperty().bind(photosProperty.emptyProperty());
+
+        heightProperty().addListener(this::handleSizeChange);
+        widthProperty().addListener(this::handleSizeChange);
     }
 
     public void setPhotos(List<Photo> photos) {
@@ -87,5 +94,11 @@ public class ImageTile extends StackPane {
 
     public void clearImageTile() {
         photos.clear();
+    }
+
+    private void handleSizeChange(Object observable) {
+        // fit image to available size
+        imageView.fitToSize(overlay.getWidth(), overlay.getHeight());
+        placeHolder.setGlyphSize(Math.min(overlay.getWidth(), overlay.getHeight()) * 0.6);
     }
 }

@@ -62,6 +62,11 @@ public class SmartImage extends StackPane {
         imageView.setPreserveRatio(preserve);
     }
 
+    public void fitToSize(double width, double height) {
+        imageView.setFitWidth(width);
+        imageView.setFitHeight(height);
+    }
+
     public void cancel() {
         if (image == null) return;
         image.cancel();
