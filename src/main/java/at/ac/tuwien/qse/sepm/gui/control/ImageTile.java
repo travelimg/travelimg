@@ -96,12 +96,14 @@ public class ImageTile extends StackPane {
     public void setTag(Tag tag) {
         name.setText(tag.getName());
         overLayIcon.setGlyphName("TAGS");
+        placeHolder.setGlyphName("TAGS");
         overLayIcon.setGlyphSize(30);
     }
 
     public void setGood() {
         name.setText("Favorites");
         overLayIcon.setGlyphName("HEART");
+        placeHolder.setGlyphName("HEART");
         overLayIcon.setGlyphSize(30);
     }
 
