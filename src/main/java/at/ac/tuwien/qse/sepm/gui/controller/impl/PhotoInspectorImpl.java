@@ -1,25 +1,19 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 import at.ac.tuwien.qse.sepm.entities.*;
-import at.ac.tuwien.qse.sepm.gui.*;
-import at.ac.tuwien.qse.sepm.gui.control.AwesomeMapScene;
+import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.control.InspectorPane;
 import at.ac.tuwien.qse.sepm.gui.control.RatingPicker;
 import at.ac.tuwien.qse.sepm.gui.control.TagSelector;
-import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.SlideshowView;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.*;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
-import javafx.util.Pair;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,7 +53,7 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
     private TagSelector tagSelector;
 
     @FXML
-    private AwesomeMapScene mapScene;
+    private GoogleMapScene mapScene;
 
     private Runnable updateHandler;
 

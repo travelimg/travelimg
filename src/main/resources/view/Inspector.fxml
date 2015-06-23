@@ -6,13 +6,13 @@
 <?import at.ac.tuwien.qse.sepm.gui.control.InspectorPane?>
 <?import at.ac.tuwien.qse.sepm.gui.control.RatingPicker?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<?import at.ac.tuwien.qse.sepm.gui.control.AwesomeMapScene?>
+<?import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene?>
 <InspectorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="280.0" styleClass="inspector"
             stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
             fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.PhotoInspectorImpl">
     <children>
         <RatingPicker fx:id="ratingPicker"/>
-        <AwesomeMapScene fx:id="mapScene" styleClass="map" maxHeight="200.0"/>
+        <GoogleMapScene fx:id="mapScene" styleClass="map" maxHeight="200.0"/>
         <VBox>
             <padding>
                 <Insets right="16" left="16" top="16" bottom="16"/>

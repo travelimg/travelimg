@@ -2,7 +2,7 @@ package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 
 import at.ac.tuwien.qse.sepm.entities.Place;
-import at.ac.tuwien.qse.sepm.gui.control.AwesomeMapScene;
+import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
@@ -23,7 +23,7 @@ public class WorldmapViewImpl implements WorldmapView {
     @FXML
     private BorderPane root;
     @FXML
-    private AwesomeMapScene mapScene;
+    private GoogleMapScene mapScene;
 
     @Autowired
     private ClusterService clusterService;

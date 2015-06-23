@@ -2,7 +2,7 @@ package at.ac.tuwien.qse.sepm.gui.dialogs;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
-import at.ac.tuwien.qse.sepm.gui.control.AwesomeMapScene;
+import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.FlickrService;
@@ -70,7 +70,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     @FXML
     private DatePicker datePicker;
     @FXML
-    private AwesomeMapScene mapScene;
+    private GoogleMapScene mapScene;
 
     private FlickrService flickrService;
     private ExifService exifService;

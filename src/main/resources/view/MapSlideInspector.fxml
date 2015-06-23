@@ -3,7 +3,7 @@
 <?import at.ac.tuwien.qse.sepm.gui.control.InspectorPane?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
-<?import at.ac.tuwien.qse.sepm.gui.control.AwesomeMapScene?>
+<?import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene?>
 <?import javafx.scene.control.Button?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.ToggleButton?>
@@ -13,7 +13,7 @@
         <Label>Beschriftung</Label>
         <TextField fx:id="captionField"/>
 
-        <AwesomeMapScene fx:id="map" maxHeight="300" minHeight="100" maxWidth="300" minWidth="100"/>
+        <GoogleMapScene fx:id="map" maxHeight="300" minHeight="100" maxWidth="300" minWidth="100"/>
         <ToggleButton fx:id="chooseLocationButton">
             <graphic>
                 <FontAwesomeIconView glyphName="PLUS"></FontAwesomeIconView>

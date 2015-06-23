@@ -3,7 +3,7 @@ package at.ac.tuwien.qse.sepm.gui.controller.impl;
 import at.ac.tuwien.qse.sepm.entities.MapSlide;
 import at.ac.tuwien.qse.sepm.gui.control.InspectorPane;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
-import at.ac.tuwien.qse.sepm.gui.control.AwesomeMapScene;
+import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
@@ -27,7 +27,7 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
     @FXML
     private TextField captionField;
     @FXML
-    private AwesomeMapScene map;
+    private GoogleMapScene map;
     @FXML
     private ToggleButton chooseLocationButton;
 

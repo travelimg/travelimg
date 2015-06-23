@@ -13,7 +13,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class AwesomeMapScene extends VBox {
+public class GoogleMapScene extends VBox {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -25,7 +25,7 @@ public class AwesomeMapScene extends VBox {
 
     private Runnable onLoadedCallback = null;
 
-    public AwesomeMapScene() {
+    public GoogleMapScene() {
         webView = new WebView();
         webEngine = webView.getEngine();
 
