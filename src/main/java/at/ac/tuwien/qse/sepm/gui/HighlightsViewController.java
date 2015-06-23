@@ -246,6 +246,8 @@ public class HighlightsViewController {
                     .collect(Collectors.toList());
 
             googleMapScene.drawPolyline(path);
+            LatLong position = new LatLong(places.get(places.size()-1).getLatitude(), places.get(places.size()-1).getLongitude());
+            googleMapScene.addMarker(position);
         }
     }
 
