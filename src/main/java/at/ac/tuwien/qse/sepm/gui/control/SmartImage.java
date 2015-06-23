@@ -44,7 +44,6 @@ public class SmartImage extends StackPane {
         }
 
         image = cache.get(path, size);
-
         imageView.setImage(image);
 
         // NOTE: Image may be loaded already.
@@ -58,10 +57,6 @@ public class SmartImage extends StackPane {
                 indicateLoaded();
             }
         });
-
-        if (image.getProgress() == 1.0) {
-            indicateLoaded();
-        }
     }
 
     public void cancel() {
