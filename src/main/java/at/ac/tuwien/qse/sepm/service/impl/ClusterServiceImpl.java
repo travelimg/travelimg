@@ -16,7 +16,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ClusterServiceImpl implements ClusterService {
 
@@ -65,6 +67,36 @@ public class ClusterServiceImpl implements ClusterService {
             throw new ServiceException("Failed to read Photos by journey");
         }
         return places;
+    }
+
+    @Override
+    public List<Place> getPlacesByJourneyChronological(Journey journey) throws ServiceException {
+        List<Photo> photos;
+
+        try {
+            photos = photoDAO.readPhotosByJourney(journey);
+
+        } catch (DAOException ex) {
+            logger.error("Failed to read all photos by journey", ex);
+            throw new ServiceException("Failed to read all photos by journey", ex);
+        }
+
+        Map<Place, LocalDateTime> minTimeByPlace = new HashMap<>();
+
+        for (Photo photo : photos) {
+            Place place = photo.getData().getPlace();
+            LocalDateTime time = photo.getData().getDatetime();
+
+            if (!minTimeByPlace.containsKey(place)) {
+                minTimeByPlace.put(place, time);
+            } else if (minTimeByPlace.get(place).isAfter(time)) {
+                minTimeByPlace.put(place, time);
+            }
+        }
+
+        return minTimeByPlace.keySet().stream()
+                .sorted((p1, p2) -> minTimeByPlace.get(p1).compareTo(minTimeByPlace.get(p2)))
+                .collect(Collectors.toList());
     }
 
     @Override

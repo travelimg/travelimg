@@ -34,6 +34,15 @@ public interface ClusterService {
     Set<Place> getPlacesByJourney(Journey journey) throws ServiceException;
 
     /**
+     * Read and return a list of places of a journey sorted in chronological (visiting) order.
+     *
+     * @param journey The journey for which the places are desired.
+     * @return The places which where visited during the journey in ascending order.
+     * @throws ServiceException If the places can not be fetched.
+     */
+    List<Place> getPlacesByJourneyChronological(Journey journey) throws ServiceException;
+
+    /**
      * Adds a new place to the datastore.
      *
      * @param place Place to be created in the datastore.
