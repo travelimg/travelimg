@@ -8,6 +8,9 @@ import org.apache.logging.log4j.Logger;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 
+/**
+ * Cache for images. If the image is not present it is loaded from disk and put into the cache.
+ */
 public class ImageCache {
 
     private static final Logger LOGGER = LogManager.getLogger();
