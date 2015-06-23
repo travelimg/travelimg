@@ -28,7 +28,7 @@ public class WikipediaInfoPane extends VBox {
     @FXML
     private Label countryLabel;
     @FXML
-    private Text descriptionText;
+    private Label descriptionText;
     @FXML
     private TableColumn<String, String> categoryName;
     @FXML
@@ -48,6 +48,8 @@ public class WikipediaInfoPane extends VBox {
 
         categoryName.setCellValueFactory(new PropertyValueFactory<>("Key"));
         categoryValue.setCellValueFactory(new PropertyValueFactory<>("Value"));
+
+        infoTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
 
