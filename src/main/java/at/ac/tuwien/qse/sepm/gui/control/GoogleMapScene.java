@@ -78,7 +78,7 @@ public class GoogleMapScene extends VBox {
     public void drawPolyline(List<LatLong> vertices) {
 
         Optional<String> jsVertices = vertices.stream()
-                .map(v -> String.format("[%f, %f]", v.getLatitude(), v.getLongitude()))
+                .map(v -> String.format(Locale.US,"[%f, %f]", v.getLatitude(), v.getLongitude()))
                 .reduce((v1, v2) -> v1 + ", " + v2);
 
         if (jsVertices.isPresent()) {
