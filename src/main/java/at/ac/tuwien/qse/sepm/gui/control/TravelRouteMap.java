@@ -1,44 +1,12 @@
 package at.ac.tuwien.qse.sepm.gui.control;
 
 import at.ac.tuwien.qse.sepm.entities.Place;
-import at.ac.tuwien.qse.sepm.gui.util.GeoUtils;
-import com.lynden.gmapsfx.GoogleMapView;
-import com.lynden.gmapsfx.javascript.object.*;
-import com.lynden.gmapsfx.shapes.Polyline;
-import com.lynden.gmapsfx.shapes.PolylineOptions;
+import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class TravelRouteMap {
-
-    private GoogleMapsScene googleMapsScene;
-
-    private final List<Marker> markers = new ArrayList<>();
-    private final List<Polyline> lines = new ArrayList<>();
-
-    public TravelRouteMap(GoogleMapsScene googleMapsScene) {
-        this.googleMapsScene = googleMapsScene;
-    }
-
-    private GoogleMapView getMapView() {
-        return googleMapsScene.getMapView();
-    }
-
-    private GoogleMap getGoogleMap() {
-        return getMapView().getMap();
-    }
-
-    public void clear() {
-        markers.forEach(marker -> getGoogleMap().removeMarker(marker));
-        lines.forEach(line -> getGoogleMap().removeMapShape(line));
-
-        markers.clear();
-        lines.clear();
-    }
-
+public class TravelRouteMap extends GoogleMapScene {
 
     public void drawJourney(List<Place> places) {
         clear();
@@ -47,52 +15,16 @@ public class TravelRouteMap {
             return;
         }
 
-        List<LatLong> path = Arrays.asList(GeoUtils.toLatLong(places));
-
         if (places.size() == 1) {
-            Marker marker = createMarkerAt(path.get(0));
-            getGoogleMap().addMarker(marker);
-            markers.add(marker);
-
-            // fit marker to screen
+            Place place = places.get(0);
+            LatLong position = new LatLong(place.getLatitude(), place.getLongitude());
+            addMarker(position);
         } else {
-            MVCArray mvcArray = new MVCArray();
+            List<LatLong> path = places.stream()
+                    .map(p -> new LatLong(p.getLatitude(), p.getLongitude()))
+                    .collect(Collectors.toList());
 
-            path.forEach((pos) -> {
-                mvcArray.push(pos);
-
-                Marker marker = createMarkerAt(pos);
-                getGoogleMap().addMarker(marker);
-                markers.add(marker);
-            });
-
-            Polyline polyline = createPolylineForPath(mvcArray);
-
-            getGoogleMap().addMapShape(polyline);
-            lines.add(polyline);
-
-            // fit markers to screen
+            drawPolyline(path);
         }
-    }
-
-    private Marker createMarkerAt(LatLong pos) {
-        MarkerOptions options = new MarkerOptions()
-                .position(pos)
-                .icon("https://maps.gstatic.com/intl/en_us/mapfiles/markers2/measle_blue.png");
-
-        return new Marker(options);
-    }
-
-    private Polyline createPolylineForPath(MVCArray mvcArray) {
-        PolylineOptions polylineOptions = new PolylineOptions();
-        polylineOptions.path(mvcArray)
-                .clickable(false)
-                .draggable(false)
-                .editable(false)
-                .strokeColor("#ff4500")
-                .strokeWeight(2)
-                .visible(true);
-
-        return new Polyline(polylineOptions);
     }
 }

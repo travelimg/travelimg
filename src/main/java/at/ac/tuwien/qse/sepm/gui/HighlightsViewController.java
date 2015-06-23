@@ -37,7 +37,7 @@ public class HighlightsViewController {
     @FXML
     private VBox journeys, tree, tagheartContainer;
     @FXML
-    private HBox titleHBox, tagContainer, wikipediaInfoPaneContainer, mapContainer, firstFourTagsHBox;
+    private HBox titleHBox, tagContainer, wikipediaInfoPaneContainer, firstFourTagsHBox;
     @FXML
     private ScrollPane scrollPhotoView, treeScroll;
     @FXML
@@ -46,6 +46,9 @@ public class HighlightsViewController {
     private Button tag1, tag2, tag3, tag4, tag5, good;
     @FXML
     private StrokeLineCap lineCap;
+    @FXML
+    private TravelRouteMap travelRouteMap;
+
     @Autowired
     private ClusterService clusterService;
     @Autowired
@@ -64,20 +67,12 @@ public class HighlightsViewController {
     private ImageCache imageCache;
     private Line redLine;
 
-    private TravelRouteMap travelRouteMap = null;
 
     @Autowired
     public void setImageCache(ImageCache imageCache) {
         this.imageCache = imageCache;
     }
 
-    public void setMap(GoogleMapsScene map) {
-        map.getMapView().addMapInializedListener(() -> {
-            travelRouteMap = new TravelRouteMap(map);
-        });
-
-        mapContainer.getChildren().add(map.getMapView());
-    }
 
     @FXML
     private void initialize() {
@@ -117,6 +112,8 @@ public class HighlightsViewController {
             handleJourneySelected(journeysListView.getSelectionModel().getSelectedItem());
         });
         noJourneysAvailableLabel.setWrapText(true);
+
+        reloadJourneys();
     }
 
     public void reloadJourneys() {

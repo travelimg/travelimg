@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import at.ac.tuwien.qse.sepm.gui.control.TravelRouteMap?>
 <BorderPane fx:id="root" stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.HighlightsViewController">
     <left>
         <BorderPane fx:id="left" prefWidth="240.0">
@@ -68,7 +69,7 @@
                                         </Button>
                                     </children>
                                 </VBox>
-                                <HBox fx:id="mapContainer" prefWidth="600" prefHeight="400"></HBox>
+                                <TravelRouteMap fx:id="travelRouteMap" prefHeight="400" prefWidth="600"/>
                             </children>
                         </HBox>
                     </children>
