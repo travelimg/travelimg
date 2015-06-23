@@ -10,7 +10,10 @@ import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.JourneyFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.layout.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,11 +35,12 @@ public class HighlightsViewController {
     private ImageTile tag1, tag2, tag3, tag4, tag5, good;
     @FXML
     private GoogleMapScene googleMapScene;
-
     @FXML
     private JourneyPlaceList journeyPlaceList;
     @FXML
     private GridPane gridPane;
+
+    private FontAwesomeIconView wikipediaPlaceholder = new FontAwesomeIconView(FontAwesomeIcon.INFO);
 
     @Autowired
     private ClusterService clusterService;
@@ -57,7 +61,14 @@ public class HighlightsViewController {
 
         wikipediaInfoPane = new WikipediaInfoPane(wikipediaService);
         HBox.setHgrow(wikipediaInfoPane, Priority.ALWAYS);
-        wikipediaInfoPaneContainer.getChildren().add(wikipediaInfoPane);
+        wikipediaInfoPaneContainer.getChildren().addAll(wikipediaInfoPane, wikipediaPlaceholder);
+
+        wikipediaPlaceholder.setGlyphSize(80);
+        wikipediaInfoPaneContainer.setAlignment(Pos.CENTER);
+        wikipediaPlaceholder.getStyleClass().addAll("wikipedia-placeholder");
+        wikipediaInfoPane.managedProperty().bind(wikipediaInfoPane.visibleProperty());
+        wikipediaPlaceholder.visibleProperty().bind(wikipediaInfoPane.visibleProperty().not());
+        wikipediaInfoPane.setVisible(false);
 
         journeyPlaceList.setOnJourneySelected(this::handleJourneySelected);
         journeyPlaceList.setOnPlaceSelected(this::handlePlaceSelected);
@@ -119,13 +130,16 @@ public class HighlightsViewController {
 
         if(place==null){
             // draw journey for all places
+            wikipediaInfoPane.setVisible(false);
             drawJourney(places, true);
         }
         else{
             List<Place> placesUntil = places.subList(0, places.indexOf(place) + 1);
             // draw journey until place
             drawJourney(placesUntil, false);
+
             wikipediaInfoPane.showDefaultWikiInfo(place);
+            wikipediaInfoPane.setVisible(true);
         }
 
         setGoodPhotos(place);

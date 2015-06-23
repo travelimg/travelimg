@@ -923,6 +923,9 @@
 .wikipedia #descriptionText {
     -fx-padding: 20 0 0 00;
 }
+.wikipedia-placeholder {
+    -fx-fill: -tmg-text-bright;
+}
 
 .journey-places-list {
     -fx-background-color: -tmg-bg1;
