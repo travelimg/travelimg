@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.gui.FullscreenWindow;
 import at.ac.tuwien.qse.sepm.gui.util.ImageCacheImpl;
+import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -26,8 +27,8 @@ import java.util.Random;
 
 public class ImageTile extends StackPane {
 
-    private List<Photo> photos = new ArrayList<>();
-    private final ImageView imageView = new ImageView();
+    private static final Logger logger = LogManager.getLogger();
+    private final SmartImage imageView = new SmartImage(ImageSize.ORIGINAL);
     private final BorderPane overlay = new BorderPane();
     private final Label taggingIndicator = new Label();
     private static final Logger logger = LogManager.getLogger();
@@ -50,12 +51,7 @@ public class ImageTile extends StackPane {
                 randomPos = rand.nextInt(photos.size()-1);
             }
 
-            try {
-                imageView.setImage(new Image(new FileInputStream(new File(photos.get(randomPos).getPath())), 300, 200, true,
-                        true));
-            } catch (FileNotFoundException e) {
-                logger.debug(e);
-            }
+            imageView.setImage(photos.get(randomPos).getFile());
             addEvents(photos);
         }
     }
