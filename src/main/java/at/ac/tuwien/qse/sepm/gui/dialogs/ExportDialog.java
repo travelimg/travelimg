@@ -64,11 +64,13 @@ public class ExportDialog extends ResultDialog<String> {
         String dropboxFolder = "";
         try {
             dropboxFolder = dropboxService.getDropboxFolder();
+            this.exportFolder = dropboxFolder;
+            directoryField.setText(dropboxFolder);
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Export", "Konnte keinen Dropboxordner finden");
+        } finally {
+            handleBrowse(event);
         }
-        this.exportFolder = dropboxFolder;
-        directoryField.setText(dropboxFolder);
     }
 
     private void handleBrowse(Event event) {
