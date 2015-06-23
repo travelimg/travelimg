@@ -6,6 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import at.ac.tuwien.qse.sepm.gui.control.ImageTile?>
+<?import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene?>
 <BorderPane fx:id="root" stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.HighlightsViewController">
     <left>
         <JourneyPlaceList fx:id="journeyPlaceList"/>
@@ -25,7 +26,7 @@
                                         </ImageTile>
                                     </children>
                                 </VBox>
-                                <TravelRouteMap fx:id="travelRouteMap" prefHeight="400" prefWidth="600"/>
+                                <GoogleMapScene fx:id="googleMapScene" prefHeight="400" prefWidth="600"/>
                             </children>
                         </HBox>
                     </children>
