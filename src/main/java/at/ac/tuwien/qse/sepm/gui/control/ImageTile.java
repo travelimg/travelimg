@@ -54,7 +54,12 @@ public class ImageTile extends StackPane {
 
         setAlignment(overlay, Pos.CENTER);
 
-        setOnMouseEntered((event) -> setCursor(Cursor.HAND));
+        setOnMouseEntered((event) -> {
+            if (photos.size() > 0) {
+                setCursor(Cursor.HAND);
+            }
+        });
+        
         setOnMouseExited((event -> setCursor(Cursor.DEFAULT)));
 
         imageView.visibleProperty().bind(photosProperty.emptyProperty().not());
@@ -65,10 +70,10 @@ public class ImageTile extends StackPane {
         widthProperty().addListener(this::handleSizeChange);
     }
 
-    public void setPhotos(List<Photo> photos) {
+    public void setPhotos(List<Photo> ps) {
         handleSizeChange(null);
         this.photos.clear();
-        this.photos.addAll(photos);
+        this.photos.addAll(ps);
 
         if (photos.size() > 0) {
             Random rand = new Random();
@@ -80,8 +85,10 @@ public class ImageTile extends StackPane {
             imageView.setImage(photos.get(randomPos).getFile());
 
             setOnMouseClicked((event) -> {
-                FullscreenWindow fw = new FullscreenWindow();
-                fw.present(photos, photos.get(0));
+                if (photos.size() > 0) {
+                    FullscreenWindow fw = new FullscreenWindow();
+                    fw.present(this.photos, this.photos.get(0));
+                }
             });
         }
     }
@@ -101,6 +108,7 @@ public class ImageTile extends StackPane {
     public void clearImageTile() {
         photos.clear();
         name.setText("");
+        setOnMouseClicked(null);
     }
 
     private void handleSizeChange(Object observable) {
