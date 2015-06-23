@@ -89,5 +89,4 @@
     <bean id="statusIndicatorController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.StatusIndicatorImpl"></bean>
     <bean id="imageCache" class="at.ac.tuwien.qse.sepm.gui.util.ImageCacheImpl"></bean>
     <bean id="highlightsViewController" class="at.ac.tuwien.qse.sepm.gui.HighlightsViewController"></bean>
-    <bean id="titleslideInspector" class="at.ac.tuwien.qse.sepm.gui.controller.impl.TitleSlideInspectorImpl"></bean>
 </beans>
