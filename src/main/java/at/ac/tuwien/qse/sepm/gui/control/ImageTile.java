@@ -28,7 +28,7 @@ import java.util.Random;
 public class ImageTile extends StackPane {
 
     private static final Logger logger = LogManager.getLogger();
-    private final SmartImage imageView = new SmartImage(ImageSize.ORIGINAL);
+    private final SmartImage imageView = new SmartImage(ImageSize.LARGE);
     private final BorderPane overlay = new BorderPane();
     private final Label taggingIndicator = new Label();
     private List<Photo> photos = new ArrayList<>();
