@@ -84,6 +84,7 @@ public class OrganizerImpl implements Organizer {
         filterViewButton.setToggleGroup(toggleGroup);
         folderViewButton.setToggleGroup(toggleGroup);
 
+
         buttonBox = new HBox(filterViewButton, folderViewButton);
         buttonBox.setAlignment(Pos.CENTER);
 
@@ -152,11 +153,10 @@ public class OrganizerImpl implements Organizer {
         Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
         findFiles(rootDirectories.toFile(), null);
 
-        usedFilter = new PhotoPathFilter();
         filterContainer.getChildren().addAll(buttonBox, filesTree);
-
         VBox.setVgrow(filesTree, Priority.ALWAYS);
-
+        usedFilter = new PhotoPathFilter();
+        handleFilterChange();
     }
 
     private void findFiles(File dir, FilePathTreeItem parent) {
