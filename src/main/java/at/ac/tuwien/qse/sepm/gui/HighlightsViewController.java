@@ -11,8 +11,7 @@ import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.JourneyFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import javafx.fxml.FXML;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +22,7 @@ import java.util.stream.Collectors;
 public class HighlightsViewController {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
     List<ImageTile> tagImageTiles = new ArrayList<>();
     @FXML
     private BorderPane root;
@@ -35,6 +35,8 @@ public class HighlightsViewController {
 
     @FXML
     private JourneyPlaceList journeyPlaceList;
+    @FXML
+    private GridPane gridPane;
 
     @Autowired
     private ClusterService clusterService;
@@ -66,6 +68,25 @@ public class HighlightsViewController {
 
         journeyPlaceList.setOnJourneySelected(this::handleJourneySelected);
         journeyPlaceList.setOnPlaceSelected(this::handlePlaceSelected);
+
+        // give each row and each column in the grid the same size
+        ColumnConstraints column1 = new ColumnConstraints();
+        column1.setPercentWidth(25);
+        ColumnConstraints column2 = new ColumnConstraints();
+        column2.setPercentWidth(25);
+        ColumnConstraints column3 = new ColumnConstraints();
+        column3.setPercentWidth(25);
+        ColumnConstraints column4 = new ColumnConstraints();
+        column4.setPercentWidth(25);
+        gridPane.getColumnConstraints().addAll(column1, column2, column3, column4);
+
+        RowConstraints row1 = new RowConstraints();
+        row1.setPercentHeight(33);
+        RowConstraints row2 = new RowConstraints();
+        row2.setPercentHeight(33);
+        RowConstraints row3 = new RowConstraints();
+        row3.setPercentHeight(33);
+        gridPane.getRowConstraints().addAll(row1, row2, row3);
 
         reloadJourneys();
     }
