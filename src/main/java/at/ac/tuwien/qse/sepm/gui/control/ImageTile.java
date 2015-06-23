@@ -31,9 +31,9 @@ public class ImageTile extends StackPane {
     private final SmartImage imageView = new SmartImage(ImageSize.ORIGINAL);
     private final BorderPane overlay = new BorderPane();
     private final Label taggingIndicator = new Label();
-    private static final Logger logger = LogManager.getLogger();
+    private List<Photo> photos = new ArrayList<>();
 
-    public ImageTile(){
+    public ImageTile() {
         setAlignment(overlay, Pos.CENTER);
         getStyleClass().add("imageTile");
         overlay.getStyleClass().add("overlay");
@@ -41,14 +41,14 @@ public class ImageTile extends StackPane {
         overlay.setCenter(taggingIndicator);
     }
 
-    public void setPhotos(List<Photo> photos){
+    public void setPhotos(List<Photo> photos) {
         this.photos = photos;
-        if(photos.size()>0){
+        if (photos.size() > 0) {
             getChildren().add(imageView);
             Random rand = new Random();
             int randomPos = 0;
-            if(photos.size()>1){
-                randomPos = rand.nextInt(photos.size()-1);
+            if (photos.size() > 1) {
+                randomPos = rand.nextInt(photos.size() - 1);
             }
 
             imageView.setImage(photos.get(randomPos).getFile());
@@ -56,7 +56,7 @@ public class ImageTile extends StackPane {
         }
     }
 
-    public void setTag(Tag tag){
+    public void setTag(Tag tag) {
         getChildren().add(overlay);
         FontAwesomeIconView taggingIndicatorIcon = new FontAwesomeIconView();
         taggingIndicatorIcon.setGlyphName("TAGS");
@@ -65,7 +65,7 @@ public class ImageTile extends StackPane {
         overlay.setVisible(true);
     }
 
-    public void setGood(){
+    public void setGood() {
         getChildren().add(overlay);
         FontAwesomeIconView taggingIndicatorIcon = new FontAwesomeIconView();
         taggingIndicatorIcon.setGlyphName("HEART");
@@ -74,27 +74,30 @@ public class ImageTile extends StackPane {
         overlay.setVisible(true);
     }
 
-    private void addEvents(List<Photo> photos){
+    private void addEvents(List<Photo> photos) {
 
         setOnMouseEntered(new EventHandler<MouseEvent>() {
-            @Override public void handle(MouseEvent event) {
-                    setCursor(Cursor.HAND);
+            @Override
+            public void handle(MouseEvent event) {
+                setCursor(Cursor.HAND);
             }
         });
         setOnMouseExited(new EventHandler<MouseEvent>() {
-            @Override public void handle(MouseEvent event) {
-                    setCursor(Cursor.DEFAULT);
+            @Override
+            public void handle(MouseEvent event) {
+                setCursor(Cursor.DEFAULT);
             }
         });
         setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override public void handle(MouseEvent event) {
+            @Override
+            public void handle(MouseEvent event) {
                 FullscreenWindow fw = new FullscreenWindow(new ImageCacheImpl());
                 fw.present(photos, photos.get(0));
             }
         });
     }
 
-    public void clearImageTile(){
+    public void clearImageTile() {
         setOnMouseEntered(null);
         setOnMouseClicked(null);
         getChildren().clear();
