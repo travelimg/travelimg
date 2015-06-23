@@ -10,6 +10,7 @@
     </script>
     <script type="text/javascript">
         function initialize() {
+            var loaded = false;
             var latlng = new google.maps.LatLng(37.39822, -121.9643936);
             var markers = [];
             var lines = [];
@@ -29,6 +30,12 @@
 
             google.maps.event.addListener(document.map, 'tilesloaded', function() {
 
+                if (loaded) {
+                    return;
+                }
+
+                loaded = true;
+
                 google.maps.event.addListener(document.map, "click", function(event) {
                     var lat = event.latLng.lat();
                     var lng = event.latLng.lng();
@@ -42,7 +49,6 @@
 
                     alert("double-click(" + lat + ", " + lng + ")");
                 });
-
 
                 alert("map-loaded");
             });
