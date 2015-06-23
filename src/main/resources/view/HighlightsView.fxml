@@ -7,14 +7,14 @@
         <JourneyPlaceList fx:id="journeyPlaceList" prefWidth="240"/>
     </left>
     <center>
-        <GridPane fx:id="gridPane" maxHeight="Infinity" maxWidth="Infinity" style="-fx-background-color: #FFA726">
+        <GridPane fx:id="gridPane" style="-fx-background-color: #FFA726">
             <children>
                 <HBox fx:id="wikipediaInfoPaneContainer" GridPane.rowSpan="2" GridPane.columnIndex="0"
                       GridPane.rowIndex="0" />
                 <GoogleMapScene fx:id="googleMapScene" GridPane.rowSpan="2" GridPane.columnSpan="2"
-                                GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.fillWidth="true"/>
+                                GridPane.columnIndex="2" GridPane.rowIndex="0" />
                 <ImageTile fx:id="tag1" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-                <ImageTile fx:id="good" styleClass="good" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <ImageTile fx:id="good" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
                 <!-- Bottom row -->
                 <ImageTile fx:id="tag2" GridPane.rowIndex="2" GridPane.columnIndex="0" />
