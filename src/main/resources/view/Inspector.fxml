@@ -10,19 +10,23 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.*?>
 <?import at.ac.tuwien.qse.sepm.gui.control.TagPicker?>
+<?import at.ac.tuwien.qse.sepm.gui.control.SuggestionField?>
 <InspectorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="280.0" styleClass="inspector"
             stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
             fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.PhotoInspectorImpl">
     <children>
         <RatingPicker fx:id="ratingPicker"/>
         <GoogleMapScene fx:id="mapScene" styleClass="map" maxHeight="200.0"/>
-        <VBox>
+        <VBox spacing="16">
             <padding>
                 <Insets right="16" left="16" top="16" bottom="16"/>
             </padding>
             <children>
 
+                <SuggestionField fx:id="photographerField" label="Fotograf:" suggestions="Kris, Lukas, Marian, Christoph, David, Branko, Enri"/>
+                <SuggestionField fx:id="tagField" label="Neue Kategorie:" suggestions="Architektur, Essen, Ameisen, Elefanten, Elfenbein, Lukas, Kris"/>
                 <TagPicker fx:id="tagPicker"/>
+
                 <!--TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="260">
                     <columns>
                         <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
