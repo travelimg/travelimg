@@ -881,3 +881,22 @@
     -fx-padding: 0;
     -fx-background-color: -tmg-primary;
 }
+
+.folder-drop-target {
+    -fx-background-color: -tmg-overlay-dark;
+    -fx-spacing: 32px;
+    -fx-alignment: center;
+}
+.folder-drop-target .glyph-icon {
+    -glyph-size: 200px;
+    -glyph-name: "FOLDER_ALT";
+    -fx-fill: -tmg-text;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+.folder-drop-target .label {
+    -fx-text-fill: -tmg-text;
+    -fx-font-size: 32px;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}

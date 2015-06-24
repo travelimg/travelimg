@@ -13,9 +13,10 @@ import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.util.IOHandler;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.Node;
+import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,13 @@ public class GridViewImpl implements GridView {
     private ExifService exifService;
 
     @FXML
-    private BorderPane root;
+    private StackPane root;
+
+    @FXML
+    private BorderPane content;
+
+    @FXML
+    private Node folderDropTarget;
 
     private PaginatedImageGrid grid;
     private boolean disableReload = false;
@@ -77,10 +84,10 @@ public class GridViewImpl implements GridView {
         LOGGER.debug("initializing");
 
         this.grid = new PaginatedImageGrid(menu);
-        root.setCenter(grid);
+        content.setCenter(grid);
         menu.addListener(new MenuListener());
         organizer.setFilterChangeAction(this::handleFilterChange);
-        root.setCenter(grid);
+        content.setCenter(grid);
 
         // Selected photos are shown in the inspector.
         grid.setSelectionChangeAction(inspector::setEntities);
@@ -109,6 +116,12 @@ public class GridViewImpl implements GridView {
         photoService.subscribeCreate(this::handlePhotoCreated);
         photoService.subscribeUpdate(this::handlePhotoUpdated);
         photoService.subscribeDelete(this::handlePhotoDeleted);
+
+        root.setOnDragEntered(this::handleDragEntered);
+        root.setOnDragOver(this::handleDragOver);
+        root.setOnDragDropped(this::handleDragDropped);
+        root.setOnDragExited(this::handleDragExited);
+        folderDropTarget.setVisible(false);
     }
 
     private void handleImportError(Throwable error) {
@@ -147,28 +160,6 @@ public class GridViewImpl implements GridView {
         });
     }
 
-
-    /**
-     * Called whenever a new photo is imported
-     *
-     * @param photo The newly imported    photo
-     */
-    private void handleImportedPhoto(Photo photo) {
-        // queue an update in the main gui
-        Platform.runLater(() -> {
-            disableReload = true;
-
-            // Ignore photos that are not part of the current filter.
-            if (!organizer.getUsedFilter().test(photo)) {
-                disableReload = false;
-                return;
-            }
-            grid.addPhoto(photo);
-
-            disableReload = false;
-        });
-    }
-
     private void handleFilterChange() {
         if (!disableReload)
             reloadImages();
@@ -185,6 +176,36 @@ public class GridViewImpl implements GridView {
             ErrorDialog.show(root, "Laden von Fotos fehlgeschlagen",
                     "Fehlermeldung: " + ex.getMessage());
         }
+    }
+
+    private void handleDragEntered(DragEvent event) {
+        LOGGER.debug("drag entered");
+        folderDropTarget.setVisible(true);
+        event.consume();
+    }
+
+    private void handleDragOver(DragEvent event) {
+        event.acceptTransferModes(TransferMode.LINK);
+        event.consume();
+    }
+
+    private void handleDragDropped(DragEvent event) {
+        LOGGER.debug("drag dropped");
+
+        Dragboard dragboard = event.getDragboard();
+        boolean success = dragboard.hasFiles();
+        if (success) {
+            dragboard.getFiles().forEach(f -> LOGGER.debug("dropped file {}", f));
+            // TODO: add folders to workspace
+        }
+        event.setDropCompleted(success);
+        event.consume();
+    }
+
+    private void handleDragExited(DragEvent event) {
+        LOGGER.debug("drag exited");
+        folderDropTarget.setVisible(false);
+        event.consume();
     }
 
     private class MenuListener implements Menu.Listener {
