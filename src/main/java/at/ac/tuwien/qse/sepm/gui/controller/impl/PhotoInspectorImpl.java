@@ -1,10 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 import at.ac.tuwien.qse.sepm.entities.*;
-import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
-import at.ac.tuwien.qse.sepm.gui.control.InspectorPane;
-import at.ac.tuwien.qse.sepm.gui.control.RatingPicker;
-import at.ac.tuwien.qse.sepm.gui.control.TagSelector;
+import at.ac.tuwien.qse.sepm.gui.control.*;
 import at.ac.tuwien.qse.sepm.gui.controller.SlideshowView;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
@@ -13,7 +10,6 @@ import javafx.collections.ListChangeListener;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,7 +26,7 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
     private InspectorPane root;
 
     @FXML
-    private VBox tagSelectionContainer;
+    private TagPicker tagPicker;
 
     @FXML
     private RatingPicker ratingPicker;
@@ -48,10 +44,6 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
     @FXML
     private Button addToSlideshowButton;
 
-    //@FXML
-    //private TableView<Pair<String, String>> exifTable;
-    private TagSelector tagSelector;
-
     @FXML
     private GoogleMapScene mapScene;
 
@@ -66,9 +58,6 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
     @Autowired
     private ExifService exifService;
 
-    @Autowired
-    private TagService tagService;
-
     @Override public void setEntities(Collection<Photo> photos) {
         super.setEntities(photos);
 
@@ -77,22 +66,14 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
         showDetails(getEntities());
     }
 
-    @Override public void refresh() {
-        if (tagSelector != null) {
-            tagSelector.initializeTagList();
-        }
-    }
-
     @FXML
     private void initialize() {
-        tagSelector = new TagSelector(new TagListChangeListener(), photoservice, tagService, root);
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
-
-        tagSelectionContainer.getChildren().add(tagSelector);
         addToSlideshowButton.setOnAction(this::handleAddToSlideshow);
-
         slideshowsCombobox.setConverter(new SlideshowStringConverter());
         slideshowsCombobox.setItems(slideshowView.getSlideshows());
+
+        tagPicker.setOnUpdate(() -> getEntities().forEach(this::updateTags));
     }
 
     private void handleRatingChange(Rating newRating) {
@@ -146,8 +127,6 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
         boolean singleActive = photos.size() == 1;
         /*exifTable.setVisible(singleActive);
         exifTable.setManaged(singleActive);*/
-        tagSelectionContainer.setVisible(singleActive);
-        tagSelectionContainer.setManaged(singleActive);
 
         // Nothing to show.
         if (noneActive) return;
@@ -168,12 +147,18 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
         photos.forEach((photo) -> mapScene.addMarker(new LatLong(photo.getData().getLatitude(), photo.getData().getLongitude())));
         mapScene.fitToMarkers();
 
+        // Add tags to the tag picker.
+        tagPicker.getEntities().clear();
+        photos.forEach((photo) -> {
+            Set<String> tags = photo.getData().getTags().stream()
+                    .map(Tag::getName)
+                    .collect(Collectors.toSet());
+            tagPicker.getEntities().add(tags);
+        });
+
         // Show additional details for a single selected photo.
         if (singleActive) {
             Photo photo = photos.iterator().next();
-            tagSelector.showCurrentlySetTags(photo);
-
-
 
             /*try {
                 Exif exif = exifService.getExif(photo);
@@ -211,37 +196,30 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
         slideshowView.addPhotosToSlideshow(new ArrayList<>(getEntities()), slideshow);
     }
 
-    private class TagListChangeListener implements ListChangeListener<Tag> {
+    private void updateTags(Photo photo) {
+        LOGGER.debug("updating tags of {}", photo);
 
-        public void onChanged(Change<? extends Tag> change) {
+        // Find the new tags.
+        Set<String> oldTags = photo.getData().getTags().stream()
+                .map(Tag::getName)
+                .collect(Collectors.toSet());
+        Set<String> newTags = tagPicker.filter(oldTags);
+        LOGGER.debug(tagPicker.getTags());
+        LOGGER.debug("old tags {} will be updated to new tags {}", oldTags, newTags);
+        if (oldTags.equals(newTags)) {
+            LOGGER.debug("tags have not changed of photo {}", photo);
+            return;
+        }
 
-            boolean updateNeeded = false;
+        // Replace tags with new ones.
+        photo.getData().getTags().clear();
+        newTags.forEach(tag -> photo.getData().getTags().add(new Tag(null, tag)));
 
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    Tag added = change.getAddedSubList().get(0);
-                    try {
-                        tagService.addTagToPhotos(new ArrayList<>(getEntities()), added);
-                        updateNeeded = true;
-                    } catch (ServiceException ex) {
-                        LOGGER.error("failed adding tag", ex);
-                        ErrorDialog.show(root, "Speichern fehlgeschlagen", "Die Kategorien für das Foto konnten nicht gespeichert werden.");
-                    }
-                }
-                if (change.wasRemoved()) {
-                    Tag removed = change.getRemoved().get(0);
-                    try {
-                        tagService.removeTagFromPhotos(new ArrayList<>(getEntities()), removed);
-                        updateNeeded = true;
-                    } catch (ServiceException ex) {
-                        LOGGER.error("failed removing tag", ex);
-                        ErrorDialog.show(root, "Speichern fehlgeschlagen", "Die Kategorien für das Foto konnten nicht gespeichert werden.");
-                    }
-                }
-            }
-
-            if (updateNeeded)
-                onUpdate();
+        try {
+            photoservice.editPhoto(photo);
+        } catch (ServiceException ex) {
+            LOGGER.warn("failed updating photo", photo);
+            LOGGER.error("error while updating photo", ex);
         }
     }
 
