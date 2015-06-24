@@ -123,7 +123,6 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
     public void deleteAllEntriesOfSpecificPhoto(Photo photo)
             throws DAOException {
         if (photo == null) throw new IllegalArgumentException();
-        if (photo.getId() == null) throw new IllegalArgumentException();
         LOGGER.debug("Entering deleteAllEntriesOfSpecificPhoto with {}", photo);
 
         try {
