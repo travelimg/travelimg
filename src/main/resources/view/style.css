@@ -881,3 +881,38 @@
     -fx-padding: 0;
     -fx-background-color: -tmg-primary;
 }
+
+.tag-picker {
+}
+.tag-picker .tag {
+    -fx-padding: 4px 0;
+}
+.tag-picker .tag .label-container {
+    -fx-spacing: 16px;
+}
+.tag-picker .tag .label {
+    -fx-text-fill: -tmg-text;
+}
+.tag-picker .tag .check-icon {
+    -glyph-size: 25;
+    -fx-fill: -tmg-bg0;
+}
+.tag-picker .tag.applied .check-icon {
+    -fx-fill: -tmg-primary;
+}
+.tag-picker .tag.partial .check-icon {
+    -fx-fill: -tmg-secondary;
+}
+.tag-picker .tag.partial .check-icon:hover {
+    -glyph-name: "CHECK_SQUARE";
+}
+.tag-picker .tag .remove-icon {
+    -fx-fill: -tmg-text;
+    -glyph-size: 16px;
+}
+.tag-picker .tag .remove-icon:hover {
+    -fx-fill: -tmg-text-light;
+}
+.tag-picker .tag .remove-icon:pressed {
+    -fx-fill: -tmg-text-bright;
+}
