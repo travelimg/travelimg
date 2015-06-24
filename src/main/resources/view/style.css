@@ -916,3 +916,9 @@
 .tag-picker .tag .remove-icon:pressed {
     -fx-fill: -tmg-text-bright;
 }
+.tag-picker .placeholder {
+    -fx-background-color: -tmg-bg1-dark;
+    -fx-text-fill: -tmg-text-dark;
+    -fx-padding: 8px 0;
+}
+}

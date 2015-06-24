@@ -28,9 +28,11 @@ public class TagPickerSkin extends SkinBase<TagPicker> {
         LOGGER.debug("creating instance");
 
         placeholder = new Label();
-        placeholder.setText("Keine Tags zugeteilt.");
+        placeholder.getStyleClass().setAll("placeholder");
+        placeholder.setText("Keine Kategorien.");
         placeholder.setTextAlignment(TextAlignment.CENTER);
         placeholder.setAlignment(Pos.CENTER);
+        placeholder.setMaxWidth(Double.MAX_VALUE);
 
         list = new VBox();
 
