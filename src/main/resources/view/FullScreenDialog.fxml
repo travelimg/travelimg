@@ -11,18 +11,22 @@
     <children>
         <HBox fx:id="bottomBar" maxHeight="Infinity" maxWidth="Infinity" alignment="BOTTOM_CENTER">
             <children>
-                <Button fx:id="bt_previous" onAction="#bt_previousPressed">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="ARROW_LEFT"/>
-                    </graphic>
-                </Button>
-                <VBox fx:id="ratingContainer"></VBox>
-                <Button fx:id="bt_next" onAction="#bt_nextPressed">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="ARROW_RIGHT"/>
-                    </graphic>
-                </Button>
+                <HBox>
+                    <children>
+                        <Button fx:id="bt_previous" onAction="#bt_previousPressed">
+                            <graphic>
+                                <FontAwesomeIconView glyphName="ARROW_LEFT"/>
+                            </graphic>
+                        </Button>
+                        <VBox fx:id="ratingContainer"></VBox>
+                        <Button fx:id="bt_next" onAction="#bt_nextPressed">
+                            <graphic>
+                                <FontAwesomeIconView glyphName="ARROW_RIGHT"/>
+                            </graphic>
+                        </Button>
+                    </children>
+                </HBox>
             </children>
-        </HBox>
+        </Group>
     </children>
 </fx:root>
