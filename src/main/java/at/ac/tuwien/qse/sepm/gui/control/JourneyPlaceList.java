@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -40,6 +41,8 @@ public class JourneyPlaceList extends VBox {
     private VBox places;
     @FXML
     private Node noJourneyPlaceholder;
+    @FXML
+    private RadioButton allPlacesButton;
 
     private ObjectProperty<Journey> selectedJourney = new SimpleObjectProperty<>(null);
     private ObjectProperty<Place> selectedPlace = new SimpleObjectProperty<>(null);
@@ -66,6 +69,9 @@ public class JourneyPlaceList extends VBox {
         backButton.visibleProperty().bind(selectedJourney.isNotNull());
 
         backButton.setOnAction((event) -> selectedJourney.set(null));
+
+        allPlacesButton.setToggleGroup(toggleGroup);
+        allPlacesButton.setOnAction((event) -> allPlacesSelectedCallback.accept(selectedJourney.get()));
 
         selectedJourney.addListener(((observable, oldValue, newValue) -> {
             if (newValue == null) {
@@ -138,33 +144,40 @@ public class JourneyPlaceList extends VBox {
     private void populatePlacesBox() {
         places.getChildren().clear();
         places.setSpacing(20.0);
-        places.setPadding(new Insets(10.0,0,0,10.0));
-        places.getChildren().add(new AllPlacesEntry());
-
-
-
-        /*places.getChildren().addAll(placesByJourney.get(selectedJourney.get()).stream()
-                        .map(PlaceEntry::new)
-                        .collect(Collectors.toList())
-        );*/
+        places.setPadding(new Insets(10.0, 0, 0, 10.0));
+        places.getChildren().add(allPlacesButton);
+        
         List<Place> placesOfJourney = placesByJourney.get(selectedJourney.get());
         VBox vbox2 = new VBox();
-        for(int i = 0; i<placesOfJourney.size(); i++ ){
-            vbox2.getChildren().add(new PlaceEntry(placesOfJourney.get(i)));
-            if(i!=placesOfJourney.size()-1){
+
+        PlaceEntry prev = null;
+        for (int i = 0; i < placesOfJourney.size(); i++) {
+            PlaceEntry current = new PlaceEntry(placesOfJourney.get(i));
+
+            current.setPrev(prev);
+            if (prev != null) {
+                prev.setNext(current);
+            }
+
+            vbox2.getChildren().add(current);
+            if (i != placesOfJourney.size() - 1) {
                 Rectangle rect = RectangleBuilder.create()
                         .width(5)
                         .height(40)
                         .styleClass("rect")
                         .build();
                 VBox vbox = new VBox();
-                vbox.setPadding(new Insets(0,0,0,7.0));
+                vbox.setPadding(new Insets(0, 0, 0, 7.0));
                 vbox.getChildren().add(rect);
                 vbox2.getChildren().add(vbox);
             }
 
+            prev = current;
+
         }
         places.getChildren().add(vbox2);
+
+        allPlacesButton.setSelected(true);
 
     }
 
@@ -176,23 +189,61 @@ public class JourneyPlaceList extends VBox {
         }
     }
 
-    private class AllPlacesEntry extends RadioButton {
-        public AllPlacesEntry() {
-            super("Alle Orte");
-            setStyle("-fx-font-size: 15");
-            setToggleGroup(toggleGroup);
-            selectedProperty().setValue(true);
-            setOnAction((event) -> allPlacesSelectedCallback.accept(selectedJourney.get()));
-        }
-    }
-
     private class PlaceEntry extends RadioButton {
+        private Place place;
+        private PlaceEntry prev = null;
+        private PlaceEntry next = null;
+
         public PlaceEntry(Place place) {
             super(place.getCity());
-            setStyle("-fx-font-size: 15");
+            this.place = place;
+
             getStyleClass().add("place-radio-button");
+
             setToggleGroup(toggleGroup);
-            setOnAction((event) -> selectedPlace.set(place));
+            setOnAction(this::handleSelected);
+        }
+
+        public void setPrev(PlaceEntry prev) {
+            this.prev = prev;
+        }
+
+        public void setNext(PlaceEntry next) {
+            this.next = next;
+        }
+
+        public void setVisited() {
+            getStyleClass().removeAll("unvisited");
+
+            if (!getStyleClass().contains("visited")) {
+                getStyleClass().add("visited");
+            }
+
+            if (prev != null) {
+                prev.setVisited();
+            }
+        }
+
+        public void setUnvisited() {
+            getStyleClass().removeAll("visited");
+
+            if (!getStyleClass().contains("unvisited")) {
+                getStyleClass().add("unvisited");
+            }
+
+            if (next != null) {
+                next.setUnvisited();
+            }
+        }
+
+        private void handleSelected(Event event) {
+            selectedPlace.set(this.place);
+
+            setVisited();
+
+            if (next != null) {
+                next.setUnvisited();
+            }
         }
     }
 }
