@@ -95,10 +95,10 @@ public class GridViewImpl implements GridView {
         // Updated photos that no longer match the filter are removed from the grid.
         inspector.setUpdateHandler(() -> {
             inspector.getEntities().stream()
-                    .filter(organizer.getFilter().negate())
+                    .filter(organizer.getUsedFilter().negate())
                     .forEach(grid::removePhoto);
             inspector.getEntities().stream()
-                    .filter(organizer.getFilter())
+                    .filter(organizer.getUsedFilter())
                     .forEach(grid::updatePhoto);
         });
 
@@ -120,7 +120,7 @@ public class GridViewImpl implements GridView {
 
     private void handlePhotoCreated(Photo photo) {
         Platform.runLater(() -> {
-            if (organizer.getFilter().test(photo)) {
+            if (organizer.getUsedFilter().test(photo)) {
                 grid.addPhoto(photo);
             }
         });
@@ -159,7 +159,7 @@ public class GridViewImpl implements GridView {
             disableReload = true;
 
             // Ignore photos that are not part of the current filter.
-            if (!organizer.getFilter().test(photo)) {
+            if (!organizer.getUsedFilter().test(photo)) {
                 disableReload = false;
                 return;
             }
@@ -177,7 +177,7 @@ public class GridViewImpl implements GridView {
     private void reloadImages() {
         try {
 
-            grid.setPhotos(photoService.getAllPhotos(organizer.getFilter()).stream()
+            grid.setPhotos(photoService.getAllPhotos(organizer.getUsedFilter()).stream()
                             .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
                             .collect(Collectors.toList()));
         } catch (ServiceException ex) {

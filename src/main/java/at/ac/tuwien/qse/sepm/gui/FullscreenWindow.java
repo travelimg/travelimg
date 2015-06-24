@@ -13,6 +13,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -47,7 +48,7 @@ public class FullscreenWindow extends StackPane {
     @FXML
     private VBox ratingContainer;
     @FXML
-    private HBox bottomBar;
+    private Group bottomBar;
 
     @Autowired
     private PhotoService photoservice;
@@ -95,6 +96,8 @@ public class FullscreenWindow extends StackPane {
 
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
         ratingContainer.getChildren().add(ratingPicker);
+
+        StackPane.setAlignment(bottomBar, Pos.BOTTOM_CENTER);
     }
 
     public void present(List<Photo> photos, Photo initial) {

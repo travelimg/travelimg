@@ -60,16 +60,18 @@ public class OrganizerImpl implements Organizer {
 
     private HBox buttonBox;
 
-    private PhotoFilter filter = new PhotoFilter();
+    private PhotoFilter usedFilter = new PhotoFilter();
+    private PhotoFilter photoFilter = usedFilter;
+    private PhotoFilter folderFilter = new PhotoPathFilter();
     private Runnable filterChangeCallback;
 
     @Override public void setFilterChangeAction(Runnable callback) {
-        LOGGER.debug("setting filter change action");
+        LOGGER.debug("setting usedFilter change action");
         filterChangeCallback = callback;
     }
 
-    @Override public PhotoFilter getFilter() {
-        return filter;
+    @Override public PhotoFilter getUsedFilter() {
+        return usedFilter;
     }
 
     @FXML private void initialize() {
@@ -81,6 +83,7 @@ public class OrganizerImpl implements Organizer {
         ToggleGroup toggleGroup = new ToggleGroup();
         filterViewButton.setToggleGroup(toggleGroup);
         folderViewButton.setToggleGroup(toggleGroup);
+
 
         buttonBox = new HBox(filterViewButton, folderViewButton);
         buttonBox.setAlignment(Pos.CENTER);
@@ -132,14 +135,14 @@ public class OrganizerImpl implements Organizer {
         resetFilter();
     }
 
-    // This Method let's the User switch to the filter-view
+    // This Method let's the User switch to the usedFilter-view
     private void filterViewClicked() {
         filterContainer.getChildren().clear();
         filterContainer.getChildren()
                 .addAll(buttonBox, ratingListView, categoryListView, photographerListView,
                         journeyListView, placeListView);
-        filter = new PhotoFilter();
-        resetFilter();
+        usedFilter = photoFilter;
+        handleFilterChange();
     }
 
     // This Method let's the User switch to the folder-view
@@ -149,11 +152,11 @@ public class OrganizerImpl implements Organizer {
 
         Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
         findFiles(rootDirectories.toFile(), null);
-        filter = new PhotoPathFilter();
+
         filterContainer.getChildren().addAll(buttonBox, filesTree);
-
         VBox.setVgrow(filesTree, Priority.ALWAYS);
-
+        usedFilter = new PhotoPathFilter();
+        handleFilterChange();
     }
 
     private void findFiles(File dir, FilePathTreeItem parent) {
@@ -179,7 +182,7 @@ public class OrganizerImpl implements Organizer {
     }
 
     private void handleFilterChange() {
-        LOGGER.debug("filter changed");
+        LOGGER.debug("usedFilter changed");
         if (filterChangeCallback == null)
             return;
         filterChangeCallback.run();
@@ -189,8 +192,8 @@ public class OrganizerImpl implements Organizer {
         LOGGER.debug("handle folder");
         FilePathTreeItem item = (FilePathTreeItem) filesTree.getSelectionModel().getSelectedItem();
         if (item != null) {
-            if (filter instanceof PhotoPathFilter)
-                ((PhotoPathFilter) filter).setIncludedPath(Paths.get(item.getFullPath()));
+            if (usedFilter instanceof PhotoPathFilter)
+                ((PhotoPathFilter) usedFilter).setIncludedPath(Paths.get(item.getFullPath()));
             handleFilterChange();
         }
         //        Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
@@ -199,44 +202,44 @@ public class OrganizerImpl implements Organizer {
     }
 
     private void handleRatingsChange(List<Rating> values) {
-        LOGGER.debug("rating filter changed");
-        filter.getIncludedRatings().clear();
-        filter.getIncludedRatings().addAll(values);
+        LOGGER.debug("rating usedFilter changed");
+        usedFilter.getIncludedRatings().clear();
+        usedFilter.getIncludedRatings().addAll(values);
         handleFilterChange();
     }
 
     private void handleCategoriesChange(List<Tag> values) {
-        LOGGER.debug("category filter changed");
-        filter.setUntaggedIncluded(values.contains(null));
+        LOGGER.debug("category usedFilter changed");
+        usedFilter.setUntaggedIncluded(values.contains(null));
         values.remove(null);
-        filter.getIncludedCategories().clear();
-        filter.getIncludedCategories().addAll(values);
+        usedFilter.getIncludedCategories().clear();
+        usedFilter.getIncludedCategories().addAll(values);
         handleFilterChange();
     }
 
     private void handlePhotographersChange(List<Photographer> values) {
-        LOGGER.debug("photographer filter changed");
-        filter.getIncludedPhotographers().clear();
-        filter.getIncludedPhotographers().addAll(values);
+        LOGGER.debug("photographer usedFilter changed");
+        usedFilter.getIncludedPhotographers().clear();
+        usedFilter.getIncludedPhotographers().addAll(values);
         handleFilterChange();
     }
 
     private void handleJourneysChange(List<Journey> values) {
-        LOGGER.debug("journey filter changed");
-        filter.getIncludedJourneys().clear();
-        filter.getIncludedJourneys().addAll(values);
+        LOGGER.debug("journey usedFilter changed");
+        usedFilter.getIncludedJourneys().clear();
+        usedFilter.getIncludedJourneys().addAll(values);
         handleFilterChange();
     }
 
     private void handlePlacesChange(List<Place> values) {
-        LOGGER.debug("place filter changed");
-        filter.getIncludedPlaces().clear();
-        filter.getIncludedPlaces().addAll(values);
+        LOGGER.debug("place usedFilter changed");
+        usedFilter.getIncludedPlaces().clear();
+        usedFilter.getIncludedPlaces().addAll(values);
         handleFilterChange();
     }
 
     private void refreshLists() {
-        LOGGER.debug("refreshing filter");
+        LOGGER.debug("refreshing usedFilter");
 
         ratingListView.setValues(getAllRatings());
         categoryListView.setValues(getAllCategories());
@@ -317,7 +320,7 @@ public class OrganizerImpl implements Organizer {
     }
 
     private void resetFilter() {
-        // don't update the filter until all list views have been reset
+        // don't update the usedFilter until all list views have been reset
         Runnable savedCallback = filterChangeCallback;
         filterChangeCallback = null;
 
