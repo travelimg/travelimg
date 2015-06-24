@@ -659,11 +659,11 @@
     -fx-padding: 80px 0 0 0;
 }
 .inspector-pane .placeholder .label {
-    -fx-text-fill: -tmg-text;
+    -fx-text-fill: -tmg-text-dark;
 }
 .inspector-pane .placeholder .glyph-icon {
     -fx-fill: -tmg-bg0;
-    -glyph-name: "CAMERA";
+    -glyph-name: "PICTURE_ALT";
     -glyph-size: 80px;
 }
 .inspector-pane .selection-info {
