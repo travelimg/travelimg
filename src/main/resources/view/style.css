@@ -919,9 +919,10 @@
 }
 .wikipedia #countryLabel {
     -fx-font-size: 18px;
+    -fx-padding: 0 0 20 0;
 }
 .wikipedia #descriptionText {
-    -fx-padding: 20 0 0 00;
+    -fx-fill: -tmg-text-bright;
 }
 .wikipedia-placeholder {
     -fx-fill: -tmg-text-bright;

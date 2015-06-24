@@ -24,11 +24,13 @@ import java.util.List;
 public class WikipediaInfoPane extends VBox {
 
     @FXML
+    private VBox root;
+    @FXML
     private Label placeLabel;
     @FXML
     private Label countryLabel;
     @FXML
-    private Label descriptionText;
+    private Text descriptionText;
     @FXML
     private TableColumn<String, String> categoryName;
     @FXML
