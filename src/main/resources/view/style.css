@@ -930,3 +930,20 @@
 .journey-places-list {
     -fx-background-color: -tmg-bg1;
 }
+
+.place-radio-button *.radio  {
+/* -fx-background terms are: shadow-highlight, border, -fx-inner-border, body */
+-fx-padding: 4;
+-fx-background-color: -fx-shadow-highlight-color, -fx-body-color;
+-fx-background-insets: 0 0 -1 0, 0, 1, 2;
+}
+
+.place-radio-button .dot {
+  -fx-mark-highlight-color: -tmg-primary ;
+  -fx-mark-color: -tmg-primary  ;
+}
+
+.rect {
+    -fx-fill: -tmg-primary;
+}
+
