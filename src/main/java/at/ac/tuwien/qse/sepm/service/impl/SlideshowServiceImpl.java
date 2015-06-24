@@ -29,7 +29,7 @@ public class SlideshowServiceImpl implements SlideshowService {
     private SlideshowDAO slideshowDAO;
 
     @Autowired
-    private SlideDAO<PhotoSlide> photoSlideDAO;
+    private SlideDAO slideDAO;
 
     @Override
     public Slideshow create(Slideshow slideshow) throws ServiceException {
@@ -80,7 +80,7 @@ public class SlideshowServiceImpl implements SlideshowService {
         try {
             for (Photo photo : photos) {
                 PhotoSlide slide = new PhotoSlide(-1, slideshow.getId(), order, "", photo);
-                slide = photoSlideDAO.create(slide);
+                slide = slideDAO.create(slide);
 
                 slides.add(slide);
                 slideshow.getSlides().add(slide);

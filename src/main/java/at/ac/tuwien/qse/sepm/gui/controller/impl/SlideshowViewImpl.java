@@ -163,7 +163,13 @@ public class SlideshowViewImpl implements SlideshowView {
 
     private void handleSlideChanged(Slide slide) {
         try {
-            slideService.update(slide);
+            if (slide instanceof PhotoSlide) {
+                slideService.update((PhotoSlide) slide);
+            } else if (slide instanceof MapSlide) {
+                 slideService.update((MapSlide) slide);
+            } else if (slide instanceof TitleSlide) {
+                slideService.update((TitleSlide) slide);
+            }
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Ändern der Slides", "Fehlermeldung: " + ex.getMessage());
         }
@@ -192,7 +198,13 @@ public class SlideshowViewImpl implements SlideshowView {
         slide.setSlideshowId(selected.getId());
 
         try {
-            slide = slideService.create(slide);
+            if (slide instanceof PhotoSlide) {
+                slide = slideService.create((PhotoSlide)slide);
+            } else if (slide instanceof MapSlide) {
+                slide = slideService.create((MapSlide)slide);
+            } else if (slide instanceof TitleSlide) {
+                slide = slideService.create((TitleSlide)slide);
+            }
             selected.getSlides().add(position, slide);
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Erstellen der Slide", "");
@@ -205,7 +217,13 @@ public class SlideshowViewImpl implements SlideshowView {
                 s.setOrder(s.getOrder() + 1);
 
                 try {
-                    slideService.update(s);
+                    if (s instanceof PhotoSlide) {
+                        slideService.update((PhotoSlide)s);
+                    } else if (s instanceof MapSlide) {
+                        slideService.update((MapSlide)s);
+                    } else if (s instanceof TitleSlide) {
+                        slideService.update((TitleSlide)s);
+                    }
                 } catch (ServiceException ex) {
                     ErrorDialog.show(root, "Fehler beim Setzen der neuen Reihenfolge", "");
                 }
