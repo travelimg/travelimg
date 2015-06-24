@@ -46,7 +46,7 @@ public class ImageTile extends StackPane {
 
         setMinHeight(0);
         setMinWidth(0);
-        imageView.setPreserveRatio(true);
+        imageView.setPreserveRatio(false);
 
         getChildren().add(placeHolder);
         getChildren().add(imageView);
