@@ -361,11 +361,11 @@
 }
 
 .filter-list {
-    -fx-padding: 8px 0 16px 0;
+    -fx-padding: 8px 0 8px 0;
     -fx-background-color: -tmg-bg1;
 }
 .filter-list .check-item {
-    -fx-padding: 8px 14px;
+    -fx-padding: 4px 14px;
     -fx-font-size: 14;
 }
 .filter-list .check-item:hover {
@@ -391,7 +391,7 @@
     -fx-text-fill: -tmg-text-bright;
 }
 .filter-list .check-item .glyph-icon {
-    -glyph-size: 16;
+    -glyph-size: 14px;
     -fx-fill: -tmg-bg0;
 }
 .filter-list .check-item.checked .glyph-icon {
@@ -403,7 +403,7 @@
 .filter-list .header {
     -fx-background-color: -tmg-bg2;
     -fx-font-size: 16;
-    -fx-padding: 8px 12px;
+    -fx-padding: 4px 12px;
 }
 .filter-list .header .label {
     -fx-text-fill: -tmg-text;
