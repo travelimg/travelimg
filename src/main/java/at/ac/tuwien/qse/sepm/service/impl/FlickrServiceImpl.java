@@ -220,10 +220,12 @@ public class FlickrServiceImpl implements FlickrService {
                     String serverId = p.getServer();
                     String id = p.getId();
                     String originalSecret = flickr.getPhotosInterface().getInfo(p.getId(), p.getSecret()).getOriginalSecret();
+                    String secret = p.getSecret();
                     String format = p.getOriginalFormat();
-                    String url = "https://farm" + farmId + ".staticflickr.com/" + serverId + "/" + id + "_" + originalSecret + "_o." + format;
-                    if (!originalSecret.isEmpty()) {
-                        downloadPhotoFromFlickr(url, id, format);
+                    if (!originalSecret.isEmpty() && !secret.isEmpty()) {
+                        String url = "https://farm" + farmId + ".staticflickr.com/" + serverId + "/" + id + "_" + originalSecret + "_o." + format;
+                        String mediumSizeUrl = "https://farm" + farmId + ".staticflickr.com/" + serverId + "/" + id + "_" + secret + "_z." + format;
+                        downloadPhotoFromFlickr(mediumSizeUrl, id, format);
                         at.ac.tuwien.qse.sepm.entities.Photo downloaded = createPhotoWithGeoData(id, format);
                         logger.debug("Downloaded photo {}", downloaded);
                         callback.accept(downloaded);

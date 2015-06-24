@@ -54,13 +54,11 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     @FXML
     private BorderPane borderPane;
     @FXML
-    private HBox progress;
-    @FXML
-    private ProgressBar progressBar;
+    private ProgressIndicator progressIndicator;
     @FXML
     private FlowPane photosFlowPane;
     @FXML
-    private Button downloadButton, importButton, stopButton, cancelButton;
+    private Button searchButton, importButton, cancelButton, fullscreenButton;
     @FXML
     private ScrollPane scrollPane;
     @FXML
@@ -123,18 +121,18 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
                 }
             }
         });
-        progressBar.getStyleClass().add("progress-bar");
-        progressBar.setTooltip(new Tooltip("Fotos werden heruntergeladen..."));
-        stopButton.setTooltip(new Tooltip("Abbrechen"));
         datePicker.setValue(LocalDate.now());
         datePicker.setTooltip(new Tooltip("Wählen Sie ein Datum für die Fotos aus"));
 
         cancelButton.setOnAction(e -> close());
         importButton.setOnAction(e -> handleImport());
-        downloadButton.setOnAction(e -> handleDownload());
-        stopButton.setOnAction(e -> handleStop());
+        searchButton.setOnAction(e -> handleSearch());
+        fullscreenButton.setOnAction(e -> handleFullscreen());
     }
 
+    private void handleFullscreen() {
+
+    }
 
     public void addKeyword(String keyword) {
         HBox hbox = new HBox();
@@ -162,14 +160,12 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
             public void handle(MouseEvent event) {
                 keywordsFlowPane.getChildren().remove(hbox);
                 flickrService.reset();
-                downloadButton.setText("Fotos herunterladen");
             }
         });
         hbox.getChildren().add(new Text("  "));
         hbox.getChildren().add(x);
         keywordsFlowPane.getChildren().add(hbox);
         flickrService.reset();
-        downloadButton.setText("Fotos herunterladen");
     }
 
     private void dropMarker(LatLong ll) {
@@ -179,12 +175,12 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
         this.actualLatLong = ll;
         mapScene.addMarker(ll);
         flickrService.reset();
-        downloadButton.setText("Fotos herunterladen");
+        searchButton.setText("Fotos herunterladen");
     }
 
-    public void handleDownload() {
-        downloadButton.setDisable(true);
-        progress.setVisible(true);
+    public void handleSearch() {
+        searchButton.setDisable(true);
+        progressIndicator.setVisible(true);
         downloadPhotos();
     }
 
@@ -216,9 +212,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
         logger.debug("Canceling the download...");
         if (downloadTask != null)
             downloadTask.cancel();
-        progress.setVisible(false);
-        progressBar.setProgress(0.0);
-        downloadButton.setDisable(false);
+        searchButton.setDisable(false);
 
     }
 
@@ -290,12 +284,9 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
                             Platform.runLater(new Runnable() {
 
                                 public void run() {
-                                    progressBar.setProgress(downloadProgress);
                                     if (downloadProgress == 1.0) {
-                                        progress.setVisible(false);
-                                        progressBar.setProgress(0.0);
-                                        downloadButton.setDisable(false);
-                                        downloadButton.setText("Mehr herunterladen");
+                                        searchButton.setDisable(false);
+                                        progressIndicator.setVisible(false);
                                     }
                                 }
                             });

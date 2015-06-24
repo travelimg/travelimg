@@ -37,19 +37,31 @@
                             </children>
                         </VBox>
                     </HBox>
-                    <HBox spacing="16.0">
+                    <HBox spacing="145.0">
                         <children>
-                            <Button fx:id="downloadButton" styleClass="btn,primary" text="Fotos herunterladen" />
-                            <HBox fx:id="progress" spacing="2.0" visible="false" alignment="CENTER">
-                                <children>
-                                    <Button fx:id="stopButton" styleClass="btn,stop">
-                                        <graphic>
-                                            <FontAwesomeIconView/>
-                                        </graphic>
-                                    </Button>
-                                    <ProgressBar fx:id="progressBar" progress="0.0" />
-                                </children>
+                            <HBox>
+                                <Button fx:id="searchButton" styleClass="btn,primary">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="SEARCH" />
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Fotos suchen" />
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="fullscreenButton" styleClass="btn,primary" disable="true">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="EXPAND" />
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Fotos ansehen" />
+                                    </tooltip>
+                                </Button>
                             </HBox>
+                            <ProgressIndicator fx:id="progressIndicator" maxHeight="30" maxWidth="30" styleClass="progress" HBox.hgrow="ALWAYS" visible="false">
+                                <tooltip>
+                                    <Tooltip text="Fotos werden gesucht..." />
+                                </tooltip>
+                            </ProgressIndicator>
                         </children>
                     </HBox>
                 </VBox>
