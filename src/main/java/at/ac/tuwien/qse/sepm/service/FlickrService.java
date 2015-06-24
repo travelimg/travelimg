@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -12,7 +13,7 @@ import java.util.function.Consumer;
 public interface FlickrService {
 
     /**
-     * Downloads (if possible) 10 new photos every time it is called. This is a non-blocking operation
+     * Downloads (if possible) 10 new photos(in medium size) every time it is called. This is a non-blocking operation
      *
      * @param tags         a list of tags used as keywords inorder to perform the search
      * @param latitude     used to find photos near to it
@@ -23,7 +24,17 @@ public interface FlickrService {
      * @return a Cancelable object, that can be used to interrupt the download
      * @throws ServiceException
      */
-    Cancelable downloadPhotos(String tags[], double latitude, double longitude, boolean useGeoData, Consumer<Photo> callback, Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler) throws ServiceException;
+    Cancelable searchPhotos(String tags[], double latitude, double longitude, boolean useGeoData,
+            Consumer<Photo> callback, Consumer<Double> progressCallback,
+            ErrorHandler<ServiceException> errorHandler) throws ServiceException;
+
+    /**
+     * Downloads photos from flickr in original size
+     * @param photos the photos, should contain the url as path, geodata and date
+     * @return a Cancelable object, that can be used to interrupt the download
+     * @throws ServiceException
+     */
+    Cancelable downloadPhotos(List<Photo> photos) throws ServiceException;
 
     /**
      * After calling this method, the service will be ready to load photos again from the beginning.

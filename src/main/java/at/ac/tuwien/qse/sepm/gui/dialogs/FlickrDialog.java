@@ -39,9 +39,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -189,19 +186,14 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
         for (ImageTile i : selectedImages) {
             Photo p = i.getPhoto();
             p.getData().setDatetime(datePicker.getValue().atStartOfDay());
-            try {
-                exifService.setDateAndGeoData(p);
-                photos.add(p);
-                Path path = Paths.get(p.getPath());
-                ioHandler.copyFromTo(Paths.get(p.getPath()),Paths.get(System.getProperty("user.home"),"travelimg/"+path.getFileName()));
-            } catch (IOException e) {
-                logger.debug("Couldn't copy photo {} to travelimg folder ",p.getPath(),e);
-            } catch (ServiceException e) {
-                logger.debug("Couldn't set date and geodata for {} ",p.getPath(),e);
-            }
+            //exifService.setDateAndGeoData(p);
+            photos.add(p);
+            //Path path = Paths.get(p.getPath());
+            //ioHandler.copyFromTo(Paths.get(p.getPath()),Paths.get(System.getProperty("user.home"),"travelimg/"+path.getFileName()));
             logger.debug("Added photo for import {}", p);
         }
         selectedImages.clear();
+        setResult(photos);
         close();
     }
 
@@ -234,7 +226,8 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
                 longitude = actualLatLong.getLongitude();
                 useGeoData = true;
             }
-            downloadTask = flickrService.downloadPhotos(tags, latitude, longitude, useGeoData, new Consumer<Photo>() {
+            downloadTask = flickrService.searchPhotos(tags, latitude, longitude, useGeoData,
+                    new Consumer<Photo>() {
 
                         public void accept(Photo photo) {
 
@@ -243,8 +236,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
                                 public void run() {
                                     ImageTile imageTile = new ImageTile(photo);
                                     imageTile.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                                        @Override
-                                        public void handle(MouseEvent event) {
+                                        @Override public void handle(MouseEvent event) {
                                             if (event.isControlDown()) {
                                                 if (imageTile.getSelectedProperty().getValue()) {
                                                     imageTile.unselect();
@@ -276,8 +268,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
 
                         }
 
-                    },
-                    new Consumer<Double>() {
+                    }, new Consumer<Double>() {
 
                         public void accept(Double downloadProgress) {
 
@@ -294,7 +285,6 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
                         }
 
                     }
-
 
                     , new ErrorHandler<ServiceException>() {
 
