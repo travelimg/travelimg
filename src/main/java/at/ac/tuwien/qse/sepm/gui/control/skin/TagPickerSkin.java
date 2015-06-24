@@ -35,6 +35,7 @@ public class TagPickerSkin extends SkinBase<TagPicker> {
         placeholder.setMaxWidth(Double.MAX_VALUE);
 
         list = new VBox();
+        list.getStyleClass().setAll("list");
 
         container = new StackPane();
         container.getChildren().addAll(placeholder, list);

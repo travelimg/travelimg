@@ -882,10 +882,12 @@
     -fx-background-color: -tmg-primary;
 }
 
-.tag-picker {
+.tag-picker .list {
+    -fx-spacing: 2px;
 }
 .tag-picker .tag {
-    -fx-padding: 4px 0;
+    -fx-padding: 4px 8px 4px 4px;
+    -fx-background-color: -tmg-bg1-light;
 }
 .tag-picker .tag .label-container {
     -fx-spacing: 16px;
@@ -894,7 +896,7 @@
     -fx-text-fill: -tmg-text;
 }
 .tag-picker .tag .check-icon {
-    -glyph-size: 25;
+    -glyph-size: 20;
     -fx-fill: -tmg-bg0;
 }
 .tag-picker .tag.applied .check-icon {
@@ -919,7 +921,7 @@
 .tag-picker .placeholder {
     -fx-background-color: -tmg-bg1-dark;
     -fx-text-fill: -tmg-text-dark;
-    -fx-padding: 8px 0;
+    -fx-padding: 5px 0 6px 0;
 }
 
 .suggestion-field {
