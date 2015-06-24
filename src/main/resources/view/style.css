@@ -921,4 +921,17 @@
     -fx-text-fill: -tmg-text-dark;
     -fx-padding: 8px 0;
 }
+
+.suggestion-field {
+    -fx-font-size: 14px;
+}
+.suggestion-field .suggestion {
+    -fx-text-fill: -tmg-primary;
+    -fx-cursor: hand;
+}
+.suggestion-field .suggestion:hover {
+    -fx-underline: true;
+}
+.suggestion-field .label {
+    -fx-font-size: 12px;
 }
