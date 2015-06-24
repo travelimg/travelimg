@@ -31,6 +31,12 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
     private TagPicker tagPicker;
 
     @FXML
+    private SuggestionField tagField;
+
+    @FXML
+    private SuggestionField photographerField;
+
+    @FXML
     private RatingPicker ratingPicker;
 
     @FXML
@@ -68,8 +74,37 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
         slideshowsCombobox.setConverter(new SlideshowStringConverter());
         slideshowsCombobox.setItems(slideshowView.getSlideshows());
 
-        ratingPicker.setRatingChangeHandler(r -> getEntities().forEach(this::saveRating));
-        tagPicker.setOnUpdate(() -> getEntities().forEach(this::saveTags));
+        ratingPicker.setRatingChangeHandler(r -> {
+            getEntities().forEach(this::saveRating);
+            onUpdate();
+        });
+
+        tagPicker.setOnUpdate(() -> {
+            getEntities().forEach(this::saveTags);
+            onUpdate();
+        });
+
+        tagField.setOnAction(() -> {
+            String value = tagField.getText();
+            if (value == null || value.isEmpty()) return;
+            for (Photo photo : getEntities()) {
+                tagField.setText(null);
+                photo.getData().getTags().add(new Tag(null, value));
+                savePhoto(photo);
+            }
+            onUpdate();
+        });
+
+        photographerField.setOnAction(() -> {
+            String value = photographerField.getText();
+            if (value == null || value.isEmpty()) return;
+            for (Photo photo : getEntities()) {
+                photographerField.setText(null);
+                photo.getData().setPhotographer(new Photographer(null, value));
+                savePhoto(photo);
+            }
+            onUpdate();
+        });
     }
 
     private void handleAddToSlideshow(Event event) {
@@ -92,28 +127,7 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
         Rating oldRating = photo.getData().getRating();
         LOGGER.debug("setting photo rating from {} to {}", oldRating, rating);
         photo.getData().setRating(rating);
-
-        try {
-            photoservice.editPhoto(photo);
-        } catch (ServiceException ex) {
-            LOGGER.error("Failed saving photo rating.", ex);
-            LOGGER.debug("Resetting rating from {} to {}.", rating, oldRating);
-
-            // Undo changes.
-            photo.getData().setRating(oldRating);
-            // FIXME: Reset the RatingPicker.
-            // This is not as simple as expected. Calling ratingPicker.getData().setRating(oldValue) here
-            // will complete and finish. But once the below dialog is closed ANOTHER selection-
-            // change will occur in RatingPicker that is the same as the once that caused the error.
-            // That causes an infinite loop of error dialogs.
-
-            ErrorDialog.show(root,
-                    "Bewertung fehlgeschlagen",
-                    "Die Bewertung für das Foto konnte nicht gespeichert werden."
-            );
-        }
-
-        onUpdate();
+        savePhoto(photo);
     }
     private void saveTags(Photo photo) {
         LOGGER.debug("updating tags of {}", photo);
@@ -133,12 +147,14 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
         // Replace tags with new ones.
         photo.getData().getTags().clear();
         newTags.forEach(tag -> photo.getData().getTags().add(new Tag(null, tag)));
-
+        savePhoto(photo);
+    }
+    private void savePhoto(Photo photo) {
         try {
             photoservice.editPhoto(photo);
         } catch (ServiceException ex) {
             LOGGER.warn("failed updating photo", photo);
-            LOGGER.error("error while updating photo", ex);
+            LOGGER.error("", ex);
         }
     }
 
