@@ -944,3 +944,22 @@
 .rect {
     -fx-fill: -tmg-primary;
 }
+.journey-places-list #journeyHeader {
+    -fx-padding: 5 0 0 5;
+}
+.journey-places-list #backButton {
+    -fx-background-color: transparent;
+}
+.journey-places-list #backButton .glyph-icon {
+    -fx-fill: -tmg-text-bright;
+}
+.journey-places-list #journeyLabel {
+    -fx-font-size: 20px;
+}
+.journey-places-list .journey-entry {
+    -fx-background-color: transparent;
+    -fx-font-size: 15px;
+}
+.journey-entry {
+    -fx-spacing: 10px;
+}

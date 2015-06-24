@@ -13,12 +13,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.RectangleBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +79,7 @@ public class JourneyPlaceList extends VBox {
 
         selectedJourney.addListener(((observable, oldValue, newValue) -> {
             if (newValue == null) {
-                journeyLabel.setText("Reisen");
+                journeyLabel.setText("Verfügbare Reisen");
             } else {
                 journeyLabel.setText(newValue.getName());
             }
@@ -176,11 +178,24 @@ public class JourneyPlaceList extends VBox {
         allPlacesButton.setSelected(true);
     }
 
-    private class JourneyEntry extends Button {
-        public JourneyEntry(Journey journey) {
-            super(journey.getName());
+    private class JourneyEntry extends HBox {
+        private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM.yyyy");
 
-            setOnAction((event) -> selectedJourney.set(journey));
+        public JourneyEntry(Journey journey) {
+            super();
+            getStyleClass().add("journey-entry");
+
+            String time = String.format("(%s - %s)", formatter.format(journey.getStartDate()), formatter.format(journey.getEndDate()));
+
+            Label name = new Label(journey.getName());
+            Label duration = new Label(time);
+
+            name.getStyleClass().add("name");
+            duration.getStyleClass().add("duration");
+
+            getChildren().addAll(name, duration);
+
+            setOnMouseClicked((event) -> selectedJourney.set(journey));
         }
     }
 
