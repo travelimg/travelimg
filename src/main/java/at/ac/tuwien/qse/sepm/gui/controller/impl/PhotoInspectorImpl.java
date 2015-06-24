@@ -10,12 +10,15 @@ import javafx.collections.ListChangeListener;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class PhotoInspectorImpl extends InspectorImpl<Photo> {
@@ -31,12 +34,8 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
     @FXML
     private RatingPicker ratingPicker;
 
-
-    /*@FXML
-    private TableColumn<String, String> exifName;
-
     @FXML
-    private TableColumn<String, String> exifValue;*/
+    private VBox exifList;
 
     @FXML
     private ComboBox<Slideshow> slideshowsCombobox;
@@ -125,8 +124,6 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
         // Depending on the number of photos selected show different elements.
         boolean noneActive = photos.size() == 0;
         boolean singleActive = photos.size() == 1;
-        /*exifTable.setVisible(singleActive);
-        exifTable.setManaged(singleActive);*/
 
         // Nothing to show.
         if (noneActive) return;
@@ -156,34 +153,37 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
             tagPicker.getEntities().add(tags);
         });
 
-        // Show additional details for a single selected photo.
-        if (singleActive) {
-            Photo photo = photos.iterator().next();
-
-            /*try {
-                Exif exif = exifService.getExif(photo);
-
-                List<Pair<String, String>> exifList = new ArrayList<Pair<String, String>>() {{
-                    add(new Pair<>("Aufnahmedatum", photo.getData().getDatetime().toString().replace("T", " ")));
-                    add(new Pair<>("Kamerahersteller", exif.getMake()));
-                    add(new Pair<>("Kameramodell", exif.getModel()));
-                    add(new Pair<>("Belichtungszeit", exif.getExposure() + " Sek."));
-                    add(new Pair<>("Blende", "f/" + exif.getAperture()));
-                    add(new Pair<>("Brennweite", "" + exif.getFocalLength()));
-                    add(new Pair<>("ISO", "" + exif.getIso()));
-                    add(new Pair<>("Blitz", exif.isFlash() ? "wurde ausgelöst" : "wurde nicht ausgelöst"));
-                    add(new Pair<>("Höhe", "" + exif.getAltitude()));
-                }};
-
-                ObservableList<Pair<String, String>> exifData = FXCollections.observableArrayList(exifList);
-
-                /*exifName.setCellValueFactory(new PropertyValueFactory<>("Key"));
-                exifValue.setCellValueFactory(new PropertyValueFactory<>("Value"));*
-                //exifTable.setItems(exifData);
-            } catch (ServiceException e) {
-                ErrorDialog.show(root, "Fehler beim Laden der Exif Daten", "Fehlermeldung: " + e.getMessage());
-            }*/
+        // Fetch EXIF data for all photos.
+        Collection<Exif> exifs = new ArrayList<>(photos.size());
+        for (Photo photo : photos) {
+            try {
+                exifs.add(exifService.getExif(photo));
+            } catch (ServiceException ex) {
+                LOGGER.warn("failed loading EXIF data for photo {}", photo);
+                LOGGER.error("", ex);
+            }
         }
+
+        exifList.getChildren().clear();
+        addExifCell("Fotograf", photos, p -> {
+            Photographer photographer = p.getData().getPhotographer();
+            if (photographer == null)
+                return null;
+            return photographer.getName();
+        });
+        addExifCell("Datum", photos, p -> {
+            LocalDateTime date = p.getData().getDatetime();
+            if (date == null) return null;
+            return date.toString().replace("T", " ");
+        });
+        addExifCell("Kamerahersteller", exifs, Exif::getMake);
+        addExifCell("Kameramodell", exifs, Exif::getModel);
+        addExifCell("Belichtungszeit", exifs, e -> e.getExposure() + " Sekunden");
+        addExifCell("Blende", exifs, Exif::getAperture);
+        addExifCell("Brennweite", exifs, Exif::getFocalLength);
+        addExifCell("ISO", exifs, Exif::getIso);
+        addExifCell("Blitz", exifs, e -> e.isFlash() ? "ausgelöst" : "ohne");
+        addExifCell("Höhe", exifs, Exif::getAltitude);
     }
 
     private void handleAddToSlideshow(Event event) {
@@ -221,6 +221,27 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
             LOGGER.warn("failed updating photo", photo);
             LOGGER.error("error while updating photo", ex);
         }
+    }
+
+    private <T> void addExifCell(String key, Collection<T> entities, Function<T, Object> mapper) {
+        Set<String> values = new HashSet<>();
+        entities.forEach(t -> {
+            String value = null;
+            Object obj = mapper.apply(t);
+            if (obj != null) {
+                value = obj.toString();
+            }
+            values.add(value);
+        });
+        boolean indetermined = values.size() != 1;
+
+        KeyValueCell cell = new KeyValueCell();
+        cell.setKey(key);
+        cell.setIndetermined(indetermined);
+        if (!indetermined) {
+            cell.setValue(values.iterator().next());
+        }
+        exifList.getChildren().add(cell);
     }
 
     private static class SlideshowStringConverter extends StringConverter<Slideshow> {

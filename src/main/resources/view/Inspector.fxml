@@ -1,56 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene?>
-<?import at.ac.tuwien.qse.sepm.gui.control.InspectorPane?>
-<?import at.ac.tuwien.qse.sepm.gui.control.RatingPicker?>
+<?import at.ac.tuwien.qse.sepm.gui.control.*?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.*?>
-<?import at.ac.tuwien.qse.sepm.gui.control.TagPicker?>
-<?import at.ac.tuwien.qse.sepm.gui.control.SuggestionField?>
 <InspectorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="280.0" styleClass="inspector"
             stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
             fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.PhotoInspectorImpl">
     <children>
         <RatingPicker fx:id="ratingPicker"/>
         <GoogleMapScene fx:id="mapScene" styleClass="map" maxHeight="200.0"/>
-        <VBox spacing="16">
-            <padding>
-                <Insets right="16" left="16" top="16" bottom="16"/>
-            </padding>
-            <children>
+        <ScrollPane hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+            <VBox spacing="16">
+                <padding>
+                    <Insets right="16" left="16" top="16" bottom="16"/>
+                </padding>
+                <children>
 
-                <SuggestionField fx:id="photographerField" label="Fotograf:" suggestions="Kris, Lukas, Marian, Christoph, David, Branko, Enri"/>
-                <SuggestionField fx:id="tagField" label="Neue Kategorie:" suggestions="Architektur, Essen, Ameisen, Elefanten, Elfenbein, Lukas, Kris"/>
-                <TagPicker fx:id="tagPicker"/>
+                    <SuggestionField fx:id="tagField" label="Neue Kategorie:" suggestions="Architektur, Essen, Ameisen, Elefanten, Elfenbein, Lukas, Kris"/>
+                    <TagPicker fx:id="tagPicker"/>
 
-                <!--TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="260">
-                    <columns>
-                        <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
-                        <TableColumn fx:id="exifValue" prefWidth="135.0" text="Wert"/>
-                    </columns>
-                </TableView-->
+                    <SuggestionField fx:id="photographerField" label="Fotograf setzen:" suggestions="Kris, Lukas, Marian, Christoph, David, Branko, Enri"/>
+                    <VBox fx:id="exifList" spacing="2"/>
 
-                <VBox>
-                    <children>
-                        <Label text="Zu Präsentation hinzufügen:"/>
-                        <HBox>
-                            <children>
-                                <ComboBox fx:id="slideshowsCombobox" />
+                    <VBox>
+                        <children>
+                            <Label text="Zu Präsentation hinzufügen:"/>
+                            <HBox>
+                                <children>
+                                    <ComboBox fx:id="slideshowsCombobox" />
 
-                            </children>
-                        </HBox>
-                    </children>
-                    <Button fx:id="addToSlideshowButton">
-                        <graphic>
-                            <FontAwesomeIconView glyphName="PLUS"></FontAwesomeIconView>
-                        </graphic>
-                    </Button>
-                </VBox>
-            </children>
-        </VBox>
+                                </children>
+                            </HBox>
+                        </children>
+                        <Button fx:id="addToSlideshowButton">
+                            <graphic>
+                                <FontAwesomeIconView glyphName="PLUS"></FontAwesomeIconView>
+                            </graphic>
+                        </Button>
+                    </VBox>
+                </children>
+            </VBox>
+        </ScrollPane>
     </children>
 </InspectorPane>

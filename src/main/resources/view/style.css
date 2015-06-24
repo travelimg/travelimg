@@ -130,7 +130,7 @@
     -fx-text-fill: -tmg-text;
 }
 
-.border-pane, .scroll-pane {
+.border-pane, .scroll-pane, .scroll-pane > * {
     -fx-padding: 0;
     -fx-background-color: transparent;
 }
@@ -870,18 +870,6 @@
     -fx-background-color: -tmg-control-pressed;
 }
 
-.check-list-view .list-cell:focused {
-    -fx-background-color: transparent;
-}
-.check-list-view .check-box {
-    -fx-padding: 0;
-    -fx-background-color: -tmg-bg0;
-}
-.check-list-view .check-box:selected {
-    -fx-padding: 0;
-    -fx-background-color: -tmg-primary;
-}
-
 .tag-picker .list {
     -fx-spacing: 2px;
 }
@@ -936,4 +924,33 @@
 }
 .suggestion-field .label {
     -fx-font-size: 12px;
+}
+
+.key-value-cell {
+    -fx-padding: 4px 8px;
+    -fx-background-color: -tmg-bg1-light;
+}
+.key-value-cell .key {
+    -fx-text-fill: -tmg-text;
+}
+.key-value-cell .value {
+    -fx-text-fill: -tmg-text-light;
+}
+.key-value-cell.empty .key {
+    -fx-text-fill: -tmg-text-dark;
+    -fx-text-alignment: left;
+}
+.key-value-cell.empty .value {
+    -fx-text-fill: -tmg-text-dark;
+    -fx-font-style: italic;
+    -fx-text-alignment: right;
+}
+.key-value-cell.indetermined .key {
+    -fx-text-fill: -tmg-text-dark;
+    -fx-text-alignment: left;
+}
+.key-value-cell.indetermined .value {
+    -fx-text-fill: -tmg-secondary;
+    -fx-font-style: italic;
+    -fx-text-alignment: right;
 }
