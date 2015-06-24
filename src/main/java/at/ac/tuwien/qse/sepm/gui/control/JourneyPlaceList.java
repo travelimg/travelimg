@@ -40,6 +40,8 @@ public class JourneyPlaceList extends VBox {
     @FXML
     private VBox places;
     @FXML
+    private VBox timeline;
+    @FXML
     private Node noJourneyPlaceholder;
     @FXML
     private RadioButton allPlacesButton;
@@ -142,43 +144,36 @@ public class JourneyPlaceList extends VBox {
     }
 
     private void populatePlacesBox() {
-        places.getChildren().clear();
-        places.setSpacing(20.0);
-        places.setPadding(new Insets(10.0, 0, 0, 10.0));
-        places.getChildren().add(allPlacesButton);
-        
         List<Place> placesOfJourney = placesByJourney.get(selectedJourney.get());
-        VBox vbox2 = new VBox();
 
+        timeline.getChildren().clear();
         PlaceEntry prev = null;
+
         for (int i = 0; i < placesOfJourney.size(); i++) {
-            PlaceEntry current = new PlaceEntry(placesOfJourney.get(i));
+            Place place = placesOfJourney.get(i);
+            PlaceEntry current = new PlaceEntry(place);
 
             current.setPrev(prev);
             if (prev != null) {
                 prev.setNext(current);
             }
 
-            vbox2.getChildren().add(current);
+            timeline.getChildren().add(current);
+
             if (i != placesOfJourney.size() - 1) {
-                Rectangle rect = RectangleBuilder.create()
-                        .width(5)
-                        .height(40)
-                        .styleClass("rect")
-                        .build();
+                Rectangle rect = new Rectangle(5, 40);
+                rect.getStyleClass().add("rect");
+
                 VBox vbox = new VBox();
                 vbox.setPadding(new Insets(0, 0, 0, 7.0));
                 vbox.getChildren().add(rect);
-                vbox2.getChildren().add(vbox);
+                timeline.getChildren().add(vbox);
             }
 
             prev = current;
-
         }
-        places.getChildren().add(vbox2);
 
         allPlacesButton.setSelected(true);
-
     }
 
     private class JourneyEntry extends Button {

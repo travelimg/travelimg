@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Label?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.RadioButton?>
+<?import javafx.geometry.Insets?>
 <fx:root fx:id="root" stylesheets="@../style.css" type="javafx.scene.layout.VBox"
          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
         styleClass="journey-places-list">
@@ -25,11 +26,20 @@
             <children>
                 <Label fx:id="noJourneyPlaceholder">Keine Reisen vorhanden</Label>
                 <VBox fx:id="journeys" visible="false" managed="false"></VBox>
-                <VBox fx:id="places" visible="false" managed="false">
+                <VBox fx:id="places" visible="false" managed="false" spacing="20">
+                    <padding>
+                        <Insets top="30" left="10" />
+                    </padding>
                     <children>
                         <RadioButton fx:id="allPlacesButton" styleClass="place-radio-button,all-places" text="Alle Orte">
 
                         </RadioButton>
+
+                        <VBox fx:id="timeline">
+                            <children>
+
+                            </children>
+                        </VBox>
                     </children>
                 </VBox>
             </children>
