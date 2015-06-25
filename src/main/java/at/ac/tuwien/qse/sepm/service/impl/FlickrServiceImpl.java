@@ -1,10 +1,13 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
-import at.ac.tuwien.qse.sepm.entities.Photographer;
-import at.ac.tuwien.qse.sepm.entities.Place;
-import at.ac.tuwien.qse.sepm.entities.Rating;
-import at.ac.tuwien.qse.sepm.service.*;
-import at.ac.tuwien.qse.sepm.util.*;
+import at.ac.tuwien.qse.sepm.service.ExifService;
+import at.ac.tuwien.qse.sepm.service.FlickrService;
+import at.ac.tuwien.qse.sepm.service.PhotographerService;
+import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.util.Cancelable;
+import at.ac.tuwien.qse.sepm.util.CancelableTask;
+import at.ac.tuwien.qse.sepm.util.ErrorHandler;
+import at.ac.tuwien.qse.sepm.util.IOHandler;
 import com.flickr4java.flickr.Flickr;
 import com.flickr4java.flickr.FlickrException;
 import com.flickr4java.flickr.REST;
@@ -127,47 +130,6 @@ public class FlickrServiceImpl implements FlickrService {
         } catch (IOException e) {
             throw new ServiceException(e.getMessage(), e);
         }
-    }
-
-
-    /**
-     * Creates photo with geo data. This photo is available at flickr.
-     *
-     * @param id     the id of the photo at flickr
-     * @param format the format of the photo
-     * @return the photo
-     * @throws ServiceException if the id or format is not correct or if the a photo with that id
-     * doesn't exist.
-     */
-    @Deprecated
-    public at.ac.tuwien.qse.sepm.entities.Photo createPhotoWithGeoData(String id, String format)
-            throws ServiceException {
-        logger.debug("Creating photo with geo data with id: {} and format: {}", id, format);
-        if(id==null || format == null){
-            throw new ServiceException("Photo id or format invalid.");
-        }
-        GeoData geoData = null;
-        try {
-            geoData = flickr.getPhotosInterface().getGeoInterface().getLocation(id);
-        } catch (FlickrException e) {
-           throw new ServiceException(e.getMessage());
-        }
-        at.ac.tuwien.qse.sepm.entities.Photo created = new at.ac.tuwien.qse.sepm.entities.Photo();
-        created.setPath(tmpDir + id + "." + format);
-        created.getData().setLatitude(geoData.getLatitude());
-        created.getData().setLongitude(geoData.getLongitude());
-        created.getData().setRating(Rating.NONE);
-
-        // attach flickr photographer
-        Photographer photographer = photographerService.readAll()
-                .stream()
-                .filter(p -> p.getId() == 2)
-                .findFirst()
-                .orElse(new Photographer(1, null)); // default photographer
-        created.getData().setPhotographer(photographer);
-        created.getData().setPlace(new Place(1, "Unknown city", "Unknown country", 0.0, 0.0));
-
-        return created;
     }
 
     private class AsyncSearcher extends CancelableTask {
