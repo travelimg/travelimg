@@ -51,16 +51,6 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Tag readName(Tag tag) throws ServiceException {
-        try {
-            return tagDAO.readName(tag);
-        } catch (DAOException e) {
-            LOGGER.error("Failed to read tag by name", e);
-            throw new ServiceException("Failed to read tag by name", e);
-        }
-    }
-
-    @Override
     public List<Tag> getAllTags() throws ServiceException {
         LOGGER.debug("Retrieving all tags...");
         try {
