@@ -1,23 +1,22 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 import at.ac.tuwien.qse.sepm.entities.MapSlide;
+import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.control.InspectorPane;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
-import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
 import javafx.beans.Observable;
+import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Collection;
 
 public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
 
@@ -33,6 +32,8 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
     private ToggleButton chooseLocationButton;
     @FXML
     private Slider zoomSlider;
+    @FXML
+    private Button deleteButton;
 
     @Autowired
     private SlideService slideService;
@@ -43,6 +44,7 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
         zoomSlider.valueProperty().addListener(this::handleZoomChange);
 
         map.setClickCallback(this::handleMapClicked);
+        deleteButton.setOnAction(this::handleDelete);
     }
 
     @Override
@@ -118,6 +120,21 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
             updateCoordinates(position.getLatitude(), position.getLongitude());
 
             chooseLocationButton.setSelected(false);
+        }
+    }
+
+    private void handleDelete(Event event) {
+        MapSlide slide = getSlide();
+
+        if (slide == null) {
+            return;
+        }
+
+        try {
+            slideService.delete(slide);
+            onUpdate();
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Ändern des Textes", "");
         }
     }
 }

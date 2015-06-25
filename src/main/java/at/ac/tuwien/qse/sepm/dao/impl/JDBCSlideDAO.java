@@ -127,15 +127,15 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
     }
 
     @Override public void delete(PhotoSlide slide) throws DAOException, ValidationException {
-
+        LOGGER.debug("Deleting slide {}", slide);
     }
 
     @Override public void delete(MapSlide slide) throws DAOException, ValidationException {
-
+        LOGGER.debug("Deleting slide {}", slide);
     }
 
     @Override public void delete(TitleSlide slide) throws DAOException, ValidationException {
-
+        LOGGER.debug("Deleting slide {}", slide);
     }
 
     @Override public List<PhotoSlide> getPhotoSlidesForSlideshow(int slideshowId)

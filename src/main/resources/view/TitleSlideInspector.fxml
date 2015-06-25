@@ -5,11 +5,21 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.Button?>
 <InspectorPane fx:id="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
                fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.TitleSlideInspectorImpl">
     <VBox>
         <Label>Beschriftung</Label>
         <TextField fx:id="captionField"/>
         <ColorPicker fx:id="colorPicker"/>
+
+        <Button fx:id="deleteButton"
+                style="-fx-background-color: transparent">
+            <graphic>
+                <FontAwesomeIconView glyphName="TRASH" glyphSize="25"
+                                     style="-fx-fill: -tmg-text-light"/>
+            </graphic>
+        </Button>
     </VBox>
 </InspectorPane>
