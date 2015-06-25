@@ -276,9 +276,10 @@ public class FlickrServiceImpl implements FlickrService {
                     downloadPhotoFromFlickr(url,p.getId()+"_o",p.getOriginalFormat());
                     progressCallback.accept((double)(i+1)/(double)photos.size());
                 } catch (ServiceException e) {
-
+                    progressCallback.accept(1.0);
                 }
             }
+            progressCallback.accept(1.0);
         }
     }
 }

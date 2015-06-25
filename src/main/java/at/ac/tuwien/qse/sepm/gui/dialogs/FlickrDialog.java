@@ -2,6 +2,8 @@ package at.ac.tuwien.qse.sepm.gui.dialogs;
 
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
+import at.ac.tuwien.qse.sepm.gui.controller.Menu;
+import at.ac.tuwien.qse.sepm.gui.controller.impl.MenuImpl;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.FlickrService;
@@ -9,6 +11,9 @@ import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import at.ac.tuwien.qse.sepm.util.IOHandler;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import javafx.animation.Animation;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -18,6 +23,7 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -32,6 +38,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -73,14 +80,17 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     private ArrayList<ImageTile> selectedImages = new ArrayList<ImageTile>();
     private Cancelable downloadTask;
     private static final String tmpDir = "src/main/resources/tmp/";
+    private Menu sender;
 
-    public FlickrDialog(Node origin, String title, FlickrService flickrService, ExifService exifService, IOHandler ioHandler) {
+    public FlickrDialog(Node origin, String title, FlickrService flickrService, ExifService exifService, IOHandler ioHandler,
+            Menu sender) {
         super(origin, title);
         FXMLLoadHelper.load(this, this, FlickrDialog.class, "view/FlickrDialog.fxml");
 
         this.flickrService = flickrService;
         this.exifService = exifService;
         this.ioHandler = ioHandler;
+        this.sender = sender;
         keywordTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -190,30 +200,39 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             //ioHandler.copyFromTo(Paths.get(p.getPath()),Paths.get(System.getProperty("user.home"),"travelimg/"+path.getFileName()));
             logger.debug("Added photo for import {}", i.getPhoto());
         }
+        Button flickrButton = ((MenuImpl)sender).getFlickrButton();
         try {
-            flickrService.downloadPhotos(photos
-                    , new Consumer<Double>() {
-                        public void accept(Double downloadProgress) {
-                            Platform.runLater(new Runnable() {
-                                public void run() {
-                                    logger.debug("Progress {}", downloadProgress);
-                                }
-                            });
 
+            flickrButton.setTooltip(null);
+            DownloadProgressControl downloadProgressControl = new DownloadProgressControl(flickrButton);
+
+            flickrService.downloadPhotos(photos, new Consumer<Double>() {
+                public void accept(Double downloadProgress) {
+                    Platform.runLater(new Runnable() {
+                        public void run() {
+                            downloadProgressControl.setProgress(downloadProgress);
+                            if (downloadProgress == 1.0) {
+                                downloadProgressControl.finish();
+                            }
+                            logger.debug("Downloading photos from flickr. Progress {}",
+                                    downloadProgress);
                         }
-                    }
+                    });
+
+                }
+            }
 
                     , new ErrorHandler<ServiceException>() {
 
-                        public void handle(ServiceException exception) {
-                            //handle errors here
-                        }
+                public void handle(ServiceException exception) {
+                    //handle errors here
+                }
                     });
         } catch (ServiceException e) {
             e.printStackTrace();
         }
         selectedImages.clear();
-        setResult(photos);
+        //setResult(photos);
         close();
     }
 
@@ -377,5 +396,79 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         public BooleanProperty getSelectedProperty() {
             return selected;
         }
+    }
+
+    private class DownloadProgressControl extends PopupControl{
+
+        private BorderPane borderPane;
+        private Button button;
+        private ProgressBar progressBar;
+        private FadeTransition ft;
+
+        public DownloadProgressControl(Button button){
+            super();
+            this.borderPane = new BorderPane();
+            this.button = button;
+            this.progressBar = new ProgressBar();
+
+            this.ft = new FadeTransition(Duration.millis(1000), button);
+            ft.setFromValue(1.0);
+            ft.setToValue(0.3);
+            ft.setCycleCount(Animation.INDEFINITE);
+            ft.setAutoReverse(true);
+            ft.play();
+            progressBar.setProgress(0.0);
+            FontAwesomeIconView stopIcon = new FontAwesomeIconView();
+            stopIcon.setGlyphName("TIMES");
+            HBox hBox = new HBox(5.0);
+            hBox.setAlignment(Pos.CENTER);
+
+            hBox.setPadding(new Insets(5.0,5.0,5.0,5.0));
+            hBox.getChildren().add(progressBar);
+            hBox.getChildren().add(stopIcon);
+            FontAwesomeIconView minimizeIcon = new FontAwesomeIconView();
+            minimizeIcon.setGlyphName("MINUS");
+            borderPane.setStyle("-fx-background-color: white");
+            borderPane.setPadding(new Insets(5.0, 5.0, 5.0, 5.0));
+            borderPane.setRight(minimizeIcon);
+            Label label = new Label("Fotos werden heruntergeladen");
+            label.setAlignment(Pos.CENTER);
+            borderPane.setCenter(label);
+            borderPane.setBottom(hBox);
+
+            minimizeIcon.setOnMouseClicked(event -> hide());
+            Point2D p = button.localToScene(button.getLayoutBounds().getMinX(), button.getLayoutBounds().getMinY());
+            //double posX = p.getX() + flickrButton.getScene().getX() + flickrButton.getScene().getWindow().getX();
+            //double posY = p.getY() + flickrButton.getScene().getY() + flickrButton.getScene().getWindow().getY();
+            button.setOnMouseEntered(event -> show(button,p.getX()+35.0,p.getY()-35.0));
+            getScene().setRoot(borderPane);
+        }
+
+        public void setProgress(double progress){
+            progressBar.setProgress(progress);
+        }
+
+        public void finish(){
+            ft.stop();
+            borderPane.getChildren().clear();
+            HBox hBox = new HBox();
+            hBox.setPadding(new Insets(5.0,5.0,5.0,5.0));
+            hBox.setAlignment(Pos.CENTER);
+            hBox.getChildren().add(new Label("Fotos wurden heruntergeladen"));
+            FontAwesomeIconView checkIcon = new FontAwesomeIconView();
+            checkIcon.setGlyphName("CHECK");
+            hBox.getChildren().add(checkIcon);
+            FontAwesomeIconView closeIcon = new FontAwesomeIconView();
+            closeIcon.setGlyphName("CLOSE");
+            closeIcon.setOnMouseClicked(event -> hide());
+            button.setOnMouseEntered(null);
+            button.setOnMouseExited(null);
+            borderPane.setCenter(hBox);
+            borderPane.setRight(closeIcon);
+            Point2D p = button.localToScene(button.getLayoutBounds().getMinX(), button.getLayoutBounds().getMinY());
+            hide();
+            show(button,p.getX()+35.0,p.getY()-5.0);
+        }
+
     }
 }
