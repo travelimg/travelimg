@@ -18,24 +18,19 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
 
 public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String BASE_UPDATE_STATEMENT = "UPDATE SLIDE SET slideshow_id = ?, orderposition = ?, caption = ? WHERE id = ?;";
-    private static final String MAP_INSERT_STATEMENT = "INSERT INTO MapSlide(id, latitude, longitude) VALUES(?, ?, ?)";
-    private static final String MAP_UPDATE_STATEMENT = "UPDATE MapSlide SET latitude = ?, longitude = ?  WHERE id = ?;";
+    private static final String MAP_INSERT_STATEMENT = "INSERT INTO MapSlide(id, latitude, longitude, zoomLevel) VALUES(?, ?, ?, ?)";
+    private static final String MAP_UPDATE_STATEMENT = "UPDATE MapSlide SET latitude = ?, longitude = ?, zoomLevel = ?  WHERE id = ?;";
     private static final String MAP_DELETE_STATEMENT = "DELETE FROM MapSlide where id = ?;";
-    private static final String MAP_READ_ALL_BY_SLIDESHOW_STATEMENT =
-            "SELECT Slide.id, slideshow_id, orderposition, caption, latitude, longitude FROM MapSlide JOIN Slide ON MapSlide.id = Slide.id WHERE slideshow_id=? ORDER BY orderposition asc;";
+    private static final String MAP_READ_ALL_BY_SLIDESHOW_STATEMENT = "SELECT Slide.id, slideshow_id, orderposition, caption, latitude, longitude, zoomLevel FROM MapSlide JOIN Slide ON MapSlide.id = Slide.id WHERE slideshow_id=? ORDER BY orderposition asc;";
     private static final String TITLE_INSERT_STATEMENT = "INSERT INTO TitleSlide(id, color) VALUES(?, ?)";
     private static final String TITLE_UPDATE_STATEMENT = "UPDATE TitleSlide SET color = ?  WHERE id = ?;";
     private static final String TITLE_READ_ALL_BY_SLIDESHOW_STATEMENT =
@@ -76,7 +71,8 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
         createBase(slide);
 
         try {
-            jdbcTemplate.update(MAP_INSERT_STATEMENT, slide.getId(), slide.getLatitude(), slide.getLongitude());
+            jdbcTemplate.update(MAP_INSERT_STATEMENT, slide.getId(), slide.getLatitude(),
+                    slide.getLongitude(), slide.getZoomLevel());
             return slide;
         } catch (DataAccessException ex) {
             throw new DAOException("Failed to create map slide", ex);
@@ -121,11 +117,8 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
         updateBase(slide);
 
         try {
-            jdbcTemplate.update(MAP_UPDATE_STATEMENT,
-                    slide.getLatitude(),
-                    slide.getLongitude(),
-                    slide.getId()
-            );
+            jdbcTemplate.update(MAP_UPDATE_STATEMENT, slide.getLatitude(), slide.getLongitude(),
+                    slide.getZoomLevel(), slide.getId());
             logger.debug("Successfully updated map slide");
             return slide;
         } catch (DataAccessException ex) {

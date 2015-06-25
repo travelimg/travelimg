@@ -23,5 +23,6 @@ public class MapSlideView extends SlideView {
 
         mapScene.addMarker(position);
         mapScene.center(position);
+        mapScene.setZoom(slide.getZoomLevel());
     }
 }

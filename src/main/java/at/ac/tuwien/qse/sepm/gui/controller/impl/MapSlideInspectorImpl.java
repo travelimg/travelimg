@@ -10,6 +10,7 @@ import at.ac.tuwien.qse.sepm.service.SlideService;
 import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import org.apache.logging.log4j.LogManager;
@@ -30,6 +31,8 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
     private GoogleMapScene map;
     @FXML
     private ToggleButton chooseLocationButton;
+    @FXML
+    private Slider zoomSlider;
 
     @Autowired
     private SlideService slideService;
@@ -37,6 +40,7 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
     @FXML
     private void initialize() {
         captionField.textProperty().addListener(this::handleCaptionChange);
+        zoomSlider.valueProperty().addListener(this::handleZoomChange);
 
         map.setClickCallback(this::handleMapClicked);
     }
@@ -46,6 +50,7 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
         super.setSlide(slide);
 
         captionField.setText(slide.getCaption());
+        zoomSlider.setValue(slide.getZoomLevel());
 
         map.clear();
         map.addMarker(new LatLong(slide.getLatitude(), slide.getLongitude()));
@@ -82,6 +87,23 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
         }
 
         slide.setCaption(captionField.getText());
+
+        try {
+            slideService.update(slide);
+            onUpdate();
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Ändern des Textes", "");
+        }
+    }
+
+    private void handleZoomChange(Observable observable) {
+        MapSlide slide = getSlide();
+
+        if (slide == null) {
+            return;
+        }
+
+        slide.setZoomLevel((int)zoomSlider.getValue());
 
         try {
             slideService.update(slide);
