@@ -136,6 +136,10 @@ public class SlideshowViewImpl implements SlideshowView {
         return new Slideshow(NEW_SLIDESHOW_MARKER_ID, NEW_SLIDESHOW_PROMPT, durationBetweenPhotos);
     }
 
+    private void refreshGrid() {
+        grid.setSlideshow(slideshowOrganizer.getSelected());
+    }
+
     private class SlideSelectedCallback implements SlideCallback<Void> {
         @Override
         public void handle(PhotoSlide slide) {
@@ -200,6 +204,7 @@ public class SlideshowViewImpl implements SlideshowView {
 
             updateOrderForOtherSlides(selected, position);
             selected.getMapSlides().add(slide);
+            refreshGrid();
         }
 
         @Override
@@ -222,6 +227,7 @@ public class SlideshowViewImpl implements SlideshowView {
 
             updateOrderForOtherSlides(selected, position);
             selected.getTitleSlides().add(slide);
+            refreshGrid();
         }
 
         private void updateOrderForOtherSlides(Slideshow slideshow, int insertPosition) {
