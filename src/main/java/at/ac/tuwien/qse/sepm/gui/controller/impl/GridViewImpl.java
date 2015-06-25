@@ -52,6 +52,8 @@ public class GridViewImpl implements GridView {
     private IOHandler ioHandler;
     @Autowired
     private ExifService exifService;
+    @Autowired
+    private FullscreenWindow fullscreenWindow;
 
     @FXML
     private BorderPane root;
@@ -178,10 +180,10 @@ public class GridViewImpl implements GridView {
     private class MenuListener implements Menu.Listener {
 
         @Override public void onPresent(Menu sender) {
-            FullscreenWindow fullscreen = new FullscreenWindow();
+
             List<Photo> getSelectedPhoto = new ArrayList<>();
             getSelectedPhoto.addAll(grid.getSelected());
-            fullscreen.present(grid.getPhotos(), getSelectedPhoto.get(0));
+            fullscreenWindow.present(grid.getPhotos(), getSelectedPhoto.get(0));
         }
 
         @Override public void onFlickr(Menu sender) {

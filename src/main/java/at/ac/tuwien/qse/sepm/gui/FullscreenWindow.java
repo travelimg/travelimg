@@ -16,6 +16,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseDragEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -24,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 
@@ -44,7 +46,7 @@ public class FullscreenWindow extends StackPane {
     private HBox bottomBar;
 
     @Autowired
-    private PhotoService photoservice;
+    private PhotoService photoService;
 
     private List<Photo> photos;
     private SmartImage image = new SmartImage(ImageSize.ORIGINAL);
@@ -52,12 +54,13 @@ public class FullscreenWindow extends StackPane {
     private int activeIndex = 0;
     private RatingPicker ratingPicker = new RatingPicker();
 
-    public FullscreenWindow() {
+    public FullscreenWindow(){
         FXMLLoadHelper.load(this, this, FullscreenWindow.class, "view/FullScreenDialog.fxml");
     }
 
     @FXML
     private void initialize() {
+
         this.stage = new Stage();
         this.scene = new Scene(this);
 
@@ -92,8 +95,12 @@ public class FullscreenWindow extends StackPane {
 
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
         ratingContainer.getChildren().add(ratingPicker);
-
+        ratingContainer.setOnMouseDragOver(this::handleMouseOver);
         StackPane.setAlignment(bottomBar, Pos.BOTTOM_CENTER);
+    }
+
+    private void handleMouseOver(MouseDragEvent mouseDragEvent) {
+        ratingContainer.set
     }
 
     public void present(List<Photo> photos, Photo initial) {
@@ -124,7 +131,9 @@ public class FullscreenWindow extends StackPane {
             photos.get(activeIndex).getData().setRating(newRating);
 
             try {
-                photoservice.editPhoto(photos.get(activeIndex));
+                System.out.println(photos.get(activeIndex).toString());
+
+                photoService.editPhoto(photos.get(activeIndex));
             } catch (ServiceException ex) {
                 LOGGER.error("Failed saving photo rating.", ex);
                 LOGGER.debug("Resetting rating from {} to {}.", newRating, oldRating);
