@@ -64,4 +64,8 @@ public class MenuImpl implements Menu {
         pageSelector.currentPageProperty().addListener((object, oldValue, newValue) ->
             listeners.forEach(l -> l.onPageSwitch(this)));
     }
+
+    public Button getFlickrButton(){
+        return flickrButton;
+    }
 }
