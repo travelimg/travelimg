@@ -73,8 +73,6 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     }
 
     public void setSlideshows(ObservableList<Slideshow> slideshows) {
-        slideshowList.setItems(FXCollections.observableArrayList()); // clear list
-        
         // only display real slideshows (no placeholder)
         FilteredList<Slideshow> filtered = slideshows.filtered(s -> s.getId() >= 0);
         slideshowList.setItems(filtered);
