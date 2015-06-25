@@ -69,8 +69,9 @@ public class FlickrServiceImpl implements FlickrService {
     }
 
     @Override
-    public Cancelable downloadPhotos(List<at.ac.tuwien.qse.sepm.entities.Photo> photos){
-        AsyncDownloader downloader = new AsyncDownloader(photos);
+    public Cancelable downloadPhotos(List<at.ac.tuwien.qse.sepm.entities.Photo> photos, Consumer<Double> progressCallback,
+            ErrorHandler<ServiceException> errorHandler){
+        AsyncDownloader downloader = new AsyncDownloader(photos, progressCallback, errorHandler);
         executorService.submit(downloader);
         return downloader;
     }
@@ -262,9 +263,13 @@ public class FlickrServiceImpl implements FlickrService {
     private class AsyncDownloader extends CancelableTask{
 
         private List<at.ac.tuwien.qse.sepm.entities.Photo> photos;
+        private Consumer<Double> progressCallback;
+        private ErrorHandler<ServiceException> errorHandler;
 
-        public AsyncDownloader(List<at.ac.tuwien.qse.sepm.entities.Photo> photos){
+        public AsyncDownloader(List<at.ac.tuwien.qse.sepm.entities.Photo> photos, Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler){
             this.photos = photos;
+            this.progressCallback = progressCallback;
+            this.errorHandler = errorHandler;
         }
 
         @Override

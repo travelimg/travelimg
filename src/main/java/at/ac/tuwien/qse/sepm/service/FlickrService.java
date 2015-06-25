@@ -20,6 +20,7 @@ public interface FlickrService {
      * @param longitude    used to find photos near to ii
      * @param useGeoData   if true, geodata(latitude and longitude) will be used for searching
      * @param callback     used to notify the GUI after a new photo has been downloaded(the photo object will contain the path where the photo is temporary stored)
+     * @param progressCallback used to notify the GUI about the download progress
      * @param errorHandler handler for occurring exceptions
      * @return a Cancelable object, that can be used to interrupt the download
      * @throws ServiceException
@@ -31,10 +32,13 @@ public interface FlickrService {
     /**
      * Downloads photos from flickr in original size
      * @param photos the photos, should contain the url as path, geodata and date
+     * @param progressCallback used to notify the GUI about the download progress
+     * @param errorHandler handler for occurring exceptions
      * @return a Cancelable object, that can be used to interrupt the download
      * @throws ServiceException
      */
-    Cancelable downloadPhotos(List<Photo> photos) throws ServiceException;
+    Cancelable downloadPhotos(List<Photo> photos, Consumer<Double> progressCallback,
+            ErrorHandler<ServiceException> errorHandler) throws ServiceException;
 
     /**
      * After calling this method, the service will be ready to load photos again from the beginning.
