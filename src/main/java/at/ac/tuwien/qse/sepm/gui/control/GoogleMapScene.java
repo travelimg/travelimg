@@ -74,6 +74,10 @@ public class GoogleMapScene extends VBox {
         callJS("document.fitToMarkers();");
     }
 
+    public void fitToLastTwoMarkers() {
+        callJS("document.fitToLastTwoMarkers();");
+    }
+
     /**
      * Draw a polyline path using a list of vertices on the path.
      * @param vertices A ordered path of vertices which to draw.
@@ -81,7 +85,7 @@ public class GoogleMapScene extends VBox {
     public void drawPolyline(List<LatLong> vertices) {
 
         Optional<String> jsVertices = vertices.stream()
-                .map(v -> String.format("[%f, %f]", v.getLatitude(), v.getLongitude()))
+                .map(v -> String.format(Locale.US,"[%f, %f]", v.getLatitude(), v.getLongitude()))
                 .reduce((v1, v2) -> v1 + ", " + v2);
 
         if (jsVertices.isPresent()) {

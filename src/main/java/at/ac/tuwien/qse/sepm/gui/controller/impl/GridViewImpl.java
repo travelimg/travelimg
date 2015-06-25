@@ -8,7 +8,6 @@ import at.ac.tuwien.qse.sepm.gui.controller.Menu;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.*;
 import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid;
-import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.util.IOHandler;
 import javafx.application.Platform;
@@ -51,8 +50,6 @@ public class GridViewImpl implements GridView {
     @Autowired
     private Menu menu;
     @Autowired
-    private ImageCache imageCache;
-    @Autowired
     private IOHandler ioHandler;
     @Autowired
     private ExifService exifService;
@@ -69,15 +66,6 @@ public class GridViewImpl implements GridView {
     private PaginatedImageGrid grid;
     private boolean disableReload = false;
     private boolean treeViewActive = false;
-
-    @Autowired
-    public void setImageCache(ImageCache imageCache) {
-        this.imageCache = imageCache;
-
-        if (grid == null) {
-            this.grid = new PaginatedImageGrid(menu);
-        }
-    }
 
     @FXML
     private void initialize() {
@@ -211,7 +199,7 @@ public class GridViewImpl implements GridView {
     private class MenuListener implements Menu.Listener {
 
         @Override public void onPresent(Menu sender) {
-            FullscreenWindow fullscreen = new FullscreenWindow(imageCache);
+            FullscreenWindow fullscreen = new FullscreenWindow();
             List<Photo> getSelectedPhoto = new ArrayList<>();
             getSelectedPhoto.addAll(grid.getSelected());
             fullscreen.present(grid.getPhotos(), getSelectedPhoto.get(0));

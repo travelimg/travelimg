@@ -61,8 +61,6 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
     @Override public void setEntities(Collection<Photo> photos) {
         super.setEntities(photos);
 
-        getEntities().forEach(photo -> mapScene.addMarker(new LatLong(photo.getData().getLatitude(), photo.getData().getLongitude())));
-
         showDetails(getEntities());
     }
 

@@ -26,6 +26,7 @@ public class WorldmapViewImpl implements WorldmapView {
     private GoogleMapScene mapScene;
 
     @Autowired
+
     private ClusterService clusterService;
 
     @FXML

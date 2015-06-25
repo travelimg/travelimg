@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Place;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ClusterService {
 
@@ -22,6 +23,15 @@ public interface ClusterService {
      * @throws ServiceException propagates DAOExceptions
      */
     List<Place> getAllPlaces() throws ServiceException;
+
+    /**
+     * Read and return a list of places of a journey sorted in chronological (visiting) order.
+     *
+     * @param journey The journey for which the places are desired.
+     * @return The places which where visited during the journey in ascending order.
+     * @throws ServiceException If the places can not be fetched.
+     */
+    List<Place> getPlacesByJourneyChronological(Journey journey) throws ServiceException;
 
     /**
      * Adds a new place to the datastore.
