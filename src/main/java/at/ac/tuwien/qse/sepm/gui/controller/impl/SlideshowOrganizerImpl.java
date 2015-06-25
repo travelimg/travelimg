@@ -201,7 +201,9 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
         protected void updateItem(Slideshow item, boolean empty) {
             super.updateItem(item, empty);
 
-            if (item != null) {
+            if (empty) {
+                setText(null);
+            } else if (item != null) {
                 setText(item.getName());
             }
         }
