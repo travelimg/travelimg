@@ -667,14 +667,22 @@
     -glyph-size: 80px;
 }
 .inspector-pane .selection-info {
-    -fx-background-color: -tmg-secondary;
-    -fx-text-fill: -tmg-text-bright;
+    -fx-background-color: -tmg-bg1-light;
     -fx-padding: 16px 16px;
 }
 .inspector-pane .selection-info .label {
     -fx-font-size: 20px;
-    -fx-text-fill: -tmg-text-bright;
+    -fx-text-fill: -tmg-text-dark;
     -fx-alignment: center;
+}
+.inspector-pane.multiple .selection-info {
+    -fx-background-color: -tmg-secondary;
+}
+.inspector-pane.multiple .selection-info .label {
+    -fx-text-fill: -tmg-text-bright;
+}
+.inspector-pane .body {
+    -fx-padding: 16px;
 }
 
 .rating-picker * {

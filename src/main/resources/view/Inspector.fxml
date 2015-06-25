@@ -10,15 +10,17 @@
 <?import javafx.scene.layout.*?>
 <InspectorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="280.0" styleClass="inspector"
             stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
-            fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.PhotoInspectorImpl">
-    <children>
-        <RatingPicker fx:id="ratingPicker"/>
-        <GoogleMapScene fx:id="mapScene" styleClass="map" maxHeight="200.0"/>
+            fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.PhotoInspectorImpl"
+            entityName="Fotos">
+    <header>
+        <VBox>
+            <RatingPicker fx:id="ratingPicker"/>
+            <GoogleMapScene fx:id="mapScene" styleClass="map" maxHeight="200.0"/>
+        </VBox>
+    </header>
+    <VBox>
         <ScrollPane hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
             <VBox spacing="16">
-                <padding>
-                    <Insets right="16" left="16" top="16" bottom="16"/>
-                </padding>
                 <children>
 
                     <SuggestionField fx:id="tagField" label="Neue Kategorie:" suggestions="Architektur, Essen, Ameisen, Elefanten, Elfenbein, Lukas, Kris"/>
@@ -46,5 +48,5 @@
                 </children>
             </VBox>
         </ScrollPane>
-    </children>
+    </VBox>
 </InspectorPane>
