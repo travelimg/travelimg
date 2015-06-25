@@ -48,7 +48,7 @@
                                         <Tooltip text="Fotos suchen" />
                                     </tooltip>
                                 </Button>
-                                <Button fx:id="fullscreenButton" styleClass="btn,primary" disable="false">
+                                <Button fx:id="fullscreenButton" styleClass="btn,primary" disable="true">
                                     <graphic>
                                         <FontAwesomeIconView glyphName="EXPAND" />
                                     </graphic>
