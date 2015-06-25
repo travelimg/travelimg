@@ -79,6 +79,10 @@ public class SlideshowViewImpl implements SlideshowView {
             slideshowOrganizer.setSlideshows(slideshows);
         });
 
+        slideshowOrganizer.setDeleteAction((slideshow) -> {
+            slideshows.remove(slideshow);
+        });
+
         slideshowOrganizer.setPresentAction(() -> {
             Slideshow selected = slideshowOrganizer.getSelected();
             PresentationWindow presentationWindow = new PresentationWindow(selected);

@@ -40,6 +40,8 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     @FXML
     private Button addButton;
     @FXML
+    private Button deleteButton;
+    @FXML
     private Button presentButton;
     @FXML
     private VBox slideshowPropertiesBox;
@@ -57,6 +59,8 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     private SlideshowServiceImpl slideshowService;
 
     private Consumer<Slideshow> slideshowAddedCallback = null;
+    private Consumer<Slideshow> slideshowDeletedCallback = null;
+
     private ObjectProperty<Slideshow> selectedSlideshowProperty = new SimpleObjectProperty<>(null);
 
 
@@ -87,6 +91,10 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
         this.slideshowAddedCallback = callback;
     }
 
+    @Override public void setDeleteAction(Consumer<Slideshow> callback) {
+        this.slideshowDeletedCallback = callback;
+    }
+
     @FXML
     private void initialize() {
         slideshowList.setCellFactory(new SlideshowCellFactory());
@@ -98,6 +106,7 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
         longDurationButton.setToggleGroup(durationToggleGroup);
 
         addButton.setOnAction(this::handleAddSlideshow);
+        deleteButton.setOnAction(this::handleDeleteSlideshow);
         slideshowNameTextField.textProperty().addListener(this::updateSelectedSlideshowName);
         durationToggleGroup.selectedToggleProperty().addListener(this::updateSlideshowDuration);
         slideshowList.getSelectionModel().selectedItemProperty().addListener(this::onActiveSlideshowChanged);
@@ -144,6 +153,24 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
             }
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Erstellen der Diashow", "");
+        }
+    }
+
+    private void handleDeleteSlideshow(Event event) {
+        Slideshow slideshow = getSelected();
+
+        if (slideshow == null) {
+            return;
+        }
+
+        try {
+            slideshowService.delete(slideshow);
+
+            if (slideshowDeletedCallback != null) {
+                slideshowDeletedCallback.accept(slideshow);
+            }
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Löschen der Diashow", "");
         }
     }
 
