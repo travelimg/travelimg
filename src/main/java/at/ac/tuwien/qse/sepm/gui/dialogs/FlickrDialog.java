@@ -1,6 +1,8 @@
 package at.ac.tuwien.qse.sepm.gui.dialogs;
 
+import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
+import at.ac.tuwien.qse.sepm.gui.FullscreenWindow;
 import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.controller.Menu;
 import at.ac.tuwien.qse.sepm.gui.controller.impl.MenuImpl;
@@ -53,7 +55,6 @@ import java.util.function.Consumer;
 
 public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photos.Photo>> {
 
-    private static final Logger logger = LogManager.getLogger();
     @FXML
     private BorderPane borderPane;
     @FXML
@@ -61,7 +62,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     @FXML
     private FlowPane photosFlowPane;
     @FXML
-    private Button searchButton, importButton, cancelButton, fullscreenButton;
+    private Button searchButton, fullscreenButton, resetButton, importButton, cancelButton;
     @FXML
     private ScrollPane scrollPane;
     @FXML
@@ -73,13 +74,16 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     @FXML
     private GoogleMapScene mapScene;
 
+    private static final Logger logger = LogManager.getLogger();
+    private static final String tmpDir = System.getProperty("java.io.tmpdir");
     private FlickrService flickrService;
     private ExifService exifService;
     private IOHandler ioHandler;
     private LatLong actualLatLong;
-    private ArrayList<ImageTile> selectedImages = new ArrayList<ImageTile>();
-    private Cancelable downloadTask;
-    private static final String tmpDir = "src/main/resources/tmp/";
+    private ArrayList<ImageTile> selectedImages = new ArrayList<>();
+    private ArrayList<Photo> photos = new ArrayList<>();
+    private Cancelable sarchTask;
+
     private Menu sender;
 
     public FlickrDialog(Node origin, String title, FlickrService flickrService, ExifService exifService, IOHandler ioHandler,
@@ -91,6 +95,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         this.exifService = exifService;
         this.ioHandler = ioHandler;
         this.sender = sender;
+
         keywordTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -110,9 +115,6 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                 }
             }
         });
-
-        mapScene.setDoubleClickCallback((position) -> dropMarker(position));
-
         scrollPane.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -128,50 +130,15 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                 }
             }
         });
+
         datePicker.setValue(LocalDate.now());
         datePicker.setTooltip(new Tooltip("Wählen Sie ein Datum für die Fotos aus"));
-
+        mapScene.setDoubleClickCallback((position) -> dropMarker(position));
         cancelButton.setOnAction(e -> close());
         importButton.setOnAction(e -> handleImport());
         searchButton.setOnAction(e -> handleSearch());
         fullscreenButton.setOnAction(e -> handleFullscreen());
-    }
-
-    private void handleFullscreen() {
-
-    }
-
-    public void addKeyword(String keyword) {
-        HBox hbox = new HBox();
-        hbox.setStyle("-fx-background-radius: 5; -fx-background-color: #E91E63; ");
-        Text text = new Text(keyword);
-        text.setFill(Color.WHITE);
-        hbox.setAlignment(Pos.CENTER);
-        hbox.setPadding(new Insets(3, 5, 5, 5));
-        hbox.getChildren().add(text);
-        Text x = new Text("x");
-        x.setOnMouseEntered(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                keywordsFlowPane.setCursor(Cursor.HAND);
-            }
-        });
-        x.setOnMouseExited(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                keywordsFlowPane.setCursor(Cursor.DEFAULT);
-            }
-        });
-        x.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override public void handle(MouseEvent event) {
-                keywordsFlowPane.getChildren().remove(hbox);
-                flickrService.reset();
-            }
-        });
-        hbox.getChildren().add(new Text("  "));
-        hbox.getChildren().add(x);
-        keywordsFlowPane.getChildren().add(hbox);
-        flickrService.reset();
+        resetButton.setOnAction(e -> handleReset());
     }
 
     private void dropMarker(LatLong ll) {
@@ -181,86 +148,23 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         this.actualLatLong = ll;
         mapScene.addMarker(ll);
         flickrService.reset();
-        searchButton.setText("Fotos herunterladen");
     }
 
-    public void handleSearch() {
+    public void addKeyword(String name) {
+        Keyword keyword = new Keyword(name);
+        keyword.setOnClosed(new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent event) {
+                keywordsFlowPane.getChildren().remove(keyword);
+                flickrService.reset();
+            }
+        });
+        keywordsFlowPane.getChildren().add(keyword);
+        flickrService.reset();
+    }
+
+    private void handleSearch() {
         searchButton.setDisable(true);
         progressIndicator.setVisible(true);
-        downloadPhotos();
-    }
-
-    public void handleImport() {
-        if(selectedImages.isEmpty()){
-            return;
-        }
-        ArrayList<com.flickr4java.flickr.photos.Photo> photos = new ArrayList<>();
-        for (ImageTile i : selectedImages) {
-            //i.getPhoto().setDateAdded(datePicker.getValue().atStartOfDay());
-            photos.add(i.getPhoto());
-            //exifService.setDateAndGeoData(p);
-            //Path path = Paths.get(p.getPath());
-            //ioHandler.copyFromTo(Paths.get(p.getPath()),Paths.get(System.getProperty("user.home"),"travelimg/"+path.getFileName()));
-            logger.debug("Added photo for import {}", i.getPhoto());
-        }
-        Button flickrButton = ((MenuImpl)sender).getFlickrButton();
-        String flickrButtonStyle = flickrButton.getGraphic().getStyle();
-        flickrButton.getGraphic().setStyle("-fx-fill: -tmg-primary;");
-        Tooltip flickrButtonTooltip = flickrButton.getTooltip();
-        flickrButton.setTooltip(null);
-        EventHandler flickrButtonOnAction = flickrButton.getOnAction();
-        flickrButton.setOnAction(null);
-
-        try {
-
-
-            DownloadProgressControl downloadProgressControl = new DownloadProgressControl(flickrButton);
-
-            flickrService.downloadPhotos(photos, new Consumer<Double>() {
-                public void accept(Double downloadProgress) {
-                    Platform.runLater(new Runnable() {
-                        public void run() {
-                            downloadProgressControl.setProgress(downloadProgress);
-                            if (downloadProgress == 1.0) {
-                                downloadProgressControl.finish();
-                                flickrButton.getGraphic().setStyle(flickrButtonStyle);
-                                flickrButton.setTooltip(flickrButtonTooltip);
-                                flickrButton.setOnAction(flickrButtonOnAction);
-                            }
-                            logger.debug("Downloading photos from flickr. Progress {}",
-                                    downloadProgress);
-                        }
-                    });
-
-                }
-            }
-
-                    , new ErrorHandler<ServiceException>() {
-
-                public void handle(ServiceException exception) {
-                    //handle errors here
-                }
-                    });
-        } catch (ServiceException e) {
-
-        }
-        selectedImages.clear();
-        flickrService.reset();
-        close();
-    }
-
-    public void handleStop() {
-        ConfirmationDialog confirmationDialog = new ConfirmationDialog(borderPane, "Download abbrechen", "Download abbrechen?");
-        Optional<Boolean> confirmed = confirmationDialog.showForResult();
-        if (!confirmed.isPresent() || !confirmed.get()) return;
-        logger.debug("Canceling the download...");
-        if (downloadTask != null)
-            downloadTask.cancel();
-        searchButton.setDisable(false);
-
-    }
-
-    private void downloadPhotos() {
         ObservableList<Node> test = keywordsFlowPane.getChildren();
         String tags[] = new String[test.size()];
         for (int i = 0; i < test.size(); i++) {
@@ -278,7 +182,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                 longitude = actualLatLong.getLongitude();
                 useGeoData = true;
             }
-            downloadTask = flickrService.searchPhotos(tags, latitude, longitude, useGeoData,
+            sarchTask = flickrService.searchPhotos(tags, latitude, longitude, useGeoData,
                     new Consumer<com.flickr4java.flickr.photos.Photo>() {
 
                         public void accept(com.flickr4java.flickr.photos.Photo photo) {
@@ -287,6 +191,9 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
 
                                 public void run() {
                                     ImageTile imageTile = new ImageTile(photo);
+                                    Photo p = new Photo();
+                                    p.setPath(tmpDir+photo.getId()+"."+photo.getOriginalFormat());
+                                    photos.add(p);
                                     imageTile.setOnMouseClicked(new EventHandler<MouseEvent>() {
                                         @Override public void handle(MouseEvent event) {
                                             if (event.isControlDown()) {
@@ -349,17 +256,103 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         }
     }
 
+    private void handleFullscreen() {
+        FullscreenWindow fullscreenWindow = new FullscreenWindow();
+        fullscreenWindow.present(photos,photos.get(0));
+    }
+
+    private void handleReset(){
+        selectedImages.clear();
+        photos.clear();
+        photosFlowPane.getChildren().clear();
+        actualLatLong = null;
+        mapScene.clear();
+        keywordsFlowPane.getChildren().clear();
+        keywordTextField.clear();
+        fullscreenButton.setDisable(true);
+        importButton.setDisable(true);
+        if (sarchTask != null)
+            sarchTask.cancel();
+    }
+
+    private void handleImport() {
+        flickrService.reset();
+        if(selectedImages.isEmpty()){
+            return;
+        }
+        ArrayList<com.flickr4java.flickr.photos.Photo> photos = new ArrayList<>();
+        for (ImageTile i : selectedImages) {
+            //i.getFlickrPhoto().setDateAdded(datePicker.getValue().atStartOfDay());
+            photos.add(i.getFlickrPhoto());
+            //exifService.setDateAndGeoData(p);
+            //Path path = Paths.get(p.getPath());
+            //ioHandler.copyFromTo(Paths.get(p.getPath()),Paths.get(System.getProperty("user.home"),"travelimg/"+path.getFileName()));
+            logger.debug("Added photo for import {}", i.getFlickrPhoto());
+        }
+        Button flickrButton = ((MenuImpl)sender).getFlickrButton();
+        String flickrButtonStyle = flickrButton.getGraphic().getStyle();
+        flickrButton.getGraphic().setStyle("-fx-fill: -tmg-primary;");
+        Tooltip flickrButtonTooltip = flickrButton.getTooltip();
+        flickrButton.setTooltip(null);
+        EventHandler flickrButtonOnAction = flickrButton.getOnAction();
+        flickrButton.setOnAction(null);
+
+        try {
+
+            DownloadProgressControl downloadProgressControl = new DownloadProgressControl(flickrButton);
+
+            flickrService.downloadPhotos(photos, new Consumer<Double>() {
+                public void accept(Double downloadProgress) {
+                    Platform.runLater(new Runnable() {
+                        public void run() {
+                            downloadProgressControl.setProgress(downloadProgress);
+                            if (downloadProgress == 1.0) {
+                                downloadProgressControl.finish();
+                                flickrButton.getGraphic().setStyle(flickrButtonStyle);
+                                flickrButton.setTooltip(flickrButtonTooltip);
+                                flickrButton.setOnAction(flickrButtonOnAction);
+                            }
+                            logger.debug("Downloading photos from flickr. Progress {}",
+                                    downloadProgress);
+                        }
+                    });
+
+                }
+            }
+
+                    , new ErrorHandler<ServiceException>() {
+
+                public void handle(ServiceException exception) {
+                    //handle errors here
+                }
+                    });
+        } catch (ServiceException e) {
+
+        }
+        selectedImages.clear();
+        close();
+    }
+
+    private void handleStop() {
+        ConfirmationDialog confirmationDialog = new ConfirmationDialog(borderPane, "Download abbrechen", "Download abbrechen?");
+        Optional<Boolean> confirmed = confirmationDialog.showForResult();
+        if (!confirmed.isPresent() || !confirmed.get()) return;
+        logger.debug("Canceling the download...");
+        if (sarchTask != null)
+            sarchTask.cancel();
+
+    }
+
     /**
      * Widget for one widget in the image grid. Can either be in a selected or an unselected state.
      */
     private class ImageTile extends HBox {
 
         private BooleanProperty selected = new SimpleBooleanProperty(false);
-
         private com.flickr4java.flickr.photos.Photo photo;
-
         private Image image;
         private ImageView imageView;
+        private Photo p;
 
         public ImageTile(com.flickr4java.flickr.photos.Photo photo) {
 
@@ -381,6 +374,14 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             this.getChildren().add(imageView);
         }
 
+        public void setPhoto(Photo p){
+            this.p=p;
+        }
+
+        public Photo getPhoto(){
+            return p;
+        }
+
         /**
          * Select this photo. Triggers an update of the inspector widget.
          */
@@ -397,7 +398,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             this.selected.set(false);
         }
 
-        public com.flickr4java.flickr.photos.Photo getPhoto() {
+        public com.flickr4java.flickr.photos.Photo getFlickrPhoto() {
             return photo;
         }
 
@@ -409,6 +410,31 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         public BooleanProperty getSelectedProperty() {
             return selected;
         }
+    }
+
+    private class Keyword extends HBox{
+
+        private Text x;
+
+        public Keyword(String name){
+            super();
+            setStyle("-fx-background-radius: 5; -fx-background-color: #E91E63; ");
+            Text text = new Text(name);
+            text.setFill(Color.WHITE);
+            setAlignment(Pos.CENTER);
+            setPadding(new Insets(3, 5, 5, 5));
+            getChildren().add(text);
+            this.x = new Text("x");
+            x.setOnMouseEntered(event -> keywordsFlowPane.setCursor(Cursor.HAND));
+            x.setOnMouseExited(event -> keywordsFlowPane.setCursor(Cursor.DEFAULT));
+            getChildren().add(new Text("  "));
+            getChildren().add(x);
+        }
+
+        public void setOnClosed(EventHandler eventHandler){
+            x.setOnMouseClicked(eventHandler);
+        }
+
     }
 
     private class DownloadProgressControl extends PopupControl{

@@ -14,7 +14,7 @@
             <center>
                 <VBox styleClass="body">
                     <HBox spacing="16">
-                        <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="300" maxWidth="300" vbarPolicy="AS_NEEDED">
+                        <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefHeight="350" maxHeight="350" maxWidth="300" vbarPolicy="AS_NEEDED">
                             <content>
                                 <FlowPane fx:id="photosFlowPane" hgap="15" maxHeight="440" styleClass="image-grid" vgap="15" style="-fx-background-color: -tmg-bg0">
                                     <padding>
@@ -23,21 +23,21 @@
                                 </FlowPane>
                             </content>
                         </ScrollPane>
-                        <VBox spacing="5.0" maxWidth="300" maxHeight="300">
+                        <VBox spacing="5.0" maxWidth="300" maxHeight="350">
                             <children>
                                 <Label text="Doppelklick um Ort zu wählen" />
-                                <GoogleMapScene fx:id="mapScene" maxHeight="200"/>
+                                <GoogleMapScene fx:id="mapScene" maxHeight="250" prefHeight="250"/>
                                 <Label text="Suchbegriffe" />
-                                <ScrollPane hbarPolicy="NEVER" prefHeight="100" style="-fx-background-color: -tmg-bg0">
+                                <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" prefHeight="150" style="-fx-background-color: -tmg-bg0">
                                     <content>
-                                        <FlowPane fx:id="keywordsFlowPane" hgap="10" vgap="10" style="-fx-background-color: -tmg-bg0"/>
+                                        <FlowPane  fx:id="keywordsFlowPane" hgap="10" vgap="5" style="-fx-background-color: -tmg-bg0"/>
                                     </content>
                                 </ScrollPane>
                                 <TextField fx:id="keywordTextField" promptText="Neuer Suchbegriff" />
                             </children>
                         </VBox>
                     </HBox>
-                    <HBox spacing="145.0">
+                    <HBox spacing="85.0">
                         <children>
                             <HBox>
                                 <Button fx:id="searchButton" styleClass="btn,primary">
@@ -48,12 +48,20 @@
                                         <Tooltip text="Fotos suchen" />
                                     </tooltip>
                                 </Button>
-                                <Button fx:id="fullscreenButton" styleClass="btn,primary" disable="true">
+                                <Button fx:id="fullscreenButton" styleClass="btn,primary" disable="false">
                                     <graphic>
                                         <FontAwesomeIconView glyphName="EXPAND" />
                                     </graphic>
                                     <tooltip>
                                         <Tooltip text="Fotos ansehen" />
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="resetButton" styleClass="btn,primary">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="UNDO" />
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Zurücksetzen" />
                                     </tooltip>
                                 </Button>
                             </HBox>
@@ -75,7 +83,7 @@
                         <HBox maxWidth="Infinity" spacing="8.0" BorderPane.alignment="CENTER_RIGHT">
                             <children>
                                 <Button fx:id="cancelButton" alignment="CENTER_RIGHT" text="ABBRECHEN" styleClass="btn"/>
-                                <Button fx:id="importButton" alignment="CENTER_RIGHT" text="FOTOS IMPORTIEREN" styleClass="btn,primary" />
+                                <Button fx:id="importButton" alignment="CENTER_RIGHT" text="FOTOS IMPORTIEREN" styleClass="btn,primary" disable="true" />
                             </children>
                         </HBox>
                     </right>

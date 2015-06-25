@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -34,7 +33,7 @@ public class FlickrServiceImpl implements FlickrService {
 
     private static final String API_KEY = "206f4ffa559e5e48301f84f046bf208b";
     private static final String SECRET = "f58343bd30c130b6";
-    private static final String tmpDir = "src/main/resources/tmp/";
+    private static final String tmpDir = System.getProperty("java.io.tmpdir");
     private static final Logger logger = LogManager.getLogger();
     private static int nrOfPhotosToDownload = 10;
     public static long oneMB = 1048576;
@@ -83,14 +82,14 @@ public class FlickrServiceImpl implements FlickrService {
 
     @Override
     public void close() {
-        File directory = new File(tmpDir);
+        /*File directory = new File(tmpDir);
         if (directory.exists()) {
             File[] files = directory.listFiles();
             logger.debug("Deleting photos from tmp folder...");
             for (int i = 0; i < files.length; i++) {
                 files[i].delete();
             }
-        }
+        }*/
     }
 
     /**
@@ -200,7 +199,7 @@ public class FlickrServiceImpl implements FlickrService {
                         GeoData geoData = flickr.getPhotosInterface().getGeoInterface().getLocation(p.getId());
                         p.setGeoData(geoData);
                         downloadPhotoFromFlickr(mediumSizeUrl, p.getId(), p.getOriginalFormat());
-                        logger.debug("Downloaded photo {}", p);
+                        logger.debug("Downloaded photo {}", p.getId());
                         callback.accept(p);
                         progressCallback.accept((double) nrOfDownloadedPhotos / (double) nrOfPhotosToDownload);
                         nrOfDownloadedPhotos++;
