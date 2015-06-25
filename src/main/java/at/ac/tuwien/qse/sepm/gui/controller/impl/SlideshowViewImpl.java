@@ -139,29 +139,42 @@ public class SlideshowViewImpl implements SlideshowView {
     private class SlideSelectedCallback implements SlideCallback<Void> {
         @Override
         public void handle(PhotoSlide slide) {
+            LOGGER.debug("Selected {}", slide);
             photoSlideInspector.setSlide(slide);
 
             photoSlideInspectorPane.setVisible(true);
+            photoSlideInspectorPane.setCount(1);
+
             mapSlideInspectorPane.setVisible(false);
+            mapSlideInspectorPane.setCount(0);
             titleSlideInspectorPane.setVisible(false);
+            titleSlideInspectorPane.setCount(0);
         }
 
         @Override
         public void handle(MapSlide slide) {
             mapSlideInspector.setSlide(slide);
 
-            photoSlideInspectorPane.setVisible(false);
             mapSlideInspectorPane.setVisible(true);
+            mapSlideInspectorPane.setCount(1);
+
+            photoSlideInspectorPane.setVisible(false);
+            photoSlideInspectorPane.setCount(0);
             titleSlideInspectorPane.setVisible(false);
+            titleSlideInspectorPane.setCount(0);
         }
 
         @Override
         public void handle(TitleSlide slide) {
             titleSlideInspector.setSlide(slide);
 
-            photoSlideInspectorPane.setVisible(false);
-            mapSlideInspectorPane.setVisible(false);
             titleSlideInspectorPane.setVisible(true);
+            titleSlideInspectorPane.setCount(1);
+
+            photoSlideInspectorPane.setVisible(false);
+            photoSlideInspectorPane.setCount(0);
+            mapSlideInspectorPane.setVisible(false);
+            mapSlideInspectorPane.setCount(0);
         }
     }
 
