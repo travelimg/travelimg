@@ -25,6 +25,4 @@ public interface SlideDAO{
     List<PhotoSlide> getPhotoSlidesForSlideshow(int slideshowId) throws DAOException;
     List<MapSlide> getMapSlidesForSlideshow(int slideshowId) throws DAOException;
     List<TitleSlide> getTitleSlidesForSlideshow(int slideshowId) throws DAOException;
-
-    List<Slide> getSlidesForSlideshow(int slideshowId) throws DAOException, ValidationException;
 }

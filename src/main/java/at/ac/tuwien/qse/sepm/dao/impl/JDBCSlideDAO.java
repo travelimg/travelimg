@@ -195,22 +195,6 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
         }
     }
 
-    @Override
-    public List<Slide> getSlidesForSlideshow(int slideshowId) throws DAOException, ValidationException {
-        logger.debug("Retrieving slides for slideshow with id {}", slideshowId);
-
-        SlideValidator.validateID(slideshowId);
-
-        List<Slide> slides = new ArrayList<>();
-        slides.addAll(getPhotoSlidesForSlideshow(slideshowId));
-        slides.addAll(getMapSlidesForSlideshow(slideshowId));
-        slides.addAll(getTitleSlidesForSlideshow(slideshowId));
-
-        return slides.stream()
-                .sorted((s1, s2) -> s1.getOrder().compareTo(s2.getOrder()))
-                .collect(Collectors.toList());
-    }
-
     private Slide createBase(Slide slide) throws DAOException, ValidationException {
         logger.debug("Creating slide {}", slide);
 
