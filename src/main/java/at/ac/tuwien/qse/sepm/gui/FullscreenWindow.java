@@ -1,6 +1,5 @@
 package at.ac.tuwien.qse.sepm.gui;
 
-
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.gui.control.RatingPicker;
@@ -13,7 +12,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
@@ -43,7 +41,7 @@ public class FullscreenWindow extends StackPane {
     @FXML
     private VBox ratingContainer;
     @FXML
-    private Group bottomBar;
+    private HBox bottomBar;
 
     @Autowired
     private PhotoService photoservice;
