@@ -18,9 +18,9 @@
         </VBox>
     </header>
     <VBox spacing="16">
-        <SuggestionField fx:id="tagField" label="Neue Kategorie:" suggestions="Architektur, Essen, Ameisen, Elefanten, Elfenbein, Lukas, Kris"/>
+        <SuggestionField fx:id="tagField" label="Neue Kategorie:"/>
         <TagPicker fx:id="tagPicker"/>
-        <SuggestionField fx:id="photographerField" label="Fotograf setzen:" suggestions="Kris, Lukas, Marian, Christoph, David, Branko, Enri"/>
+        <SuggestionField fx:id="photographerField" label="Fotograf setzen:"/>
         <VBox fx:id="exifList" spacing="2"/>
         <Label text="Zu Präsentation hinzufügen:"/>
 
