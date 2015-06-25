@@ -1,16 +1,12 @@
 package at.ac.tuwien.qse.sepm.gui.slide;
 
 import at.ac.tuwien.qse.sepm.entities.PhotoSlide;
-import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
-import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Paths;
 
 public class PhotoSlideView extends SlideView {
 

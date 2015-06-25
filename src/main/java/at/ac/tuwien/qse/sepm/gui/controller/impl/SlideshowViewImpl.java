@@ -7,7 +7,6 @@ import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.SlideshowView;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.grid.SlideGrid;
-import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
 import at.ac.tuwien.qse.sepm.service.SlideshowService;
@@ -34,8 +33,6 @@ public class SlideshowViewImpl implements SlideshowView {
     private SlideService slideService;
     @Autowired
     private SlideshowService slideShowService;
-    @Autowired
-    private ImageCache imageCache;
 
     @Autowired
     private Inspector<PhotoSlide> photoSlideInspector;

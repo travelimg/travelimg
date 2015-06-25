@@ -3,15 +3,11 @@ package at.ac.tuwien.qse.sepm.gui.grid;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.controller.Menu;
-import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import at.ac.tuwien.qse.sepm.gui.util.LRUCache;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
-import javafx.scene.control.Pagination;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -244,7 +240,7 @@ public class PaginatedImageGrid extends StackPane {
      */
     private void handleSizeChange(Object observable) {
         // estimate tile size
-        int size = ImageSize.inPixels(ImageSize.MEDIUM);
+        int size = ImageSize.MEDIUM.pixels();
         int tileSize = PADDING + GAP + size;
 
         int photosPerRow = (int) getWidth() / tileSize;

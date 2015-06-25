@@ -1,29 +1,29 @@
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
-       xmlns="http://www.springframework.org/schema/beans"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 	http://www.springframework.org/schema/context
 	http://www.springframework.org/schema/context/spring-context-3.0.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
-    <context:annotation-config/>
+	<context:annotation-config/>
 
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
-    </bean>
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+	</bean>
 
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-        <property name="driverClass" value="org.h2.Driver"/>
-        <property name="url" value="jdbc:h2:file:${user.home}/travelimg.db"/>
-        <property name="username" value="sa"/>
-        <property name="password" value=""/>
-    </bean>
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+		<property name="driverClass" value="org.h2.Driver"/>
+		<property name="url" value="jdbc:h2:file:${user.home}/travelimg.db"/>
+		<property name="username" value="sa"/>
+		<property name="password" value=""/>
+	</bean>
 
-    <jdbc:initialize-database data-source="dataSource" ignore-failures="DROPS">
-        <jdbc:script location="classpath:db/create.sql"/>
-        <jdbc:script location="classpath:db/insert.sql"/>
-    </jdbc:initialize-database>
+	<jdbc:initialize-database data-source="dataSource" ignore-failures="DROPS">
+		<jdbc:script location="classpath:db/create.sql"/>
+		<jdbc:script location="classpath:db/insert.sql"/>
+	</jdbc:initialize-database>
 
     <bean id="executor" class="java.util.concurrent.Executors" factory-method="newFixedThreadPool"
             destroy-method="shutdown">
@@ -71,6 +71,7 @@
     <bean id="geoService" class="at.ac.tuwien.qse.sepm.service.impl.GeoServiceImpl"></bean>
     <bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
     <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl" destroy-method="close"></bean>
+    <bean id="wikipediaService" class="at.ac.tuwien.qse.sepm.service.impl.WikipediaServiceImpl"></bean>
     <bean id="slideService" class="at.ac.tuwien.qse.sepm.service.impl.SlideServiceImpl"></bean>
     <bean id="slideshowService" class="at.ac.tuwien.qse.sepm.service.impl.SlideshowServiceImpl"></bean>
 
@@ -86,5 +87,5 @@
     <bean id="slideshowOrganizer" class="at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowOrganizerImpl"></bean>
     <bean id="menuController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.MenuImpl"></bean>
     <bean id="statusIndicatorController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.StatusIndicatorImpl"></bean>
-    <bean id="imageCache" class="at.ac.tuwien.qse.sepm.gui.util.ImageCacheImpl"></bean>
+    <bean id="highlightsViewController" class="at.ac.tuwien.qse.sepm.gui.HighlightsViewController"></bean>
 </beans>

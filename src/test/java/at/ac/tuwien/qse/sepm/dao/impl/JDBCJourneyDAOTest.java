@@ -71,5 +71,11 @@ public class JDBCJourneyDAOTest  extends AbstractJDBCDAOTest {
         assertThat(countRowsWhere("name = 'United States'"), is(1));
     }
 
+    @Test
+    @WithData
+    public void readByNameReturnsJourney() throws DAOException {
+        assertThat(journeyDAO.getByName("Other").getId(), is(2));
+    }
+
 
 }

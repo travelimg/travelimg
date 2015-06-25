@@ -38,4 +38,15 @@
             <fx:include source="/view/SlideshowView.fxml"></fx:include>
         </content>
     </Tab>
+    <Tab fx:id="highlights" text="" closable="false">
+        <graphic>
+            <FontAwesomeIconView glyphName="AUTOMOBILE"/>
+        </graphic>
+        <tooltip>
+            <Tooltip text="Reise highlights"/>
+        </tooltip>
+        <content>
+            <fx:include source="/view/HighlightsView.fxml"></fx:include>
+        </content>
+    </Tab>
 </TabPane>

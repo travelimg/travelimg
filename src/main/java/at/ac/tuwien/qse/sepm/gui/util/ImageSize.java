@@ -4,11 +4,15 @@ package at.ac.tuwien.qse.sepm.gui.util;
 public enum ImageSize {
     SMALL,
     MEDIUM,
+    LARGE,
     ORIGINAL;
 
-    public static int inPixels(ImageSize size) {
-        if (size == SMALL) return 100;
-        else if (size == MEDIUM) return 150;
-        else return 1; // placeholder
+    public int pixels() {
+        switch (this) {
+            case SMALL: return 100;
+            case MEDIUM: return 150;
+            case LARGE: return 300;
+            default: return 1; // placeholder
+        }
     }
 }

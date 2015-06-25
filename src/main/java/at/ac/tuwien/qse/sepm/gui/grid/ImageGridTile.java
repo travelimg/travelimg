@@ -32,8 +32,8 @@ public abstract class ImageGridTile extends Tile {
         }
 
         image = new SmartImage(size);
-        image.setPrefHeight(ImageSize.inPixels(size));
-        image.setPrefWidth(ImageSize.inPixels(size));
+        image.setPrefHeight(size.pixels());
+        image.setPrefWidth(size.pixels());
         image.setImage(photo.getFile());
 
         getChildren().add(0, image);

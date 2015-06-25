@@ -961,3 +961,90 @@
     -fx-font-style: italic;
     -fx-text-alignment: right;
 }
+.check-list-view .check-box:selected {
+    -fx-padding: 0;
+    -fx-background-color: -tmg-primary;
+}
+
+.imageTile .smart-image {
+    -fx-background-color: rgba(255, 255, 255, 0);
+}
+
+.imageTile .glyph-icon {
+    -fx-fill: -tmg-text-dark;
+}
+
+.highlights .hoverlay {
+    -fx-padding: 15px;
+    -fx-font-size: 25px;
+    -fx-fill: -tmg-text-bright;
+    -fx-background-color: -tmg-overlay;
+    -fx-background-radius: 10 10 10 10;
+}
+
+.highlights HBox.hoverlay {
+    -fx-spacing: 10px;
+}
+
+.highlights .hoverlay .glyph-icon {
+    -fx-fill: -tmg-text-bright;
+}
+
+.highlights .hoverlay:hover {
+    -fx-background-color: -tmg-overlay-dark;
+}
+
+.wikipedia {
+    -fx-padding: 10 0 0 10;
+    -fx-font-size: 15px;
+}
+.wikipedia #placeLabel {
+    -fx-font-size: 25px;
+}
+.wikipedia #countryLabel {
+    -fx-font-size: 18px;
+    -fx-padding: 0 0 20 0;
+}
+.wikipedia #descriptionText {
+    -fx-fill: -tmg-text-bright;
+}
+.wikipedia-placeholder {
+    -fx-fill: -tmg-text-bright;
+}
+
+.journey-places-list {
+    -fx-background-color: -tmg-bg1;
+}
+
+.place-radio-button *.radio  {
+    -fx-padding: 4;
+    -fx-background-color: -fx-shadow-highlight-color, -fx-body-color;
+    -fx-background-insets: 0 0 -1 0, 0, 1, 2;
+}
+
+.place-radio-button {
+    -fx-font-size: 15px;
+}
+
+.rect {
+    -fx-fill: -tmg-primary;
+}
+.journey-places-list #journeyHeader {
+    -fx-padding: 5 0 0 5;
+}
+.journey-places-list #backButton {
+    -fx-background-color: transparent;
+}
+.journey-places-list #backButton .glyph-icon {
+    -fx-fill: -tmg-text-bright;
+}
+.journey-places-list #journeyLabel {
+    -fx-font-size: 20px;
+}
+.journey-places-list .journey-entry {
+    -fx-background-color: transparent;
+    -fx-font-size: 15px;
+}
+.journey-entry {
+    -fx-spacing: 10px;
+}
