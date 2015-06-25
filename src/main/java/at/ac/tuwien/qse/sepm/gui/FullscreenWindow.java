@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 
+import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.gui.control.RatingPicker;
@@ -44,8 +45,9 @@ public class FullscreenWindow extends AnchorPane {
     private ImageView imageView;
     @FXML
     private Button bt_previous, bt_next;
-    @Autowired private RatingPicker ratingPicker = new RatingPicker();
-    @Autowired private PhotoService photoService = new PhotoServiceImpl();
+    @Autowired private RatingPicker ratingPicker;
+    @Autowired private PhotoService photoService;
+    @Autowired private PhotoDAO photoDAO;
     @FXML
     private HBox raitingContainer;
     private List<Photo> photos;
@@ -55,7 +57,7 @@ public class FullscreenWindow extends AnchorPane {
 
     private ImageCache imageCache;
 
-    public FullscreenWindow(ImageCache imageCache) {
+    public  FullscreenWindow(ImageCache imageCache){
         FXMLLoadHelper.load(this, this, FullscreenWindow.class, "view/FullScreenDialog.fxml");
 
         this.imageCache = imageCache;
@@ -63,9 +65,11 @@ public class FullscreenWindow extends AnchorPane {
 
     @FXML
     private void initialize() {
+
         this.stage = new Stage();
         this.scene = new Scene(this);
-
+        this.bt_next.setOnAction(this::bt_nextPressed);
+        this.bt_previous.setOnAction(this::bt_previousPressed);
         stage.setScene(scene);
         imageView.fitWidthProperty().bind(root.widthProperty());
         imageView.fitHeightProperty().bind(root.heightProperty());
@@ -79,6 +83,9 @@ public class FullscreenWindow extends AnchorPane {
                 }
                 if (keyEvent.getCode() == KeyCode.ESCAPE) {
                     stage.close();
+                }
+                if(keyEvent.getCode() == KeyCode.DIGIT1){
+                    handleRatingChange(Rating.BAD);
                 }
             }
         });

@@ -78,7 +78,8 @@ public class GridViewImpl implements GridView {
         });
 
         organizer.setPresentAction(() -> {
-            FullscreenWindow fullscreen = new FullscreenWindow(imageCache);
+            FullscreenWindow fullscreen = new FullscreenWindow(this.imageCache);
+
             fullscreen.present(grid.getPhotos(), grid.getActivePhoto());
         });
         organizer.setJourneyAction(() -> {

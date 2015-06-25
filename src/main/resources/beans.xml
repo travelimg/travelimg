@@ -61,5 +61,5 @@
     <bean id="organizerController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.OrganizerImpl"></bean>
     <bean id="inspectorController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.InspectorImpl"></bean>
     <bean id="imageCache" class="at.ac.tuwien.qse.sepm.gui.util.ImageCacheImpl"></bean>
-   
+
 </beans>
