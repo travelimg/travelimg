@@ -37,7 +37,7 @@ public class InspectorPaneSkin extends SkinBase<InspectorPane> {
 
         body.getStyleClass().setAll("body");
         body.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        body.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        body.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
         root.setPlaceholder(placeholder);
         root.setContent(new VBox(header, body));
