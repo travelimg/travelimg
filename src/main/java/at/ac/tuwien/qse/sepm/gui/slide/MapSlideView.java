@@ -19,6 +19,9 @@ public class MapSlideView extends SlideView {
     }
 
     private void addMarker() {
-        mapScene.addMarker(new LatLong(slide.getLatitude(), slide.getLongitude()));
+        LatLong position = new LatLong(slide.getLatitude(), slide.getLongitude());
+
+        mapScene.addMarker(position);
+        mapScene.center(position);
     }
 }
