@@ -191,6 +191,9 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     }
 
     public void handleImport() {
+        if(selectedImages.isEmpty()){
+            return;
+        }
         ArrayList<com.flickr4java.flickr.photos.Photo> photos = new ArrayList<>();
         for (ImageTile i : selectedImages) {
             //i.getPhoto().setDateAdded(datePicker.getValue().atStartOfDay());
@@ -201,9 +204,16 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             logger.debug("Added photo for import {}", i.getPhoto());
         }
         Button flickrButton = ((MenuImpl)sender).getFlickrButton();
+        String flickrButtonStyle = flickrButton.getGraphic().getStyle();
+        flickrButton.getGraphic().setStyle("-fx-fill: -tmg-primary;");
+        Tooltip flickrButtonTooltip = flickrButton.getTooltip();
+        flickrButton.setTooltip(null);
+        EventHandler flickrButtonOnAction = flickrButton.getOnAction();
+        flickrButton.setOnAction(null);
+
         try {
 
-            flickrButton.setTooltip(null);
+
             DownloadProgressControl downloadProgressControl = new DownloadProgressControl(flickrButton);
 
             flickrService.downloadPhotos(photos, new Consumer<Double>() {
@@ -213,6 +223,9 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                             downloadProgressControl.setProgress(downloadProgress);
                             if (downloadProgress == 1.0) {
                                 downloadProgressControl.finish();
+                                flickrButton.getGraphic().setStyle(flickrButtonStyle);
+                                flickrButton.setTooltip(flickrButtonTooltip);
+                                flickrButton.setOnAction(flickrButtonOnAction);
                             }
                             logger.debug("Downloading photos from flickr. Progress {}",
                                     downloadProgress);
@@ -229,10 +242,10 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                 }
                     });
         } catch (ServiceException e) {
-            e.printStackTrace();
+
         }
         selectedImages.clear();
-        //setResult(photos);
+        flickrService.reset();
         close();
     }
 
