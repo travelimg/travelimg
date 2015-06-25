@@ -52,8 +52,8 @@ public class GridViewImpl implements GridView {
     private IOHandler ioHandler;
     @Autowired
     private ExifService exifService;
-    @Autowired
-    private FullscreenWindow fullscreenWindow;
+  //  @Autowired
+  //  private FullscreenWindow fullscreenWindow;
 
     @FXML
     private BorderPane root;
@@ -183,6 +183,7 @@ public class GridViewImpl implements GridView {
 
             List<Photo> getSelectedPhoto = new ArrayList<>();
             getSelectedPhoto.addAll(grid.getSelected());
+            FullscreenWindow fullscreenWindow = new FullscreenWindow(photoService);
             fullscreenWindow.present(grid.getPhotos(), getSelectedPhoto.get(0));
         }
 
