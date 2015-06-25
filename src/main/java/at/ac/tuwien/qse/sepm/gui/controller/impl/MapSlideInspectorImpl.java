@@ -41,26 +41,23 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
         map.setClickCallback(this::handleMapClicked);
     }
 
-    public void setPreview(Node node) {
-
-    }
-
     @Override
-    public void setEntities(Collection<MapSlide> entities) {
-        super.setEntities(entities);
+    public void setSlide(MapSlide slide) {
+        super.setSlide(slide);
 
-        if (getEntities().size() > 0) {
-            MapSlide slide = getEntities().iterator().next();
-            captionField.setText(slide.getCaption());
+        captionField.setText(slide.getCaption());
 
-            map.clear();
-            map.addMarker(new LatLong(slide.getLatitude(), slide.getLongitude()));
-            map.center(new LatLong(slide.getLatitude(), slide.getLongitude()));
-        }
+        map.clear();
+        map.addMarker(new LatLong(slide.getLatitude(), slide.getLongitude()));
+        map.center(new LatLong(slide.getLatitude(), slide.getLongitude()));
     }
 
     private void updateCoordinates(double latitude, double longitude) {
-        MapSlide slide = getEntities().iterator().next();
+        MapSlide slide = getSlide();
+
+        if (slide == null) {
+            return;
+        }
 
         slide.setLatitude(latitude);
         slide.setLongitude(longitude);
@@ -78,11 +75,12 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
     }
 
     private void handleCaptionChange(Observable observable) {
-        if (getEntities().size() == 0) {
+        MapSlide slide = getSlide();
+
+        if (slide == null) {
             return;
         }
 
-        MapSlide slide = getEntities().iterator().next();
         slide.setCaption(captionField.getText());
 
         try {

@@ -75,7 +75,7 @@ public class SlideshowServiceImpl implements SlideshowService {
     @Override
     public List<Slide> addPhotosToSlideshow(List<Photo> photos, Slideshow slideshow) throws ServiceException {
         List<Slide> slides = new ArrayList<>();
-        int order = slideshow.getSlides().size() + 1;
+        int order = slideshow.getAllSlides().size() + 1;
 
         try {
             for (Photo photo : photos) {
@@ -83,7 +83,7 @@ public class SlideshowServiceImpl implements SlideshowService {
                 slide = slideDAO.create(slide);
 
                 slides.add(slide);
-                slideshow.getSlides().add(slide);
+                slideshow.getPhotoSlides().add(slide);
                 order++;
             }
         } catch (DAOException | ValidationException ex) {

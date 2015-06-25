@@ -34,27 +34,21 @@ public class TitleSlideInspectorImpl extends SlideInspectorImpl<TitleSlide> {
         colorPicker.valueProperty().addListener(this::handleColorChange);
     }
 
-    public void setPreview(Node node) {
-
-    }
-
     @Override
-    public void setEntities(Collection<TitleSlide> entities) {
-        super.setEntities(entities);
+    public void setSlide(TitleSlide slide) {
+        super.setSlide(slide);
 
-        if (getEntities().size() > 0) {
-            TitleSlide slide = getEntities().iterator().next();
-            captionField.setText(slide.getCaption());
-            colorPicker.setValue(ColorUtils.fromInt(slide.getColor()));
-        }
+        captionField.setText(slide.getCaption());
+        colorPicker.setValue(ColorUtils.fromInt(slide.getColor()));
     }
 
     private void handleCaptionChange(Observable observable) {
-        if (getEntities().size() == 0) {
+        TitleSlide slide = getSlide();
+
+        if (slide == null) {
             return;
         }
 
-        TitleSlide slide = getEntities().iterator().next();
         slide.setCaption(captionField.getText());
 
         try {
@@ -66,11 +60,12 @@ public class TitleSlideInspectorImpl extends SlideInspectorImpl<TitleSlide> {
     }
 
     private void handleColorChange(Observable observable) {
-        if (getEntities().size() == 0) {
+        TitleSlide slide = getSlide();
+
+        if (slide == null) {
             return;
         }
 
-        TitleSlide slide = getEntities().iterator().next();
         slide.setColor(ColorUtils.toInt(colorPicker.getValue()));
 
         try {

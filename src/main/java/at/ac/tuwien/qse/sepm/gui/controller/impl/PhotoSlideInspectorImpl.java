@@ -29,26 +29,20 @@ public class PhotoSlideInspectorImpl extends SlideInspectorImpl<PhotoSlide> {
         captionField.textProperty().addListener(this::handleCaptionChange);
     }
 
-    public void setPreview(Node node) {
-
-    }
-
     @Override
-    public void setEntities(Collection<PhotoSlide> entities) {
-        super.setEntities(entities);
+    public void setSlide(PhotoSlide slide) {
+        super.setSlide(slide);
 
-        if (getEntities().size() > 0) {
-            PhotoSlide slide = getEntities().iterator().next();
-            captionField.setText(slide.getCaption());
-        }
+        captionField.setText(slide.getCaption());
     }
 
     private void handleCaptionChange(Observable observable) {
-        if (getEntities().size() == 0) {
+        PhotoSlide slide = getSlide();
+
+        if (slide == null) {
             return;
         }
 
-        PhotoSlide slide = getEntities().iterator().next();
         slide.setCaption(captionField.getText());
 
         try {

@@ -134,8 +134,7 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     }
 
     private void handleAddSlideshow(Event event) {
-        List<Slide> slides = new ArrayList<>();
-        Slideshow slideshow = new Slideshow(-1, NEW_SLIDESHOW_DEFAULT_NAME, 5.0, slides);
+        Slideshow slideshow = new Slideshow(-1, NEW_SLIDESHOW_DEFAULT_NAME, 5.0);
 
         try {
             slideshow = slideshowService.create(slideshow);
