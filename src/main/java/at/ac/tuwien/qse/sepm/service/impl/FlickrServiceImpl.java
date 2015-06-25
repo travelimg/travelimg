@@ -3,10 +3,7 @@ package at.ac.tuwien.qse.sepm.service.impl;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.Rating;
-import at.ac.tuwien.qse.sepm.service.ExifService;
-import at.ac.tuwien.qse.sepm.service.FlickrService;
-import at.ac.tuwien.qse.sepm.service.PhotographerService;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.util.*;
 import com.flickr4java.flickr.Flickr;
 import com.flickr4java.flickr.FlickrException;
@@ -25,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -59,7 +55,7 @@ public class FlickrServiceImpl implements FlickrService {
 
     @Override
     public Cancelable searchPhotos(String tags[], double latitude, double longitude,
-            boolean useGeoData, Consumer<at.ac.tuwien.qse.sepm.entities.Photo> callback,
+            boolean useGeoData, Consumer<Photo> callback,
             Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler) throws ServiceException {
         if (i == 0) {
             searcher = new AsyncSearcher(tags, latitude, longitude, useGeoData, callback, progressCallback, errorHandler);
@@ -69,7 +65,7 @@ public class FlickrServiceImpl implements FlickrService {
     }
 
     @Override
-    public Cancelable downloadPhotos(List<at.ac.tuwien.qse.sepm.entities.Photo> photos, Consumer<Double> progressCallback,
+    public Cancelable downloadPhotos(List<Photo> photos, Consumer<Double> progressCallback,
             ErrorHandler<ServiceException> errorHandler){
         AsyncDownloader downloader = new AsyncDownloader(photos, progressCallback, errorHandler);
         executorService.submit(downloader);
@@ -143,6 +139,7 @@ public class FlickrServiceImpl implements FlickrService {
      * @throws ServiceException if the id or format is not correct or if the a photo with that id
      * doesn't exist.
      */
+    @Deprecated
     public at.ac.tuwien.qse.sepm.entities.Photo createPhotoWithGeoData(String id, String format)
             throws ServiceException {
         logger.debug("Creating photo with geo data with id: {} and format: {}", id, format);
@@ -178,13 +175,13 @@ public class FlickrServiceImpl implements FlickrService {
         private double latitude;
         private double longitude;
         private boolean useGeoData;
-        private Consumer<at.ac.tuwien.qse.sepm.entities.Photo> callback;
+        private Consumer<Photo> callback;
         private Consumer<Double> progressCallback;
         private ErrorHandler<ServiceException> errorHandler;
         private PhotoList<Photo> list;
 
         public AsyncSearcher(String tags[], double latitude, double longitude, boolean useGeoData,
-                Consumer<at.ac.tuwien.qse.sepm.entities.Photo> callback,
+                Consumer<Photo> callback,
                 Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler) {
             super();
             this.tags = tags;
@@ -233,20 +230,17 @@ public class FlickrServiceImpl implements FlickrService {
                     if (!isRunning())
                         return;
                     logger.debug("Downloading photo nr {} ...", i + 1);
-                    String farmId = p.getFarm();
-                    String serverId = p.getServer();
-                    String id = p.getId();
-                    String originalSecret = flickr.getPhotosInterface().getInfo(p.getId(), p.getSecret()).getOriginalSecret();
-                    String secret = p.getSecret();
-                    String format = p.getOriginalFormat();
-                    if (!originalSecret.isEmpty() && !secret.isEmpty()) {
-                        String url = "https://farm" + farmId + ".staticflickr.com/" + serverId + "/" + id + "_" + originalSecret + "_o." + format;
-                        String mediumSizeUrl = "https://farm" + farmId + ".staticflickr.com/" + serverId + "/" + id + "_" + secret + "_z." + format;
-                        downloadPhotoFromFlickr(mediumSizeUrl, id, format);
-                        at.ac.tuwien.qse.sepm.entities.Photo downloaded = createPhotoWithGeoData(id, format);
-                        logger.debug("Downloaded photo {}", downloaded);
-                        callback.accept(downloaded);
-                        progressCallback.accept((double)nrOfDownloadedPhotos/(double)nrOfPhotosToDownload);
+                    p.setOriginalSecret(
+                            flickr.getPhotosInterface().getInfo(p.getId(), p.getSecret())
+                                    .getOriginalSecret());
+                    if (!p.getOriginalSecret().isEmpty() && !p.getSecret().isEmpty()) {
+                        String mediumSizeUrl = "https://farm" + p.getFarm() + ".staticflickr.com/" + p.getServer() + "/" + p.getId() + "_" + p.getSecret() + "_z." + p.getOriginalFormat();
+                        GeoData geoData = flickr.getPhotosInterface().getGeoInterface().getLocation(p.getId());
+                        p.setGeoData(geoData);
+                        downloadPhotoFromFlickr(mediumSizeUrl, p.getId(), p.getOriginalFormat());
+                        logger.debug("Downloaded photo {}", p);
+                        callback.accept(p);
+                        progressCallback.accept((double) nrOfDownloadedPhotos / (double) nrOfPhotosToDownload);
                         nrOfDownloadedPhotos++;
                     } else {
                         logger.debug("Can't get original secret for photo.");
@@ -262,11 +256,11 @@ public class FlickrServiceImpl implements FlickrService {
 
     private class AsyncDownloader extends CancelableTask{
 
-        private List<at.ac.tuwien.qse.sepm.entities.Photo> photos;
+        private List<Photo> photos;
         private Consumer<Double> progressCallback;
         private ErrorHandler<ServiceException> errorHandler;
 
-        public AsyncDownloader(List<at.ac.tuwien.qse.sepm.entities.Photo> photos, Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler){
+        public AsyncDownloader(List<Photo> photos, Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler){
             this.photos = photos;
             this.progressCallback = progressCallback;
             this.errorHandler = errorHandler;
@@ -274,18 +268,14 @@ public class FlickrServiceImpl implements FlickrService {
 
         @Override
         protected void execute() {
-            for(at.ac.tuwien.qse.sepm.entities.Photo p: photos){
-                try {
-                    Path path = Paths.get(p.getPath());
-                    String id = path.getFileName()+"_o";
-                    String format = new ImageFileFilter().getExtension(p.getPath());
-                    downloadPhotoFromFlickr(p.getPath(),id,format);
-                    p.setPath(Paths.get(tmpDir + "/" + id + "." + format).toAbsolutePath().toString());
-                    exifService.setDateAndGeoData(p);
-                    ioHandler.copyFromTo(Paths.get(p.getPath()),Paths.get(System.getProperty("user.home"),"travelimg/"+id+"."+format));
-                } catch (ServiceException e) {
 
-                } catch (IOException e) {
+            for(int i=0; i<photos.size();i++){
+                try {
+                    Photo p = photos.get(i);
+                    String url = "https://farm" + p.getFarm() + ".staticflickr.com/" + p.getServer() + "/" + p.getId() + "_" + p.getOriginalSecret() + "_o." + p.getOriginalFormat();
+                    downloadPhotoFromFlickr(url,p.getId()+"_o",p.getOriginalFormat());
+                    progressCallback.accept((double)(i+1)/(double)photos.size());
+                } catch (ServiceException e) {
 
                 }
             }

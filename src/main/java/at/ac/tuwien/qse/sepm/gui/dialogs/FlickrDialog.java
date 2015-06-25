@@ -1,6 +1,5 @@
 package at.ac.tuwien.qse.sepm.gui.dialogs;
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
@@ -45,7 +44,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class FlickrDialog extends ResultDialog<List<Photo>> {
+public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photos.Photo>> {
 
     private static final Logger logger = LogManager.getLogger();
     @FXML
@@ -73,6 +72,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     private LatLong actualLatLong;
     private ArrayList<ImageTile> selectedImages = new ArrayList<ImageTile>();
     private Cancelable downloadTask;
+    private static final String tmpDir = "src/main/resources/tmp/";
 
     public FlickrDialog(Node origin, String title, FlickrService flickrService, ExifService exifService, IOHandler ioHandler) {
         super(origin, title);
@@ -153,8 +153,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
             }
         });
         x.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
+            @Override public void handle(MouseEvent event) {
                 keywordsFlowPane.getChildren().remove(hbox);
                 flickrService.reset();
             }
@@ -182,15 +181,36 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     }
 
     public void handleImport() {
-        ArrayList<Photo> photos = new ArrayList<Photo>();
+        ArrayList<com.flickr4java.flickr.photos.Photo> photos = new ArrayList<>();
         for (ImageTile i : selectedImages) {
-            Photo p = i.getPhoto();
-            p.getData().setDatetime(datePicker.getValue().atStartOfDay());
+            //i.getPhoto().setDateAdded(datePicker.getValue().atStartOfDay());
+            photos.add(i.getPhoto());
             //exifService.setDateAndGeoData(p);
-            photos.add(p);
             //Path path = Paths.get(p.getPath());
             //ioHandler.copyFromTo(Paths.get(p.getPath()),Paths.get(System.getProperty("user.home"),"travelimg/"+path.getFileName()));
-            logger.debug("Added photo for import {}", p);
+            logger.debug("Added photo for import {}", i.getPhoto());
+        }
+        try {
+            flickrService.downloadPhotos(photos
+                    , new Consumer<Double>() {
+                        public void accept(Double downloadProgress) {
+                            Platform.runLater(new Runnable() {
+                                public void run() {
+                                    logger.debug("Progress {}", downloadProgress);
+                                }
+                            });
+
+                        }
+                    }
+
+                    , new ErrorHandler<ServiceException>() {
+
+                        public void handle(ServiceException exception) {
+                            //handle errors here
+                        }
+                    });
+        } catch (ServiceException e) {
+            e.printStackTrace();
         }
         selectedImages.clear();
         setResult(photos);
@@ -227,9 +247,9 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
                 useGeoData = true;
             }
             downloadTask = flickrService.searchPhotos(tags, latitude, longitude, useGeoData,
-                    new Consumer<Photo>() {
+                    new Consumer<com.flickr4java.flickr.photos.Photo>() {
 
-                        public void accept(Photo photo) {
+                        public void accept(com.flickr4java.flickr.photos.Photo photo) {
 
                             Platform.runLater(new Runnable() {
 
@@ -304,17 +324,17 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
 
         private BooleanProperty selected = new SimpleBooleanProperty(false);
 
-        private Photo photo;
+        private com.flickr4java.flickr.photos.Photo photo;
 
         private Image image;
         private ImageView imageView;
 
-        public ImageTile(Photo photo) {
+        public ImageTile(com.flickr4java.flickr.photos.Photo photo) {
 
             this.photo = photo;
-
             try {
-                image = new Image(new FileInputStream(new File(photo.getPath())), 150, 0, true, true);
+                image = new Image(new FileInputStream(new File(tmpDir+ photo.getId()+"."+ photo
+                        .getOriginalFormat())), 150, 0, true, true);
             } catch (FileNotFoundException ex) {
                 logger.error("Could not find photo", ex);
                 return;
@@ -345,7 +365,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
             this.selected.set(false);
         }
 
-        public Photo getPhoto() {
+        public com.flickr4java.flickr.photos.Photo getPhoto() {
             return photo;
         }
 

@@ -1,8 +1,8 @@
 package at.ac.tuwien.qse.sepm.service;
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
+import com.flickr4java.flickr.photos.Photo;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -19,7 +19,7 @@ public interface FlickrService {
      * @param latitude     used to find photos near to it
      * @param longitude    used to find photos near to ii
      * @param useGeoData   if true, geodata(latitude and longitude) will be used for searching
-     * @param callback     used to notify the GUI after a new photo has been downloaded(the photo object will contain the path where the photo is temporary stored)
+     * @param callback     used to notify the GUI after a new photo has been downloaded
      * @param progressCallback used to notify the GUI about the download progress
      * @param errorHandler handler for occurring exceptions
      * @return a Cancelable object, that can be used to interrupt the download
