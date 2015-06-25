@@ -78,6 +78,15 @@ public class FullscreenWindow extends StackPane {
                 if (keyEvent.getCode() == KeyCode.ESCAPE) {
                     stage.close();
                 }
+                if(keyEvent.getCode() == KeyCode.DIGIT1){
+                    handleRatingChange(Rating.BAD);
+                }
+                if(keyEvent.getCode() == KeyCode.DIGIT2){
+                    handleRatingChange(Rating.NEUTRAL);
+                }
+                if(keyEvent.getCode() == KeyCode.DIGIT3){
+                    handleRatingChange(Rating.GOOD);
+                }
             }
         });
 
