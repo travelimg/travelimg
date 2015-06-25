@@ -1,53 +1,56 @@
 package at.ac.tuwien.qse.sepm.entities;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-public class Photo {
+public class Photo implements Comparable<Photo> {
 
-    private final List<Tag> tags = new ArrayList<>();
     private Integer id;
-    private Photographer photographer;
-    private String path;
-    private Rating rating;
-    private LocalDateTime datetime;
-    private double latitude;
-    private double longitude;
-    private Place place;
+    private Path file = Paths.get("");
+    private final PhotoMetadata data;
 
     public Photo() {
+        data = new PhotoMetadata();
     }
 
-    public Photo(Integer id, Photographer photographer, String path, Rating rating, LocalDateTime datetime, double latitude, double longitude, Place place) {
+    public Photo(Path file) {
+        this(file, new PhotoMetadata());
+    }
+
+    public Photo(Path file, PhotoMetadata data) {
+        if (file == null) throw new IllegalArgumentException();
+        if (data == null) throw new IllegalArgumentException();
+        this.file = file;
+        this.data = data;
+    }
+
+    public Photo(Integer id, Path file, PhotoMetadata data) {
+        if (id == null) throw new IllegalArgumentException();
+        if (file == null) throw new IllegalArgumentException();
+        if (data == null) throw new IllegalArgumentException();
         this.id = id;
-        this.photographer = photographer;
-        this.path = path;
-        this.rating = rating;
-        this.datetime = datetime;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.place = place;
+        this.file = file;
+        this.data = data;
     }
 
-    public Photo(Photo other) {
-        this.id = other.id;
-        this.photographer = other.photographer;
-        this.path = other.path;
-        this.rating = other.rating;
-        this.datetime = other.datetime;
-        this.latitude = other.latitude;
-        this.longitude = other.longitude;
-        this.place = other.place;
+    public Photo(Photo from) {
+        if (from == null) throw new IllegalArgumentException();
+        this.id = from.id;
+        this.file = from.file;
+        this.data = new PhotoMetadata(from.data);
     }
 
-    public Place getPlace() {
-        return place;
-    }
-
-    public void setPlace(Place place) {
-        this.place = place;
+    @Deprecated
+    public Photo(Integer id, Photographer photographer, String path, Rating rating, LocalDateTime datetime, double latitude, double longitude, Place place) {
+        this(Paths.get(path));
+        setId(id);
+        getData().setPhotographer(photographer);
+        getData().setRating(rating);
+        getData().setDatetime(datetime);
+        getData().setLatitude(latitude);
+        getData().setLongitude(longitude);
+        getData().setPlace(place);
     }
 
     public Integer getId() {
@@ -58,90 +61,44 @@ public class Photo {
         this.id = id;
     }
 
+    public Path getFile() {
+        return file;
+    }
+
+    public PhotoMetadata getData() {
+        return data;
+    }
+
     public String getPath() {
-        return path;
+        return file.toString();
     }
 
     public void setPath(String path) {
-        this.path = path;
+        this.file = Paths.get(path);
     }
 
-    public Rating getRating() {
-        return rating;
-    }
-
-    public void setRating(Rating rating) {
-        this.rating = rating;
-    }
-
-    public Photographer getPhotographer() {
-        return photographer;
-    }
-
-    public void setPhotographer(Photographer photographer) {
-        this.photographer = photographer;
-    }
-
-    public LocalDateTime getDatetime() {
-        return datetime;
-    }
-
-    public void setDatetime(LocalDateTime datetime) {
-        this.datetime = datetime;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Photo))
+            return false;
 
         Photo photo = (Photo) o;
 
-        if (!Paths.get(path).equals(Paths.get(photo.path))) return false;
+        if (id != photo.id)
+            return false;
+        if (data != null ? !data.equals(photo.data) : photo.data != null)
+            return false;
+        if (file != null ? !file.equals(photo.file) : photo.file != null)
+            return false;
 
-        if (Double.compare(photo.latitude, latitude) != 0) return false;
-        if (Double.compare(photo.longitude, longitude) != 0) return false;
-        if (id != null ? !id.equals(photo.id) : photo.id != null) return false;
-        if (photographer != null ? !photographer.equals(photo.photographer) : photo.photographer != null) return false;
-        if (rating != null ? !rating.equals(photo.rating) : photo.rating != null) return false;
-        if (place != null ? place.getId() != photo.getPlace().getId() : place != null) return false;
-        return !(datetime != null ? !datetime.equals(photo.datetime) : photo.datetime != null);
-
+        return true;
     }
 
-    @Override
-    public int hashCode() {
-        int result;
-        long temp;
-        result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (photographer != null ? photographer.hashCode() : 0);
-        result = 31 * result + (path != null ? path.hashCode() : 0);
-        result = 31 * result + (rating != null ? rating.hashCode() : 0);
-        result = 31 * result + (datetime != null ? datetime.hashCode() : 0);
-        temp = Double.doubleToLongBits(latitude);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(longitude);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
+    @Override public int hashCode() {
+        int result = id;
+        result = 31 * result + (file != null ? file.hashCode() : 0);
+        result = 31 * result + (data != null ? data.hashCode() : 0);
         return result;
     }
 
@@ -149,13 +106,12 @@ public class Photo {
     public String toString() {
         return "Photo{" +
                 "id=" + id +
-                ", photographer=" + photographer +
-                ", path='" + path + '\'' +
-                ", rating=" + rating +
-                ", datetime=" + datetime +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
-                ", place=" + place +
+                ", file=" + file +
+                ", data=" + data +
                 '}';
+    }
+
+    @Override public int compareTo(Photo o) {
+        return getData().getDatetime().compareTo(o.getData().getDatetime());
     }
 }

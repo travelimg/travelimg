@@ -1,0 +1,169 @@
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+        html { height: 100% }
+        body { height: 100%; margin: 0px; padding: 0px }
+        #map_canvas { height: 100%; background-color: #666970; }
+    </style>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&libraries=geometry">
+    </script>
+    <script type="text/javascript">
+        function initialize() {
+            var loaded = false;
+            var latlng = new google.maps.LatLng(37.39822, -121.9643936);
+            var markers = [];
+            var lines = [];
+
+            var myOptions = {
+                zoom: 2,
+                center: latlng,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                mapTypeControl: false,
+                navigationControl: false,
+                streetViewControl: false,
+                backgroundColor: "#666970",
+                disableDoubleClickZoom: true
+            };
+
+            document.map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
+
+            google.maps.event.addListener(document.map, 'tilesloaded', function() {
+
+                if (loaded) {
+                    return;
+                }
+
+                loaded = true;
+
+                google.maps.event.addListener(document.map, "click", function(event) {
+                    var lat = event.latLng.lat();
+                    var lng = event.latLng.lng();
+
+                    alert("click(" + lat + ", " + lng + ")");
+                });
+
+                google.maps.event.addListener(document.map, "dblclick", function(event) {
+                    var lat = event.latLng.lat();
+                    var lng = event.latLng.lng();
+
+                    alert("double-click(" + lat + ", " + lng + ")");
+                });
+
+                alert("map-loaded");
+            });
+
+            document.setZoom = function setZoom(level) {
+
+                if (level < 0) {
+                    level = 0;
+                } else if (level > 20) {
+                    level = 20;
+                }
+
+                document.map.setZoom(level);
+            }
+
+            document.clear = function clear() {
+                for (var i = 0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+                }
+
+                for (var i = 0; i < lines.length; i++) {
+                    lines[i].setMap(null);
+                }
+
+                markers = [];
+                lines = [];
+            }
+
+            document.center = function center(latitude, longitude) {
+                document.map.setCenter(new google.maps.LatLng(latitude, longitude));
+            }
+
+            document.addMarker = function addMarker(latitude, longitude) {
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(latitude, longitude),
+                    map: document.map
+                });
+
+                markers.push(marker);
+                document.setZoom(document.map.getZoom()-1);
+                document.setZoom(document.map.getZoom()+1);
+            }
+
+            document.fitToMarkers = function fitToMarkers() {
+                var bounds = new google.maps.LatLngBounds();
+
+                for (var i = 0; i < markers.length; i++) {
+                    bounds.extend(markers[i].position);
+                }
+
+                document.map.fitBounds(bounds);
+
+                var minDistance = 0.002;
+                var distance = google.maps.geometry.spherical.computeDistanceBetween (bounds.getNorthEast(), bounds.getSouthWest());
+
+                if(distance<minDistance){
+                   document.map.setZoom(16);
+                }
+            }
+
+            document.fitToLastTwoMarkers = function fitToLastTwoMarkers() {
+                var posToStart = markers.length - 2;
+                if(posToStart<0){
+                    posToStart = markers.length - 1;
+                }
+
+                if(posToStart>=0){
+                    var bounds = new google.maps.LatLngBounds();
+
+                    for (var i = posToStart; i < markers.length; i++) {
+                        bounds.extend(markers[i].position);
+                    }
+
+                    document.map.fitBounds(bounds);
+
+                    var minDistance = 0.002;
+                    var distance = google.maps.geometry.spherical.computeDistanceBetween (bounds.getNorthEast(), bounds.getSouthWest());
+
+                    if(distance<minDistance){
+                        document.map.setZoom(16);
+                    }
+                }
+
+            }
+
+            document.drawPolyline = function drawPolyline(vertices) {
+                var path = [];
+                var image = 'red_circle.png';
+                for (var i = 0; i < vertices.length; i++) {
+                    path.push(new google.maps.LatLng(vertices[i][0], vertices[i][1]));
+                    var marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(vertices[i][0], vertices[i][1]),
+                        map: document.map,
+                        icon: image
+                    });
+                    markers.push(marker);
+                }
+
+                var line = new google.maps.Polyline({
+                    map: document.map,
+                    path: path,
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 1.0,
+                    strokeWeight: 2
+                });
+
+                lines.push(line);
+                document.fitToMarkers();
+                document.setZoom(document.map.getZoom()-1);
+                document.setZoom(document.map.getZoom()+1);
+            }
+        }
+    </script>
+</head>
+<body onload="initialize()">
+<div id="map_canvas" style="width:100%; height:100%"></div>
+</body>
+</html>

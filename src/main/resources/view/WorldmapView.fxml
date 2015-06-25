@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.BorderPane?>
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="border"
+<?import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root"
             stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8"
             fx:controller="at.ac.tuwien.qse.sepm.gui.controller.WorldmapView">
+
+    <center>
+        <GoogleMapScene fx:id="mapScene"/>
+    </center>
 
 </BorderPane>

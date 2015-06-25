@@ -7,11 +7,11 @@ import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
 import at.ac.tuwien.qse.sepm.service.TagService;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -22,15 +22,11 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class TagTest extends ServiceTestBase {
 
-    @Autowired
-    private TagService tagService;
-    @Autowired
-    private PhotoService photoService;
+    @Autowired private TagService tagService;
+    @Autowired private PhotoService photoService;
 
     private Photo getPhoto(int index) throws ServiceException {
         return photoService.getAllPhotos().get(index);
@@ -206,7 +202,6 @@ public class TagTest extends ServiceTestBase {
         // assert that p2 was not affected
         assertThat(getTags(p2), equalTo(toList(t2)));
     }
-
     @Test
     @WithData
     public void test_get_most_frequent() throws ServiceException {
@@ -251,7 +246,6 @@ public class TagTest extends ServiceTestBase {
 
         tagService.getMostFrequentTags(toList(p0, p1, p2));
     }
-
     @Test
     @WithData
     public void test_no_tags_available_for_photos() throws ServiceException {

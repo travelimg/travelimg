@@ -38,8 +38,8 @@
                     <right>
                         <HBox spacing="8.0">
                             <children>
-                                <Button fx:id="cancelButton" alignment="CENTER_RIGHT" text="BEHALTEN"/>
-                                <Button fx:id="confirmButton" alignment="CENTER_RIGHT" styleClass="primary"
+                                <Button fx:id="cancelButton" alignment="CENTER_RIGHT" text="BEHALTEN" styleClass="btn"/>
+                                <Button fx:id="confirmButton" alignment="CENTER_RIGHT" styleClass="btn,primary"
                                         text="LÖSCHEN"/>
                             </children>
                         </HBox>

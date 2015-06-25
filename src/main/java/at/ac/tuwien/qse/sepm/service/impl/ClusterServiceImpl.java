@@ -16,9 +16,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ClusterServiceImpl implements ClusterService {
 
@@ -56,14 +56,33 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     @Override
-    public List<Place> getPlacesByJourney(Journey journey) throws ServiceException {
+    public List<Place> getPlacesByJourneyChronological(Journey journey) throws ServiceException {
+        List<Photo> photos;
+
         try {
-            return placeDAO.readByJourney(journey);
-        } catch (DAOException e) {
-            throw new ServiceException("Failed to get places", e);
-        } catch (ValidationException e) {
-            throw new ServiceException("Failed to validate journey id", e);
+            photos = photoDAO.readPhotosByJourney(journey);
+
+        } catch (DAOException ex) {
+            logger.error("Failed to read all photos by journey", ex);
+            throw new ServiceException("Failed to read all photos by journey", ex);
         }
+
+        Map<Place, LocalDateTime> minTimeByPlace = new HashMap<>();
+
+        for (Photo photo : photos) {
+            Place place = photo.getData().getPlace();
+            LocalDateTime time = photo.getData().getDatetime();
+
+            if (!minTimeByPlace.containsKey(place)) {
+                minTimeByPlace.put(place, time);
+            } else if (minTimeByPlace.get(place).isAfter(time)) {
+                minTimeByPlace.put(place, time);
+            }
+        }
+
+        return minTimeByPlace.keySet().stream()
+                .sorted((p1, p2) -> minTimeByPlace.get(p1).compareTo(minTimeByPlace.get(p2)))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -85,8 +104,8 @@ public class ClusterServiceImpl implements ClusterService {
         } catch (DAOException ex) {
             logger.error("Journey-creation for {} failed.", journey);
             throw new ServiceException("Creation of journey failed.", ex);
-        } catch (ValidationException e) {
-            throw new ServiceException("Failed to validate entity", e);
+        } catch (ValidationException ex) {
+            throw new ServiceException("Failed to validate entity: " + ex.getMessage(), ex);
         }
     }
 
@@ -100,7 +119,7 @@ public class ClusterServiceImpl implements ClusterService {
         addJourney(journey);
 
         try {
-            photos = photoDAO.readPhotosByJourney(journey);
+            photos = photoDAO.readPhotosBetween(journey.getStartDate(), journey.getEndDate());
         } catch (DAOException e) {
             logger.error("Failed to read photos of journey", e);
             throw new ServiceException("Failed to read photos of journey", e);
@@ -108,8 +127,8 @@ public class ClusterServiceImpl implements ClusterService {
 
         // attach a place to each photo
         for (Photo photo : photos) {
-            final double latitude = photo.getLatitude();
-            final double longitude = photo.getLongitude();
+            final double latitude = photo.getData().getLatitude();
+            final double longitude = photo.getData().getLongitude();
 
             double epsilon = 1.0;
             Optional<Place> place = places.stream()
@@ -119,19 +138,19 @@ public class ClusterServiceImpl implements ClusterService {
 
             if (!place.isPresent()) {
                 // if no we don't already know a place in close proximity look it up
-                place = Optional.of(lookupPlace(photo, journey));
+                place = Optional.of(lookupPlace(photo));
                 places.add(place.get());
             }
 
-            photo.setPlace(place.get());
+            photo.getData().setPlace(place.get());
+            photo.getData().setJourney(journey);
             photoService.editPhoto(photo);
         }
         return places;
     }
 
-    private Place lookupPlace(Photo photo, Journey journey) throws ServiceException {
-        Place place = geoService.getPlaceByGeoData(photo.getLatitude(), photo.getLongitude());
-        place.setJourney(journey);
+    private Place lookupPlace(Photo photo) throws ServiceException {
+        Place place = geoService.getPlaceByGeoData(photo.getData().getLatitude(), photo.getData().getLongitude());
 
         logger.debug("New unknown place cluster: {}", place);
 

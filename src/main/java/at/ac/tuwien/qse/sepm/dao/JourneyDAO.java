@@ -51,4 +51,13 @@ public interface JourneyDAO {
      * @throws ValidationException If the id is invalid.
      */
     Journey getByID(int id) throws DAOException, ValidationException;
+
+    /**
+     * Retrive a journey by its name.
+     *
+     * @param name The name of the data store entry.
+     * @return Returns journey record with the given name.
+     * @throws DAOException        If the data store fails to deliver the record.
+     */
+    Journey getByName(String name) throws DAOException;
 }

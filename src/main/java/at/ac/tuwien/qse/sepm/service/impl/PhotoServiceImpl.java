@@ -1,68 +1,88 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
-import at.ac.tuwien.qse.sepm.dao.JourneyDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
-import at.ac.tuwien.qse.sepm.entities.Journey;
+import at.ac.tuwien.qse.sepm.dao.repo.AsyncPhotoRepository;
+import at.ac.tuwien.qse.sepm.dao.repo.Operation;
+import at.ac.tuwien.qse.sepm.dao.repo.PhotoRepository;
+import at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher;
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Place;
-import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class PhotoServiceImpl implements PhotoService {
 
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final int REFRESH_RATE = 5;
 
-    @Autowired
-    private ExecutorService executorService;
     @Autowired
     private PhotoDAO photoDAO;
     @Autowired
-    private JourneyDAO journeyDAO;
+    private PollingFileWatcher watcher;
+    @Autowired
+    private AsyncPhotoRepository photoRepository;
+
+    private Listener listener;
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private ScheduledFuture<?> watcherSchedule = null;
+
+    @Autowired
+    private void initializeListeners(AsyncPhotoRepository repository) {
+        listener = new Listener();
+        repository.addListener((AsyncPhotoRepository.AsyncListener)listener);
+        repository.addListener((PhotoRepository.Listener)listener);
+    }
 
     @Override
-    public void deletePhotos(List<Photo> photos) throws ServiceException {
+    public void synchronize() {
+        LOGGER.debug("Synchronizing repository");
+
+        // schedule the update in a separate thread with a little delay
+        scheduler.schedule(this::synchronizeAndSchedule, 2, TimeUnit.SECONDS);
+    }
+
+    private void synchronizeAndSchedule() {
+        watcher.refresh();
+        try {
+            photoRepository.synchronize();
+        } catch (DAOException ex) {
+            LOGGER.error("Failed to synchronize files", ex);
+        }
+
+        // schedule watcher to notify about future changes
+        watcherSchedule = scheduler.scheduleAtFixedRate(watcher::refresh, REFRESH_RATE, REFRESH_RATE, TimeUnit.SECONDS);
+    }
+
+    public void close() {
+        if (watcherSchedule != null) {
+            watcherSchedule.cancel(true);
+        }
+        scheduler.shutdown();
+        listener.close();
+    }
+
+    @Override
+    public void deletePhotos(Collection<Photo> photos) throws ServiceException {
         if (photos == null) {
             throw new ServiceException("List<Photo> photos is null");
         }
         for (Photo p : photos) {
             LOGGER.debug("Deleting photo {}", p);
             try {
-                photoDAO.delete(p);
+                photoRepository.delete(p.getFile());
             } catch (DAOException e) {
                 throw new ServiceException(e);
-            } catch (ValidationException e) {
-                throw new ServiceException("Failed to validate entity", e);
-            }
-        }
-    }
-
-
-    @Override
-    public void editPhotos(List<Photo> photos, Photo photo) throws ServiceException {
-        if (photos == null) {
-            throw new ServiceException("List<Photo> photos is null");
-        }
-        for (Photo p : photos) {
-            LOGGER.debug("Updating photo {}", p);
-            try {
-                //TODO update all attributes
-                p.setPlace(photo.getPlace());
-                photoDAO.update(p);
-            } catch (DAOException e) {
-                throw new ServiceException(e);
-            } catch (ValidationException e) {
-                throw new ServiceException("Failed to validate entity", e);
             }
         }
     }
@@ -91,58 +111,79 @@ public class PhotoServiceImpl implements PhotoService {
         LOGGER.debug("Entering editPhoto with {}", photo);
 
         try {
-            photoDAO.update(photo);
+            photoRepository.update(photo);
             LOGGER.info("Successfully updated {}", photo);
         } catch (DAOException ex) {
             LOGGER.error("Updating {} failed due to DAOException", photo);
             throw new ServiceException("Could update photo.", ex);
-        } catch (ValidationException ex) {
-            LOGGER.error("Updating {} failed due to ValidationException", photo);
-            throw new ServiceException("Could not update photo.", ex);
         }
 
         LOGGER.debug("Leaving editPhoto with {}", photo);
     }
 
     @Override
-    @Deprecated
-    public void addJourneyToPhotos(List<Photo> photos, Journey journey)
-            throws ServiceException {
-        LOGGER.debug("Entering addJourneyToPhotos with {}, {}", photos, journey);
-        if (photos == null) {
-            throw new ServiceException("List<Photo> photos is null");
-        }
-        try {
-            journeyDAO.create(journey);
-        } catch (DAOException ex) {
-            LOGGER.error("Journey-creation with {}, {} failed.", journey);
-            throw new ServiceException("Creation of Journey failed.", ex);
-        } catch (ValidationException e) {
-            throw new ServiceException("Failed to validate entity", e);
-        }
-
-        for (Photo photo : photos) {
-            photo.getPlace().setJourney(journey);
-//            exifService.exportMetaToExif(photo);
-            LOGGER.debug("Leaving addJourneyToPhotos");
-        }
+    public void subscribeCreate(Consumer<Photo> callback) {
+        photoRepository.addListener(new PhotoRepository.Listener() {
+            @Override public void onCreate(PhotoRepository repository, Path file) {
+                LOGGER.info("created {}", file);
+                try {
+                    Photo photo = repository.read(file);
+                    callback.accept(photo);
+                } catch (DAOException ex) {
+                    LOGGER.error("Failed to read photo {}", file);
+                }
+            }
+        });
     }
 
     @Override
-    @Deprecated
-    public void addPlaceToPhotos(List<Photo> photos, Place place)
-            throws ServiceException {
-        LOGGER.debug("Entering addPlaceToPhotos with {}, {}", photos, place);
-        if (photos == null) {
-            throw new ServiceException("List<Photo> photos is null");
+    public void subscribeUpdate(Consumer<Photo> callback) {
+        photoRepository.addListener(new PhotoRepository.Listener() {
+            @Override public void onUpdate(PhotoRepository repository, Path file) {
+                LOGGER.info("updated {}", file);
+                try {
+                    Photo photo = repository.read(file);
+                    callback.accept(photo);
+                } catch (DAOException ex) {
+                    LOGGER.error("Failed to read photo {}", file);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void subscribeDelete(Consumer<Path> callback) {
+        photoRepository.addListener(new PhotoRepository.Listener() {
+            @Override public void onDelete(PhotoRepository repository, Path file) {
+                LOGGER.info("deleted {}", file);
+                callback.accept(file);
+            }
+        });
+    }
+
+    private class Listener implements
+            AsyncPhotoRepository.AsyncListener,
+            PhotoRepository.Listener {
+
+        private final ExecutorService executor = Executors.newFixedThreadPool(1);
+
+        public void close() {
+            executor.shutdown();
         }
 
-        for (Photo photo : photos) {
-//            exifService.exportMetaToExif(photo);
+        @Override public void onError(PhotoRepository repository, DAOException error) {
+            LOGGER.error("repository error {}", error);
         }
-        Photo p = new Photo();
-        p.setPlace(place);
-        editPhotos(photos, p);
-        LOGGER.debug("Leaving addPlaceToPhotos");
+
+        @Override public void onError(AsyncPhotoRepository repository, Operation operation, DAOException error) {
+            LOGGER.warn("failed operation {}", operation);
+            LOGGER.error("operation error {}", error);
+        }
+
+        @Override public void onQueue(AsyncPhotoRepository repository, Operation operation) {
+            LOGGER.info("queued {}", operation);
+            LOGGER.info("queue length {}", repository.getQueue().size());
+            executor.execute(repository::completeNext);
+        }
     }
 }

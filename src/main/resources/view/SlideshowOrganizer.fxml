@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="240.0" styleClass="organizer"
+            stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
+            fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowOrganizerImpl">
+    <center>
+        <VBox>
+            <children>
+                <ScrollPane hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true"
+                            maxHeight="Infinity" VBox.vgrow="ALWAYS">
+                    <ListView fx:id="slideshowList">
+                    </ListView>
+                </ScrollPane>
+                <VBox fx:id="slideshowPropertiesBox" prefHeight="100">
+                    <children>
+                        <TextField fx:id="slideshowNameTextField"/>
+                        <RadioButton fx:id="shortDurationButton" mnemonicParsing="false" text="5 Sekunden" />
+                        <RadioButton fx:id="mediumDurationButton" mnemonicParsing="false" text="10 Sekunden" />
+                        <RadioButton fx:id="longDurationButton" mnemonicParsing="false" text="15 Sekunden" />
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </center>
+    <bottom>
+        <HBox styleClass="navbar">
+            <children>
+                <Button fx:id="addButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                    <graphic>
+                        <FontAwesomeIconView glyphName="PLUS"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Diashow hinzufügen"/>
+                    </tooltip>
+                </Button>
+                <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                    <graphic>
+                        <FontAwesomeIconView glyphName="EXPAND"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Diashow starten"/>
+                    </tooltip>
+                </Button>
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>

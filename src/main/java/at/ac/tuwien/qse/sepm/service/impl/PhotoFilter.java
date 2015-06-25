@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -93,32 +94,36 @@ public class PhotoFilter implements Predicate<Photo> {
     }
 
     private boolean testRating(Photo photo) {
-        return getIncludedRatings().contains(photo.getRating());
+        return getIncludedRatings().contains(photo.getData().getRating());
     }
 
     private boolean testPhotographer(Photo photo) {
-        return getIncludedPhotographers().contains(photo.getPhotographer());
+        // TODO: implement correct filter for null
+        if (photo.getData().getPhotographer() == null) {
+            return true;
+        }
+        return getIncludedPhotographers().contains(photo.getData().getPhotographer());
     }
 
     private boolean testCategories(Photo photo) {
-        if (photo.getTags().isEmpty()) {
+        if (photo.getData().getTags().isEmpty()) {
             return isUntaggedIncluded();
         }
         return hasCategory(photo);
     }
 
     private boolean testJourney(Photo photo) {
-        Journey journey = null;
-        if (photo.getPlace() != null)
-            journey = photo.getPlace().getJourney();
-
-        for (Journey j : getIncludedJourneys()) {
-            if (j == null) {
-                if (journey == null) {
+        // TODO: implement correct filter for null
+        if (photo.getData().getJourney() == null) {
+            return true;
+        }
+        for (Journey journey : getIncludedJourneys()) {
+            if (journey == null) {
+                if (photo.getData().getJourney() == null) {
                     return true; // belongs to no journey
                 }
             } else {
-                if (j.equals(journey))
+                if (journey.equals(photo.getData().getJourney()))
                     return true;
             }
         }
@@ -127,12 +132,16 @@ public class PhotoFilter implements Predicate<Photo> {
     }
 
     private boolean testPlace(Photo photo) {
-        return getIncludedPlaces().contains(photo.getPlace());
+        // TODO: implement correct filter for null
+        if (photo.getData().getJourney() == null) {
+            return true;
+        }
+        return getIncludedPlaces().contains(photo.getData().getPlace());
     }
 
     private boolean hasCategory(Photo photo) {
         for (Tag category : getIncludedCategories()) {
-            if (photo.getTags().contains(category)) {
+            if (photo.getData().getTags().contains(category)) {
                 return true;
             }
         }

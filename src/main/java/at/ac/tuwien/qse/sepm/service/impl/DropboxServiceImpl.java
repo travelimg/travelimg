@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -79,7 +80,7 @@ public class DropboxServiceImpl implements DropboxService {
     }
 
     @Override
-    public Cancelable uploadPhotos(List<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
+    public Cancelable uploadPhotos(Collection<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
         LOGGER.debug("uploading photos to {}", destination);
         AsyncExporter exporter = new AsyncExporter(photos, destination, callback, errorHandler);
         executorService.submit(exporter);
@@ -88,12 +89,12 @@ public class DropboxServiceImpl implements DropboxService {
     }
 
     private class AsyncExporter extends CancelableTask {
-        private List<Photo> photos;
+        private Collection<Photo> photos;
         private String destination;
         private Consumer<Photo> callback;
         private ErrorHandler<ServiceException> errorHandler;
 
-        public AsyncExporter(List<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
+        public AsyncExporter(Collection<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
             super();
             this.photos = photos;
             this.destination = destination;
@@ -103,21 +104,21 @@ public class DropboxServiceImpl implements DropboxService {
 
         @Override
         protected void execute() {
-            LOGGER.debug("executing async Dropbox exporter");
+            LOGGER.debug("executing async exporter");
             Path dest;
             // get the target path by combining dropbox root folder and the destination inside the dropbox folder
             try {
-                String dropboxPath = getDropboxFolder();
-                LOGGER.debug("building destination from {} and {}", dropboxPath, destination);
+//                String dropboxPath = getDropboxFolder();
+//                LOGGER.debug("building destination from {} and {}", dropboxPath, destination);
 
-                dest = Paths.get(dropboxPath, destination);
+                dest = Paths.get(destination);
                 LOGGER.debug("destination is {}", destination);
                 if (!Files.exists(dest)) {
                     LOGGER.debug("destination does not exist at {}", dest);
-                    throw new ServiceException("Can't upload to dropboxfolder which does not exist: " + dest.toString());
+                    throw new ServiceException("Can't upload to folder which does not exist: " + dest.toString());
                 }
             } catch (ServiceException ex) {
-                LOGGER.error("Failed to upload photos to dropbox", ex);
+                LOGGER.error("Failed to upload photos to folder", ex);
                 errorHandler.propagate(ex);
                 return;
             }
@@ -135,8 +136,8 @@ public class DropboxServiceImpl implements DropboxService {
                     callback.accept(photo);
 
                 } catch (Exception ex) {
-                    LOGGER.error("Failed to export photo to dropbox", ex);
-                    errorHandler.propagate(new ServiceException("Failed to export photo to dropbox", ex));
+                    LOGGER.error("Failed to export photo to folder", ex);
+                    errorHandler.propagate(new ServiceException("Failed to export photo to folder", ex));
                 }
             }
         }

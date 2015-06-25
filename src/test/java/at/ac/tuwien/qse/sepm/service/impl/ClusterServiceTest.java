@@ -1,8 +1,7 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.*;
-import at.ac.tuwien.qse.sepm.entities.Journey;
-import at.ac.tuwien.qse.sepm.entities.Place;
+import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
 import org.apache.logging.log4j.LogManager;
@@ -10,65 +9,50 @@ import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 
-@UsingTable("Photo")
 public class ClusterServiceTest extends ServiceTestBase {
 
-    private static final Logger logger = LogManager.getLogger(ClusterServiceTest.class);
-
     @Autowired
-    ClusterServiceImpl clusterService;
+    private ClusterServiceImpl clusterService;
     @Autowired
-    PhotoDAO photoDAO;
-    @Autowired
-    PlaceDAO placeDAO;
-
-    private Journey inputJourneys[] = new Journey[]{
-            new Journey(1, "Asien", LocalDateTime.of(2015, 3, 3, 0, 0, 0), LocalDateTime.of(2015, 3, 7, 0, 0, 0)),
-            new Journey(2, "Amerika", LocalDateTime.of(2005, 11, 8, 0, 0, 0), LocalDateTime.of(2005, 11, 10, 0, 0, 0)),
-            new Journey(3, "Leere Reise", LocalDateTime.of(2000, 3, 6, 0, 0, 0), LocalDateTime.of(2000, 3, 6, 0, 0, 0))
-    };
+    private PhotoDAO photoDAO;
 
     private Journey getViennaJourney() {
         return new Journey(4, "Vienna", LocalDateTime.of(2010, 8, 10, 0, 0, 0), LocalDateTime.of(2010, 8, 15, 0, 0, 0));
     }
 
-
-    @WithData
-    @Test
-    public void testClusteringService() {
-        try {
-            clusterService.clusterJourney(inputJourneys[0]);
-            clusterService.clusterJourney(inputJourneys[1]);
-            clusterService.clusterJourney(inputJourneys[2]);
-            logger.debug(placeDAO.readAll());
-
-        } catch (ServiceException e) {
-            e.printStackTrace();
-        } catch (DAOException e) {
-            e.printStackTrace();
-        }
+    private Journey getDenverJourney() {
+        return new Journey(3, "Denver", LocalDateTime.of(2005, 9, 10, 0, 0, 0), LocalDateTime.of(2005, 9, 12, 0, 0, 0));
     }
 
-    /*
+    private List<Photo> photos = Arrays.asList(
+            new Photo(2, Paths.get("2.jpg"), makeMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
+            new Photo(3, Paths.get("3.jpg"), makeMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
+            new Photo(4, Paths.get("4.jpg"), makeMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9))
+    );
 
-    @Override
-    public Journey addJourney(Journey journey) throws ServiceException {
-        try {
-            return journeyDAO.create(journey);
-        } catch (DAOException ex) {
-            logger.error("Journey-creation for {} failed.", journey);
-            throw new ServiceException("Creation of journey failed.", ex);
-        } catch (ValidationException e) {
-            throw new ServiceException("Failed to validate entity", e);
-        }
+    private PhotoMetadata makeMeta(LocalDateTime datetime, double lat, double lon) {
+        PhotoMetadata data = new PhotoMetadata();
+        data.setPhotographer(new Photographer(1, "Test Photographer"));
+        data.setJourney(getDenverJourney());
+        data.setPlace(new Place(1, "Denver", "United States", 39.7, -104.9));
+        data.setDatetime(datetime);
+        data.setLatitude(lat);
+        data.setLongitude(lon);
+        return data;
     }
-     */
 
     @Test(expected = ServiceException.class)
     public void test_create_place_malformed_throws1() throws ServiceException {
@@ -77,17 +61,12 @@ public class ClusterServiceTest extends ServiceTestBase {
 
     @Test(expected = ServiceException.class)
     public void test_create_place_malformed_throws2() throws ServiceException {
-        clusterService.addPlace(new Place(1, null, "city", 0, 0, inputJourneys[0]));
+        clusterService.addPlace(new Place(1, null, "city", 0, 0));
     }
 
     @Test(expected = ServiceException.class)
     public void test_create_place_malformed_throws3() throws ServiceException {
-        clusterService.addPlace(new Place(1, "country", null, 0, 0, inputJourneys[0]));
-    }
-
-    @Test(expected = ServiceException.class)
-    public void test_create_place_malformed_throws4() throws ServiceException {
-        clusterService.addPlace(new Place(1, "country", "city", 0, 0, null));
+        clusterService.addPlace(new Place(1, "country", null, 0, 0));
     }
 
     @Test
@@ -95,7 +74,7 @@ public class ClusterServiceTest extends ServiceTestBase {
         assertThat(clusterService.getAllPlaces(), empty());
 
         // create a place
-        Place place = new Place(-1, "Amerika", "San Francisco", 0, 0, inputJourneys[1]);
+        Place place = new Place(-1, "Amerika", "San Francisco", 0, 0);
         Place created = clusterService.addPlace(place);
 
         // check that place was added correctly
@@ -149,5 +128,28 @@ public class ClusterServiceTest extends ServiceTestBase {
         // check that journey was added correctly
         journey.setId(created.getId());
         assertThat(clusterService.getAllJourneys(), contains(journey));
+    }
+
+    @Test
+    @WithData
+    public void test_simple_cluster() throws ServiceException, DAOException {
+        Journey denverJourney = getDenverJourney();
+
+        assertThat(clusterService.getAllJourneys().size(), is(2));
+        List<Place> places = clusterService.clusterJourney(denverJourney);
+        assertThat(clusterService.getAllJourneys().size(), is(3));
+        assertThat(clusterService.getAllJourneys(), hasItem(denverJourney));
+
+        assertThat(places.size(), is(1));
+        assertThat(places.get(0).getCity(), equalTo("Denver"));
+        assertThat(places.get(0).getCountry(), equalTo("United States"));
+
+        List<Photo> journeyPhotos = photoDAO.readPhotosByJourney(denverJourney);
+        assertThat(journeyPhotos.size(), is(3));
+        assertThat(journeyPhotos, containsInAnyOrder(photos.get(0), photos.get(1), photos.get(2)));
+
+        assertThat(journeyPhotos.get(0).getData().getPlace(), equalTo(places.get(0)));
+        assertThat(journeyPhotos.get(1).getData().getPlace(), equalTo(places.get(0)));
+        assertThat(journeyPhotos.get(2).getData().getPlace(), equalTo(places.get(0)));
     }
 }

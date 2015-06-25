@@ -17,6 +17,7 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.IllegalFormatCodePointException;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
 
     private static final String UPDATE_STATEMENT = "UPDATE Photographer SET name=? WHERE id=?";
     private static final String GET_BY_ID_STATEMENT = "SELECT ID, name FROM Photographer WHERE ID=?;";
+    private static final String GET_BY_NAME_STATEMENT = "SELECT ID, name FROM Photographer WHERE name=?;";
     private static final String READ_ALL_STATEMENT = "SELECT ID, name FROM Photographer;";
 
     private SimpleJdbcInsert insertPhotographer;
@@ -61,6 +63,16 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
     public Photographer getById(int id) throws DAOException {
         try {
             return this.jdbcTemplate.queryForObject(GET_BY_ID_STATEMENT, new Object[]{id}, new PhotographerMapper());
+        } catch (DataAccessException ex) {
+            logger.error("Failed to read photographer", ex);
+            throw new DAOException("Failed to read photographer", ex);
+        }
+    }
+
+    @Override public Photographer getByName(String name) throws DAOException {
+        if (name == null) throw new IllegalArgumentException();
+        try {
+            return this.jdbcTemplate.queryForObject(GET_BY_NAME_STATEMENT, new Object[]{name}, new PhotographerMapper());
         } catch (DataAccessException ex) {
             logger.error("Failed to read photographer", ex);
             throw new DAOException("Failed to read photographer", ex);

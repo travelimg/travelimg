@@ -7,15 +7,15 @@ public class Place {
     private String country;
     private double latitude;
     private double longitude;
-    private Journey journey;
 
-    public Place(Integer id, String city, String country, double latitude, double longitude, Journey journey) {
+    private WikiPlaceInfo wikiPlaceInfo;
+
+    public Place(Integer id, String city, String country, double latitude, double longitude) {
         this.id = id;
         this.city = city;
         this.country = country;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.journey = journey;
     }
 
     public Integer getId() {
@@ -58,12 +58,10 @@ public class Place {
         this.longitude = longitude;
     }
 
-    public Journey getJourney() {
-        return journey;
-    }
+    public WikiPlaceInfo getWikiPlaceInfo() { return wikiPlaceInfo; }
 
-    public void setJourney(Journey journey) {
-        this.journey = journey;
+    public void setWikiPlaceInfo(WikiPlaceInfo wikiPlaceInfo) {
+        this.wikiPlaceInfo = wikiPlaceInfo;
     }
 
     @Override
@@ -75,8 +73,6 @@ public class Place {
 
         Place place = (Place) o;
 
-        if (id != place.id)
-            return false;
         if (!city.equals(place.city))
             return false;
         return country.equals(place.country);
@@ -85,20 +81,17 @@ public class Place {
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + city.hashCode();
+        int result = city.hashCode();
         result = 31 * result + country.hashCode();
         return result;
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
         return "Place{" +
                 "city='" + city + '\'' +
                 ", country='" + country + '\'' +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
-                ", journey=" + journey +
                 '}';
     }
 }

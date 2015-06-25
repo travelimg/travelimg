@@ -32,8 +32,19 @@
     <bean id="tagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTagDAO"></bean>
     <bean id="journeyDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCJourneyDAO"></bean>
     <bean id="placeDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPlaceDAO"></bean>
-    <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO">
-        <constructor-arg value="${java.io.tmpdir}/travelimg"></constructor-arg>
+    <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO"></bean>
+
+    <!-- DAO repo beans -->
+    <bean id="watcher" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher"></bean>
+    <bean id="serializer" class="at.ac.tuwien.qse.sepm.dao.repo.impl.MockPhotoSerializer"></bean>
+    <bean id="photoRepository" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PhotoFileRepository">
+        <constructor-arg ref="watcher"></constructor-arg>
+        <constructor-arg ref="serializer"></constructor-arg>
+    </bean>
+    <bean id="photoCache" class="at.ac.tuwien.qse.sepm.dao.repo.impl.JdbcPhotoCache"></bean>
+    <bean id="asyncPhotoRepository" class="at.ac.tuwien.qse.sepm.dao.repo.impl.CachedPhotoRepository">
+        <constructor-arg ref="photoRepository"></constructor-arg>
+        <constructor-arg ref="photoCache"></constructor-arg>
     </bean>
 
     <!-- Service beans -->
@@ -46,4 +57,5 @@
     <bean id="geoService" class="at.ac.tuwien.qse.sepm.service.impl.GeoServiceImpl"></bean>
     <bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
     <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl" destroy-method="close"></bean>
+    <bean id="wikipediaService" class="at.ac.tuwien.qse.sepm.service.impl.WikipediaServiceImpl"></bean>
 </beans>

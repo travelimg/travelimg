@@ -18,26 +18,18 @@ public interface ExifService {
     Exif getExif(Photo photo) throws ServiceException;
 
     /**
-     * Reads and sets the metadata from a photo which are saved in the user comment entry in the exif data
-     *
-     * @param photo the photo, must have a valid path
-     * @throws ServiceException
-     */
-    void getTagsFromExif(Photo photo) throws ServiceException;
-
-    /**
-     * Sets the metadata from a photo to the user comment entry in the exif data of the photofile
-     *
-     * @param photo the photo, must have a valid path
-     * @throws ServiceException
-     */
-    void exportMetaToExif(Photo photo) throws ServiceException;
-
-    /**
      * Reads date, latitude and longitude (if possible)
      *
      * @param photo the photo, must have a valid path
      * @throws ServiceException
      */
+    @Deprecated
     void attachDateAndGeoData(Photo photo) throws ServiceException;
+
+    /**
+     * Sets date and geodata for a given photo
+     * @param photo the photo, must have a valid path
+     * @throws ServiceException
+     */
+    void setDateAndGeoData(Photo photo) throws ServiceException;
 }

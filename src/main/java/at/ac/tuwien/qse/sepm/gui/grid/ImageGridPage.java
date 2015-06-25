@@ -2,18 +2,17 @@ package at.ac.tuwien.qse.sepm.gui.grid;
 
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
-public class ImageGridPage extends ImageGrid {
+public class ImageGridPage extends ImageGrid<PhotoGridTile> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public ImageGridPage(List<Photo> photos, ImageCache imageCache) {
-        super(imageCache);
+    public ImageGridPage(List<Photo> photos) {
+        super(PhotoGridTile::new);
 
         setPhotos(photos);
     }
@@ -39,7 +38,7 @@ public class ImageGridPage extends ImageGrid {
         if (tiles.isEmpty())
             return;
 
-        PhotoGridTile tile = tiles.get(Math.max(Math.min(tiles.size() - 1, index), 0));
+        ImageGridTile tile = tiles.get(Math.max(Math.min(tiles.size() - 1, index), 0));
         tile.select();
         onSelectionChange();
     }
@@ -50,7 +49,7 @@ public class ImageGridPage extends ImageGrid {
      * @return the index of the first selected tile or -1 if none is selected.
      */
     public int getFirstSelectedIndex() {
-        PhotoGridTile selected = tiles.stream()
+        ImageGridTile selected = tiles.stream()
                 .filter(ImageGridTile::isSelected)
                 .findFirst()
                 .orElse(null);
