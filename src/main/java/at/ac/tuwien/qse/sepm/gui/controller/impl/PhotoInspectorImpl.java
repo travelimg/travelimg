@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.control.*;
 import at.ac.tuwien.qse.sepm.gui.controller.SlideshowView;
@@ -60,6 +61,12 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
     @Autowired
     private ExifService exifService;
 
+    @Autowired
+    private TagService tagService;
+
+    @Autowired
+    private PhotographerService photographerService;
+
     @Override public void setEntities(Collection<Photo> photos) {
         super.setEntities(photos);
 
@@ -105,6 +112,30 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
             }
             onUpdate();
         });
+
+        // TODO: reload these when tags / photographers are added
+        try {
+            LOGGER.debug("loading photographer suggestions");
+            photographerField.getSuggestions().setAll(
+                    photographerService.readAll().stream()
+                            .map(Photographer::getName)
+                            .collect(Collectors.toSet())
+            );
+        } catch (ServiceException ex) {
+            LOGGER.warn("failed loading photographer suggestions");
+            LOGGER.error("", ex);
+        }
+        try {
+            LOGGER.debug("loading tag suggestions");
+            tagField.getSuggestions().setAll(
+                    tagService.getAllTags().stream()
+                        .map(Tag::getName)
+                        .collect(Collectors.toSet())
+            );
+        } catch (ServiceException ex) {
+            LOGGER.warn("failed loading tag suggestions");
+            LOGGER.error("", ex);
+        }
     }
 
     private void handleAddToSlideshow(Event event) {
