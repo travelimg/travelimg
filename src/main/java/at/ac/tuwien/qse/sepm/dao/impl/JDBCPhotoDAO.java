@@ -40,6 +40,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private PlaceDAO placeDAO;
     @Autowired
     private JourneyDAO journeyDAO;
+    @Autowired
+    private SlideDAO slideDAO;
 
     @Override
     @Autowired
@@ -126,6 +128,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
         try {
             int id = photo.getId();
             photoTagDAO.deleteAllEntriesOfSpecificPhoto(photo);
+            slideDAO.deleteAllSlidesWithPhoto(photo);
             jdbcTemplate.update(DELETE_STATEMENT, id);
         } catch (DataAccessException e) {
             throw new DAOException("Failed to delete photo", e);
