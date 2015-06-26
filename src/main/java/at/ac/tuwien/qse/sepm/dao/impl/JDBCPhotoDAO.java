@@ -40,6 +40,8 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
     private PlaceDAO placeDAO;
     @Autowired
     private JourneyDAO journeyDAO;
+    @Autowired
+    private SlideDAO slideDAO;
 
     @Override
     @Autowired

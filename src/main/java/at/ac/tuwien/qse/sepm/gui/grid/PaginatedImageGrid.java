@@ -110,15 +110,6 @@ public class PaginatedImageGrid extends StackPane {
 
     }
 
-    public boolean containsPhoto(Photo photo) {
-        for (Photo p : photos) {
-            if (photo.getPath().equals(p.getPath())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Select all photos in the currently active page.
      */
@@ -166,22 +157,27 @@ public class PaginatedImageGrid extends StackPane {
      * @param photo The photo to be updated.
      */
     public void updatePhoto(Photo photo) {
-        if (!containsPhoto(photo)) {
-            LOGGER.debug("photo not in grid {}", photo);
+        int index = 0;
+        boolean found = false;
+
+        for (Photo p : photos) {
+            if (p.getPath().equals(photo.getPath())) {
+                found = true;
+                break;
+            }
+            index++;
+        }
+
+        if (!found) {
+            LOGGER.debug("Photo not in grid {}", photo);
             addPhoto(photo);
             return;
         }
+
         ImageGridPage page = getPageForPhoto(photo);
         page.updatePhoto(photo);
 
         // update photo in list
-        int index = 0;
-        for (Photo p : photos) {
-            if (p.getId().equals(photo.getId()))
-                break;
-            index++;
-        }
-
         photos.set(index, photo);
     }
 
