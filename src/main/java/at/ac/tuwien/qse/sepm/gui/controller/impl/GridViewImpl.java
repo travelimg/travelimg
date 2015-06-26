@@ -79,10 +79,12 @@ public class GridViewImpl implements GridView {
 
         // Updated photos that no longer match the filter are removed from the grid.
         inspector.setUpdateHandler(() -> {
-            inspector.getEntities().stream()
+            Collection<Photo> photos = inspector.getEntities();
+
+            photos.stream()
                     .filter(organizer.getUsedFilter().negate())
                     .forEach(grid::removePhoto);
-            inspector.getEntities().stream()
+            photos.stream()
                     .filter(organizer.getUsedFilter())
                     .forEach(grid::updatePhoto);
         });
