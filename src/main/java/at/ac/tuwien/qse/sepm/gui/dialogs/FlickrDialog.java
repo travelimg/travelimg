@@ -195,41 +195,41 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             searchTask = flickrService.searchPhotos(tags, latitude, longitude, useGeoData
 
                     , new Consumer<com.flickr4java.flickr.photos.Photo>() {
-                        public void accept(com.flickr4java.flickr.photos.Photo photo) {
-                            Platform.runLater(new Runnable() {
-                                public void run() {
-                                    ImageTile imageTile = new ImageTile(photo);
-                                    Photo p = new Photo();
-                                    p.setPath(tmpDir+photo.getId()+"."+photo.getOriginalFormat());
-                                    photos.add(p);
-                                    if(photos.size()==1){
-                                        fullscreenButton.setDisable(false);
-                                    }
-                                    photosFlowPane.getChildren().add(imageTile);
-                                }
-                            });
-                        }
-                    }
-                    , new Consumer<Double>() {
-                        public void accept(Double downloadProgress) {
-                            Platform.runLater(new Runnable() {
-                                public void run() {
-                                    if (downloadProgress == 1.0) {
-                                        searchButton.setDisable(false);
-                                        progressIndicator.setVisible(false);
-                                        importButton.setDisable(false);
-                                    }
-                                }
-                            });
-                        }
-                    }
-                    , new ErrorHandler<ServiceException>() {
-                        public void handle(ServiceException exception) {
-                            searchButton.setDisable(false);
-                            progressIndicator.setVisible(false);
-                            importButton.setDisable(false);
+                public void accept(com.flickr4java.flickr.photos.Photo photo) {
+                    Platform.runLater(new Runnable() {
+                        public void run() {
+                            ImageTile imageTile = new ImageTile(photo);
+                            Photo p = new Photo();
+                            p.setPath(tmpDir+photo.getId()+"."+photo.getOriginalFormat());
+                            photos.add(p);
+                            if(photos.size()==1){
+                                fullscreenButton.setDisable(false);
+                            }
+                            photosFlowPane.getChildren().add(imageTile);
                         }
                     });
+                }
+            }
+                    , new Consumer<Double>() {
+                public void accept(Double downloadProgress) {
+                    Platform.runLater(new Runnable() {
+                        public void run() {
+                            if (downloadProgress == 1.0) {
+                                searchButton.setDisable(false);
+                                progressIndicator.setVisible(false);
+                                importButton.setDisable(false);
+                            }
+                        }
+                    });
+                }
+            }
+                    , new ErrorHandler<ServiceException>() {
+                public void handle(ServiceException exception) {
+                    searchButton.setDisable(false);
+                    progressIndicator.setVisible(false);
+                    importButton.setDisable(false);
+                }
+            });
         } catch (ServiceException e) {
             searchButton.setDisable(false);
             progressIndicator.setVisible(false);
@@ -289,30 +289,37 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
 
             DownloadProgressControl downloadProgressControl = new DownloadProgressControl(flickrButton);
 
-            flickrService.downloadPhotos(flickrPhotos, new Consumer<Double>() {
-                public void accept(Double downloadProgress) {
-                    Platform.runLater(new Runnable() {
-                        public void run() {
-                            downloadProgressControl.setProgress(downloadProgress);
-                            if (downloadProgress == 1.0) {
-                                downloadProgressControl.finish();
-                                flickrButton.getGraphic().setStyle(flickrButtonStyle);
-                                flickrButton.setTooltip(flickrButtonTooltip);
-                                flickrButton.setOnAction(flickrButtonOnAction);
-                            }
-                            logger.debug("Downloading photos from flickr. Progress {}",
-                                    downloadProgress);
+            flickrService.downloadPhotos(flickrPhotos,
+                    new Consumer<com.flickr4java.flickr.photos.Photo>() {
+                        @Override public void accept(com.flickr4java.flickr.photos.Photo photo) {
+                            //TODO
                         }
-                    });
+                    }
+                    ,
+                    new Consumer<Double>() {
+                        public void accept(Double downloadProgress) {
+                            Platform.runLater(new Runnable() {
+                                public void run() {
+                                    downloadProgressControl.setProgress(downloadProgress);
+                                    if (downloadProgress == 1.0) {
+                                        downloadProgressControl.finish();
+                                        flickrButton.getGraphic().setStyle(flickrButtonStyle);
+                                        flickrButton.setTooltip(flickrButtonTooltip);
+                                        flickrButton.setOnAction(flickrButtonOnAction);
+                                    }
+                                    logger.debug("Downloading photos from flickr. Progress {}",
+                                            downloadProgress);
+                                }
+                            });
 
-                }
-            }
+                        }
+                    }
 
                     , new ErrorHandler<ServiceException>() {
 
-                public void handle(ServiceException exception) {
-                    //handle errors here
-                }
+                        public void handle(ServiceException exception) {
+                            //handle errors here
+                        }
                     });
         } catch (ServiceException e) {
 

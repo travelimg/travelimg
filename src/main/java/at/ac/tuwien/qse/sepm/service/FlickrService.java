@@ -32,12 +32,13 @@ public interface FlickrService {
     /**
      * Downloads photos from flickr in original size
      * @param photos the photos, should contain the url as path, geodata and date
+     * @param callback used to notify the GUI after a new photo has been downloaded
      * @param progressCallback used to notify the GUI about the download progress
      * @param errorHandler handler for occurring exceptions
      * @return a Cancelable object, that can be used to interrupt the download
      * @throws ServiceException
      */
-    Cancelable downloadPhotos(List<Photo> photos, Consumer<Double> progressCallback,
+    Cancelable downloadPhotos(List<Photo> photos, Consumer<Photo> callback, Consumer<Double> progressCallback,
             ErrorHandler<ServiceException> errorHandler) throws ServiceException;
 
     /**

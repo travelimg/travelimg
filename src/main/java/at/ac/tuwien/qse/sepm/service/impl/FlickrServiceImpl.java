@@ -67,9 +67,9 @@ public class FlickrServiceImpl implements FlickrService {
     }
 
     @Override
-    public Cancelable downloadPhotos(List<Photo> photos, Consumer<Double> progressCallback,
+    public Cancelable downloadPhotos(List<Photo> photos, Consumer<Photo> callback, Consumer<Double> progressCallback,
             ErrorHandler<ServiceException> errorHandler){
-        AsyncDownloader downloader = new AsyncDownloader(photos, progressCallback, errorHandler);
+        AsyncDownloader downloader = new AsyncDownloader(photos, callback, progressCallback, errorHandler);
         executorService.submit(downloader);
         return downloader;
     }
@@ -226,11 +226,13 @@ public class FlickrServiceImpl implements FlickrService {
     private class AsyncDownloader extends CancelableTask{
 
         private List<Photo> photos;
+        private Consumer<Photo> callback;
         private Consumer<Double> progressCallback;
         private ErrorHandler<ServiceException> errorHandler;
 
-        public AsyncDownloader(List<Photo> photos, Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler){
+        public AsyncDownloader(List<Photo> photos, Consumer<Photo> callback, Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler){
             this.photos = photos;
+            this.callback = callback;
             this.progressCallback = progressCallback;
             this.errorHandler = errorHandler;
         }
@@ -243,6 +245,7 @@ public class FlickrServiceImpl implements FlickrService {
                     Photo p = photos.get(i);
                     String url = "https://farm" + p.getFarm() + ".staticflickr.com/" + p.getServer() + "/" + p.getId() + "_" + p.getOriginalSecret() + "_o." + p.getOriginalFormat();
                     downloadPhotoFromFlickr(url,p.getId()+"_o",p.getOriginalFormat());
+                    callback.accept(p);
                     progressCallback.accept((double)(i+1)/(double)photos.size());
                 } catch (ServiceException e) {
                     progressCallback.accept(1.0);
