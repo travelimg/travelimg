@@ -48,15 +48,7 @@ public class WorldmapViewImpl implements WorldmapView {
         mapScene.setOnLoaded(this::showPlaces);
         mapScene.setMarkerClickCallback((position) -> clickMarker(position));
     }
-    @Override
-    public void ListenLatLong(LatLong latLong){
-        CallbackHandler callbackHandler = new CallbackHandler() {
-            @Override public void handle(Callback[] callbacks)
-                    throws IOException, UnsupportedCallbackException {
 
-            }
-        };
-    }
     private void showPlaces() {
         List<Place> places;
         try {
