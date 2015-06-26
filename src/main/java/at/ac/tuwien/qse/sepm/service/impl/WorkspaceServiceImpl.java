@@ -1,5 +1,7 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
+import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.DirectoryPathDAO;
 import at.ac.tuwien.qse.sepm.dao.repo.FileWatcher;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.WorkspaceService;
@@ -17,6 +19,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired FileWatcher watcher;
+    @Autowired DirectoryPathDAO directoryPathDAO;
 
     /**
      * Expand the current workspace by the given Path <tt>path</tt>.
@@ -33,8 +36,14 @@ public class WorkspaceServiceImpl implements WorkspaceService{
             throw new ServiceException("Invalid path for directory.");
         }
 
-        watcher.register(path);
-        watcher.index();
+        try {
+            directoryPathDAO.create(path);
+            watcher.register(path);
+        } catch (DAOException ex) {
+            LOGGER.error("Failed to add directory to workspace: {}", path);
+            throw new ServiceException("Failed to add directory to workspace.", ex);
+        }
+        watcher.index(); //to refresh
     }
 
     /**
@@ -58,8 +67,29 @@ public class WorkspaceServiceImpl implements WorkspaceService{
             throw new ServiceException("Invalid path for directory.");
         }
 
-        watcher.unregister(path);
-        watcher.index();
+        try {
+            directoryPathDAO.delete(path);
+            watcher.unregister(path);
+        } catch (DAOException ex) {
+            LOGGER.error("Failed to remove directory from workspace: {}", path);
+            throw new ServiceException("Failed to remove directory from workspace",ex);
+        }
+        watcher.index(); //to refresh
+    }
+
+    /**
+     * Return Collection of all directory-paths which are currently used as workspace.
+     * @return collection of all directory-paths that are currently used as workspace.
+     * @throws ServiceException if path retrieval failed
+     */
+    @Override
+    public Collection<Path> getDirectories() throws ServiceException {
+        try {
+            return directoryPathDAO.read();
+        } catch (DAOException ex) {
+            LOGGER.error("Failed to read workspace directories.");
+            throw new ServiceException("Failed to read workspace directories.",ex);
+        }
     }
 
     /**
@@ -82,7 +112,5 @@ public class WorkspaceServiceImpl implements WorkspaceService{
         return true;
     }
 
-    public Collection<Path> getDirectories() {
-        return watcher.getDirectories();
-    }
+
 }
