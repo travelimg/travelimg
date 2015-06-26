@@ -77,8 +77,6 @@ public class PaginatedImageGrid extends StackPane {
      * @param photo The photo to be added
      */
     public void addPhoto(Photo photo) {
-        photos.add(photo);
-
         // insert sorted
         int index = 0;
         for (Photo p : photos) {
