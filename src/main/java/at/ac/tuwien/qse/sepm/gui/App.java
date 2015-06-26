@@ -31,12 +31,7 @@ public class App extends Application {
         logger.info("Application started.");
 
         FXMLLoader loader = new FXMLLoader();
-        loader.setControllerFactory(new Callback<Class<?>, Object>() {
-            @Override
-            public Object call(Class<?> param) {
-                return context.getBean(param);
-            }
-        });
+        loader.setControllerFactory(context::getBean);
 
         // set base location so that resources can be loaded using relative paths
         loader.setLocation(getClass().getClassLoader().getResource("view"));

@@ -2,7 +2,7 @@ package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotographerDAO;
-import at.ac.tuwien.qse.sepm.dao.repo.EntityWatcher;
+import at.ac.tuwien.qse.sepm.dao.EntityWatcher;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
@@ -22,8 +22,8 @@ public class PhotographerServiceImpl implements PhotographerService {
     private PhotographerDAO photographerDAO;
     private Consumer<Photographer> refreshPhotographers;
 
-    @Autowired private void setEntityWatcher(EntityWatcher entityWatcher) {
-        entityWatcher.subscribePhotographerAdded(this::photographerAdded);
+    @Autowired private void setEntityWatcher(EntityWatcher<Photographer> watcher) {
+        watcher.subscribeAdded(this::photographerAdded);
     }
 
     @Override
@@ -59,7 +59,9 @@ public class PhotographerServiceImpl implements PhotographerService {
     }
 
     private void photographerAdded(Photographer photographer) {
-        refreshPhotographers.accept(photographer);
+        if (refreshPhotographers != null) {
+            refreshPhotographers.accept(photographer);
+        }
     }
 
     @Override public void subscribeChanged(Consumer<Photographer> callback) {
