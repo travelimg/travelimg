@@ -26,13 +26,12 @@ public class GoogleMapScene extends VBox {
 
     private final WebEngine webEngine;
     private final WebView webView;
-
+    @Autowired private WorldmapView worldmapView;
     private Consumer<LatLong> clickCallback = null;
     private Consumer<LatLong> doubleClickCallback = null;
     private Consumer<LatLong> markerClickCallback = null;
     private Runnable onLoadedCallback = null;
-    @Autowired
-    private Organizer organizer;
+
     public GoogleMapScene() {
         webView = new WebView();
         webEngine = webView.getEngine();
@@ -139,7 +138,7 @@ public class GoogleMapScene extends VBox {
                 } else if (type.equals("click") && clickCallback != null) {
                     clickCallback.accept(new LatLong(latitude, longitude));
                 }else if (type.equals("marker-click")) {
-
+                    worldmapView.ListenLatLong(new LatLong(latitude,longitude));
                 }
             } catch (NumberFormatException ex) {
                 LOGGER.debug("Failed to parse click event from map");

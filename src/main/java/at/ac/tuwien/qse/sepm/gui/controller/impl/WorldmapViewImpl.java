@@ -28,6 +28,7 @@ public class WorldmapViewImpl implements WorldmapView {
 
     @Autowired
     private ClusterService clusterService;
+
     private HashMap<LatLong,Place> markerPlaces = new HashMap<>();
     @FXML
     private void initialize() {
