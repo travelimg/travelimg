@@ -3,10 +3,7 @@ package at.ac.tuwien.qse.sepm.gui.control;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -15,7 +12,7 @@ public class FilterList<E> extends VBox {
 
     private final CheckItem header = new CheckItem();
     private final Function<E, String> valueConverter;
-    private final Map<E, CheckItem> items = new IdentityHashMap<>();
+    private final Map<E, CheckItem> items = new HashMap<>();
 
     private Consumer<List<E>> changeHandler;
     private boolean suppressChangeEvents = false;

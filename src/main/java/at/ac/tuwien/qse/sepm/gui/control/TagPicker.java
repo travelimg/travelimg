@@ -22,6 +22,10 @@ public class TagPicker extends Control {
     private ObservableList<Set<String>> entities = FXCollections.observableArrayList();
     private Runnable onUpdate;
 
+    public TagPicker() {
+        getStyleClass().setAll(DEFAULT_STYLE_CLASS);
+    }
+
     /**
      * Get the list of tagged entities represented by their tags.
      *
@@ -146,6 +150,11 @@ public class TagPicker extends Control {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Adds the tag to all entities.
+     *
+     * @param tag tag that should be applied
+     */
     public void apply(String tag) {
         if (tag == null) throw new IllegalArgumentException();
         getEntities().forEach(s -> s.add(tag));
@@ -154,6 +163,11 @@ public class TagPicker extends Control {
         }
     }
 
+    /**
+     * Removes the tag from all entities.
+     *
+     * @param tag tag that should be removed
+     */
     public void remove(String tag) {
         if (tag == null) throw new IllegalArgumentException();
         getEntities().forEach(s -> s.remove(tag));
@@ -178,4 +192,6 @@ public class TagPicker extends Control {
     @Override protected Skin<?> createDefaultSkin() {
         return new TagPickerSkin(this);
     }
+
+    private static final String DEFAULT_STYLE_CLASS = "tag-picker";
 }

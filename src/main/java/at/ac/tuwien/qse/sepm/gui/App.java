@@ -5,6 +5,8 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
@@ -42,8 +44,9 @@ public class App extends Application {
         Parent root = loader.load(getClass().getClassLoader().getResourceAsStream("view/Main.fxml"));
 
         stage.setScene(new Scene(root));
-        stage.setMaximized(true);
+
         stage.setTitle("travelimg");
+        stage.getIcons().add(getApplicationIcon());
         stage.show();
 
         PhotoService photoService = (PhotoService)context.getBean("photoService");
@@ -55,5 +58,9 @@ public class App extends Application {
         super.stop();
 
         context.close();
+    }
+
+    private Image getApplicationIcon() {
+        return new Image(App.class.getClassLoader().getResourceAsStream("graphics/tmg_logo.png"));
     }
 }

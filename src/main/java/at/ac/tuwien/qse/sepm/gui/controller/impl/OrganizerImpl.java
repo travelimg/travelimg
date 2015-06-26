@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -134,6 +135,14 @@ public class OrganizerImpl implements Organizer {
         resetFilter();
     }
 
+
+    @Override
+    public void setWorldMapPlace(Place place) {
+        placeListView.uncheckAll();
+        placeListView.check(place);
+
+        handlePlacesChange(placeListView.getChecked());
+    }
     // This Method let's the User switch to the usedFilter-view
     private void filterViewClicked() {
         filterContainer.getChildren().clear();

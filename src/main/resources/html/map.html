@@ -50,6 +50,7 @@
                     alert("double-click(" + lat + ", " + lng + ")");
                 });
 
+
                 alert("map-loaded");
             });
 
@@ -62,7 +63,7 @@
                 }
 
                 document.map.setZoom(level);
-            }
+            };
 
             document.clear = function clear() {
                 for (var i = 0; i < markers.length; i++) {
@@ -75,22 +76,29 @@
 
                 markers = [];
                 lines = [];
-            }
+            };
 
             document.center = function center(latitude, longitude) {
                 document.map.setCenter(new google.maps.LatLng(latitude, longitude));
-            }
+            };
 
             document.addMarker = function addMarker(latitude, longitude) {
                 var marker = new google.maps.Marker({
                     position: new google.maps.LatLng(latitude, longitude),
                     map: document.map
+
                 });
+                google.maps.event.addListener(marker, 'click', function() {
+                     var lat = marker.getPosition().lat();
+                     var lng = marker.getPosition().lng();
+
+                     alert("marker-click(" + lat + ", " + lng + ")");
+                  });
 
                 markers.push(marker);
                 document.setZoom(document.map.getZoom()-1);
                 document.setZoom(document.map.getZoom()+1);
-            }
+            };
 
             document.fitToMarkers = function fitToMarkers() {
                 var bounds = new google.maps.LatLngBounds();
@@ -107,7 +115,7 @@
                 if(distance<minDistance){
                    document.map.setZoom(16);
                 }
-            }
+            };
 
             document.fitToLastTwoMarkers = function fitToLastTwoMarkers() {
                 var posToStart = markers.length - 2;
@@ -132,7 +140,7 @@
                     }
                 }
 
-            }
+            };
 
             document.drawPolyline = function drawPolyline(vertices) {
                 var path = [];
@@ -159,7 +167,7 @@
                 document.fitToMarkers();
                 document.setZoom(document.map.getZoom()-1);
                 document.setZoom(document.map.getZoom()+1);
-            }
+            };
         }
     </script>
 </head>

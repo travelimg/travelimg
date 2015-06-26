@@ -130,7 +130,7 @@
     -fx-text-fill: -tmg-text;
 }
 
-.border-pane, .scroll-pane {
+.border-pane, .scroll-pane, .scroll-pane > * {
     -fx-padding: 0;
     -fx-background-color: transparent;
 }
@@ -361,11 +361,11 @@
 }
 
 .filter-list {
-    -fx-padding: 8px 0 16px 0;
+    -fx-padding: 8px 0 8px 0;
     -fx-background-color: -tmg-bg1;
 }
 .filter-list .check-item {
-    -fx-padding: 8px 14px;
+    -fx-padding: 4px 14px;
     -fx-font-size: 14;
 }
 .filter-list .check-item:hover {
@@ -391,7 +391,7 @@
     -fx-text-fill: -tmg-text-bright;
 }
 .filter-list .check-item .glyph-icon {
-    -glyph-size: 16;
+    -glyph-size: 14px;
     -fx-fill: -tmg-bg0;
 }
 .filter-list .check-item.checked .glyph-icon {
@@ -403,7 +403,7 @@
 .filter-list .header {
     -fx-background-color: -tmg-bg2;
     -fx-font-size: 16;
-    -fx-padding: 8px 12px;
+    -fx-padding: 4px 12px;
 }
 .filter-list .header .label {
     -fx-text-fill: -tmg-text;
@@ -656,25 +656,32 @@
 .inspector-pane .placeholder {
     -fx-spacing: 16px;
     -fx-alignment: center;
-    -fx-padding: 80px 0 0 0;
 }
 .inspector-pane .placeholder .label {
-    -fx-text-fill: -tmg-text;
+    -fx-text-fill: -tmg-text-dark;
 }
 .inspector-pane .placeholder .glyph-icon {
     -fx-fill: -tmg-bg0;
-    -glyph-name: "CAMERA";
+    -glyph-name: "PICTURE_ALT";
     -glyph-size: 80px;
 }
 .inspector-pane .selection-info {
-    -fx-background-color: -tmg-secondary;
-    -fx-text-fill: -tmg-text-bright;
+    -fx-background-color: -tmg-bg1-light;
     -fx-padding: 16px 16px;
 }
 .inspector-pane .selection-info .label {
     -fx-font-size: 20px;
-    -fx-text-fill: -tmg-text-bright;
+    -fx-text-fill: -tmg-text-dark;
     -fx-alignment: center;
+}
+.inspector-pane.multiple .selection-info {
+    -fx-background-color: -tmg-secondary;
+}
+.inspector-pane.multiple .selection-info .label {
+    -fx-text-fill: -tmg-text-bright;
+}
+.inspector-pane .body {
+    -fx-padding: 16px;
 }
 
 .rating-picker * {
@@ -870,12 +877,89 @@
     -fx-background-color: -tmg-control-pressed;
 }
 
-.check-list-view .list-cell:focused {
-    -fx-background-color: transparent;
+.tag-picker .list {
+    -fx-spacing: 2px;
 }
-.check-list-view .check-box {
-    -fx-padding: 0;
-    -fx-background-color: -tmg-bg0;
+.tag-picker .tag {
+    -fx-padding: 4px 8px 4px 4px;
+    -fx-background-color: -tmg-bg1-light;
+}
+.tag-picker .tag .label-container {
+    -fx-spacing: 16px;
+}
+.tag-picker .tag .label {
+    -fx-text-fill: -tmg-text;
+}
+.tag-picker .tag .check-icon {
+    -glyph-size: 20;
+    -fx-fill: -tmg-bg0;
+}
+.tag-picker .tag.applied .check-icon {
+    -fx-fill: -tmg-primary;
+}
+.tag-picker .tag.partial .check-icon {
+    -fx-fill: -tmg-secondary;
+}
+.tag-picker .tag.partial .check-icon:hover {
+    -glyph-name: "CHECK_SQUARE";
+}
+.tag-picker .tag .remove-icon {
+    -fx-fill: -tmg-text;
+    -glyph-size: 16px;
+}
+.tag-picker .tag .remove-icon:hover {
+    -fx-fill: -tmg-text-light;
+}
+.tag-picker .tag .remove-icon:pressed {
+    -fx-fill: -tmg-text-bright;
+}
+.tag-picker .placeholder {
+    -fx-background-color: -tmg-bg1-dark;
+    -fx-text-fill: -tmg-text-dark;
+    -fx-padding: 5px 0 6px 0;
+}
+
+.suggestion-field {
+    -fx-font-size: 14px;
+}
+.suggestion-field .suggestion {
+    -fx-text-fill: -tmg-primary;
+    -fx-cursor: hand;
+}
+.suggestion-field .suggestion:hover {
+    -fx-underline: true;
+}
+.suggestion-field .label {
+    -fx-font-size: 12px;
+}
+
+.key-value-cell {
+    -fx-padding: 4px 8px;
+    -fx-background-color: -tmg-bg1-light;
+}
+.key-value-cell .key {
+    -fx-text-fill: -tmg-text;
+}
+.key-value-cell .value {
+    -fx-text-fill: -tmg-text-light;
+}
+.key-value-cell.empty .key {
+    -fx-text-fill: -tmg-text-dark;
+    -fx-text-alignment: left;
+}
+.key-value-cell.empty .value {
+    -fx-text-fill: -tmg-text-dark;
+    -fx-font-style: italic;
+    -fx-text-alignment: right;
+}
+.key-value-cell.indetermined .key {
+    -fx-text-fill: -tmg-text-dark;
+    -fx-text-alignment: left;
+}
+.key-value-cell.indetermined .value {
+    -fx-text-fill: -tmg-secondary;
+    -fx-font-style: italic;
+    -fx-text-alignment: right;
 }
 .check-list-view .check-box:selected {
     -fx-padding: 0;

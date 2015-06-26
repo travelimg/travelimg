@@ -7,6 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
@@ -34,30 +35,31 @@ public class TagControlSkin extends SkinBase<TagControl> {
 
         applyButton = new Button();
         applyButton.getStyleClass().setAll("apply-button");
-        applyButton.setAlignment(Pos.CENTER_LEFT);
-        applyButton.setTextAlignment(TextAlignment.CENTER);
         applyButton.setGraphic(icon);
 
         label = new Label();
         label.getStyleClass().setAll("label");
-        label.setAlignment(Pos.CENTER_LEFT);
-        label.setTextAlignment(TextAlignment.LEFT);
 
         FontAwesomeIconView removeIcon = new FontAwesomeIconView();
+        removeIcon.getStyleClass().setAll("remove-icon");
         removeIcon.setGlyphName(REMOVE_BUTTON_GLYPH_NAME);
         removeIcon.setGlyphSize(20);
         removeIcon.setFill(Color.GRAY);
         removeButton = new Button();
-        removeButton.getStyleClass().setAll("remove");
-        removeButton.setAlignment(Pos.CENTER_RIGHT);
+        removeButton.getStyleClass().setAll("remove-button");
         removeButton.setGraphic(removeIcon);
         getChildren().add(removeButton);
 
-        HBox container = new HBox();
-        container.getChildren().addAll(applyButton, label, removeButton);
-        HBox.setHgrow(applyButton, Priority.ALWAYS);
-        HBox.setHgrow(label, Priority.ALWAYS);
-        HBox.setHgrow(removeButton, Priority.ALWAYS);
+        HBox left = new HBox();
+        left.getStyleClass().setAll("label-container");
+        left.getChildren().addAll(applyButton, label);
+        left.setAlignment(Pos.CENTER_LEFT);
+        HBox right = new HBox();
+        right.getChildren().addAll(removeButton);
+        right.setAlignment(Pos.CENTER_RIGHT);
+        BorderPane container = new BorderPane();
+        container.setLeft(left);
+        container.setRight(right);
         getChildren().add(container);
 
         // Register listeners.

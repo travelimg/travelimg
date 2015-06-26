@@ -4,6 +4,7 @@ package at.ac.tuwien.qse.sepm.gui.control;
 import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.entities.WikiPlaceInfo;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
+import at.ac.tuwien.qse.sepm.gui.util.BackgroundTask;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.WikipediaService;
 import javafx.collections.FXCollections;
@@ -19,6 +20,8 @@ import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class WikipediaInfoPane extends VBox {
@@ -74,16 +77,27 @@ public class WikipediaInfoPane extends VBox {
      */
     public void showWikipediaInfo(Place place) {
 
-        WikiPlaceInfo info;
+        BackgroundTask<WikiPlaceInfo> task = new BackgroundTask<WikiPlaceInfo>() {
+            @Override
+            public WikiPlaceInfo compute() throws ComputeException {
+                try {
+                    return wikipediaService.getWikiPlaceInfo(place);
+                } catch (ServiceException ex) {
+                    return new WikiPlaceInfo(place.getCity(), place.getCountry(),
+                            "Fehler beim Laden des Wikipedia Infos", null, null, null, null, null, null);
+                }
+            }
 
-        try {
-            info = wikipediaService.getWikiPlaceInfo(place);
+            @Override
+            public void onFinished(WikiPlaceInfo result) {
+                updatePane(result);
+            }
+        };
 
-        } catch (ServiceException ex) {
-            info = new WikiPlaceInfo(place.getCity(), place.getCountry(),
-                    "Fehler beim Laden des Wikipedia Infos", null, null, null, null, null, null);
-        }
+        (new Thread(task)).start();
+    }
 
+    public void updatePane(WikiPlaceInfo info) {
         placeLabel.setText(info.getPlaceName());
         countryLabel.setText(info.getCountryName());
         descriptionText.setText(info.getDescription());

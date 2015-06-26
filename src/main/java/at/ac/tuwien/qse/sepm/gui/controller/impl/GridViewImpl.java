@@ -23,10 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GridViewImpl implements GridView {
@@ -93,10 +90,12 @@ public class GridViewImpl implements GridView {
 
         // Updated photos that no longer match the filter are removed from the grid.
         inspector.setUpdateHandler(() -> {
-            inspector.getEntities().stream()
+            Collection<Photo> photos = inspector.getEntities();
+
+            photos.stream()
                     .filter(organizer.getUsedFilter().negate())
                     .forEach(grid::removePhoto);
-            inspector.getEntities().stream()
+            photos.stream()
                     .filter(organizer.getUsedFilter())
                     .forEach(grid::updatePhoto);
         });
@@ -210,9 +209,15 @@ public class GridViewImpl implements GridView {
 
         @Override public void onPresent(Menu sender) {
             FullscreenWindow fullscreen = new FullscreenWindow();
-            List<Photo> getSelectedPhoto = new ArrayList<>();
-            getSelectedPhoto.addAll(grid.getSelected());
-            fullscreen.present(grid.getPhotos(), getSelectedPhoto.get(0));
+
+            Set<Photo> selected = grid.getSelected();
+
+            Photo start = grid.getActivePhoto();
+            if (selected.size() == 1) {
+                start = selected.iterator().next();
+            }
+            
+            fullscreen.present(grid.getPhotos(), start);
         }
 
         @Override public void onFlickr(Menu sender) {

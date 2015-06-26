@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
-public class Photo implements Comparable<Photo>{
+public class Photo implements Comparable<Photo> {
 
     private Integer id;
     private Path file = Paths.get("");

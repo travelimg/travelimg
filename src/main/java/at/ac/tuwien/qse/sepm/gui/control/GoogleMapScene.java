@@ -23,8 +23,10 @@ public class GoogleMapScene extends VBox {
 
     private Consumer<LatLong> clickCallback = null;
     private Consumer<LatLong> doubleClickCallback = null;
+    private Consumer<LatLong> markerClickCallback = null;
 
     private Runnable onLoadedCallback = null;
+
 
     public GoogleMapScene() {
         webView = new WebView();
@@ -48,6 +50,9 @@ public class GoogleMapScene extends VBox {
 
     public void setDoubleClickCallback(Consumer<LatLong> doubleClickCallback) {
         this.doubleClickCallback = doubleClickCallback;
+    }
+    public void setMarkerClickCallback(Consumer<LatLong> markerClickCallback){
+        this.markerClickCallback = markerClickCallback;
     }
 
     public void center(LatLong position) {
@@ -110,6 +115,7 @@ public class GoogleMapScene extends VBox {
                 onLoadedCallback.run();
             }
         } else if (data.contains("click")) {
+
             String type = data.substring(0, data.indexOf("("));
             String params = data.substring(data.indexOf("(") + 1, data.indexOf(")"));
 
@@ -124,9 +130,14 @@ public class GoogleMapScene extends VBox {
                 double longitude = Double.parseDouble(latLng[1].trim());
 
                 if (type.equals("double-click") && doubleClickCallback != null) {
+
                     doubleClickCallback.accept(new LatLong(latitude, longitude));
+
+
                 } else if (type.equals("click") && clickCallback != null) {
                     clickCallback.accept(new LatLong(latitude, longitude));
+                } else if (type.equals("marker-click") && markerClickCallback != null) {
+                     markerClickCallback.accept(new LatLong(latitude,longitude));
                 }
             } catch (NumberFormatException ex) {
                 LOGGER.debug("Failed to parse click event from map");
