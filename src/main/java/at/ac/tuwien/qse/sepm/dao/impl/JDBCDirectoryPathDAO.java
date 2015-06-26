@@ -27,7 +27,7 @@ public class JDBCDirectoryPathDAO extends JDBCDAOBase implements DirectoryPathDA
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String READ_STATEMENT = "SELECT path from WorkspaceDirectory";
-    private static final String DELETE_STATEMENT = "DELETE FROM WorkspaceDirectories "
+    private static final String DELETE_STATEMENT = "DELETE FROM WorkspaceDirectory "
             + "WHERE path like ?";
 
     private SimpleJdbcInsert insertDirectory;
