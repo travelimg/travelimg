@@ -234,9 +234,9 @@ public class PaginatedImageGrid extends StackPane {
      * Calculate how many photos we can fit inside the page.
      */
     private void handleSizeChange(Object observable) {
-        // estimate tile size
+        // (over) estimate tile size
         int size = ImageSize.MEDIUM.pixels();
-        int tileSize = PADDING + GAP + size;
+        int tileSize = (int)Math.ceil(PADDING + GAP + 1.1 * size);
 
         int photosPerRow = (int) getWidth() / tileSize;
         int photosPerCol = (int) getHeight() / tileSize;
