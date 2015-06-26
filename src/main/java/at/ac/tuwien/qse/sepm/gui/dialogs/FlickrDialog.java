@@ -95,6 +95,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         this.ioHandler = ioHandler;
         this.sender = sender;
 
+        flickrService.reset();
         keywordTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
