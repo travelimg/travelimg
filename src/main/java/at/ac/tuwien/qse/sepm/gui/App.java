@@ -44,7 +44,7 @@ public class App extends Application {
         Parent root = loader.load(getClass().getClassLoader().getResourceAsStream("view/Main.fxml"));
 
         stage.setScene(new Scene(root));
-
+        
         // maximize the stage to fill the available screen space
         int width = (int) Screen.getPrimary().getVisualBounds().getWidth();
         int height = (int)Screen.getPrimary().getVisualBounds().getHeight();
