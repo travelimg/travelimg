@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
 import java.nio.file.Path;
 
 public class WorkspaceServiceImpl implements WorkspaceService{
@@ -23,9 +24,14 @@ public class WorkspaceServiceImpl implements WorkspaceService{
      * @throws ServiceException if an Exception on persistence layer causes the operation to fail
      */
     @Override public void addDirectory(Path path) throws ServiceException {
-        LOGGER.debug("Adding directory {}", path);
+        LOGGER.debug("Adding directory to workspace: {}", path);
 
-        //if (path.to)
+        if (!isValid(path)) {
+            LOGGER.error("Path is not an existing directory: {}", path);
+            throw new ServiceException("Invalid path for directory.");
+        }
+
+        watcher.register(path);
     }
 
     /**
@@ -42,6 +48,33 @@ public class WorkspaceServiceImpl implements WorkspaceService{
      * @throws ServiceException if an Exception on persistence layer causes the operation to fail
      */
     @Override public void removeDirectory(Path path) throws ServiceException {
+        LOGGER.debug("Removing directory from workspace: {}", path);
 
+        if (!isValid(path)) {
+            LOGGER.error("Path is not an existing directory: {}", path);
+            throw new ServiceException("Invalid path for directory.");
+        }
+
+        watcher.unregister(path);
+    }
+
+    /**
+     * Checks if <tt>path</tt> represents an existing directory.
+     *
+     * @param path Path to be checked
+     * @return true iff <tt>path</tt> represents an existing directory
+     */
+    private boolean isValid(Path path) {
+        if (path == null) {
+            return false;
+        }
+
+        File pathFile = path.toFile();
+
+        if (!pathFile.exists() || !pathFile.isDirectory()) {
+            return false;
+        }
+
+        return true;
     }
 }
