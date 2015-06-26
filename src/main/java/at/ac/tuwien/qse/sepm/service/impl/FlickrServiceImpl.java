@@ -199,13 +199,15 @@ public class FlickrServiceImpl implements FlickrService {
                     if (!p.getOriginalSecret().isEmpty() && !p.getSecret().isEmpty()) {
                         String mediumSizeUrl = "https://farm" + p.getFarm() + ".staticflickr.com/" + p.getServer() + "/" + p.getId() + "_" + p.getSecret() + "_z." + p.getOriginalFormat();
                         GeoData geoData = flickr.getPhotosInterface().getGeoInterface().getLocation(p.getId());
+                        Photo photoWIthTags = flickr.getTagsInterface().getListPhoto(p.getId());
+                        p.setTags(photoWIthTags.getTags());
                         p.setGeoData(geoData);
                         downloadPhotoFromFlickr(mediumSizeUrl, p.getId(), p.getOriginalFormat());
                         if(!isRunning()){
                             logger.debug("Download interrupted");
                             break;
                         }
-                        logger.debug("Downloaded photo {}", p.getId());
+                        logger.debug("Downloaded photo id={}, geodata=[{},{}], tags={}", p.getId(),p.getGeoData().getLatitude(),p.getGeoData().getLongitude(),p.getTags());
                         callback.accept(p);
                         progressCallback.accept((double) nrOfDownloadedPhotos / (double) nrOfPhotosToDownload);
                         nrOfDownloadedPhotos++;
