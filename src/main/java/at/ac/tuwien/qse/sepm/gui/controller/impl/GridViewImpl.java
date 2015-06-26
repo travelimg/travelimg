@@ -79,10 +79,12 @@ public class GridViewImpl implements GridView {
 
         // Updated photos that no longer match the filter are removed from the grid.
         inspector.setUpdateHandler(() -> {
-            inspector.getEntities().stream()
+            Collection<Photo> photos = inspector.getEntities();
+
+            photos.stream()
                     .filter(organizer.getUsedFilter().negate())
                     .forEach(grid::removePhoto);
-            inspector.getEntities().stream()
+            photos.stream()
                     .filter(organizer.getUsedFilter())
                     .forEach(grid::updatePhoto);
         });
@@ -132,27 +134,6 @@ public class GridViewImpl implements GridView {
         });
     }
 
-
-    /**
-     * Called whenever a new photo is imported
-     *
-     * @param photo The newly imported    photo
-     */
-    private void handleImportedPhoto(Photo photo) {
-        // queue an update in the main gui
-        Platform.runLater(() -> {
-            disableReload = true;
-
-            // Ignore photos that are not part of the current filter.
-            if (!organizer.getUsedFilter().test(photo)) {
-                disableReload = false;
-                return;
-            }
-            grid.addPhoto(photo);
-
-            disableReload = false;
-        });
-    }
 
     private void handleFilterChange() {
         if (!disableReload)

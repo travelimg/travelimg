@@ -403,7 +403,7 @@
 .filter-list .header {
     -fx-background-color: -tmg-bg2;
     -fx-font-size: 16;
-    -fx-padding: 4px 12px;
+    -fx-padding: 8px 12px;
 }
 .filter-list .header .label {
     -fx-text-fill: -tmg-text;
@@ -1047,4 +1047,12 @@
 }
 .journey-entry {
     -fx-spacing: 10px;
+}
+
+.date-picker-popup > * > .spinner > .label {
+    -fx-text-fill: black;
+}
+
+.date-picker-popup > * > .date-cell {
+    -fx-text-fill: black;
 }

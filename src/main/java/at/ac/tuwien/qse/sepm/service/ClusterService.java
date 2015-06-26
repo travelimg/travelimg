@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.entities.Place;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public interface ClusterService {
 
@@ -62,4 +63,16 @@ public interface ClusterService {
      * @throws ServiceException If cluster-service fails due to database errors.
      */
     List<Place> clusterJourney(Journey journey) throws ServiceException;
+
+    /**
+     * Subscribe a callback to refresh places
+     * @param callback
+     */
+    void subscribePlaceChanged(Consumer<Place> callback);
+
+    /**
+     * Subscribe a callback to refresh journeys
+     * @param callback
+     */
+    void subscribeJourneyChanged(Consumer<Journey> callback);
 }

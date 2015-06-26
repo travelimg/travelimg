@@ -82,10 +82,7 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
         slideshowsCombobox.setConverter(new SlideshowStringConverter());
         slideshowsCombobox.setItems(slideshowView.getSlideshows());
 
-        ratingPicker.setRatingChangeHandler(r -> {
-            getEntities().forEach(this::saveRating);
-            onUpdate();
-        });
+        ratingPicker.setRatingChangeHandler(r -> getEntities().forEach(this::saveRating));
 
         mapScene.setClickCallback((position) -> {
             if (!changeCoordinatesButton.isSelected()) {
@@ -103,10 +100,7 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
             updateMap(getEntities());
         });
 
-        tagPicker.setOnUpdate(() -> {
-            getEntities().forEach(this::saveTags);
-            onUpdate();
-        });
+        tagPicker.setOnUpdate(() -> getEntities().forEach(this::saveTags));
 
         tagField.setOnAction(() -> {
             String value = tagField.getText();
@@ -176,6 +170,8 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
         LOGGER.debug("setting photo rating from {} to {}", oldRating, rating);
         photo.getData().setRating(rating);
         savePhoto(photo);
+
+        onUpdate();
     }
     private void saveTags(Photo photo) {
         LOGGER.debug("updating tags of {}", photo);
@@ -196,6 +192,7 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
         photo.getData().getTags().clear();
         newTags.forEach(tag -> photo.getData().getTags().add(new Tag(null, tag)));
         savePhoto(photo);
+        onUpdate();
     }
     private void savePhoto(Photo photo) {
         try {

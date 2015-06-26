@@ -25,16 +25,20 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String BASE_UPDATE_STATEMENT = "UPDATE SLIDE SET slideshow_id = ?, orderposition = ?, caption = ? WHERE id = ?;";
+    private static final String BASE_DELETE_STATEMENT = "DELETE FROM Slide WHERE id = ?;";
     private static final String MAP_INSERT_STATEMENT = "INSERT INTO MapSlide(id, latitude, longitude, zoomLevel) VALUES(?, ?, ?, ?)";
     private static final String MAP_UPDATE_STATEMENT = "UPDATE MapSlide SET latitude = ?, longitude = ?, zoomLevel = ?  WHERE id = ?;";
     private static final String MAP_DELETE_STATEMENT = "DELETE FROM MapSlide where id = ?;";
     private static final String MAP_READ_ALL_BY_SLIDESHOW_STATEMENT = "SELECT Slide.id, slideshow_id, orderposition, caption, latitude, longitude, zoomLevel FROM MapSlide JOIN Slide ON MapSlide.id = Slide.id WHERE slideshow_id=? ORDER BY orderposition asc;";
     private static final String TITLE_INSERT_STATEMENT = "INSERT INTO TitleSlide(id, color) VALUES(?, ?)";
     private static final String TITLE_UPDATE_STATEMENT = "UPDATE TitleSlide SET color = ?  WHERE id = ?;";
+    private static final String TITLE_DELETE_STATEMENT = "DELETE FROM TitleSlide where id = ?;";
     private static final String TITLE_READ_ALL_BY_SLIDESHOW_STATEMENT = "SELECT Slide.id, slideshow_id, orderposition, caption, color FROM TitleSlide JOIN Slide ON TitleSlide.id = Slide.id WHERE slideshow_id=? ORDER BY orderposition asc;";
     private static final String PHOTO_INSERT_STATEMENT = "INSERT INTO PhotoSlide(id, photo_id) VALUES(?, ?)";
     private static final String PHOTO_UPDATE_STATEMENT = "UPDATE PhotoSlide SET photo_id = ?  WHERE id = ?;";
     private static final String PHOTO_READ_ALL_BY_SLIDESHOW_STATEMENT = "SELECT Slide.id, slideshow_id, orderposition, caption, photo_id FROM PhotoSlide JOIN Slide ON PhotoSlide.id = Slide.id WHERE slideshow_id=? ORDER BY orderposition asc;";
+    private static final String PHOTO_READ_ALL_BY_PHOTO = "SELECT id FROM PhotoSlide WHERE photo_id = ?;";
+    private static final String PHOTO_DELETE_STATEMENT = "DELETE FROM PhotoSlide where id = ?;";
 
     @Autowired private PhotoDAO photoDAO;
 
@@ -128,14 +132,51 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
 
     @Override public void delete(PhotoSlide slide) throws DAOException, ValidationException {
         LOGGER.debug("Deleting slide {}", slide);
+
+        try {
+            jdbcTemplate.update(PHOTO_DELETE_STATEMENT, slide.getId());
+            deleteBase(slide);
+        } catch (DataAccessException e) {
+            throw new DAOException("Failed to delete slide", e);
+        }
     }
 
     @Override public void delete(MapSlide slide) throws DAOException, ValidationException {
         LOGGER.debug("Deleting slide {}", slide);
+
+        try {
+            jdbcTemplate.update(MAP_DELETE_STATEMENT, slide.getId());
+            deleteBase(slide);
+        } catch (DataAccessException e) {
+            throw new DAOException("Failed to delete slide", e);
+        }
     }
 
     @Override public void delete(TitleSlide slide) throws DAOException, ValidationException {
         LOGGER.debug("Deleting slide {}", slide);
+
+        try {
+            jdbcTemplate.update(TITLE_DELETE_STATEMENT, slide.getId());
+            deleteBase(slide);
+        } catch (DataAccessException e) {
+            throw new DAOException("Failed to delete slide", e);
+        }
+    }
+
+    @Override public void deleteAllSlidesWithPhoto(Photo photo) throws DAOException {
+        LOGGER.debug("Deleting slides with {}", photo);
+
+        try {
+            List<Integer> ids = jdbcTemplate.query(PHOTO_READ_ALL_BY_PHOTO, (rs, rowNum) -> {
+                return rs.getInt(1);
+            }, photo.getId());
+
+            for (int id : ids) {
+                delete(new PhotoSlide(id, null, null, null, null));
+            }
+        } catch (ValidationException ex) {
+            throw new DAOException("Failed to delete photo", ex);
+        }
     }
 
     @Override public List<PhotoSlide> getPhotoSlidesForSlideshow(int slideshowId)
@@ -202,6 +243,16 @@ public class JDBCSlideDAO extends JDBCDAOBase implements SlideDAO {
         } catch (DataAccessException ex) {
             logger.error("Failed to update slide", ex);
             throw new DAOException("Failed to update slide", ex);
+        }
+    }
+
+    private void deleteBase(Slide slide) throws DAOException, ValidationException {
+        logger.debug("Deleting slide {}", slide);
+
+        try {
+            jdbcTemplate.update(BASE_DELETE_STATEMENT, slide.getId());
+        } catch (DataAccessException ex) {
+            throw new DAOException("Failed to delete slide", ex);
         }
     }
 

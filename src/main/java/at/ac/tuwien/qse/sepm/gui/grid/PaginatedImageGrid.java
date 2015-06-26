@@ -42,6 +42,8 @@ public class PaginatedImageGrid extends StackPane {
         activePageProperty.addListener(this::handlePageChange);
         setAlignment(Pos.CENTER);
 
+        getChildren().add(getPage(0)); // set the initial page
+
         menu.addListener(new PageSwitchListener());
     }
 
@@ -55,18 +57,14 @@ public class PaginatedImageGrid extends StackPane {
      * @param photos The photos to show in the grid
      */
     public void setPhotos(List<Photo> photos) {
-        int oldPageCount = calculatePageCount();
+        LOGGER.debug("setPhotos {}", photos);
         this.photos = photos;
-        int newPageCount = calculatePageCount();
 
         pageCache.clear();
 
         // set the new page count
-        menu.setPageCount(newPageCount);
-
-        if (oldPageCount == newPageCount) {
-            updatePage();
-        }
+        menu.setPageCount(calculatePageCount());
+        updatePage();
     }
 
     /**
@@ -75,22 +73,19 @@ public class PaginatedImageGrid extends StackPane {
      * @param photo The photo to be added
      */
     public void addPhoto(Photo photo) {
-        int oldPageCount = calculatePageCount();
-
-        photos.add(photo);
-
-        photos = photos.stream()
-                .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
-                .collect(Collectors.toList());
-
-        int newPageCount = calculatePageCount();
-
-        pageCache.clear();
-        menu.setPageCount(newPageCount);
-
-        if (oldPageCount == newPageCount) {
-            updatePage();
+        // insert sorted
+        int index = 0;
+        for (Photo p : photos) {
+            if (p.getData().getDatetime().isBefore(photo.getData().getDatetime())) {
+                photos.add(index, photo);
+                setPhotos(photos);
+                return;
+            }
         }
+
+        // photo is the oldest, insert at end
+        photos.add(photo);
+        setPhotos(photos);
     }
 
     public void setSelectionChangeAction(Consumer<Set<Photo>> selectionChangeAction) {
@@ -109,15 +104,6 @@ public class PaginatedImageGrid extends StackPane {
 
         return activePageProperty.get().getActivePhoto();
 
-    }
-
-    public boolean containsPhoto(Photo photo) {
-        for (Photo p : photos) {
-            if (photo.getPath().equals(p.getPath())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -167,22 +153,27 @@ public class PaginatedImageGrid extends StackPane {
      * @param photo The photo to be updated.
      */
     public void updatePhoto(Photo photo) {
-        if (!containsPhoto(photo)) {
-            LOGGER.debug("photo not in grid {}", photo);
+        int index = 0;
+        boolean found = false;
+
+        for (Photo p : photos) {
+            if (p.getPath().equals(photo.getPath())) {
+                found = true;
+                break;
+            }
+            index++;
+        }
+
+        if (!found) {
+            LOGGER.debug("Photo not in grid {}", photo);
             addPhoto(photo);
             return;
         }
+
         ImageGridPage page = getPageForPhoto(photo);
         page.updatePhoto(photo);
 
         // update photo in list
-        int index = 0;
-        for (Photo p : photos) {
-            if (p.getId().equals(photo.getId()))
-                break;
-            index++;
-        }
-
         photos.set(index, photo);
     }
 
@@ -239,9 +230,9 @@ public class PaginatedImageGrid extends StackPane {
      * Calculate how many photos we can fit inside the page.
      */
     private void handleSizeChange(Object observable) {
-        // estimate tile size
+        // (over) estimate tile size
         int size = ImageSize.MEDIUM.pixels();
-        int tileSize = PADDING + GAP + size;
+        int tileSize = (int)Math.ceil(PADDING + GAP + 1.1 * size);
 
         int photosPerRow = (int) getWidth() / tileSize;
         int photosPerCol = (int) getHeight() / tileSize;
@@ -276,8 +267,7 @@ public class PaginatedImageGrid extends StackPane {
     private void updatePage() {
         ImageGridPage page = getPage(menu.getCurrentPage());
 
-        getChildren().clear();
-        getChildren().add(page);
+        getChildren().set(0, page);
     }
 
     private class PageSwitchListener implements Menu.Listener {
