@@ -50,7 +50,6 @@ public class JdbcPhotoCache implements PhotoCache {
         photo.getData().setJourney(save(photo.getData().getJourney()));
         Set<Tag> tags = new HashSet<>(photo.getData().getTags());
         photo.getData().getTags().clear();
-        photoTagDAO.deleteAllEntriesOfSpecificPhoto(photo);
         for (Tag t : tags) {
             Tag tag = save(t);
             photo.getData().getTags().add(tag);

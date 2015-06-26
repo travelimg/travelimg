@@ -114,7 +114,7 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
                         }
                     });
         } catch (DataAccessException e) {
-            logger.error("failed to read tag {}", e);
+            logger.error("Failed to read a tag", e);
             throw new DAOException("Failed to read a Tag", e);
         }
     }

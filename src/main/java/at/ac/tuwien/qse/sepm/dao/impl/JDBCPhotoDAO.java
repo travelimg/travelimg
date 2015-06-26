@@ -127,7 +127,7 @@ public class JDBCPhotoDAO extends JDBCDAOBase implements PhotoDAO {
             int id = photo.getId();
             photoTagDAO.deleteAllEntriesOfSpecificPhoto(photo);
             jdbcTemplate.update(DELETE_STATEMENT, id);
-        } catch (DataAccessException e) {
+        } catch (DataAccessException | ValidationException e) {
             throw new DAOException("Failed to delete photo", e);
         }
     }

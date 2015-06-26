@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao;
 
-import at.ac.tuwien.qse.sepm.entities.*;
+import at.ac.tuwien.qse.sepm.entities.Slide;
+import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 
 import java.util.List;
@@ -8,21 +9,25 @@ import java.util.List;
 /**
  * Created by mb on 08.06.15.
  */
-public interface SlideDAO{
+public interface SlideDAO<S extends Slide> {
 
-    PhotoSlide create(PhotoSlide slide) throws DAOException, ValidationException;
-    MapSlide create(MapSlide slide) throws DAOException, ValidationException;
-    TitleSlide create(TitleSlide slide) throws DAOException, ValidationException;
+    /**
+     * Insert the photo wich is addedTo the specified Slideshow
+     * @param slide
+     * @throws DAOException
+     * @throws ValidationException
+     */
+    S create(S slide) throws DAOException, ValidationException;
 
-    PhotoSlide update(PhotoSlide slide) throws DAOException, ValidationException;
-    MapSlide update(MapSlide slide) throws DAOException, ValidationException;
-    TitleSlide update(TitleSlide slide) throws DAOException, ValidationException;
+    /**
+     * Delete the photo from the slide
+     * @param slide
+     * @throws DAOException
+     * @throws ValidationException
+     */
+    void delete(S slide) throws DAOException, ValidationException;
 
-    void delete(PhotoSlide slide) throws DAOException, ValidationException;
-    void delete(MapSlide slide) throws DAOException, ValidationException;
-    void delete(TitleSlide slide) throws DAOException, ValidationException;
+    S update(S slide) throws DAOException, ValidationException;
 
-    List<PhotoSlide> getPhotoSlidesForSlideshow(int slideshowId) throws DAOException;
-    List<MapSlide> getMapSlidesForSlideshow(int slideshowId) throws DAOException;
-    List<TitleSlide> getTitleSlidesForSlideshow(int slideshowId) throws DAOException;
+    List<S> getSlidesForSlideshow(int slideshowId) throws DAOException, ValidationException;
 }

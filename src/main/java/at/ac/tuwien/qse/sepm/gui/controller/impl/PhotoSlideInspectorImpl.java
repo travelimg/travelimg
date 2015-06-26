@@ -6,11 +6,13 @@ import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
 import javafx.beans.Observable;
-import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Collection;
 
 public class PhotoSlideInspectorImpl extends SlideInspectorImpl<PhotoSlide> {
 
@@ -18,8 +20,6 @@ public class PhotoSlideInspectorImpl extends SlideInspectorImpl<PhotoSlide> {
     private InspectorPane root;
     @FXML
     private TextField captionField;
-    @FXML
-    private Button deleteButton;
 
     @Autowired
     private SlideService slideService;
@@ -27,42 +27,32 @@ public class PhotoSlideInspectorImpl extends SlideInspectorImpl<PhotoSlide> {
     @FXML
     private void initialize() {
         captionField.textProperty().addListener(this::handleCaptionChange);
-        deleteButton.setOnAction(this::handleDelete);
+    }
+
+    public void setPreview(Node node) {
+
     }
 
     @Override
-    public void setSlide(PhotoSlide slide) {
-        super.setSlide(slide);
+    public void setEntities(Collection<PhotoSlide> entities) {
+        super.setEntities(entities);
 
-        captionField.setText(slide.getCaption());
+        if (getEntities().size() > 0) {
+            PhotoSlide slide = getEntities().iterator().next();
+            captionField.setText(slide.getCaption());
+        }
     }
 
     private void handleCaptionChange(Observable observable) {
-        PhotoSlide slide = getSlide();
-
-        if (slide == null) {
+        if (getEntities().size() == 0) {
             return;
         }
 
+        PhotoSlide slide = getEntities().iterator().next();
         slide.setCaption(captionField.getText());
 
         try {
             slideService.update(slide);
-            onUpdate();
-        } catch (ServiceException ex) {
-            ErrorDialog.show(root, "Fehler beim Ändern des Textes", "");
-        }
-    }
-
-    private void handleDelete(Event event) {
-        PhotoSlide slide = getSlide();
-
-        if (slide == null) {
-            return;
-        }
-
-        try {
-            slideService.delete(slide);
             onUpdate();
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Ändern des Textes", "");

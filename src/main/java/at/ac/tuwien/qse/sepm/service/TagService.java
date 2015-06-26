@@ -30,6 +30,15 @@ public interface TagService {
     void delete(Tag tag) throws ServiceException;
 
     /**
+     * Retrieve an existing Tag
+     *
+     * @param tag Specifies which Tag to retrieve by providing the name.
+     * @return the Tag-Objekt
+     * @throws ServiceException If the Tag can not be retrieved or the data store fails to select the record.
+     */
+    Tag readName(Tag tag) throws ServiceException;
+
+    /**
      * Return a list of all existing tags.
      *
      * @return the list of all available tags

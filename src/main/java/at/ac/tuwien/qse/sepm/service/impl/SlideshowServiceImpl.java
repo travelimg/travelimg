@@ -29,7 +29,7 @@ public class SlideshowServiceImpl implements SlideshowService {
     private SlideshowDAO slideshowDAO;
 
     @Autowired
-    private SlideDAO slideDAO;
+    private SlideDAO<PhotoSlide> photoSlideDAO;
 
     @Override
     public Slideshow create(Slideshow slideshow) throws ServiceException {
@@ -75,15 +75,15 @@ public class SlideshowServiceImpl implements SlideshowService {
     @Override
     public List<Slide> addPhotosToSlideshow(List<Photo> photos, Slideshow slideshow) throws ServiceException {
         List<Slide> slides = new ArrayList<>();
-        int order = slideshow.getAllSlides().size() + 1;
+        int order = slideshow.getSlides().size() + 1;
 
         try {
             for (Photo photo : photos) {
                 PhotoSlide slide = new PhotoSlide(-1, slideshow.getId(), order, "", photo);
-                slide = slideDAO.create(slide);
+                slide = photoSlideDAO.create(slide);
 
                 slides.add(slide);
-                slideshow.getPhotoSlides().add(slide);
+                slideshow.getSlides().add(slide);
                 order++;
             }
         } catch (DAOException | ValidationException ex) {

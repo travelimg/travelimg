@@ -1,22 +1,22 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 import at.ac.tuwien.qse.sepm.entities.MapSlide;
-import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.control.InspectorPane;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
+import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
 import javafx.beans.Observable;
-import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Slider;
+import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Collection;
 
 public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
 
@@ -30,10 +30,6 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
     private GoogleMapScene map;
     @FXML
     private ToggleButton chooseLocationButton;
-    @FXML
-    private Slider zoomSlider;
-    @FXML
-    private Button deleteButton;
 
     @Autowired
     private SlideService slideService;
@@ -41,30 +37,30 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
     @FXML
     private void initialize() {
         captionField.textProperty().addListener(this::handleCaptionChange);
-        zoomSlider.valueProperty().addListener(this::handleZoomChange);
 
         map.setClickCallback(this::handleMapClicked);
-        deleteButton.setOnAction(this::handleDelete);
+    }
+
+    public void setPreview(Node node) {
+
     }
 
     @Override
-    public void setSlide(MapSlide slide) {
-        super.setSlide(slide);
+    public void setEntities(Collection<MapSlide> entities) {
+        super.setEntities(entities);
 
-        captionField.setText(slide.getCaption());
-        zoomSlider.setValue(slide.getZoomLevel());
+        if (getEntities().size() > 0) {
+            MapSlide slide = getEntities().iterator().next();
+            captionField.setText(slide.getCaption());
 
-        map.clear();
-        map.addMarker(new LatLong(slide.getLatitude(), slide.getLongitude()));
-        map.center(new LatLong(slide.getLatitude(), slide.getLongitude()));
+            map.clear();
+            map.addMarker(new LatLong(slide.getLatitude(), slide.getLongitude()));
+            map.center(new LatLong(slide.getLatitude(), slide.getLongitude()));
+        }
     }
 
     private void updateCoordinates(double latitude, double longitude) {
-        MapSlide slide = getSlide();
-
-        if (slide == null) {
-            return;
-        }
+        MapSlide slide = getEntities().iterator().next();
 
         slide.setLatitude(latitude);
         slide.setLongitude(longitude);
@@ -82,30 +78,12 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
     }
 
     private void handleCaptionChange(Observable observable) {
-        MapSlide slide = getSlide();
-
-        if (slide == null) {
+        if (getEntities().size() == 0) {
             return;
         }
 
+        MapSlide slide = getEntities().iterator().next();
         slide.setCaption(captionField.getText());
-
-        try {
-            slideService.update(slide);
-            onUpdate();
-        } catch (ServiceException ex) {
-            ErrorDialog.show(root, "Fehler beim Ändern des Textes", "");
-        }
-    }
-
-    private void handleZoomChange(Observable observable) {
-        MapSlide slide = getSlide();
-
-        if (slide == null) {
-            return;
-        }
-
-        slide.setZoomLevel((int)zoomSlider.getValue());
 
         try {
             slideService.update(slide);
@@ -120,21 +98,6 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
             updateCoordinates(position.getLatitude(), position.getLongitude());
 
             chooseLocationButton.setSelected(false);
-        }
-    }
-
-    private void handleDelete(Event event) {
-        MapSlide slide = getSlide();
-
-        if (slide == null) {
-            return;
-        }
-
-        try {
-            slideService.delete(slide);
-            onUpdate();
-        } catch (ServiceException ex) {
-            ErrorDialog.show(root, "Fehler beim Ändern des Textes", "");
         }
     }
 }

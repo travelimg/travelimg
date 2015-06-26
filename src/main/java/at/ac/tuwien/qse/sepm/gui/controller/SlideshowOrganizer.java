@@ -8,7 +8,6 @@ import java.util.function.Consumer;
 public interface SlideshowOrganizer {
 
     void setAddAction(Consumer<Slideshow> callback);
-    void setDeleteAction(Consumer<Slideshow> callback);
     void setPresentAction(Runnable callback);
 
 }

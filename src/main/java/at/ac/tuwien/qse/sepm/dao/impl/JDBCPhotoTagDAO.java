@@ -121,8 +121,9 @@ public class JDBCPhotoTagDAO extends JDBCDAOBase implements PhotoTagDAO {
      */
     @Override
     public void deleteAllEntriesOfSpecificPhoto(Photo photo)
-            throws DAOException {
+            throws DAOException, ValidationException {
         if (photo == null) throw new IllegalArgumentException();
+        if (photo.getId() == null) throw new IllegalArgumentException();
         LOGGER.debug("Entering deleteAllEntriesOfSpecificPhoto with {}", photo);
 
         try {

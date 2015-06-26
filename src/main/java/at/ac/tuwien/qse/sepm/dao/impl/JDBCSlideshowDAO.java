@@ -31,7 +31,7 @@ public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
     private SimpleJdbcInsert insertSlideshow;
 
     @Autowired
-    private SlideDAO slideDAO;
+    private SlideDAO<Slide> slideDAO;
 
     @Override
     @Autowired
@@ -112,17 +112,18 @@ public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
             int slideshowId = rs.getInt(1);
             List<Slide> slides;
 
-            Slideshow slideshow = new Slideshow(slideshowId, rs.getString(2), rs.getDouble(3));
-
             try {
-                slideshow.getPhotoSlides().addAll(slideDAO.getPhotoSlidesForSlideshow(slideshowId));
-                slideshow.getMapSlides().addAll(slideDAO.getMapSlidesForSlideshow(slideshowId));
-                slideshow.getTitleSlides().addAll(slideDAO.getTitleSlidesForSlideshow(slideshowId));
-            } catch (DAOException ex) {
+                slides = slideDAO.getSlidesForSlideshow(slideshowId);
+            } catch (DAOException | ValidationException ex) {
                 throw new DAOException.Unchecked("Failed to retrieve slides for given slideshow", ex);
             }
 
-            return slideshow;
+            return new Slideshow(
+                    slideshowId,
+                    rs.getString(2),
+                    rs.getDouble(3),
+                    slides
+            );
         }
     }
 }

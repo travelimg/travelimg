@@ -21,7 +21,6 @@ import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Collection;
 import java.util.List;
 
 
@@ -97,22 +96,15 @@ public class PresentationWindow extends StackPane {
     }
 
     private void showNextSlide(ActionEvent event) {
-        if (activeIndex == slideshow.getAllSlides().size() - 1)
+        if (activeIndex == slideshow.getSlides().size() - 1)
             return;
 
-        activeIndex = Math.min(slideshow.getAllSlides().size() - 1, activeIndex + 1);
+        activeIndex = Math.min(slideshow.getSlides().size() - 1, activeIndex + 1);
         loadSlide();
     }
 
-    private Slide getCurrentSlide() {
-        return slideshow.getAllSlides().stream()
-                .filter(slide -> slide.getOrder().equals(activeIndex + 1))
-                .findFirst()
-                .orElse(null);
-    }
-
     private void loadSlide() {
-        Collection<Slide> slides = slideshow.getAllSlides();
+        List<Slide> slides = slideshow.getSlides();
         if (slides.size() == 0 || slides.size() <= activeIndex) {
             // out of bounds
             return;
@@ -121,7 +113,7 @@ public class PresentationWindow extends StackPane {
         int width = (int)Screen.getPrimary().getVisualBounds().getWidth();
         int height = (int)Screen.getPrimary().getVisualBounds().getHeight();
 
-        SlideView slideView = SlideView.of(getCurrentSlide(), width, height);
+        SlideView slideView = SlideView.of(slides.get(activeIndex), width, height);
 
         getChildren().clear();
         getChildren().add(slideView);
