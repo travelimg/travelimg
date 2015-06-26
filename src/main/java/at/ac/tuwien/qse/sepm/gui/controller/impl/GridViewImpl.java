@@ -11,6 +11,7 @@ import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.util.IOHandler;
 import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.input.*;
@@ -20,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,6 +55,8 @@ public class GridViewImpl implements GridView {
     private IOHandler ioHandler;
     @Autowired
     private ExifService exifService;
+    @Autowired
+    private WorkspaceService workspaceService;
 
     @FXML
     private StackPane root;
@@ -184,7 +188,13 @@ public class GridViewImpl implements GridView {
         boolean success = dragboard.hasFiles();
         if (success) {
             dragboard.getFiles().forEach(f -> LOGGER.debug("dropped file {}", f));
-            // TODO: add folders to workspace
+            for (File file : dragboard.getFiles()) {
+                try {
+                    workspaceService.addDirectory(file.toPath());
+                } catch (ServiceException ex) {
+                    LOGGER.error("Couldn't add directory {}");
+                }
+            }
         }
         event.setDropCompleted(success);
         event.consume();

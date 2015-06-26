@@ -6,10 +6,7 @@ import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
-import at.ac.tuwien.qse.sepm.service.ClusterService;
-import at.ac.tuwien.qse.sepm.service.PhotographerService;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.service.TagService;
+import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
 import javafx.fxml.FXML;
@@ -29,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,6 +42,7 @@ public class OrganizerImpl implements Organizer {
     @Autowired private ClusterService clusterService;
     @Autowired private Inspector<Photo> inspectorController;
     @Autowired private TagService tagService;
+    @Autowired private WorkspaceService workspaceService;
 
     @FXML private BorderPane root;
     @FXML private VBox filterContainer;
@@ -149,9 +148,20 @@ public class OrganizerImpl implements Organizer {
     private void folderViewClicked() {
         LOGGER.debug("Switch view");
         filterContainer.getChildren().clear();
+        Collection<Path> workspaceDirectories;
+        try {
+            workspaceDirectories = workspaceService.getDirectories();
+        } catch (ServiceException ex) {
+            workspaceDirectories = new LinkedList<>();
+        }
 
-        Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
-        findFiles(rootDirectories.toFile(), null);
+        FilePathTreeItem root = new FilePathTreeItem(Paths.get("workspace"));
+        root.setExpanded(true);
+        filesTree.setRoot(root);
+        filesTree.setShowRoot(false);
+        for (Path dirPath : workspaceDirectories) {
+            findFiles(dirPath.toFile(), root);
+        }
 
         filterContainer.getChildren().addAll(buttonBox, filesTree);
         VBox.setVgrow(filesTree, Priority.ALWAYS);
