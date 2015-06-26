@@ -72,6 +72,7 @@
     <bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
     <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl" destroy-method="close"></bean>
     <bean id="wikipediaService" class="at.ac.tuwien.qse.sepm.service.impl.WikipediaServiceImpl"></bean>
+    <bean id="workspaceService" class="at.ac.tuwien.qse.sepm.service.impl.WorkspaceServiceImpl"></bean>
     <bean id="slideService" class="at.ac.tuwien.qse.sepm.service.impl.SlideServiceImpl"></bean>
     <bean id="slideshowService" class="at.ac.tuwien.qse.sepm.service.impl.SlideshowServiceImpl"></bean>
 
