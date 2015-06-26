@@ -51,7 +51,6 @@ import java.io.FileNotFoundException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photos.Photo>> {
@@ -152,7 +151,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         importButton.setOnAction(e -> handleImport());
         searchButton.setOnAction(e -> handleSearch());
         fullscreenButton.setOnAction(e -> handleFullscreen());
-        resetButton.setOnAction(e -> handleReset());
+        resetButton.setOnAction(e -> handleStop());
     }
 
     private void dropMarker(LatLong ll) {
@@ -254,8 +253,10 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         keywordTextField.clear();
         fullscreenButton.setDisable(true);
         progressIndicator.setVisible(false);
-        if (searchTask != null)
+        if (searchTask != null){
             searchTask.cancel();
+            logger.debug("Canceling the download...");
+        }
     }
 
     private void handleImport() {
@@ -317,13 +318,11 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     }
 
     private void handleStop() {
-        ConfirmationDialog confirmationDialog = new ConfirmationDialog(borderPane, "Download abbrechen", "Download abbrechen?");
-        Optional<Boolean> confirmed = confirmationDialog.showForResult();
-        if (!confirmed.isPresent() || !confirmed.get()) return;
-        logger.debug("Canceling the download...");
-        if (searchTask != null)
-            searchTask.cancel();
-
+        //ConfirmationDialog confirmationDialog = new ConfirmationDialog(borderPane, "Download abbrechen", "Download abbrechen?");
+        //Optional<Boolean> confirmed = confirmationDialog.showForResult();
+        //if (!confirmed.isPresent() || !confirmed.get()) return;
+        handleReset();
+        close();
     }
 
     /**
