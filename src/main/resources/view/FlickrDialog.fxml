@@ -24,7 +24,7 @@
                         <VBox spacing="5.0" maxWidth="300" maxHeight="350">
                             <children>
                                 <Label text="Doppelklick um Ort zu wählen" />
-                                <GoogleMapScene fx:id="mapScene" maxHeight="250" prefHeight="250"/>
+                                <GoogleMapScene fx:id="mapScene" maxHeight="250"/>
                                 <Label text="Suchbegriffe" />
                                 <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" prefHeight="150" style="-fx-background-color: -tmg-bg0">
                                     <content>
