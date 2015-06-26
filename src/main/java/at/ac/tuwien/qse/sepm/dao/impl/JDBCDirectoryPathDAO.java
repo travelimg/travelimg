@@ -45,9 +45,8 @@ public class JDBCDirectoryPathDAO extends JDBCDAOBase implements DirectoryPathDA
      *
      * @param directory must be a valid path to an existing directory
      * @throws DAOException        if operation fails
-     * @throws ValidationException if <tt>directory</tt> is invalid or directory does not exist
      */
-    @Override public void create(Path directory) throws DAOException, ValidationException {
+    @Override public void create(Path directory) throws DAOException {
         LOGGER.debug("Adding workspace directory {}", directory);
 
         Map<String, Object> parameters = new HashMap<String, Object>(1);
@@ -86,9 +85,8 @@ public class JDBCDirectoryPathDAO extends JDBCDAOBase implements DirectoryPathDA
      *
      * @param directory must be a valid path to an existing directory
      * @throws DAOException        if operation fails
-     * @throws ValidationException if path is invalid or directory does not exist
      */
-    @Override public void delete(Path directory) throws DAOException, ValidationException {
+    @Override public void delete(Path directory) throws DAOException {
         LOGGER.debug("Deleting directory {}", directory);
 
         try {

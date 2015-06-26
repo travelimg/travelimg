@@ -15,9 +15,8 @@ public interface DirectoryPathDAO {
      *
      * @param directory must be a valid path to an existing directory
      * @throws DAOException if operation fails
-     * @throws ValidationException if <tt>directory</tt> is invalid or directory does not exist
      */
-    void create(Path directory) throws DAOException, ValidationException;
+    void create(Path directory) throws DAOException;
 
     /**
      * Read all current workspace directories.
@@ -34,7 +33,6 @@ public interface DirectoryPathDAO {
      *
      * @param directory must be a valid path to an existing directory
      * @throws DAOException if operation fails
-     * @throws ValidationException if path is invalid or directory does not exist
      */
-    void delete (Path directory) throws DAOException, ValidationException;
+    void delete (Path directory) throws DAOException;
 }
