@@ -52,6 +52,9 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
     @FXML
     private GoogleMapScene mapScene;
 
+    @FXML
+    private ToggleButton changeCoordinatesButton;
+
     @Autowired
     private SlideshowView slideshowView;
 
@@ -82,6 +85,22 @@ public class PhotoInspectorImpl extends InspectorImpl<Photo> {
         ratingPicker.setRatingChangeHandler(r -> {
             getEntities().forEach(this::saveRating);
             onUpdate();
+        });
+
+        mapScene.setClickCallback((position) -> {
+            if (!changeCoordinatesButton.isSelected()) {
+                return;
+            }
+
+            changeCoordinatesButton.setSelected(false);
+
+            for (Photo photo : getEntities()) {
+                photo.getData().setLatitude(position.getLatitude());
+                photo.getData().setLongitude(position.getLongitude());
+                savePhoto(photo);
+            }
+
+            updateMap(getEntities());
         });
 
         tagPicker.setOnUpdate(() -> {
