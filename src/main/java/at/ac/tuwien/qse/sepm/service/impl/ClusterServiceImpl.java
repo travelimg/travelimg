@@ -165,11 +165,15 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     private void placeAdded(Place place) {
-        refreshPlaces.accept(place);
+        if (refreshPlaces != null) {
+            refreshPlaces.accept(place);
+        }
     }
 
     private void journeyAdded(Journey journey) {
-        refreshJourneys.accept(journey);
+        if (refreshJourneys != null) {
+            refreshJourneys.accept(journey);
+        }
     }
 
     @Override public void subscribePlaceChanged(Consumer<Place> callback) {

@@ -59,7 +59,9 @@ public class PhotographerServiceImpl implements PhotographerService {
     }
 
     private void photographerAdded(Photographer photographer) {
-        refreshPhotographers.accept(photographer);
+        if (refreshPhotographers != null) {
+            refreshPhotographers.accept(photographer);
+        }
     }
 
     @Override public void subscribeChanged(Consumer<Photographer> callback) {

@@ -49,7 +49,10 @@ public class TagServiceImpl implements TagService {
     @Override public void delete(Tag tag) throws ServiceException {
         try {
             tagDAO.delete(tag);
-            refreshTags.accept(tag);
+
+            if (refreshTags != null) {
+                refreshTags.accept(tag);
+            }
         } catch (DAOException ex) {
             LOGGER.error("Failed to delete tag", ex);
             throw new ServiceException("Failed to delete tag", ex);
@@ -150,7 +153,9 @@ public class TagServiceImpl implements TagService {
     }
 
     private void tagAdded(Tag tag) {
-        refreshTags.accept(tag);
+        if (refreshTags != null) {
+            refreshTags.accept(tag);
+        }
     }
 
     public void subscribeTagChanged(Consumer<Tag> callback) {
