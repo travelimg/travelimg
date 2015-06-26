@@ -16,9 +16,6 @@ public class WorkspaceServiceTest extends ServiceTestBase {
 
     @Autowired WorkspaceService workspaceService;
     @Autowired PollingFileWatcher watcher;
-    @Autowired PhotoService photoService;
-    @Autowired
-    public SynchronizationService syncService;
 
     private static final Path sourceDir1 = Paths
             .get(System.getProperty("os.name").contains("indow") ?
