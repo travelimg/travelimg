@@ -75,22 +75,21 @@ public class PaginatedImageGrid extends StackPane {
      * @param photo The photo to be added
      */
     public void addPhoto(Photo photo) {
-        int oldPageCount = calculatePageCount();
-
         photos.add(photo);
 
-        photos = photos.stream()
-                .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
-                .collect(Collectors.toList());
-
-        int newPageCount = calculatePageCount();
-
-        pageCache.clear();
-        menu.setPageCount(newPageCount);
-
-        if (oldPageCount == newPageCount) {
-            updatePage();
+        // insert sorted
+        int index = 0;
+        for (Photo p : photos) {
+            if (p.getData().getDatetime().isBefore(photo.getData().getDatetime())) {
+                photos.add(index, photo);
+                setPhotos(photos);
+                return;
+            }
         }
+
+        // photo is the oldest, insert at end
+        photos.add(photo);
+        setPhotos(photos);
     }
 
     public void setSelectionChangeAction(Consumer<Set<Photo>> selectionChangeAction) {
