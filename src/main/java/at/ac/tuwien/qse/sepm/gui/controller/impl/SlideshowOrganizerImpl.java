@@ -40,6 +40,8 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     @FXML
     private Button addButton;
     @FXML
+    private Button deleteButton;
+    @FXML
     private Button presentButton;
     @FXML
     private VBox slideshowPropertiesBox;
@@ -57,6 +59,8 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     private SlideshowServiceImpl slideshowService;
 
     private Consumer<Slideshow> slideshowAddedCallback = null;
+    private Consumer<Slideshow> slideshowDeletedCallback = null;
+
     private ObjectProperty<Slideshow> selectedSlideshowProperty = new SimpleObjectProperty<>(null);
 
 
@@ -69,8 +73,6 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     }
 
     public void setSlideshows(ObservableList<Slideshow> slideshows) {
-        slideshowList.setItems(FXCollections.observableArrayList()); // clear list
-        
         // only display real slideshows (no placeholder)
         FilteredList<Slideshow> filtered = slideshows.filtered(s -> s.getId() >= 0);
         slideshowList.setItems(filtered);
@@ -87,6 +89,10 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
         this.slideshowAddedCallback = callback;
     }
 
+    @Override public void setDeleteAction(Consumer<Slideshow> callback) {
+        this.slideshowDeletedCallback = callback;
+    }
+
     @FXML
     private void initialize() {
         slideshowList.setCellFactory(new SlideshowCellFactory());
@@ -98,6 +104,7 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
         longDurationButton.setToggleGroup(durationToggleGroup);
 
         addButton.setOnAction(this::handleAddSlideshow);
+        deleteButton.setOnAction(this::handleDeleteSlideshow);
         slideshowNameTextField.textProperty().addListener(this::updateSelectedSlideshowName);
         durationToggleGroup.selectedToggleProperty().addListener(this::updateSlideshowDuration);
         slideshowList.getSelectionModel().selectedItemProperty().addListener(this::onActiveSlideshowChanged);
@@ -134,8 +141,7 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
     }
 
     private void handleAddSlideshow(Event event) {
-        List<Slide> slides = new ArrayList<>();
-        Slideshow slideshow = new Slideshow(-1, NEW_SLIDESHOW_DEFAULT_NAME, 5.0, slides);
+        Slideshow slideshow = new Slideshow(-1, NEW_SLIDESHOW_DEFAULT_NAME, 5.0);
 
         try {
             slideshow = slideshowService.create(slideshow);
@@ -145,6 +151,24 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
             }
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Erstellen der Diashow", "");
+        }
+    }
+
+    private void handleDeleteSlideshow(Event event) {
+        Slideshow slideshow = getSelected();
+
+        if (slideshow == null) {
+            return;
+        }
+
+        try {
+            slideshowService.delete(slideshow);
+
+            if (slideshowDeletedCallback != null) {
+                slideshowDeletedCallback.accept(slideshow);
+            }
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Löschen der Diashow", "");
         }
     }
 
@@ -202,7 +226,9 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
         protected void updateItem(Slideshow item, boolean empty) {
             super.updateItem(item, empty);
 
-            if (item != null) {
+            if (empty) {
+                setText(null);
+            } else if (item != null) {
                 setText(item.getName());
             }
         }

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.Rectangle?>
+<fx:root fx:id="root" stylesheets="@../style.css" type="javafx.scene.layout.VBox"
+         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+        styleClass="journey-places-list">
+    <children>
+        <HBox fx:id="journeyHeader">
+            <children>
+                <Button fx:id="backButton" visible="false">
+                    <graphic>
+                        <FontAwesomeIconView glyphName="ARROW_LEFT"/>
+                    </graphic>
+                </Button>
+                <Label fx:id="journeyLabel" HBox.hgrow="ALWAYS" alignment="CENTER">
+                    Verfügbare Reisen
+                </Label>
+            </children>
+        </HBox>
+        <StackPane>
+            <children>
+                <Label fx:id="noJourneyPlaceholder">Keine Reisen vorhanden</Label>
+                <VBox fx:id="journeys" visible="false" managed="false" spacing="20">
+                    <padding>
+                        <Insets top="30" left="10" />
+                    </padding>
+                </VBox>
+                <VBox fx:id="places" visible="false" managed="false" spacing="20">
+                    <padding>
+                        <Insets top="30" left="10" />
+                    </padding>
+                    <children>
+                        <RadioButton fx:id="allPlacesButton" styleClass="place-radio-button,all-places" text="Alle Orte">
+
+                        </RadioButton>
+
+                        <VBox fx:id="timeline">
+                            <children>
+
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </children>
+        </StackPane>
+    </children>
+</fx:root>

@@ -1,16 +1,15 @@
 package at.ac.tuwien.qse.sepm.gui.slide;
 
 import at.ac.tuwien.qse.sepm.entities.PhotoSlide;
-import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
-import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Paths;
 
 public class PhotoSlideView extends SlideView {
 
@@ -31,6 +30,10 @@ public class PhotoSlideView extends SlideView {
             imageView.setImage(loadImage());
             getChildren().add(imageView);
         }
+
+        Node overlay = createCaptionBox(slide.getCaption());
+        StackPane.setAlignment(overlay, Pos.BOTTOM_CENTER);
+        getChildren().add(overlay);
     }
 
     private Image loadImage() {

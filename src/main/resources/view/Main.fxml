@@ -3,8 +3,7 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.*?>
 <TabPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root"
-         stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8"
-         fx:controller="at.ac.tuwien.qse.sepm.gui.MainController">
+         stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8">
 
     <Tab fx:id="grid" text="" closable="false">
         <graphic>
@@ -37,6 +36,17 @@
         </tooltip>
         <content>
             <fx:include source="/view/SlideshowView.fxml"></fx:include>
+        </content>
+    </Tab>
+    <Tab fx:id="highlights" text="" closable="false">
+        <graphic>
+            <FontAwesomeIconView glyphName="AUTOMOBILE"/>
+        </graphic>
+        <tooltip>
+            <Tooltip text="Reise highlights"/>
+        </tooltip>
+        <content>
+            <fx:include source="/view/HighlightsView.fxml"></fx:include>
         </content>
     </Tab>
 </TabPane>

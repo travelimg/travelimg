@@ -8,8 +8,8 @@ import at.ac.tuwien.qse.sepm.gui.controller.Menu;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.*;
 import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid;
-import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.service.*;
+import at.ac.tuwien.qse.sepm.util.IOHandler;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
@@ -49,7 +49,9 @@ public class GridViewImpl implements GridView {
     @Autowired
     private Menu menu;
     @Autowired
-    private ImageCache imageCache;
+    private IOHandler ioHandler;
+    @Autowired
+    private ExifService exifService;
 
     @FXML
     private BorderPane root;
@@ -57,15 +59,6 @@ public class GridViewImpl implements GridView {
     private PaginatedImageGrid grid;
     private boolean disableReload = false;
     private boolean treeViewActive = false;
-
-    @Autowired
-    public void setImageCache(ImageCache imageCache) {
-        this.imageCache = imageCache;
-
-        if (grid == null) {
-            this.grid = new PaginatedImageGrid(menu);
-        }
-    }
 
     @FXML
     private void initialize() {
@@ -90,10 +83,10 @@ public class GridViewImpl implements GridView {
         // Updated photos that no longer match the filter are removed from the grid.
         inspector.setUpdateHandler(() -> {
             inspector.getEntities().stream()
-                    .filter(organizer.getFilter().negate())
+                    .filter(organizer.getUsedFilter().negate())
                     .forEach(grid::removePhoto);
             inspector.getEntities().stream()
-                    .filter(organizer.getFilter())
+                    .filter(organizer.getUsedFilter())
                     .forEach(grid::updatePhoto);
         });
 
@@ -115,8 +108,9 @@ public class GridViewImpl implements GridView {
 
     private void handlePhotoCreated(Photo photo) {
         Platform.runLater(() -> {
-            // TODO: should we update filter
-            grid.addPhoto(photo);
+            if (organizer.getUsedFilter().test(photo)) {
+                grid.addPhoto(photo);
+            }
         });
     }
 
@@ -153,7 +147,7 @@ public class GridViewImpl implements GridView {
             disableReload = true;
 
             // Ignore photos that are not part of the current filter.
-            if (!organizer.getFilter().test(photo)) {
+            if (!organizer.getUsedFilter().test(photo)) {
                 disableReload = false;
                 return;
             }
@@ -171,7 +165,7 @@ public class GridViewImpl implements GridView {
     private void reloadImages() {
         try {
 
-            grid.setPhotos(photoService.getAllPhotos(organizer.getFilter()).stream()
+            grid.setPhotos(photoService.getAllPhotos(organizer.getUsedFilter()).stream()
                             .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
                             .collect(Collectors.toList()));
         } catch (ServiceException ex) {
@@ -184,19 +178,16 @@ public class GridViewImpl implements GridView {
     private class MenuListener implements Menu.Listener {
 
         @Override public void onPresent(Menu sender) {
-            FullscreenWindow fullscreen = new FullscreenWindow(imageCache);
+            FullscreenWindow fullscreen = new FullscreenWindow();
             List<Photo> getSelectedPhoto = new ArrayList<>();
             getSelectedPhoto.addAll(grid.getSelected());
             fullscreen.present(grid.getPhotos(), getSelectedPhoto.get(0));
         }
 
         @Override public void onFlickr(Menu sender) {
-            FlickrDialog flickrDialog = new FlickrDialog(root, "Flickr Import", flickrService);
+            FlickrDialog flickrDialog = new FlickrDialog(root, "Flickr Import", flickrService, exifService, ioHandler);
             Optional<List<Photo>> photos = flickrDialog.showForResult();
             if (!photos.isPresent()) return;
-            importService.importPhotos(photos.get(),
-                    GridViewImpl.this::handleImportedPhoto,
-                    GridViewImpl.this::handleImportError);
         }
 
         @Override public void onJourney(Menu sender) {

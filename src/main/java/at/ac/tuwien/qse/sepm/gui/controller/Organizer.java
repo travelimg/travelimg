@@ -20,5 +20,5 @@ public interface Organizer {
      *
      * @return current filter
      */
-    PhotoFilter getFilter();
+    PhotoFilter getUsedFilter();
 }
