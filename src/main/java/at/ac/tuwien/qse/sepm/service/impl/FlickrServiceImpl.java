@@ -165,7 +165,7 @@ public class FlickrServiceImpl implements FlickrService {
                     SearchParameters searchParameters = new SearchParameters();
                     searchParameters.setTags(tags);
 
-                    logger.debug("Using for search tags {}", (Object[]) tags);
+                    logger.debug("Using for search tags {}", tags);
                     if (useGeoData) {
                         logger.debug("Using for search latitude {} and longitude {}", latitude, longitude);
                         searchParameters.setLatitude(String.valueOf(latitude));
@@ -196,7 +196,7 @@ public class FlickrServiceImpl implements FlickrService {
                     p.setOriginalSecret(
                             flickr.getPhotosInterface().getInfo(p.getId(), p.getSecret())
                                     .getOriginalSecret());
-                    if (!p.getOriginalSecret().isEmpty() && !p.getSecret().isEmpty()) {
+                    if (!p.getOriginalSecret().isEmpty()) {
                         String mediumSizeUrl = "https://farm" + p.getFarm() + ".staticflickr.com/" + p.getServer() + "/" + p.getId() + "_" + p.getSecret() + "_z." + p.getOriginalFormat();
                         GeoData geoData = flickr.getPhotosInterface().getGeoInterface().getLocation(p.getId());
                         Photo photoWIthTags = flickr.getTagsInterface().getListPhoto(p.getId());
@@ -212,7 +212,7 @@ public class FlickrServiceImpl implements FlickrService {
                         progressCallback.accept((double) nrOfDownloadedPhotos / (double) nrOfPhotosToDownload);
                         nrOfDownloadedPhotos++;
                     } else {
-                        logger.debug("Can't get original secret for photo.");
+                        logger.debug("Can't get original secret for photo id {}", p.getId());
                     }
                 }
                 progressCallback.accept(1.0);
