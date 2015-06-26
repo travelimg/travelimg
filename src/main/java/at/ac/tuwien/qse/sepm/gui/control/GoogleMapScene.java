@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
 import at.ac.tuwien.qse.sepm.gui.controller.impl.WorldmapViewImpl;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
+import javafx.event.Event;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
@@ -14,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -26,11 +28,14 @@ public class GoogleMapScene extends VBox {
 
     private final WebEngine webEngine;
     private final WebView webView;
-    @Autowired private WorldmapView worldmapView;
+
+
     private Consumer<LatLong> clickCallback = null;
     private Consumer<LatLong> doubleClickCallback = null;
     private Consumer<LatLong> markerClickCallback = null;
+
     private Runnable onLoadedCallback = null;
+
 
     public GoogleMapScene() {
         webView = new WebView();
@@ -54,6 +59,9 @@ public class GoogleMapScene extends VBox {
 
     public void setDoubleClickCallback(Consumer<LatLong> doubleClickCallback) {
         this.doubleClickCallback = doubleClickCallback;
+    }
+    public void setMarkerClickCallback(Consumer<LatLong> markerClickCallback){
+        this.markerClickCallback=markerClickCallback;
     }
 
     public void center(LatLong position) {
@@ -108,9 +116,9 @@ public class GoogleMapScene extends VBox {
 
     private void handleAlert(WebEvent<String> event) {
         LOGGER.debug("Got alert {}", event);
-        System.out.println("click");
+
         String data = event.getData();
-        System.out.println(data.toString());
+
         if (data.equals("map-loaded")) {
             if (onLoadedCallback != null) {
                 onLoadedCallback.run();
@@ -137,8 +145,8 @@ public class GoogleMapScene extends VBox {
 
                 } else if (type.equals("click") && clickCallback != null) {
                     clickCallback.accept(new LatLong(latitude, longitude));
-                }else if (type.equals("marker-click")) {
-                    worldmapView.ListenLatLong(new LatLong(latitude,longitude));
+                }else if (type.equals("marker-click")&& markerClickCallback!=null ) {
+                     markerClickCallback.accept(new LatLong(latitude,longitude));
                 }
             } catch (NumberFormatException ex) {
                 LOGGER.debug("Failed to parse click event from map");
