@@ -179,30 +179,25 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     private void handleSearch() {
         searchButton.setDisable(true);
         progressIndicator.setVisible(true);
-        ObservableList<Node> test = keywordsFlowPane.getChildren();
-        String tags[] = new String[test.size()];
-        for (int i = 0; i < test.size(); i++) {
-            HBox h = (HBox) test.get(i);
-            tags[i] = ((Text) h.getChildren().get(0)).getText();
+        importButton.setDisable(true);
+
+        ObservableList<Node> keywords = keywordsFlowPane.getChildren();
+        String[] tags = keywords.stream().map(keyword -> ((Keyword)keyword).getName()).toArray(String[]::new);
+        double latitude = 0.0;
+        double longitude = 0.0;
+        boolean useGeoData = false;
+        if (actualLatLong != null) {
+            latitude = actualLatLong.getLatitude();
+            longitude = actualLatLong.getLongitude();
+            useGeoData = true;
         }
 
         try {
-            double latitude = 0.0;
-            double longitude = 0.0;
-            boolean useGeoData = false;
+            searchTask = flickrService.searchPhotos(tags, latitude, longitude, useGeoData
 
-            if (actualLatLong != null) {
-                latitude = actualLatLong.getLatitude();
-                longitude = actualLatLong.getLongitude();
-                useGeoData = true;
-            }
-            searchTask = flickrService.searchPhotos(tags, latitude, longitude, useGeoData,
-                    new Consumer<com.flickr4java.flickr.photos.Photo>() {
-
+                    , new Consumer<com.flickr4java.flickr.photos.Photo>() {
                         public void accept(com.flickr4java.flickr.photos.Photo photo) {
-
                             Platform.runLater(new Runnable() {
-
                                 public void run() {
                                     ImageTile imageTile = new ImageTile(photo);
                                     Photo p = new Photo();
@@ -214,35 +209,32 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                                     photosFlowPane.getChildren().add(imageTile);
                                 }
                             });
-
                         }
-
-                    }, new Consumer<Double>() {
-
+                    }
+                    , new Consumer<Double>() {
                         public void accept(Double downloadProgress) {
-
                             Platform.runLater(new Runnable() {
-
                                 public void run() {
                                     if (downloadProgress == 1.0) {
                                         searchButton.setDisable(false);
                                         progressIndicator.setVisible(false);
+                                        importButton.setDisable(false);
                                     }
                                 }
                             });
-
                         }
-
                     }
-
                     , new ErrorHandler<ServiceException>() {
-
                         public void handle(ServiceException exception) {
-                            //handle errors here
+                            searchButton.setDisable(false);
+                            progressIndicator.setVisible(false);
+                            importButton.setDisable(false);
                         }
                     });
         } catch (ServiceException e) {
-            e.printStackTrace();
+            searchButton.setDisable(false);
+            progressIndicator.setVisible(false);
+            importButton.setDisable(false);
         }
     }
 
@@ -252,6 +244,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     }
 
     private void handleReset(){
+        flickrService.reset();
         selectedImageTiles.clear();
         photos.clear();
         photosFlowPane.getChildren().clear();
@@ -411,10 +404,12 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
 
     private class Keyword extends HBox{
 
+        private String name;
         private Text x;
 
         public Keyword(String name){
             super();
+            this.name = name;
             setStyle("-fx-background-radius: 5; -fx-background-color: #E91E63; ");
             Text text = new Text(name);
             text.setFill(Color.WHITE);
@@ -426,6 +421,10 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             x.setOnMouseExited(event -> keywordsFlowPane.setCursor(Cursor.DEFAULT));
             getChildren().add(new Text("  "));
             getChildren().add(x);
+        }
+
+        public String getName() {
+            return name;
         }
 
         public void setOnClosed(EventHandler eventHandler){
