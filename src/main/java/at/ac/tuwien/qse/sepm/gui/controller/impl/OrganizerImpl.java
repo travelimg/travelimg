@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -137,16 +138,11 @@ public class OrganizerImpl implements Organizer {
 
 
     @Override
-    public void setWorldMapPlace(Place pl){
-        for(Place p: placeListView.getValues()){
-            if(p.getId()==pl.getId()){
-                placeListView.check(p);
-            }else{
-                placeListView.uncheck(p);
-            }
-        }
-        handlePlacesChange(placeListView.getChecked());
+    public void setWorldMapPlace(Place place) {
+        placeListView.uncheckAll();
+        placeListView.check(place);
 
+        handlePlacesChange(placeListView.getChecked());
     }
     // This Method let's the User switch to the usedFilter-view
     private void filterViewClicked() {

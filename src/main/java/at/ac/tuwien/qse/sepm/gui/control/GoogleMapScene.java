@@ -1,11 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui.control;
 
-import at.ac.tuwien.qse.sepm.entities.Place;
-import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
-import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
-import at.ac.tuwien.qse.sepm.gui.controller.impl.WorldmapViewImpl;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
-import javafx.event.Event;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
@@ -13,10 +8,7 @@ import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.awt.event.MouseEvent;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -28,7 +20,6 @@ public class GoogleMapScene extends VBox {
 
     private final WebEngine webEngine;
     private final WebView webView;
-
 
     private Consumer<LatLong> clickCallback = null;
     private Consumer<LatLong> doubleClickCallback = null;
@@ -61,7 +52,7 @@ public class GoogleMapScene extends VBox {
         this.doubleClickCallback = doubleClickCallback;
     }
     public void setMarkerClickCallback(Consumer<LatLong> markerClickCallback){
-        this.markerClickCallback=markerClickCallback;
+        this.markerClickCallback = markerClickCallback;
     }
 
     public void center(LatLong position) {
@@ -145,7 +136,7 @@ public class GoogleMapScene extends VBox {
 
                 } else if (type.equals("click") && clickCallback != null) {
                     clickCallback.accept(new LatLong(latitude, longitude));
-                }else if (type.equals("marker-click")&& markerClickCallback!=null ) {
+                } else if (type.equals("marker-click") && markerClickCallback != null) {
                      markerClickCallback.accept(new LatLong(latitude,longitude));
                 }
             } catch (NumberFormatException ex) {

@@ -85,5 +85,5 @@
     <bean id="menuController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.MenuImpl"></bean>
     <bean id="statusIndicatorController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.StatusIndicatorImpl"></bean>
     <bean id="highlightsViewController" class="at.ac.tuwien.qse.sepm.gui.HighlightsViewController"></bean>
-    <bean id="mainController" class="at.ac.tuwien.qse.sepm.gui.MainController"></bean>
+    <bean id="mainController" class="at.ac.tuwien.qse.sepm.gui.MainControllerImpl"></bean>
 </beans>
