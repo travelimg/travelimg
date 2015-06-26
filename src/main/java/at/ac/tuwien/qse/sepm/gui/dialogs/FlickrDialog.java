@@ -38,6 +38,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
@@ -80,10 +81,10 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     private ExifService exifService;
     private IOHandler ioHandler;
     private LatLong actualLatLong;
-    private ArrayList<ImageTile> selectedImages = new ArrayList<>();
+    private ArrayList<ImageTile> selectedImageTiles = new ArrayList<>();
+    private ImageTile lastSelected;
     private ArrayList<Photo> photos = new ArrayList<>();
-    private Cancelable sarchTask;
-
+    private Cancelable searchTask;
     private Menu sender;
 
     public FlickrDialog(Node origin, String title, FlickrService flickrService, ExifService exifService, IOHandler ioHandler,
@@ -121,9 +122,22 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                 if (event.isControlDown() && event.getCode() == KeyCode.A) {
                     for (Node n : photosFlowPane.getChildren()) {
                         if (n instanceof ImageTile) {
-                            if (!((ImageTile) n).getSelectedProperty().getValue()) {
+                            ((ImageTile) n).select();
+                        }
+                    }
+                }
+            }
+        });
+        scrollPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent event) {
+                if (!event.isControlDown()) {
+                    for (Node n : photosFlowPane.getChildren()) {
+                        if(n instanceof ImageTile){
+                            if(n==lastSelected) {
                                 ((ImageTile) n).select();
-                                selectedImages.add((ImageTile) n);
+                            }
+                            else {
+                                ((ImageTile) n).deselect();
                             }
                         }
                     }
@@ -182,7 +196,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                 longitude = actualLatLong.getLongitude();
                 useGeoData = true;
             }
-            sarchTask = flickrService.searchPhotos(tags, latitude, longitude, useGeoData,
+            searchTask = flickrService.searchPhotos(tags, latitude, longitude, useGeoData,
                     new Consumer<com.flickr4java.flickr.photos.Photo>() {
 
                         public void accept(com.flickr4java.flickr.photos.Photo photo) {
@@ -194,33 +208,9 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                                     Photo p = new Photo();
                                     p.setPath(tmpDir+photo.getId()+"."+photo.getOriginalFormat());
                                     photos.add(p);
-                                    imageTile.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                                        @Override public void handle(MouseEvent event) {
-                                            if (event.isControlDown()) {
-                                                if (imageTile.getSelectedProperty().getValue()) {
-                                                    imageTile.unselect();
-                                                    selectedImages.remove(imageTile);
-                                                } else {
-                                                    imageTile.select();
-                                                    selectedImages.add(imageTile);
-                                                }
-                                            } else {
-                                                for (ImageTile i : selectedImages) {
-                                                    i.unselect();
-                                                }
-                                                selectedImages.clear();
-                                                imageTile.select();
-                                                selectedImages.add(imageTile);
-                                            }
-
-                                            if (selectedImages.isEmpty()) {
-                                                importButton.setDisable(true);
-                                            } else {
-                                                importButton.setDisable(false);
-                                            }
-                                        }
-                                    });
-
+                                    if(photos.size()==1){
+                                        fullscreenButton.setDisable(false);
+                                    }
                                     photosFlowPane.getChildren().add(imageTile);
                                 }
                             });
@@ -258,11 +248,11 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
 
     private void handleFullscreen() {
         FullscreenWindow fullscreenWindow = new FullscreenWindow();
-        fullscreenWindow.present(photos,photos.get(0));
+        fullscreenWindow.present(photos, photos.get(0));
     }
 
     private void handleReset(){
-        selectedImages.clear();
+        selectedImageTiles.clear();
         photos.clear();
         photosFlowPane.getChildren().clear();
         actualLatLong = null;
@@ -270,19 +260,18 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         keywordsFlowPane.getChildren().clear();
         keywordTextField.clear();
         fullscreenButton.setDisable(true);
-        importButton.setDisable(true);
-        if (sarchTask != null)
-            sarchTask.cancel();
+        if (searchTask != null)
+            searchTask.cancel();
     }
 
     private void handleImport() {
         flickrService.reset();
-        if(selectedImages.isEmpty()){
+        if(selectedImageTiles.isEmpty()){
             return;
         }
         ArrayList<com.flickr4java.flickr.photos.Photo> photos = new ArrayList<>();
-        for (ImageTile i : selectedImages) {
-            //i.getFlickrPhoto().setDateAdded(datePicker.getValue().atStartOfDay());
+        for (ImageTile i : selectedImageTiles) {
+             //i.getFlickrPhoto().setDateAdded(datePicker.getValue().atStartOfDay());
             photos.add(i.getFlickrPhoto());
             //exifService.setDateAndGeoData(p);
             //Path path = Paths.get(p.getPath());
@@ -329,7 +318,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         } catch (ServiceException e) {
 
         }
-        selectedImages.clear();
+        selectedImageTiles.clear();
         close();
     }
 
@@ -338,68 +327,71 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         Optional<Boolean> confirmed = confirmationDialog.showForResult();
         if (!confirmed.isPresent() || !confirmed.get()) return;
         logger.debug("Canceling the download...");
-        if (sarchTask != null)
-            sarchTask.cancel();
+        if (searchTask != null)
+            searchTask.cancel();
 
     }
 
     /**
      * Widget for one widget in the image grid. Can either be in a selected or an unselected state.
      */
-    private class ImageTile extends HBox {
+    private class ImageTile extends StackPane {
 
+        private final BorderPane overlay = new BorderPane();
         private BooleanProperty selected = new SimpleBooleanProperty(false);
-        private com.flickr4java.flickr.photos.Photo photo;
-        private Image image;
-        private ImageView imageView;
-        private Photo p;
+        private com.flickr4java.flickr.photos.Photo flickrPhoto;
 
-        public ImageTile(com.flickr4java.flickr.photos.Photo photo) {
-
-            this.photo = photo;
+        public ImageTile(com.flickr4java.flickr.photos.Photo flickrPhoto) {
+            super();
+            this.flickrPhoto = flickrPhoto;
+            Image image = null;
             try {
-                image = new Image(new FileInputStream(new File(tmpDir+ photo.getId()+"."+ photo
+                image = new Image(new FileInputStream(new File(tmpDir+ flickrPhoto.getId()+"."+ flickrPhoto
                         .getOriginalFormat())), 150, 0, true, true);
             } catch (FileNotFoundException ex) {
                 logger.error("Could not find photo", ex);
                 return;
             }
-
-            imageView = new ImageView(image);
+            ImageView imageView = new ImageView(image);
             imageView.setFitWidth(150);
+            getChildren().add(imageView);
 
-            getStyleClass().add("image-tile-non-selected");
-
-
-            this.getChildren().add(imageView);
-        }
-
-        public void setPhoto(Photo p){
-            this.p=p;
-        }
-
-        public Photo getPhoto(){
-            return p;
-        }
-
-        /**
-         * Select this photo. Triggers an update of the inspector widget.
-         */
-        public void select() {
-            setStyle("-fx-effect: dropshadow(three-pass-box, black, 5, 5, 0, 0);");
-            this.selected.set(true);
-        }
-
-        /**
-         * Unselect a photo.
-         */
-        public void unselect() {
-            setStyle("-fx-effect: null");
-            this.selected.set(false);
+            setAlignment(overlay,Pos.BOTTOM_CENTER);
+            FontAwesomeIconView checkIcon = new FontAwesomeIconView();
+            checkIcon.setGlyphName("CHECK");
+            checkIcon.setStyle("-fx-fill: white");
+            overlay.setAlignment(checkIcon, Pos.CENTER_RIGHT);
+            overlay.setStyle("-fx-background-color: -tmg-secondary; -fx-max-height: 20px;");
+            overlay.setBottom(checkIcon);
+            getChildren().add(overlay);
+            overlay.setVisible(false);
+            setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override public void handle(MouseEvent event) {
+                    if(!getSelectedProperty().getValue()){
+                        select();
+                    }
+                    else{
+                        deselect();
+                    }
+                }
+            });
         }
 
         public com.flickr4java.flickr.photos.Photo getFlickrPhoto() {
-            return photo;
+            return flickrPhoto;
+        }
+
+        public void select() {
+            selected.setValue(true);
+            overlay.setVisible(true);
+            setStyle("-fx-border-color: -tmg-secondary");
+            lastSelected = this;
+        }
+
+        public void deselect() {
+            selected.setValue(false);
+            overlay.setVisible(false);
+            setStyle("-fx-border-color: none");
         }
 
         /**
@@ -410,6 +402,11 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         public BooleanProperty getSelectedProperty() {
             return selected;
         }
+
+        public boolean isSelected() {
+            return selected.getValue();
+        }
+
     }
 
     private class Keyword extends HBox{
