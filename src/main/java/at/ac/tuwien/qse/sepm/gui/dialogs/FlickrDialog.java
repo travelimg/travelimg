@@ -22,6 +22,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -40,6 +41,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
@@ -462,6 +464,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         private String buttonStyle;
         private Tooltip buttonTooltip;
         private EventHandler buttonOnAction;
+        final Circle circle = new Circle(25, 25, 50, Color.RED);
 
         public DownloadProgressControl(Button button){
             super();
@@ -487,21 +490,15 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             hBox.setPadding(new Insets(5.0,5.0,5.0,5.0));
             hBox.getChildren().add(progressBar);
             hBox.getChildren().add(stopIcon);
-            FontAwesomeIconView minimizeIcon = new FontAwesomeIconView();
-            minimizeIcon.setGlyphName("MINUS");
             borderPane.setStyle("-fx-background-color: white");
             borderPane.setPadding(new Insets(5.0, 5.0, 5.0, 5.0));
-            borderPane.setRight(minimizeIcon);
             Label label = new Label("Fotos werden heruntergeladen");
             label.setAlignment(Pos.CENTER);
             borderPane.setCenter(label);
             borderPane.setBottom(hBox);
             stopIcon.setOnMouseClicked(event -> handleInterruptDownload(this));
-            minimizeIcon.setOnMouseClicked(event -> hide());
-            Point2D p = button.localToScene(button.getLayoutBounds().getMinX(), button.getLayoutBounds().getMinY());
-            //double posX = p.getX() + flickrButton.getScene().getX() + flickrButton.getScene().getWindow().getX();
-            //double posY = p.getY() + flickrButton.getScene().getY() + flickrButton.getScene().getWindow().getY();
-            button.setOnMouseEntered(event -> show(button,p.getX()+35.0,p.getY()-35.0));
+            button.setOnMouseEntered(event -> handleShow());
+            button.setOnMouseExited(event -> hide());
             getScene().setRoot(borderPane);
         }
 
@@ -516,27 +513,52 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             hBox.setPadding(new Insets(5.0,5.0,5.0,5.0));
             hBox.setAlignment(Pos.CENTER);
             if(!interrupted){
-                hBox.getChildren().add(new Label("Fotos wurden heruntergeladen"));
+                hBox.getChildren().add(new Label("Fotos heruntergeladen "));
                 FontAwesomeIconView checkIcon = new FontAwesomeIconView();
                 checkIcon.setGlyphName("CHECK");
                 hBox.getChildren().add(checkIcon);
             }
             else{
-                hBox.getChildren().add(new Label("Abgebrochen!"));
+                hBox.getChildren().add(new Label("Herunterladen abgebrochen "));
+                FontAwesomeIconView timesIcon = new FontAwesomeIconView();
+                timesIcon.setGlyphName("TIMES");
+                hBox.getChildren().add(timesIcon);
             }
-            FontAwesomeIconView closeIcon = new FontAwesomeIconView();
-            closeIcon.setGlyphName("CLOSE");
-            closeIcon.setOnMouseClicked(event -> hide());
-            button.setOnMouseEntered(null);
-            button.setOnMouseExited(null);
+            button.setOnMouseExited(e -> {
+                button.setOnMouseEntered(null);
+                hide();
+                button.setTooltip(buttonTooltip);
+            });
             borderPane.setCenter(hBox);
-            borderPane.setRight(closeIcon);
-            Point2D p = button.localToScene(button.getLayoutBounds().getMinX(), button.getLayoutBounds().getMinY());
-            hide();
-            show(button,p.getX()+35.0,p.getY()-5.0);
+
             button.getGraphic().setStyle(buttonStyle);
-            button.setTooltip(buttonTooltip);
             button.setOnAction(buttonOnAction);
+        }
+
+        private void handleShow(){
+            Point2D p = button.localToScene(button.getLayoutBounds().getMinX(), button.getLayoutBounds().getMinY());
+            show(button,p.getX() + button.getScene().getX() + button.getScene().getWindow().getX()+35.0,p.getY() + button.getScene().getY() + button.getScene().getWindow().getY()-35.0);
+        }
+
+        public void fadeTrans() {
+            FadeTransition ft = new FadeTransition(Duration.millis(1000), circle);
+            ft.setFromValue(1.0);
+            ft.setToValue(0.0);
+            ft.setCycleCount(1);
+            ft.setAutoReverse(false);
+
+            ft.play();
+
+
+            ft.setOnFinished(new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent t) {
+                    hide();
+                    System.out.println("Hiding");
+                }
+            });
+
+
+
         }
 
     }
