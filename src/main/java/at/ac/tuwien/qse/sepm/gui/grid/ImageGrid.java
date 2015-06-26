@@ -25,6 +25,8 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
     protected final List<T> tiles = new LinkedList<>();
     private Consumer<Set<Photo>> selectionChangeAction = null;
 
+    private boolean suppressSelectEvent = false;
+
     public ImageGrid(Supplier<T> tileFactory) {
         this.tileFactory = tileFactory;
 
@@ -113,6 +115,8 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
     }
 
     private void handleTileClicked(T tile, MouseEvent event) {
+        suppressSelectEvent = true;
+
         if (event.isControlDown()) {
             if (tile.isSelected()) {
                 deselect(tile);
@@ -123,6 +127,9 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
             deselectAll();
             select(tile);
         }
+
+        suppressSelectEvent = false;
+        onSelectionChange();
     }
 
     protected void select(T tile) {
@@ -138,7 +145,7 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
     }
 
     protected void onSelectionChange() {
-        if (selectionChangeAction == null) return;
+        if (selectionChangeAction == null || suppressSelectEvent) return;
 
         selectionChangeAction.accept(getSelectedItems());
     }

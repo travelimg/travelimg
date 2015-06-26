@@ -23,61 +23,95 @@ public class SlideServiceImpl implements SlideService{
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
-    private SlideDAO<PhotoSlide> photoSlideDAO;
-    @Autowired
-    private SlideDAO<MapSlide> mapSlideDAO;
-    @Autowired
-    private SlideDAO<TitleSlide> titleSlideDAO;
+    private SlideDAO slideDAO;
 
-
-    @Override public Slide create(Slide slide) throws ServiceException {
-
+    @Override
+    public PhotoSlide create(PhotoSlide slide) throws ServiceException {
         try {
-            if (slide instanceof PhotoSlide) {
-                return photoSlideDAO.create((PhotoSlide)slide);
-            } else if (slide instanceof MapSlide) {
-                return mapSlideDAO.create((MapSlide)slide);
-            } else if (slide instanceof TitleSlide) {
-                return titleSlideDAO.create((TitleSlide)slide);
-            }
-            return null;
+            return slideDAO.create(slide);
         } catch (DAOException | ValidationException ex) {
-            throw new ServiceException("Failed to create Slide", ex);
+            LOGGER.error("Failed to create slide {}", slide, ex);
+            throw new ServiceException("Failed to create slide", ex);
         }
     }
 
-    @Override public void delete(Slide slide) throws ServiceException {
-
+    @Override
+    public MapSlide create(MapSlide slide) throws ServiceException {
         try {
-            if (slide instanceof PhotoSlide) {
-                photoSlideDAO.delete((PhotoSlide)slide);
-            } else if (slide instanceof MapSlide) {
-                mapSlideDAO.delete((MapSlide)slide);
-            } else if (slide instanceof TitleSlide) {
-                titleSlideDAO.delete((TitleSlide)slide);
-            }
+            return slideDAO.create(slide);
         } catch (DAOException | ValidationException ex) {
+            LOGGER.error("Failed to create slide {}", slide, ex);
+            throw new ServiceException("Failed to create slide", ex);
+        }
+    }
+
+    @Override
+    public TitleSlide create(TitleSlide slide) throws ServiceException {
+        try {
+            return slideDAO.create(slide);
+        } catch (DAOException | ValidationException ex) {
+            LOGGER.error("Failed to create slide {}", slide, ex);
+            throw new ServiceException("Failed to create slide", ex);
+        }
+    }
+
+    @Override
+    public PhotoSlide update(PhotoSlide slide) throws ServiceException {
+        try {
+            return slideDAO.update(slide);
+        } catch (DAOException | ValidationException ex) {
+            LOGGER.error("Failed to update slide {}", slide, ex);
+            throw new ServiceException("Failed to update slide", ex);
+        }
+    }
+
+    @Override
+    public MapSlide update(MapSlide slide) throws ServiceException {
+        try {
+            return slideDAO.update(slide);
+        } catch (DAOException | ValidationException ex) {
+            LOGGER.error("Failed to update slide {}", slide, ex);
+            throw new ServiceException("Failed to update slide", ex);
+        }
+    }
+
+    @Override
+    public TitleSlide update(TitleSlide slide) throws ServiceException {
+        try {
+            return slideDAO.update(slide);
+        } catch (DAOException | ValidationException ex) {
+            LOGGER.error("Failed to update slide {}", slide, ex);
+            throw new ServiceException("Failed to update slide", ex);
+        }
+    }
+
+    @Override
+    public void delete(PhotoSlide slide) throws ServiceException {
+        try {
+            slideDAO.delete(slide);
+        } catch (DAOException | ValidationException ex) {
+            LOGGER.error("Failed to delete slide {}", slide, ex);
             throw new ServiceException("Failed to delete slide", ex);
         }
     }
 
     @Override
-    public Slide update(Slide slide) throws ServiceException {
-        LOGGER.debug("Updating slide {}", slide);
-
+    public void delete(MapSlide slide) throws ServiceException {
         try {
-            if (slide instanceof PhotoSlide) {
-                return photoSlideDAO.update((PhotoSlide) slide);
-            } else if (slide instanceof MapSlide) {
-                return mapSlideDAO.update((MapSlide) slide);
-            } else if (slide instanceof TitleSlide) {
-                return titleSlideDAO.update((TitleSlide) slide);
-            }
-
-            return null;
+            slideDAO.delete(slide);
         } catch (DAOException | ValidationException ex) {
-            LOGGER.error("Failed to update slide", ex);
-            throw new ServiceException("Failed to update slide", ex);
+            LOGGER.error("Failed to delete slide {}", slide, ex);
+            throw new ServiceException("Failed to delete slide", ex);
+        }
+    }
+
+    @Override
+    public void delete(TitleSlide slide) throws ServiceException {
+        try {
+            slideDAO.delete(slide);
+        } catch (DAOException | ValidationException ex) {
+            LOGGER.error("Failed to delete slide {}", slide, ex);
+            throw new ServiceException("Failed to delete slide", ex);
         }
     }
 }

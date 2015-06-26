@@ -13,10 +13,6 @@ public class DefaultIOHandler implements IOHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public DefaultIOHandler() {
-        LOGGER.debug("DefaultIOHandler");
-    }
-
     @Override
     public void copyFromTo(Path source, Path dest) throws IOException {
         LOGGER.debug("Copying {} to {}", source.toString(), dest.toString());
