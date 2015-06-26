@@ -195,4 +195,8 @@ public class PollingFileWatcher implements FileWatcher {
         }
         return false;
     }
+
+    public Collection<Path> getDirectories() {
+        return directories;
+    }
 }

@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.service;
 
 import java.nio.file.Path;
+import java.util.Collection;
 
 public interface WorkspaceService {
 
@@ -27,4 +28,11 @@ public interface WorkspaceService {
      * @throws ServiceException if an Exception on persistence layer causes the operation to fail
      */
     void removeDirectory(Path path) throws ServiceException;
+
+    /**
+     * Return Collection of all directory-paths which are currently used as workspace.
+     * @return collection of all directory-paths that are currently used as workspace.
+     * @throws ServiceException if path retrieval failed
+     */
+    Collection<Path> getDirectories() throws ServiceException;
 }

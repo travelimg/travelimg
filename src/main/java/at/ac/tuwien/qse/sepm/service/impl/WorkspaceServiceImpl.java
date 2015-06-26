@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
 
 public class WorkspaceServiceImpl implements WorkspaceService{
 
@@ -32,6 +34,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
         }
 
         watcher.register(path);
+        watcher.index();
     }
 
     /**
@@ -56,6 +59,7 @@ public class WorkspaceServiceImpl implements WorkspaceService{
         }
 
         watcher.unregister(path);
+        watcher.index();
     }
 
     /**
@@ -76,5 +80,9 @@ public class WorkspaceServiceImpl implements WorkspaceService{
         }
 
         return true;
+    }
+
+    public Collection<Path> getDirectories() {
+        return watcher.getDirectories();
     }
 }
