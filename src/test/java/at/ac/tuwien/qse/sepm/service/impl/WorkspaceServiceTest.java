@@ -105,8 +105,8 @@ public class WorkspaceServiceTest extends ServiceTestBase {
         workspaceService.removeDirectory(null);
     }
 
-    @Test (expected = ServiceException.class)
-    public void testRemoveDirectoryWhichHasntBeenAddedBefore_shouldThrowServiceException()
+    @Test
+    public void testRemoveDirectoryWhichHasntBeenAddedBefore_shouldHaveNoEffect()
             throws ServiceException {
         //Existing directory which, however, has not been added before
         Path sourceDir3 = Paths.get(System.getProperty("os.name").contains("indow") ?
@@ -116,6 +116,12 @@ public class WorkspaceServiceTest extends ServiceTestBase {
                         ImportTest.class.getClassLoader().getResource("db/testimages/directory3")
                                 .getPath());
 
+        int initialDirectories = workspaceService.getDirectories().size();
+        int noOfDirectoriesAfterCall = -1;
+
         workspaceService.removeDirectory(sourceDir3);
+        noOfDirectoriesAfterCall = workspaceService.getDirectories().size();
+
+        assertEquals(initialDirectories, noOfDirectoriesAfterCall);
     }
 }
