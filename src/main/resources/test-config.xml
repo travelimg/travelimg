@@ -35,6 +35,7 @@
     <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO"></bean> 
     <bean id="slideDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCSlideDAO"></bean>
     <bean id="slideshowDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCSlideshowDAO"></bean>
+    <bean id="directoryPathDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCDirectoryPathDAO"></bean>
 
     <!-- DAO repo beans -->
     <bean id="watcher" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher"></bean>
