@@ -4,7 +4,7 @@ import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.JourneyDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.dao.PlaceDAO;
-import at.ac.tuwien.qse.sepm.dao.repo.EntityWatcher;
+import at.ac.tuwien.qse.sepm.dao.EntityWatcher;
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
@@ -34,9 +34,12 @@ public class ClusterServiceImpl implements ClusterService {
     private Consumer<Place> refreshPlaces;
     private Consumer<Journey> refreshJourneys;
 
-    @Autowired private void setEntityWatcher(EntityWatcher entityWatcher) {
-        entityWatcher.subscribePlaceAdded(this::placeAdded);
-        entityWatcher.subscribeJourneyAdded(this::journeyAdded);
+    @Autowired private void setPlaceWatcher(EntityWatcher<Place> watcher) {
+        watcher.subscribeAdded(this::placeAdded);
+    }
+
+    @Autowired private void setJourneyWatcher(EntityWatcher<Journey> watcher) {
+        watcher.subscribeAdded(this::journeyAdded);
     }
 
     @Override public List<Journey> getAllJourneys() throws ServiceException {

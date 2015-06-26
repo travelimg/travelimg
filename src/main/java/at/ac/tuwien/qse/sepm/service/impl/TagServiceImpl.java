@@ -4,7 +4,7 @@ import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.dao.TagDAO;
 import at.ac.tuwien.qse.sepm.dao.repo.AsyncPhotoRepository;
-import at.ac.tuwien.qse.sepm.dao.repo.EntityWatcher;
+import at.ac.tuwien.qse.sepm.dao.EntityWatcher;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
@@ -31,8 +31,8 @@ public class TagServiceImpl implements TagService {
     private Consumer<Tag> refreshTags;
 
     @Autowired
-    private void setEntityWatcher(EntityWatcher entityWatcher) {
-        entityWatcher.subscribeTagAdded(this::tagAdded);
+    private void setWatcher(EntityWatcher<Tag> watcher) {
+        watcher.subscribeAdded(this::tagAdded);
     }
 
     @Override public Tag create(Tag tag) throws ServiceException {
