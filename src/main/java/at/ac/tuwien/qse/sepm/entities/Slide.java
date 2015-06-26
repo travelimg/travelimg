@@ -2,10 +2,6 @@ package at.ac.tuwien.qse.sepm.entities;
 
 public class Slide {
 
-    public Slide() {
-
-    }
-
     private Integer id;
     private Integer slideshowId;
     private Integer order;

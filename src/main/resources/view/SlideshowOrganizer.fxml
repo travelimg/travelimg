@@ -18,8 +18,8 @@
                     <children>
                         <TextField fx:id="slideshowNameTextField"/>
                         <RadioButton fx:id="shortDurationButton" mnemonicParsing="false" text="5 Sekunden" />
-                        <RadioButton fx:id="mediumDurationButton" mnemonicParsing="false" text="10 Sekunden" />
-                        <RadioButton fx:id="longDurationButton" mnemonicParsing="false" text="15 Sekunden" />
+                        <RadioButton fx:id="mediumDurationButton" mnemonicParsing="false" text="15 Sekunden" />
+                        <RadioButton fx:id="longDurationButton" mnemonicParsing="false" text="30 Sekunden" />
                     </children>
                 </VBox>
             </children>
@@ -34,6 +34,14 @@
                     </graphic>
                     <tooltip>
                         <Tooltip text="Diashow hinzufügen"/>
+                    </tooltip>
+                </Button>
+                <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                    <graphic>
+                        <FontAwesomeIconView glyphName="TRASH"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Diashow entfernen"/>
                     </tooltip>
                 </Button>
                 <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
