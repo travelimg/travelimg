@@ -1,15 +1,12 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher;
-import at.ac.tuwien.qse.sepm.service.PhotoService;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
+import at.ac.tuwien.qse.sepm.service.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 
-import at.ac.tuwien.qse.sepm.service.WorkspaceService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +17,8 @@ public class WorkspaceServiceTest extends ServiceTestBase {
     @Autowired WorkspaceService workspaceService;
     @Autowired PollingFileWatcher watcher;
     @Autowired PhotoService photoService;
+    @Autowired
+    public SynchronizationService syncService;
 
     private static final Path sourceDir1 = Paths
             .get(System.getProperty("os.name").contains("indow") ?
@@ -47,40 +46,30 @@ public class WorkspaceServiceTest extends ServiceTestBase {
     @Test
     public void testSetup() throws ServiceException {
         int photoPathsSize = watcher.index().size();
-        int photosInDB = photoService.getAllPhotos().size();
 
         assertEquals(3, photoPathsSize);
-        assertEquals(3, photosInDB);
     }
 
     @Test
     public void testAddDirectory_shouldPersist() throws ServiceException {
         int initiallyWatched = watcher.index().size();
         int watchedAfterAdd;
-        int photosInitiallyInDB = photoService.getAllPhotos().size();
-        int photosInDBAfterAdd;
 
         workspaceService.addDirectory(sourceDir2);
         watchedAfterAdd = watcher.index().size();
-        photosInDBAfterAdd = photoService.getAllPhotos().size();
 
         assertEquals(initiallyWatched + 2, watchedAfterAdd);
-        assertEquals(photosInitiallyInDB + 2, photosInDBAfterAdd);
     }
 
     @Test
     public void testRemoveDirectory_shouldPersist() throws ServiceException {
         int initiallyWatched = watcher.index().size();
         int watchedAfterRemove;
-        int photosInitiallyInDB = photoService.getAllPhotos().size();
-        int photosInDBAfterRemove;
 
-        workspaceService.addDirectory(sourceDir2);
+        workspaceService.removeDirectory(sourceDir1);
         watchedAfterRemove = watcher.index().size();
-        photosInDBAfterRemove = photoService.getAllPhotos().size();
 
         assertEquals(initiallyWatched - 3, watchedAfterRemove);
-        assertEquals(photosInitiallyInDB + 2, photosInDBAfterRemove);
     }
 
     @Test (expected = ServiceException.class)
