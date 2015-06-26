@@ -42,7 +42,7 @@ public class App extends Application {
         Parent root = loader.load(getClass().getClassLoader().getResourceAsStream("view/Main.fxml"));
 
         stage.setScene(new Scene(root));
-        stage.setMaximized(true);
+        //stage.setMaximized(true);
         stage.setTitle("travelimg");
         stage.show();
 
