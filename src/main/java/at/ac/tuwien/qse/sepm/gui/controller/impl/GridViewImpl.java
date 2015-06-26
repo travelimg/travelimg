@@ -135,27 +135,6 @@ public class GridViewImpl implements GridView {
     }
 
 
-    /**
-     * Called whenever a new photo is imported
-     *
-     * @param photo The newly imported    photo
-     */
-    private void handleImportedPhoto(Photo photo) {
-        // queue an update in the main gui
-        Platform.runLater(() -> {
-            disableReload = true;
-
-            // Ignore photos that are not part of the current filter.
-            if (!organizer.getUsedFilter().test(photo)) {
-                disableReload = false;
-                return;
-            }
-            grid.addPhoto(photo);
-
-            disableReload = false;
-        });
-    }
-
     private void handleFilterChange() {
         if (!disableReload)
             reloadImages();

@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.JourneyDAO;
 import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
 import at.ac.tuwien.qse.sepm.dao.PlaceDAO;
+import at.ac.tuwien.qse.sepm.dao.repo.EntityWatcher;
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
@@ -18,25 +19,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ClusterServiceImpl implements ClusterService {
 
     private static final Logger logger = LogManager.getLogger(ClusterServiceImpl.class);
 
-    @Autowired
-    private GeoService geoService;
-    @Autowired
-    private PhotoDAO photoDAO;
-    @Autowired
-    private JourneyDAO journeyDAO;
-    @Autowired
-    private PlaceDAO placeDAO;
-    @Autowired
-    private PhotoService photoService;
+    @Autowired private GeoService geoService;
+    @Autowired private PhotoDAO photoDAO;
+    @Autowired private JourneyDAO journeyDAO;
+    @Autowired private PlaceDAO placeDAO;
+    @Autowired private PhotoService photoService;
+    private Consumer<Place> refreshPlaces;
+    private Consumer<Journey> refreshJourneys;
 
-    @Override
-    public List<Journey> getAllJourneys() throws ServiceException {
+    @Autowired private void setEntityWatcher(EntityWatcher entityWatcher) {
+        entityWatcher.subscribePlaceAdded(this::placeAdded);
+        entityWatcher.subscribeJourneyAdded(this::journeyAdded);
+    }
+
+    @Override public List<Journey> getAllJourneys() throws ServiceException {
         try {
             return journeyDAO.readAll();
         } catch (DAOException ex) {
@@ -45,8 +48,7 @@ public class ClusterServiceImpl implements ClusterService {
         }
     }
 
-    @Override
-    public List<Place> getAllPlaces() throws ServiceException {
+    @Override public List<Place> getAllPlaces() throws ServiceException {
         try {
             return placeDAO.readAll();
         } catch (DAOException ex) {
@@ -55,13 +57,12 @@ public class ClusterServiceImpl implements ClusterService {
         }
     }
 
-    @Override
-    public List<Place> getPlacesByJourneyChronological(Journey journey) throws ServiceException {
+    @Override public List<Place> getPlacesByJourneyChronological(Journey journey)
+            throws ServiceException {
         List<Photo> photos;
 
         try {
             photos = photoDAO.readPhotosByJourney(journey);
-
         } catch (DAOException ex) {
             logger.error("Failed to read all photos by journey", ex);
             throw new ServiceException("Failed to read all photos by journey", ex);
@@ -85,10 +86,11 @@ public class ClusterServiceImpl implements ClusterService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public Place addPlace(Place place) throws ServiceException {
+    @Override public Place addPlace(Place place) throws ServiceException {
         try {
-            return placeDAO.create(place);
+            place = placeDAO.create(place);
+            placeAdded(place);
+            return place;
         } catch (DAOException ex) {
             logger.error("Place-creation for {} failed.", place);
             throw new ServiceException("Creation of Place failed.", ex);
@@ -97,10 +99,11 @@ public class ClusterServiceImpl implements ClusterService {
         }
     }
 
-    @Override
-    public Journey addJourney(Journey journey) throws ServiceException {
+    @Override public Journey addJourney(Journey journey) throws ServiceException {
         try {
-            return journeyDAO.create(journey);
+            journey =  journeyDAO.create(journey);
+            journeyAdded(journey);
+            return journey;
         } catch (DAOException ex) {
             logger.error("Journey-creation for {} failed.", journey);
             throw new ServiceException("Creation of journey failed.", ex);
@@ -109,8 +112,7 @@ public class ClusterServiceImpl implements ClusterService {
         }
     }
 
-    @Override
-    public List<Place> clusterJourney(Journey journey) throws ServiceException {
+    @Override public List<Place> clusterJourney(Journey journey) throws ServiceException {
         logger.debug("clustering journey {}", journey);
 
         List<Photo> photos;
@@ -131,9 +133,10 @@ public class ClusterServiceImpl implements ClusterService {
             final double longitude = photo.getData().getLongitude();
 
             double epsilon = 1.0;
-            Optional<Place> place = places.stream()
-                    .filter(p -> Math.abs(p.getLatitude() - latitude) < epsilon)   // find an existing place in lateral proximity
-                    .filter(p -> Math.abs(p.getLongitude() - longitude) < epsilon) // find an existing place in longitudinal proximity
+            Optional<Place> place = places.stream().filter(p -> Math.abs(p.getLatitude() - latitude)
+                    < epsilon)   // find an existing place in lateral proximity
+                    .filter(p -> Math.abs(p.getLongitude() - longitude)
+                            < epsilon) // find an existing place in longitudinal proximity
                     .findFirst();
 
             if (!place.isPresent()) {
@@ -150,10 +153,28 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     private Place lookupPlace(Photo photo) throws ServiceException {
-        Place place = geoService.getPlaceByGeoData(photo.getData().getLatitude(), photo.getData().getLongitude());
+        Place place = geoService
+                .getPlaceByGeoData(photo.getData().getLatitude(), photo.getData().getLongitude());
 
         logger.debug("New unknown place cluster: {}", place);
 
         return addPlace(place);
+    }
+
+    private void placeAdded(Place place) {
+        refreshPlaces.accept(place);
+    }
+
+    private void journeyAdded(Journey journey) {
+        refreshJourneys.accept(journey);
+    }
+
+    @Override public void subscribePlaceChanged(Consumer<Place> callback) {
+        this.refreshPlaces = callback;
+    }
+
+    @Override public void subscribeJourneyChanged(Consumer<Journey> callback) {
+        this.refreshJourneys = callback;
+
     }
 }
