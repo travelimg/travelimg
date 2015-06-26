@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.gui.controller.GridView;
 import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
@@ -40,29 +41,11 @@ public class MainController {
     @Autowired
     private GridView gridViewController;
 
-    private EventHandler<MouseEvent> ehandl;
 
-    private Photo wmklick = new Photo();
+    public void worldMapKlick(Place pl){
+        organizer.setWorldMapPlace(pl);
 
-
-    public MainController() {
-
-    }
-
-    @FXML
-    private void initialize() {
-
-
-
-
-
-    }
-
-
-
-
-    public void worldMapKlick(){
-       System.out.println("TEST");
+        root.getSelectionModel().select(grid);
 
     }
 

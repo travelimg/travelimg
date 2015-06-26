@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 
 import at.ac.tuwien.qse.sepm.entities.Place;
+import at.ac.tuwien.qse.sepm.gui.MainController;
 import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
@@ -37,6 +38,8 @@ public class WorldmapViewImpl implements WorldmapView {
     private ClusterService clusterService;
     @Autowired
     private Organizer organizer;
+    @Autowired
+    private MainController mainController;
     private HashMap<LatLong,Place> markerPlaces = new HashMap<>();
     private LatLong selectedMarker;
     @FXML
@@ -79,12 +82,8 @@ public class WorldmapViewImpl implements WorldmapView {
             if(Math.round(l.getLatitude())==Math.round(ll.getLatitude()) && Math.round(l.getLongitude())==Math.round(
                     ll.getLongitude())){
                 Place p = markerPlaces.get(l);
-                organizer.getUsedFilter().getIncludedPlaces().clear();
-                organizer.getUsedFilter().getIncludedPlaces().add(p);
 
-                System.out.println(organizer.getUsedFilter().getIncludedJourneys().toString());
-                System.out.println(organizer.getUsedFilter().getIncludedPlaces().toString());
-                System.out.println(markerPlaces.get(l).toString());
+                mainController.worldMapKlick(p);
             }
         }
 

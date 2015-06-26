@@ -135,6 +135,18 @@ public class OrganizerImpl implements Organizer {
         resetFilter();
     }
 
+    @Override
+    public void setWorldMapPlace(Place pl){
+        for(Place p: placeListView.getValues()){
+            if(p.getId()==pl.getId()){
+                placeListView.check(p);
+            }else{
+                placeListView.uncheck(p);
+            }
+        }
+        handlePlacesChange(placeListView.getChecked());
+
+    }
     // This Method let's the User switch to the usedFilter-view
     private void filterViewClicked() {
         filterContainer.getChildren().clear();
