@@ -75,14 +75,17 @@ public class WorldmapViewImpl implements WorldmapView {
 
 
     }
+
+    /**
+     * handle click on Marker 
+     * @param ll the LatLong from Marker
+     */
     public void clickMarker(LatLong ll){
-
         for(LatLong l : markerPlaces.keySet()){
-
+            // Math.round .. because the koord s did not match
             if(Math.round(l.getLatitude())==Math.round(ll.getLatitude()) && Math.round(l.getLongitude())==Math.round(
                     ll.getLongitude())){
                 Place p = markerPlaces.get(l);
-
                 mainController.worldMapKlick(p);
             }
         }

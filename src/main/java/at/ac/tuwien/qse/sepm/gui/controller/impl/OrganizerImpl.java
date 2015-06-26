@@ -135,6 +135,7 @@ public class OrganizerImpl implements Organizer {
         resetFilter();
     }
 
+
     @Override
     public void setWorldMapPlace(Place pl){
         for(Place p: placeListView.getValues()){
