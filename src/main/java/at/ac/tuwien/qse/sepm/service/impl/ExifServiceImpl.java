@@ -1,6 +1,9 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.repo.PhotoRepository;
+import at.ac.tuwien.qse.sepm.dao.repo.PhotoSerializer;
+import at.ac.tuwien.qse.sepm.dao.repo.impl.PhotoFileRepository;
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.service.ExifService;
@@ -36,6 +39,9 @@ public class ExifServiceImpl implements ExifService {
 
     @Autowired
     private IOHandler ioHandler;
+
+    @Autowired
+    private PhotoFileRepository repository;
 
     @Override
     public Exif getExif(Photo photo) throws ServiceException {
@@ -194,6 +200,16 @@ public class ExifServiceImpl implements ExifService {
         } catch (IOException | ImageReadException | ImageWriteException ex) {
             logger.error("Failed to set gps and date", ex);
         }
+    }
+
+    @Override public void setMetaData(Photo photo) throws ServiceException {
+        if(photo != null) {
+            try {
+                repository.update(photo);
+            } catch (DAOException ex) {
+                logger.error("Failed to write MetaData to photofile", ex);
+            }
+        }  else logger.error("Photo must not be null");
     }
 
     private LocalDateTime getDateTime(ImageMetadata metadata) {
