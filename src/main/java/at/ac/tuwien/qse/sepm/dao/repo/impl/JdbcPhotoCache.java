@@ -1,10 +1,12 @@
 package at.ac.tuwien.qse.sepm.dao.repo.impl;
 
 import at.ac.tuwien.qse.sepm.dao.*;
+import at.ac.tuwien.qse.sepm.dao.repo.EntityWatcher;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoCache;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoNotFoundException;
 import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
+import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.function.Consumer;
 
 /**
  * Photo cache that stores photo instances in an SQLite database.
  */
-public class JdbcPhotoCache implements PhotoCache {
+public class JdbcPhotoCache implements PhotoCache, EntityWatcher {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -39,6 +43,11 @@ public class JdbcPhotoCache implements PhotoCache {
 
     @Autowired
     private PhotographerDAO photographerDAO;
+
+    private Collection<Consumer<Tag>> tagListeners = new LinkedList<>();
+    private Collection<Consumer<Photographer>> photographerListeners = new LinkedList<>();
+    private Collection<Consumer<Journey>> journeyListeners = new LinkedList<>();
+    private Collection<Consumer<Place>> placeListeners = new LinkedList<>();
 
     @Override public void put(Photo photo) throws DAOException {
         if (photo == null) throw new IllegalArgumentException();
@@ -105,6 +114,8 @@ public class JdbcPhotoCache implements PhotoCache {
         LOGGER.debug("removed {}", file);
     }
 
+
+
     @Override public Collection<Path> index() throws DAOException {
         LOGGER.debug("indexing");
         Collection<Path> result = photoDAO.readAllPaths();
@@ -150,6 +161,7 @@ public class JdbcPhotoCache implements PhotoCache {
                     LOGGER.debug("creating photographer {}", photographer);
                     photographer = photographerDAO.create(photographer);
                     LOGGER.debug("created photographer {}", photographer);
+                    notifyPhotographerChange(photographer);
                     return photographer;
                 } catch (DAOException | ValidationException exx) {
                     LOGGER.warn("failed creating photographer {}", photographer);
@@ -165,12 +177,14 @@ public class JdbcPhotoCache implements PhotoCache {
                 LOGGER.debug("reading journey {}", journey);
                 journey = journeyDAO.getByName(journey.getName());
                 LOGGER.debug("read journey {}", journey);
+
                 return journey;
             } catch (DAOException ex) {
                 try {
                     LOGGER.debug("creating journey {}", journey);
                     journey = journeyDAO.create(journey);
                     LOGGER.debug("created journey {}", journey);
+                    notifyJourneyChange(journey);
                     return journey;
                 } catch (DAOException | ValidationException exx) {
                     LOGGER.warn("failed creating journey {}", journey);
@@ -192,6 +206,7 @@ public class JdbcPhotoCache implements PhotoCache {
                     LOGGER.debug("creating place {}", place);
                     place = placeDAO.create(place);
                     LOGGER.debug("created place {}", place);
+                    notifyPlaceChange(place);
                     return place;
                 } catch (DAOException | ValidationException exx) {
                     LOGGER.warn("failed creating place {}", place);
@@ -212,11 +227,46 @@ public class JdbcPhotoCache implements PhotoCache {
                 LOGGER.debug("creating tag {}", tag);
                 tag = tagDAO.create(tag);
                 LOGGER.debug("created tag {}", tag);
+                notifyTagChange(tag);
                 return tag;
             } catch (DAOException | ValidationException exx) {
                 LOGGER.warn("failed creating tag {}", tag);
                 throw new DAOException(exx);
             }
         }
+    }
+
+    @Override
+    public void subscribeTagAdded(Consumer<Tag> callback) {
+        tagListeners.add(callback);
+    }
+
+    @Override
+    public void subscribePhotographerAdded(Consumer<Photographer> callback) {
+        photographerListeners.add(callback);
+    }
+
+    @Override public void subscribeJourneyAdded(Consumer<Journey> callback) {
+        journeyListeners.add(callback);
+    }
+
+    @Override public void subscribePlaceAdded(Consumer<Place> callback) {
+        placeListeners.add(callback);
+    }
+
+    private void notifyTagChange(Tag tag) {
+        tagListeners.forEach(listener -> listener.accept(tag));
+    }
+
+    private void notifyPhotographerChange(Photographer photographer) {
+        photographerListeners.forEach(listener -> listener.accept(photographer));
+    }
+
+    private void notifyJourneyChange(Journey journey) {
+        journeyListeners.forEach(listener -> listener.accept(journey));
+    }
+
+    private void notifyPlaceChange(Place place) {
+        placeListeners.forEach(listener -> listener.accept(place));
     }
 }

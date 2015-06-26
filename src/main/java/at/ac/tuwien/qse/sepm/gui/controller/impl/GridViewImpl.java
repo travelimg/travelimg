@@ -151,6 +151,7 @@ public class GridViewImpl implements GridView {
         });
     }
 
+
     private void handleFilterChange() {
         if (!disableReload)
             reloadImages();

@@ -24,12 +24,12 @@
                                 <VBox HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Beginn" maxWidth="Infinity"/>
-                                        <DatePicker fx:id="journeyBeginDate" maxWidth="Infinity"/>
+                                        <DatePicker fx:id="journeyBeginDate" maxWidth="Infinity" styleClass="calendar"/>
                                     </children>
                                 </VBox>
                                 <VBox HBox.hgrow="ALWAYS">
                                     <children>
-                                        <Label text="Ende" maxWidth="Infinity"/>
+                                        <Label text="Ende" maxWidth="Infinity" styleClass="calendar"/>
                                         <DatePicker fx:id="journeyEndDate" maxWidth="Infinity"/>
                                     </children>
                                 </VBox>
