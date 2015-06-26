@@ -12,6 +12,7 @@ import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.TagService;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -85,7 +86,6 @@ public class OrganizerImpl implements Organizer {
         filterViewButton.setToggleGroup(toggleGroup);
         folderViewButton.setToggleGroup(toggleGroup);
 
-
         buttonBox = new HBox(filterViewButton, folderViewButton);
         buttonBox.setAlignment(Pos.CENTER);
 
@@ -134,6 +134,11 @@ public class OrganizerImpl implements Organizer {
 
         refreshLists();
         resetFilter();
+
+        tagService.subscribeTagChanged(this::refreshCategoryList);
+        clusterService.subscribeJourneyChanged(this::refreshJourneyList);
+        clusterService.subscribePlaceChanged(this::refreshPlaceList);
+        photographerService.subscribeChanged(this::refreshPhotographerList);
     }
 
 
@@ -343,5 +348,38 @@ public class OrganizerImpl implements Organizer {
 
         // restore the callback and handle the change
         filterChangeCallback = savedCallback;
+    }
+
+    public void refreshCategoryList(Tag tag) {
+        Platform.runLater(() -> {
+            inspectorController.refresh();
+            categoryListView.setValues(getAllCategories());
+            categoryListView.checkAll();
+            LOGGER.info("refresh tag-filterlist");
+        });
+    }
+
+    public void refreshJourneyList(Journey journey) {
+        Platform.runLater(() -> {
+            journeyListView.setValues(getAllJourneys());
+            journeyListView.checkAll();
+            LOGGER.info("refresh journey-filterlist");
+        });
+    }
+
+    public void refreshPlaceList(Place place) {
+        Platform.runLater(() -> {
+            placeListView.setValues(getAllPlaces());
+            placeListView.checkAll();
+            LOGGER.info("refresh place-filterlist");
+        });
+    }
+
+    public void refreshPhotographerList(Photographer photographer) {
+        Platform.runLater(() -> {
+            photographerListView.setValues(getAllPhotographers());
+            photographerListView.checkAll();
+            LOGGER.info("refresh photographer-filterlist");
+        });
     }
 }
