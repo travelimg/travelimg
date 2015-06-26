@@ -7,6 +7,7 @@ import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.SlideshowView;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.grid.SlideGrid;
+import at.ac.tuwien.qse.sepm.gui.slide.SlideCallback;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
 import at.ac.tuwien.qse.sepm.service.SlideshowService;
@@ -35,50 +36,38 @@ public class SlideshowViewImpl implements SlideshowView {
     private SlideshowService slideShowService;
 
     @Autowired
-    private Inspector<PhotoSlide> photoSlideInspector;
+    private SlideInspectorImpl<PhotoSlide> photoSlideInspector;
     @Autowired
-    private Inspector<TitleSlide> titleSlideInspector;
+    private SlideInspectorImpl<TitleSlide> titleSlideInspector;
     @Autowired
-    private Inspector<MapSlide> mapSlideInspector;
+    private SlideInspectorImpl<MapSlide> mapSlideInspector;
     @FXML
     private InspectorPane photoSlideInspectorPane;
     @FXML
     private InspectorPane titleSlideInspectorPane;
     @FXML
     private InspectorPane mapSlideInspectorPane;
-
     @FXML
     private BorderPane root;
     @FXML
-    private ScrollPane gridContainer;
+    private SlideGrid grid;
 
     @Autowired
     private SlideshowOrganizerImpl slideshowOrganizer;
     @Autowired
     private SlideshowService slideshowService;
 
-    private SlideGrid grid = new SlideGrid();
-
     private ObservableList<Slideshow> slideshows = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
-        gridContainer.setContent(grid);
-
-        grid.setSlideChangedCallback(this::handleSlideChanged);
-        grid.setSlideAddedCallback(this::handleSlideAdded);
-
-        grid.setSelectionChangeCallback(() -> {
-            setInspectorEntities(grid.getSelected());
-        });
+        grid.setSlideAddedCallback(new SlideAddedCallback());
+        grid.setSlideChangedCallback(new SlideChangedCallback());
+        grid.setSlideSelectedCallback(new SlideSelectedCallback());
 
         slideshowOrganizer.setSlideshows(slideshows);
         slideshowOrganizer.getSelectedSlideshowProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                grid.setSlides(newValue.getSlides());
-            } else {
-                grid.setSlides(FXCollections.observableArrayList());
-            }
+            grid.setSlideshow(newValue);
         });
 
         loadAllSlideshows();
@@ -87,7 +76,10 @@ public class SlideshowViewImpl implements SlideshowView {
             slideshows.remove(slideshows.size() - 1); // remove placeholder
             slideshows.add(slideshow); // add created slideshow
             slideshows.add(createNewSlideshowPlaceholder()); // re-add placeholder
-            slideshowOrganizer.setSlideshows(slideshows);
+        });
+
+        slideshowOrganizer.setDeleteAction((slideshow) -> {
+            slideshows.remove(slideshow);
         });
 
         slideshowOrganizer.setPresentAction(() -> {
@@ -96,38 +88,9 @@ public class SlideshowViewImpl implements SlideshowView {
             presentationWindow.present();
         });
 
-        photoSlideInspector.setUpdateHandler(() -> grid.setSlides(slideshowOrganizer.getSelected().getSlides()));
-        mapSlideInspector.setUpdateHandler(() -> grid.setSlides(slideshowOrganizer.getSelected().getSlides()));
-        titleSlideInspector.setUpdateHandler(() -> grid.setSlides(slideshowOrganizer.getSelected().getSlides()));
-    }
-
-    private void setInspectorEntities(Set<Slide> slides) {
-        photoSlideInspector.setEntities(slides.stream()
-                .filter(s -> s instanceof PhotoSlide)
-                .map(s -> (PhotoSlide) s)
-                .collect(Collectors.toList())
-        );
-
-        photoSlideInspectorPane.setVisible(!photoSlideInspector.getEntities().isEmpty());
-        photoSlideInspectorPane.setManaged(!photoSlideInspector.getEntities().isEmpty());
-
-        mapSlideInspector.setEntities(slides.stream()
-                        .filter(s -> s instanceof MapSlide)
-                        .map(s -> (MapSlide)s)
-                        .collect(Collectors.toList())
-        );
-
-        mapSlideInspectorPane.setVisible(!mapSlideInspector.getEntities().isEmpty());
-        mapSlideInspectorPane.setManaged(!mapSlideInspector.getEntities().isEmpty());
-
-        titleSlideInspector.setEntities(slides.stream()
-                        .filter(s -> s instanceof TitleSlide)
-                        .map(s -> (TitleSlide)s)
-                        .collect(Collectors.toList())
-        );
-
-        titleSlideInspectorPane.setVisible(!titleSlideInspector.getEntities().isEmpty());
-        titleSlideInspectorPane.setManaged(!titleSlideInspector.getEntities().isEmpty());
+        photoSlideInspector.setUpdateHandler(() -> grid.setSlideshow(slideshowOrganizer.getSelected()));
+        mapSlideInspector.setUpdateHandler(() -> grid.setSlideshow(slideshowOrganizer.getSelected()));
+        titleSlideInspector.setUpdateHandler(() -> grid.setSlideshow(slideshowOrganizer.getSelected()));
     }
 
     @Override
@@ -154,67 +117,11 @@ public class SlideshowViewImpl implements SlideshowView {
             // add the photos to the grid if the slideshow is currently being displayed
             Slideshow selected = slideshowOrganizer.getSelected();
             if (selected != null && selected.getId().equals(slideshow.getId())) {
-                grid.setSlides(slideshow.getSlides());
+                grid.setSlideshow(slideshow);
             }
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Hinzufügen zur Slideshow", "Fehlermeldung: " + ex.getMessage());
         }
-    }
-
-    private void handleSlideChanged(Slide slide) {
-        try {
-            slideService.update(slide);
-        } catch (ServiceException ex) {
-            ErrorDialog.show(root, "Fehler beim Ändern der Slides", "Fehlermeldung: " + ex.getMessage());
-        }
-
-        // sort slides in the slideshow to which the slide belongs
-        Optional<Slideshow> slideshow = slideshows.stream()
-                .filter(s -> s.getId().equals(slide.getSlideshowId()))
-                .findFirst();
-
-        if (slideshow.isPresent()) {
-            List<Slide> sorted = slideshow.get().getSlides().stream()
-                    .sorted((s1, s2) -> s1.getOrder().compareTo(s2.getOrder()))
-                    .collect(Collectors.toList());
-            slideshow.get().setSlides(sorted);
-        }
-    }
-
-    private void handleSlideAdded(Slide slide, Integer position) {
-        Slideshow selected = slideshowOrganizer.getSelected();
-
-        if (selected == null) {
-            return;
-        }
-
-        slide.setOrder(position + 1);
-        slide.setSlideshowId(selected.getId());
-
-        try {
-            slide = slideService.create(slide);
-            selected.getSlides().add(position, slide);
-        } catch (ServiceException ex) {
-            ErrorDialog.show(root, "Fehler beim Erstellen der Slide", "");
-            return;
-        }
-
-        int i = 0;
-        for (Slide s : selected.getSlides()) {
-            if (i > position) {
-                s.setOrder(s.getOrder() + 1);
-
-                try {
-                    slideService.update(s);
-                } catch (ServiceException ex) {
-                    ErrorDialog.show(root, "Fehler beim Setzen der neuen Reihenfolge", "");
-                }
-            }
-
-            i++;
-        }
-
-        grid.setSlides(selected.getSlides());
     }
 
     private void loadAllSlideshows() {
@@ -229,9 +136,170 @@ public class SlideshowViewImpl implements SlideshowView {
 
     private Slideshow createNewSlideshowPlaceholder() {
         double durationBetweenPhotos = 5; // TODO
-        List<Slide> slides = new ArrayList<>();
+        return new Slideshow(NEW_SLIDESHOW_MARKER_ID, NEW_SLIDESHOW_PROMPT, durationBetweenPhotos);
+    }
 
-        return new Slideshow(NEW_SLIDESHOW_MARKER_ID, NEW_SLIDESHOW_PROMPT, durationBetweenPhotos, slides);
+    private void refreshGrid() {
+        grid.setSlideshow(slideshowOrganizer.getSelected());
+    }
+
+    private class SlideSelectedCallback implements SlideCallback<Void> {
+        @Override
+        public void handle(PhotoSlide slide) {
+            LOGGER.debug("Selected {}", slide);
+            photoSlideInspector.setSlide(slide);
+
+            photoSlideInspectorPane.setVisible(true);
+            photoSlideInspectorPane.setCount(1);
+
+            mapSlideInspectorPane.setVisible(false);
+            mapSlideInspectorPane.setCount(0);
+            titleSlideInspectorPane.setVisible(false);
+            titleSlideInspectorPane.setCount(0);
+        }
+
+        @Override
+        public void handle(MapSlide slide) {
+            mapSlideInspector.setSlide(slide);
+
+            mapSlideInspectorPane.setVisible(true);
+            mapSlideInspectorPane.setCount(1);
+
+            photoSlideInspectorPane.setVisible(false);
+            photoSlideInspectorPane.setCount(0);
+            titleSlideInspectorPane.setVisible(false);
+            titleSlideInspectorPane.setCount(0);
+        }
+
+        @Override
+        public void handle(TitleSlide slide) {
+            titleSlideInspector.setSlide(slide);
+
+            titleSlideInspectorPane.setVisible(true);
+            titleSlideInspectorPane.setCount(1);
+
+            photoSlideInspectorPane.setVisible(false);
+            photoSlideInspectorPane.setCount(0);
+            mapSlideInspectorPane.setVisible(false);
+            mapSlideInspectorPane.setCount(0);
+        }
+    }
+
+    private class SlideAddedCallback implements SlideCallback<Integer> {
+
+        @Override
+        public void handle(MapSlide slide, Integer position) {
+            Slideshow selected = slideshowOrganizer.getSelected();
+
+            if (selected == null) {
+                return;
+            }
+
+            slide.setOrder(position + 1);
+            slide.setSlideshowId(selected.getId());
+
+            try {
+                slide = slideService.create(slide);
+            } catch (ServiceException ex) {
+                ErrorDialog.show(root, "Fehler beim Erstellen der Slide", "");
+                return;
+            }
+
+            updateOrderForOtherSlides(selected, position);
+            selected.getMapSlides().add(slide);
+            refreshGrid();
+        }
+
+        @Override
+        public void handle(TitleSlide slide, Integer position) {
+            Slideshow selected = slideshowOrganizer.getSelected();
+
+            if (selected == null) {
+                return;
+            }
+
+            slide.setOrder(position + 1);
+            slide.setSlideshowId(selected.getId());
+
+            try {
+                slide = slideService.create(slide);
+            } catch (ServiceException ex) {
+                ErrorDialog.show(root, "Fehler beim Erstellen der Slide", "");
+                return;
+            }
+
+            updateOrderForOtherSlides(selected, position);
+            selected.getTitleSlides().add(slide);
+            refreshGrid();
+        }
+
+        private void updateOrderForOtherSlides(Slideshow slideshow, int insertPosition) {
+
+            for (PhotoSlide slide : slideshow.getPhotoSlides()) {
+                if (slide.getOrder() > insertPosition) {
+                    slide.setOrder(slide.getOrder() + 1);
+
+                    try {
+                        slideService.update(slide);
+                    } catch (ServiceException ex) {
+                        ErrorDialog.show(root, "Fehler beim Setzen der neuen Reihenfolge", "");
+                    }
+                }
+            }
+
+            for (MapSlide slide : slideshow.getMapSlides()) {
+                if (slide.getOrder() > insertPosition) {
+                    slide.setOrder(slide.getOrder() + 1);
+
+                    try {
+                        slideService.update(slide);
+                    } catch (ServiceException ex) {
+                        ErrorDialog.show(root, "Fehler beim Setzen der neuen Reihenfolge", "");
+                    }
+                }
+            }
+
+            for (TitleSlide slide : slideshow.getTitleSlides()) {
+                if (slide.getOrder() > insertPosition) {
+                    slide.setOrder(slide.getOrder() + 1);
+
+                    try {
+                        slideService.update(slide);
+                    } catch (ServiceException ex) {
+                        ErrorDialog.show(root, "Fehler beim Setzen der neuen Reihenfolge", "");
+                    }
+                }
+            }
+        }
+    }
+
+    private class SlideChangedCallback implements SlideCallback<Void> {
+        @Override
+        public void handle(PhotoSlide slide) {
+            try {
+                slideService.update(slide);
+            } catch (ServiceException ex) {
+                ErrorDialog.show(root, "Fehler beim Ändern der Slides", "");
+            }
+        }
+
+        @Override
+        public void handle(MapSlide slide) {
+            try {
+                slideService.update(slide);
+            } catch (ServiceException ex) {
+                ErrorDialog.show(root, "Fehler beim Ändern der Slides", "");
+            }
+        }
+
+        @Override
+        public void handle(TitleSlide slide) {
+            try {
+                slideService.update(slide);
+            } catch (ServiceException ex) {
+                ErrorDialog.show(root, "Fehler beim Ändern der Slides", "");
+            }
+        }
     }
 
 

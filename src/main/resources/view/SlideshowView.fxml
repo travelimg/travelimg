@@ -3,6 +3,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
+<?import at.ac.tuwien.qse.sepm.gui.grid.SlideGrid?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1"
             stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8"
             fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowViewImpl"
@@ -14,7 +15,9 @@
     <center>
 
         <ScrollPane fx:id="gridContainer" prefWidth="500" prefHeight="400" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
-                    fitToWidth="true" fitToHeight="true"/>
+                    fitToWidth="true" fitToHeight="true">
+                <SlideGrid fx:id="grid" />
+        </ScrollPane>
     </center>
 
     <right>
