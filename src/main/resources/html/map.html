@@ -50,8 +50,12 @@
                     alert("double-click(" + lat + ", " + lng + ")");
                 });
 
+
                 alert("map-loaded");
             });
+
+
+
 
             document.setZoom = function setZoom(level) {
 
@@ -85,12 +89,24 @@
                 var marker = new google.maps.Marker({
                     position: new google.maps.LatLng(latitude, longitude),
                     map: document.map
-                });
 
-                markers.push(marker);
+                });
+                google.maps.event.addListener(marker, 'click', function() {
+
+                     var lat = marker.getPosition().lat();
+                     var lng = marker.getPosition().lng();
+
+                     alert("marker-click(" + lat + ", " + lng + ")");
+
+                  });
+                  markers.push(marker);
                 document.setZoom(document.map.getZoom()-1);
                 document.setZoom(document.map.getZoom()+1);
             }
+
+
+
+
 
             document.fitToMarkers = function fitToMarkers() {
                 var bounds = new google.maps.LatLngBounds();

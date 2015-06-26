@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class WorldmapViewImpl implements WorldmapView {
@@ -26,14 +27,16 @@ public class WorldmapViewImpl implements WorldmapView {
     private GoogleMapScene mapScene;
 
     @Autowired
-
     private ClusterService clusterService;
-
+    private HashMap<LatLong,Place> markerPlaces = new HashMap<>();
     @FXML
     private void initialize() {
         mapScene.setOnLoaded(this::showPlaces);
     }
-
+    @Override
+    public void ListenLatLong(LatLong latLong){
+        System.out.println(latLong.toString());
+    }
     private void showPlaces() {
         List<Place> places;
         try {
@@ -43,7 +46,11 @@ public class WorldmapViewImpl implements WorldmapView {
             return;
         }
 
-        places.forEach((place) -> mapScene.addMarker(new LatLong(place.getLatitude(), place.getLongitude())));
+        places.forEach((place) -> mapScene.addMarker(
+                new LatLong(place.getLatitude(), place.getLongitude())));
+        places.forEach((place) -> markerPlaces
+                .put(new LatLong(place.getLatitude(), place.getLongitude()), place));
         mapScene.fitToMarkers();
+
     }
 }
