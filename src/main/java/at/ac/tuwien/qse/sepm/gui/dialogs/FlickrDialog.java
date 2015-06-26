@@ -151,7 +151,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         importButton.setOnAction(e -> handleImport());
         searchButton.setOnAction(e -> handleSearch());
         fullscreenButton.setOnAction(e -> handleFullscreen());
-        resetButton.setOnAction(e -> handleStop());
+        resetButton.setOnAction(e -> handleLeaveFlickrDialog());
     }
 
     private void dropMarker(LatLong ll) {
@@ -317,12 +317,16 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         close();
     }
 
-    private void handleStop() {
+    private void handleLeaveFlickrDialog() {
         //ConfirmationDialog confirmationDialog = new ConfirmationDialog(borderPane, "Download abbrechen", "Download abbrechen?");
         //Optional<Boolean> confirmed = confirmationDialog.showForResult();
         //if (!confirmed.isPresent() || !confirmed.get()) return;
         handleReset();
         close();
+    }
+
+    private void handleInterruptDownload(){
+
     }
 
     /**
