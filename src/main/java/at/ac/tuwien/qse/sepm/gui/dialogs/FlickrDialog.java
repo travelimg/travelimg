@@ -273,10 +273,6 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             return;
         }
         logger.debug("Photos prepared for download {}", flickrPhotos);
-        //i.getFlickrPhoto().setDateAdded(datePicker.getValue().atStartOfDay());
-        //exifService.setDateAndGeoData(p);
-        //Path path = Paths.get(p.getPath());
-        //ioHandler.copyFromTo(Paths.get(p.getPath()),Paths.get(System.getProperty("user.home"),"travelimg/"+path.getFileName()));
         Button flickrButton = ((MenuImpl)sender).getFlickrButton();
         String flickrButtonStyle = flickrButton.getGraphic().getStyle();
         flickrButton.getGraphic().setStyle("-fx-fill: -tmg-primary;");
@@ -291,8 +287,18 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
 
             flickrService.downloadPhotos(flickrPhotos,
                     new Consumer<com.flickr4java.flickr.photos.Photo>() {
-                        @Override public void accept(com.flickr4java.flickr.photos.Photo photo) {
-                            //TODO
+                        @Override public void accept(com.flickr4java.flickr.photos.Photo flickrPhoto) {
+                            Photo p = new Photo();
+                            p.setPath(tmpDir+flickrPhoto.getId()+"_o."+flickrPhoto.getOriginalFormat());
+                            p.getData().setLatitude(flickrPhoto.getGeoData().getLatitude());
+                            p.getData().setLongitude(flickrPhoto.getGeoData().getLongitude());
+                            p.getData().setDatetime(datePicker.getValue().atStartOfDay());
+                            //TODO set tags
+                            //need a setter for that in photo entity
+                            //Path path = Paths.get(p.getPath());
+                            //TODO method which alters exif data (date, tags, geodata)
+                            //exifService.setDateAndGeoData(p);
+                            //ioHandler.copyFromTo(Paths.get(p.getPath()),Paths.get(System.getProperty("user.home"),"travelimg/"+path.getFileName()));
                         }
                     }
                     ,
@@ -302,7 +308,6 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                                 public void run() {
                                     downloadProgressControl.setProgress(downloadProgress);
                                     if (downloadProgress == 1.0) {
-                                        downloadProgressControl.finish();
                                         flickrButton.getGraphic().setStyle(flickrButtonStyle);
                                         flickrButton.setTooltip(flickrButtonTooltip);
                                         flickrButton.setOnAction(flickrButtonOnAction);
@@ -318,11 +323,16 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                     , new ErrorHandler<ServiceException>() {
 
                         public void handle(ServiceException exception) {
-                            //handle errors here
+                            downloadProgressControl.finish();
+                            flickrButton.getGraphic().setStyle(flickrButtonStyle);
+                            flickrButton.setTooltip(flickrButtonTooltip);
+                            flickrButton.setOnAction(flickrButtonOnAction);
                         }
                     });
         } catch (ServiceException e) {
-
+            flickrButton.getGraphic().setStyle(flickrButtonStyle);
+            flickrButton.setTooltip(flickrButtonTooltip);
+            flickrButton.setOnAction(flickrButtonOnAction);
         }
         close();
     }
