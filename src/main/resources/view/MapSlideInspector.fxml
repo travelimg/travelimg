@@ -21,7 +21,7 @@
                 <Label fx:id="choosePrompt" alignment="CENTER">Zum Ändern klicken:</Label>
                 <ToggleButton fx:id="chooseLocationButton">
                     <graphic>
-                        <FontAwesomeIconView glyphName="CROSSHAIRS"
+                        <FontAwesomeIconView glyphName="MAP_MARKER"
                                              style="-fx-fill: -tmg-text-light"/>
                     </graphic>
                 </ToggleButton>
