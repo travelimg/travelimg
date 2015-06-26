@@ -48,7 +48,7 @@ public class WikipediaServiceTest extends ServiceTestBase {
 
         assertEquals(gleisdorfInfo.getPlaceName(), "Gleisdorf");
         assertEquals(gleisdorfInfo.getCountryName(), "Österreich");
-        assertTrue(Math.abs(gleisdorfInfo.getArea() - 4.76e6) <= 0e-6);
+        assertTrue(Math.abs(gleisdorfInfo.getArea() - 4.76) <= 0e-6);
         assertEquals(gleisdorfInfo.getCurrency(), "Euro");
         assertTrue(Math.abs(gleisdorfInfo.getElevation() - 365) <= 0e-6);
         assertEquals(gleisdorfInfo.getLanguage(), "Österreichisches Deutsch");
