@@ -42,6 +42,8 @@ public class PaginatedImageGrid extends StackPane {
         activePageProperty.addListener(this::handlePageChange);
         setAlignment(Pos.CENTER);
 
+        getChildren().add(getPage(0)); // set the initial page
+
         menu.addListener(new PageSwitchListener());
     }
 
@@ -271,8 +273,7 @@ public class PaginatedImageGrid extends StackPane {
     private void updatePage() {
         ImageGridPage page = getPage(menu.getCurrentPage());
 
-        getChildren().clear();
-        getChildren().add(page);
+        getChildren().set(0, page);
     }
 
     private class PageSwitchListener implements Menu.Listener {
