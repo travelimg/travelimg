@@ -253,6 +253,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         keywordsFlowPane.getChildren().clear();
         keywordTextField.clear();
         fullscreenButton.setDisable(true);
+        progressIndicator.setVisible(false);
         if (searchTask != null)
             searchTask.cancel();
     }

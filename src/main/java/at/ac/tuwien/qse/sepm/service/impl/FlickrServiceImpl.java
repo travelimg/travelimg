@@ -188,8 +188,10 @@ public class FlickrServiceImpl implements FlickrService {
                     if (nrOfDownloadedPhotos == nrOfPhotosToDownload) {
                         break;
                     }
-                    if (!isRunning())
-                        return;
+                    if (!isRunning()){
+                        logger.debug("Download interrupted");
+                        break;
+                    }
                     logger.debug("Downloading photo nr {} ...", i + 1);
                     p.setOriginalSecret(
                             flickr.getPhotosInterface().getInfo(p.getId(), p.getSecret())
@@ -199,6 +201,10 @@ public class FlickrServiceImpl implements FlickrService {
                         GeoData geoData = flickr.getPhotosInterface().getGeoInterface().getLocation(p.getId());
                         p.setGeoData(geoData);
                         downloadPhotoFromFlickr(mediumSizeUrl, p.getId(), p.getOriginalFormat());
+                        if(!isRunning()){
+                            logger.debug("Download interrupted");
+                            break;
+                        }
                         logger.debug("Downloaded photo {}", p.getId());
                         callback.accept(p);
                         progressCallback.accept((double) nrOfDownloadedPhotos / (double) nrOfPhotosToDownload);
