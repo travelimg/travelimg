@@ -245,6 +245,10 @@ public class FlickrServiceImpl implements FlickrService {
                     Photo p = photos.get(i);
                     String url = "https://farm" + p.getFarm() + ".staticflickr.com/" + p.getServer() + "/" + p.getId() + "_" + p.getOriginalSecret() + "_o." + p.getOriginalFormat();
                     downloadPhotoFromFlickr(url,p.getId()+"_o",p.getOriginalFormat());
+                    if(!isRunning()){
+                        logger.debug("Download interrupted.");
+                        return;
+                    }
                     callback.accept(p);
                     progressCallback.accept((double)(i+1)/(double)photos.size());
                 } catch (ServiceException e) {

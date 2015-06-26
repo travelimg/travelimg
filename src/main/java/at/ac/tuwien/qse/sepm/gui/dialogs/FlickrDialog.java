@@ -83,6 +83,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     private ImageTile lastSelected;
     private ArrayList<Photo> photos = new ArrayList<>();
     private Cancelable searchTask;
+    private Cancelable downloadTask;
     private Menu sender;
 
     public FlickrDialog(Node origin, String title, FlickrService flickrService, ExifService exifService, IOHandler ioHandler,
@@ -274,18 +275,15 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         }
         logger.debug("Photos prepared for download {}", flickrPhotos);
         Button flickrButton = ((MenuImpl)sender).getFlickrButton();
-        String flickrButtonStyle = flickrButton.getGraphic().getStyle();
-        flickrButton.getGraphic().setStyle("-fx-fill: -tmg-primary;");
-        Tooltip flickrButtonTooltip = flickrButton.getTooltip();
-        flickrButton.setTooltip(null);
-        EventHandler flickrButtonOnAction = flickrButton.getOnAction();
-        flickrButton.setOnAction(null);
 
         try {
 
             DownloadProgressControl downloadProgressControl = new DownloadProgressControl(flickrButton);
+            flickrButton.getGraphic().setStyle("-fx-fill: -tmg-primary;");
+            flickrButton.setTooltip(null);
+            flickrButton.setOnAction(null);
 
-            flickrService.downloadPhotos(flickrPhotos,
+            downloadTask = flickrService.downloadPhotos(flickrPhotos,
                     new Consumer<com.flickr4java.flickr.photos.Photo>() {
                         @Override public void accept(com.flickr4java.flickr.photos.Photo flickrPhoto) {
                             Photo p = new Photo();
@@ -308,9 +306,8 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                                 public void run() {
                                     downloadProgressControl.setProgress(downloadProgress);
                                     if (downloadProgress == 1.0) {
-                                        flickrButton.getGraphic().setStyle(flickrButtonStyle);
-                                        flickrButton.setTooltip(flickrButtonTooltip);
-                                        flickrButton.setOnAction(flickrButtonOnAction);
+                                        downloadProgressControl.finish(false);
+
                                     }
                                     logger.debug("Downloading photos from flickr. Progress {}",
                                             downloadProgress);
@@ -323,16 +320,11 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                     , new ErrorHandler<ServiceException>() {
 
                         public void handle(ServiceException exception) {
-                            downloadProgressControl.finish();
-                            flickrButton.getGraphic().setStyle(flickrButtonStyle);
-                            flickrButton.setTooltip(flickrButtonTooltip);
-                            flickrButton.setOnAction(flickrButtonOnAction);
+                            downloadProgressControl.finish(true);
                         }
                     });
         } catch (ServiceException e) {
-            flickrButton.getGraphic().setStyle(flickrButtonStyle);
-            flickrButton.setTooltip(flickrButtonTooltip);
-            flickrButton.setOnAction(flickrButtonOnAction);
+
         }
         close();
     }
@@ -342,10 +334,15 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         close();
     }
 
-    private void handleInterruptDownload(){
+    private void handleInterruptDownload(DownloadProgressControl downloadProgressControl){
         //ConfirmationDialog confirmationDialog = new ConfirmationDialog(borderPane, "Download abbrechen", "Download abbrechen?");
         //Optional<Boolean> confirmed = confirmationDialog.showForResult();
         //if (!confirmed.isPresent() || !confirmed.get()) return;
+        if(downloadTask!=null){
+            downloadTask.cancel();
+            downloadProgressControl.finish(true);
+            logger.debug("Interrupting download...");
+        }
     }
 
     /**
@@ -462,12 +459,18 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         private Button button;
         private ProgressBar progressBar;
         private FadeTransition ft;
+        private String buttonStyle;
+        private Tooltip buttonTooltip;
+        private EventHandler buttonOnAction;
 
         public DownloadProgressControl(Button button){
             super();
             this.borderPane = new BorderPane();
             this.button = button;
             this.progressBar = new ProgressBar();
+            this.buttonStyle = button.getGraphic().getStyle();
+            this.buttonTooltip = button.getTooltip();
+            this.buttonOnAction = button.getOnAction();
 
             this.ft = new FadeTransition(Duration.millis(1000), button);
             ft.setFromValue(1.0);
@@ -493,7 +496,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             label.setAlignment(Pos.CENTER);
             borderPane.setCenter(label);
             borderPane.setBottom(hBox);
-
+            stopIcon.setOnMouseClicked(event -> handleInterruptDownload(this));
             minimizeIcon.setOnMouseClicked(event -> hide());
             Point2D p = button.localToScene(button.getLayoutBounds().getMinX(), button.getLayoutBounds().getMinY());
             //double posX = p.getX() + flickrButton.getScene().getX() + flickrButton.getScene().getWindow().getX();
@@ -506,16 +509,21 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             progressBar.setProgress(progress);
         }
 
-        public void finish(){
+        public void finish(boolean interrupted){
             ft.stop();
             borderPane.getChildren().clear();
             HBox hBox = new HBox();
             hBox.setPadding(new Insets(5.0,5.0,5.0,5.0));
             hBox.setAlignment(Pos.CENTER);
-            hBox.getChildren().add(new Label("Fotos wurden heruntergeladen"));
-            FontAwesomeIconView checkIcon = new FontAwesomeIconView();
-            checkIcon.setGlyphName("CHECK");
-            hBox.getChildren().add(checkIcon);
+            if(!interrupted){
+                hBox.getChildren().add(new Label("Fotos wurden heruntergeladen"));
+                FontAwesomeIconView checkIcon = new FontAwesomeIconView();
+                checkIcon.setGlyphName("CHECK");
+                hBox.getChildren().add(checkIcon);
+            }
+            else{
+                hBox.getChildren().add(new Label("Abgebrochen!"));
+            }
             FontAwesomeIconView closeIcon = new FontAwesomeIconView();
             closeIcon.setGlyphName("CLOSE");
             closeIcon.setOnMouseClicked(event -> hide());
@@ -526,6 +534,9 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             Point2D p = button.localToScene(button.getLayoutBounds().getMinX(), button.getLayoutBounds().getMinY());
             hide();
             show(button,p.getX()+35.0,p.getY()-5.0);
+            button.getGraphic().setStyle(buttonStyle);
+            button.setTooltip(buttonTooltip);
+            button.setOnAction(buttonOnAction);
         }
 
     }
