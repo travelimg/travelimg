@@ -181,6 +181,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         searchButton.setDisable(true);
         progressIndicator.setVisible(true);
         importButton.setDisable(true);
+        keywordTextField.setDisable(true);
 
         ObservableList<Node> keywords = keywordsFlowPane.getChildren();
         String[] tags = keywords.stream().map(keyword -> ((Keyword)keyword).getName()).toArray(String[]::new);
@@ -217,9 +218,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                     Platform.runLater(new Runnable() {
                         public void run() {
                             if (downloadProgress == 1.0) {
-                                searchButton.setDisable(false);
-                                progressIndicator.setVisible(false);
-                                importButton.setDisable(false);
+                                reActivateButtons();
                             }
                         }
                     });
@@ -227,15 +226,11 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             }
                     , new ErrorHandler<ServiceException>() {
                 public void handle(ServiceException exception) {
-                    searchButton.setDisable(false);
-                    progressIndicator.setVisible(false);
-                    importButton.setDisable(false);
+                    reActivateButtons();
                 }
             });
         } catch (ServiceException e) {
-            searchButton.setDisable(false);
-            progressIndicator.setVisible(false);
-            importButton.setDisable(false);
+            reActivateButtons();
         }
     }
 
@@ -333,6 +328,13 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     private void handleLeaveFlickrDialog() {
         handleReset();
         close();
+    }
+
+    private void reActivateButtons(){
+        searchButton.setDisable(false);
+        progressIndicator.setVisible(false);
+        importButton.setDisable(false);
+        keywordTextField.setDisable(false);
     }
 
     /**
