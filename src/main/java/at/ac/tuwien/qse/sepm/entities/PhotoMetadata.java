@@ -103,6 +103,10 @@ public class PhotoMetadata {
         return tags;
     }
 
+    public void setTags(Set<Tag> tags){
+        this.tags = tags;
+    }
+
     @Override public boolean equals(Object o) {
         if (this == o)
             return true;
