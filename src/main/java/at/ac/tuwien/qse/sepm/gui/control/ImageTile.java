@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.gui.FullscreenWindow;
 import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
+import at.ac.tuwien.qse.sepm.service.PhotoService;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ListProperty;
@@ -16,6 +17,7 @@ import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Random;
@@ -27,7 +29,8 @@ public class ImageTile extends StackPane {
     private final Label name = new Label();
     private final FontAwesomeIconView overLayIcon = new FontAwesomeIconView();
     private final FontAwesomeIconView placeHolder = new FontAwesomeIconView(FontAwesomeIcon.CAMERA);
-
+    @Autowired
+    private PhotoService photoService;
     private ObservableList<Photo> photos = FXCollections.observableArrayList();
     private ListProperty<Photo> photosProperty = new SimpleListProperty<>(photos);
 
@@ -86,7 +89,7 @@ public class ImageTile extends StackPane {
 
             setOnMouseClicked((event) -> {
                 if (photos.size() > 0) {
-                    FullscreenWindow fw = new FullscreenWindow();
+                    FullscreenWindow fw = new FullscreenWindow(photoService);
                     fw.present(this.photos, this.photos.get(0));
                 }
             });

@@ -32,7 +32,7 @@
     <bean id="tagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTagDAO"></bean>
     <bean id="journeyDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCJourneyDAO"></bean>
     <bean id="placeDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPlaceDAO"></bean>
-    <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO"></bean> 
+    <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO"></bean>
     <bean id="slideDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCSlideDAO"></bean>
     <bean id="slideshowDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCSlideshowDAO"></bean>
     <bean id="directoryPathDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCDirectoryPathDAO"></bean>
