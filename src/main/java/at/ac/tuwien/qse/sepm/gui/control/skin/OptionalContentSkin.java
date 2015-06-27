@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.gui.control.skin;
 import at.ac.tuwien.qse.sepm.gui.control.OptionalContent;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 
 public class OptionalContentSkin extends SkinBase<OptionalContent> {
@@ -29,8 +30,16 @@ public class OptionalContentSkin extends SkinBase<OptionalContent> {
     }
 
     private void update() {
-        placeholder.getChildren().setAll(getSkinnable().getPlaceholder());
-        content.getChildren().setAll(getSkinnable().getContent());
+        placeholder.getChildren().clear();
+        content.getChildren().clear();
+        if (getSkinnable().getPlaceholder() != null) {
+            HBox.setHgrow(getSkinnable().getPlaceholder(), Priority.ALWAYS);
+            placeholder.getChildren().add(getSkinnable().getPlaceholder());
+        }
+        if (getSkinnable().getContent() != null) {
+            HBox.setHgrow(getSkinnable().getContent(), Priority.ALWAYS);
+            content.getChildren().add(getSkinnable().getContent());
+        }
         placeholder.setVisible(!getSkinnable().getAvailable());
         content.setVisible(getSkinnable().getAvailable());
     }
