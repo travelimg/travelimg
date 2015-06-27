@@ -395,11 +395,15 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             this.flickrPhoto = flickrPhoto;
             Image image = null;
             try {
-                image = new Image(new FileInputStream(new File(tmpDir+ flickrPhoto.getId()+"."+ flickrPhoto
-                        .getOriginalFormat())), 150, 0, true, true);
+                FileInputStream fis = new FileInputStream(new File(tmpDir+ flickrPhoto.getId()+"."+ flickrPhoto
+                        .getOriginalFormat()));
+                image = new Image(fis, 150, 0, true, true);
+                fis.close();
             } catch (FileNotFoundException ex) {
                 logger.error("Could not find photo", ex);
                 return;
+            } catch (IOException e) {
+                logger.error("Could not close fileinputstream", e);
             }
             ImageView imageView = new ImageView(image);
             imageView.setFitWidth(150);

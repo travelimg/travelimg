@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -72,14 +73,7 @@ public class FlickrServiceImpl implements FlickrService {
 
     @Override
     public void close() {
-        /*File directory = new File(tmpDir);
-        if (directory.exists()) {
-            File[] files = directory.listFiles();
-            logger.debug("Deleting photos from tmp folder...");
-            for (int i = 0; i < files.length; i++) {
-                files[i].delete();
-            }
-        }*/
+        logger.debug("Flickr service closed.");
     }
 
     /**
@@ -101,7 +95,6 @@ public class FlickrServiceImpl implements FlickrService {
             logger.debug(e.getMessage());
             throw new ServiceException(e.getMessage(), e);
         }
-
         try(BufferedInputStream in = new BufferedInputStream((httpConnection.getInputStream()));
                 FileOutputStream fout = new FileOutputStream(tmpDir + filename + "." + format);)
         {
@@ -117,6 +110,8 @@ public class FlickrServiceImpl implements FlickrService {
                 // logger.debug("Downloaded {} MB", (double)downloadedFileSize/oneMB);
             }
             logger.debug("Downloaded photo {}", filename+"."+format);
+            new File(tmpDir + filename + "." + format).deleteOnExit();
+
         } catch (IOException e) {
             logger.debug(e.getMessage());
             throw new ServiceException(e.getMessage(), e);
