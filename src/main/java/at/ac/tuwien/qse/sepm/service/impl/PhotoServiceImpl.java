@@ -36,12 +36,13 @@ public class PhotoServiceImpl implements PhotoService {
     private AsyncPhotoRepository photoRepository;
     @Autowired
     private WorkspaceService workspaceService;
+    @Autowired
+    private ScheduledExecutorService scheduler;
 
     private Listener listener;
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> watcherSchedule = null;
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(1);
+    private final ExecutorService operationExecutor = Executors.newFixedThreadPool(4);
 
 
     @Autowired
@@ -89,8 +90,7 @@ public class PhotoServiceImpl implements PhotoService {
         if (watcherSchedule != null) {
             watcherSchedule.cancel(true);
         }
-        scheduler.shutdown();
-        executor.shutdown();
+        operationExecutor.shutdown();
     }
 
     @Override
@@ -198,7 +198,7 @@ public class PhotoServiceImpl implements PhotoService {
         @Override public void onQueue(AsyncPhotoRepository repository, Operation operation) {
             LOGGER.info("queued {}", operation);
             LOGGER.info("queue length {}", repository.getQueue().size());
-            executor.execute(repository::completeNext);
+            operationExecutor.execute(repository::completeNext);
         }
     }
 }
