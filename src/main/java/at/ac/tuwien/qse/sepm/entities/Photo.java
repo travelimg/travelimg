@@ -96,7 +96,7 @@ public class Photo implements Comparable<Photo> {
     }
 
     @Override public int hashCode() {
-        int result = id;
+        int result = id != null ? id : 0;
         result = 31 * result + (file != null ? file.hashCode() : 0);
         result = 31 * result + (data != null ? data.hashCode() : 0);
         return result;
