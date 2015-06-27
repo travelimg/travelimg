@@ -71,6 +71,7 @@ public class PhotoServiceImpl implements PhotoService {
 
         // refresh the watcher and synchronize the repository
         watcher.refresh();
+        photoRepository.clearQueue();
         try {
             photoRepository.synchronize();
         } catch (DAOException ex) {

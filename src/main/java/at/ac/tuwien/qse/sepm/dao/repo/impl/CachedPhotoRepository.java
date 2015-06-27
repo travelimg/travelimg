@@ -71,6 +71,10 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
         }
     }
 
+    @Override public void clearQueue() {
+        queue.clear();
+    }
+
     @Override public boolean completeNext() {
         if (queue.isEmpty()) return false;
         OperationBase operation = queue.poll();
