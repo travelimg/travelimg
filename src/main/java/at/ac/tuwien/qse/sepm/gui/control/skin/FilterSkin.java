@@ -27,6 +27,7 @@ public class FilterSkin<T> extends SkinBase<Filter<T>> {
         getSkinnable().valueProperty().addListener((observable) -> update());
         getSkinnable().includedProperty().addListener((observable) -> update());
         getSkinnable().countProperty().addListener((observable) -> update());
+        getSkinnable().converterProperty().addListener((observable) -> update());
         update();
     }
 
@@ -34,6 +35,9 @@ public class FilterSkin<T> extends SkinBase<Filter<T>> {
 
         // label with count
         String labelText = getSkinnable().getValue().toString();
+        if (getSkinnable().getConverter() != null) {
+            labelText = getSkinnable().getConverter().apply(getSkinnable().getValue());
+        }
         if (getSkinnable().isIncluded()) {
             labelText += String.format(" (%d)", getSkinnable().getCount());
         }

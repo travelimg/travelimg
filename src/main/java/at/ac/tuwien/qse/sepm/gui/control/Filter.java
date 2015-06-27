@@ -5,8 +5,11 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.function.Function;
 
 /**
  * Control representing a filter for a single possible value for some attribute of an entity.
@@ -73,6 +76,19 @@ public class Filter<T> extends Control {
     private ObjectProperty<T> value;
     public final T getValue() { return valueProperty().get(); }
     public final void setValue(T value) { valueProperty().set(value); }
+
+    /**
+     * Converter used for converting the value to a label text.
+     */
+    public final ObjectProperty<Function<T, String>> converterProperty() {
+        if (converter == null) {
+            converter = new SimpleObjectProperty<>(this, "converter");
+        }
+        return converter;
+    }
+    private ObjectProperty<Function<T, String>> converter;
+    public final Function<T, String> getConverter() { return converterProperty().get(); }
+    public final void setConverter(Function<T, String> value) { converterProperty().set(value); }
 
     /**
      * Value indicating that there is no photo in the result that matches the filter. This is the
