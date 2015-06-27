@@ -1,6 +1,5 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
-import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.FlickrService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
@@ -40,10 +39,7 @@ public class FlickrServiceImpl implements FlickrService {
     private int i = 0;
 
     @Autowired
-    private ExifService exifService;
-    @Autowired
     private ExecutorService executorService;
-
 
     public FlickrServiceImpl() {
         this.flickr = new Flickr(API_KEY, SECRET, new REST());
