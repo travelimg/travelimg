@@ -44,9 +44,7 @@
     <bean id="slideshowDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCSlideshowDAO"></bean>
 
     <!-- DAO repository beans -->
-    <bean id="watcher" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher" factory-method="forImageDirectory">
-        <constructor-arg value="${user.home}/travelimg"></constructor-arg>
-    </bean>
+    <bean id="watcher" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher"/>
     <bean id="serializer" class="at.ac.tuwien.qse.sepm.dao.repo.impl.JpegSerializer"></bean>
     <bean id="photoRepository" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PhotoFileRepository">
         <constructor-arg ref="watcher"></constructor-arg>
