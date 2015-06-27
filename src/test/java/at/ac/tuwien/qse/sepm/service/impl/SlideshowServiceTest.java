@@ -120,14 +120,14 @@ public class SlideshowServiceTest extends ServiceTestBase {
 
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = ServiceException.class)
     public void add_slides_to_slideshow_with_empty_list_should_fail() throws ServiceException {
 
         Slideshow s1 = new Slideshow(8,"Testlsideshow",5.0);
 
         List<Photo> photos = photo.getAllPhotos();
 
-        slideshowService.addPhotosToSlideshow(photos,s1);
+        slideshowService.addPhotosToSlideshow(photos,s1).size();
 
     }
 

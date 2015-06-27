@@ -32,13 +32,10 @@
     <bean id="tagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTagDAO"></bean>
     <bean id="journeyDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCJourneyDAO"></bean>
     <bean id="placeDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPlaceDAO"></bean>
-    <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO"></bean> 
+    <bean id="photoDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoDAO"></bean>
     <bean id="slideDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCSlideDAO"></bean>
     <bean id="slideshowDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCSlideshowDAO"></bean>
     <bean id="directoryPathDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCDirectoryPathDAO"></bean>
-    <bean id="photoSlideDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoSlideDAO"></bean>
-    <bean id="mapSlideDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCMapSlideDAO"></bean>
-    <bean id="titleSlideDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTitleSlideDAO"></bean>
 
     <!-- DAO repo beans -->
     <bean id="watcher" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher"></bean>
@@ -55,14 +52,14 @@
 
     <!-- Service beans -->
     <bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"></bean>
-    <bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl"></bean>
+    <bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl" destroy-method="close"></bean>
+    <bean id="synchronizationService" class="at.ac.tuwien.qse.sepm.service.impl.SynchronizationServiceImpl"></bean>
     <bean id="dropboxService" class="at.ac.tuwien.qse.sepm.service.impl.DropboxServiceImpl"></bean>
     <bean id="photographerService" class="at.ac.tuwien.qse.sepm.service.impl.PhotographerServiceImpl"></bean>
     <bean id="tagService" class="at.ac.tuwien.qse.sepm.service.impl.TagServiceImpl"></bean>
     <bean id="exifService" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>
     <bean id="geoService" class="at.ac.tuwien.qse.sepm.service.impl.GeoServiceImpl"></bean>
     <bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
-    <bean id="slidesService" class="at.ac.tuwien.qse.sepm.service.impl.SlideServiceImpl"></bean>
     <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl" destroy-method="close"></bean>
     <bean id="wikipediaService" class="at.ac.tuwien.qse.sepm.service.impl.WikipediaServiceImpl"></bean>
     <bean id="workspaceService" class="at.ac.tuwien.qse.sepm.service.impl.WorkspaceServiceImpl"></bean>
