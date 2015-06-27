@@ -275,13 +275,12 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         }
         logger.debug("Photos prepared for download {}", flickrPhotos);
         Button flickrButton = ((MenuImpl)sender).getFlickrButton();
+        DownloadProgressControl downloadProgressControl = new DownloadProgressControl(flickrButton);
+        flickrButton.getGraphic().setStyle("-fx-fill: -tmg-primary;");
+        flickrButton.setTooltip(null);
+        flickrButton.setOnAction(null);
 
         try {
-
-            DownloadProgressControl downloadProgressControl = new DownloadProgressControl(flickrButton);
-            flickrButton.getGraphic().setStyle("-fx-fill: -tmg-primary;");
-            flickrButton.setTooltip(null);
-            flickrButton.setOnAction(null);
 
             downloadTask = flickrService.downloadPhotos(flickrPhotos,
                     new Consumer<com.flickr4java.flickr.photos.Photo>() {
@@ -307,7 +306,6 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                                     downloadProgressControl.setProgress(downloadProgress);
                                     if (downloadProgress == 1.0) {
                                         downloadProgressControl.finish(false);
-
                                     }
                                     logger.debug("Downloading photos from flickr. Progress {}",
                                             downloadProgress);
@@ -316,7 +314,6 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
 
                         }
                     }
-
                     , new ErrorHandler<ServiceException>() {
 
                         public void handle(ServiceException exception) {
@@ -324,7 +321,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                         }
                     });
         } catch (ServiceException e) {
-
+            downloadProgressControl.finish(true);
         }
         close();
     }
