@@ -111,9 +111,12 @@ public class SlideshowServiceTest extends ServiceTestBase {
     @Test
     public void add_slides_to_slideshow_should_persist() throws ServiceException {
 
-        Slideshow s1 = createAmerika();
-        s1.setName("Testlsideshow");
-        List<Photo> photos = photo.getAllPhotos();
+        Photo p = new Photo();
+        List<Photo> photos = new ArrayList<>();
+        photos.add(p);
+        System.out.println(photos.size());
+        Slideshow s1 = new Slideshow(-1,"TestSlideshow",5.0);
+        slideshowService.create(s1);
 
        slideshowService.addPhotosToSlideshow(photos,s1);
 
