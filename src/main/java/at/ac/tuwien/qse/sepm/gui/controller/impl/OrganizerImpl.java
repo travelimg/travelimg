@@ -78,6 +78,7 @@ public class OrganizerImpl implements Organizer {
         listTab.setOnAction(event -> {
             listTab.setSelected(true);
             folderTab.setSelected(false);
+            usedFilter = photoFilter;
             handleFilterChange();
         });
         folderTab.setOnAction(event -> {
