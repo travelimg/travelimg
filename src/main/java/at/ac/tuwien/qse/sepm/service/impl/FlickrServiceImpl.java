@@ -2,12 +2,10 @@ package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.FlickrService;
-import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.CancelableTask;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
-import at.ac.tuwien.qse.sepm.util.IOHandler;
 import com.flickr4java.flickr.Flickr;
 import com.flickr4java.flickr.FlickrException;
 import com.flickr4java.flickr.REST;
@@ -42,11 +40,7 @@ public class FlickrServiceImpl implements FlickrService {
     private int i = 0;
 
     @Autowired
-    private PhotographerService photographerService;
-    @Autowired
     private ExifService exifService;
-    @Autowired
-    private IOHandler ioHandler;
     @Autowired
     private ExecutorService executorService;
 
