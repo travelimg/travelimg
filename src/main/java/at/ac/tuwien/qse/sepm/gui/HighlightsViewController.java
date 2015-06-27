@@ -9,7 +9,7 @@ import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.JourneyFilter;
-import at.ac.tuwien.qse.sepm.service.PhotoFilter;
+import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.fxml.FXML;
@@ -278,7 +278,7 @@ public class HighlightsViewController {
     private class GoodPhotoFilter extends PhotoFilter {
 
         public GoodPhotoFilter() {
-            getRatings().getIncluded().add(Rating.GOOD);
+            getRatingFilter().getIncluded().add(Rating.GOOD);
         }
 
         @Override

@@ -11,7 +11,7 @@ import at.ac.tuwien.qse.sepm.service.ClusterService;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.TagService;
-import at.ac.tuwien.qse.sepm.service.PhotoFilter;
+import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -146,32 +146,32 @@ public class OrganizerImpl implements Organizer {
 
     private void handleRatingsChange() {
         LOGGER.debug("rating usedFilter changed");
-        usedFilter.getRatings().getIncluded().clear();
-        usedFilter.getRatings().getIncluded().addAll(ratingFilter.getIncludedValues());
+        usedFilter.getRatingFilter().getIncluded().clear();
+        usedFilter.getRatingFilter().getIncluded().addAll(ratingFilter.getIncludedValues());
         handleFilterChange();
     }
     private void handleCategoriesChange() {
         LOGGER.debug("category usedFilter changed");
-        usedFilter.getTags().getRequired().clear();
-        usedFilter.getTags().getRequired().addAll(tagFilter.getIncludedValues());
+        usedFilter.getTagFilter().getRequired().clear();
+        usedFilter.getTagFilter().getRequired().addAll(tagFilter.getIncludedValues());
         handleFilterChange();
     }
     private void handlePhotographersChange() {
         LOGGER.debug("photographer usedFilter changed");
-        usedFilter.getPhotographers().getIncluded().clear();
-        usedFilter.getPhotographers().getIncluded().addAll(photographerFilter.getIncludedValues());
+        usedFilter.getPhotographerFilter().getIncluded().clear();
+        usedFilter.getPhotographerFilter().getIncluded().addAll(photographerFilter.getIncludedValues());
         handleFilterChange();
     }
     private void handleJourneysChange() {
         LOGGER.debug("journey usedFilter changed");
-        usedFilter.getJourneys().getIncluded().clear();
-        usedFilter.getJourneys().getIncluded().addAll(journeyFilter.getIncludedValues());
+        usedFilter.getJourneyFilter().getIncluded().clear();
+        usedFilter.getJourneyFilter().getIncluded().addAll(journeyFilter.getIncludedValues());
         handleFilterChange();
     }
     private void handlePlacesChange() {
         LOGGER.debug("place usedFilter changed");
-        usedFilter.getPlaces().getIncluded().clear();
-        usedFilter.getPlaces().getIncluded().addAll(placeFilter.getIncludedValues());
+        usedFilter.getPlaceFilter().getIncluded().clear();
+        usedFilter.getPlaceFilter().getIncluded().addAll(placeFilter.getIncludedValues());
         handleFilterChange();
     }
 
@@ -320,7 +320,7 @@ public class OrganizerImpl implements Organizer {
             // That way the filter stays the same and new values are included automatically.
             Set<T> excluded = filterGroup.getExcludedValues();
             filterGroup.getItems().clear();
-            filter.getValues().forEach(p -> {
+            values.forEach(p -> {
                 FilterControl<T> filter = new FilterControl<>();
                 filter.setValue(p);
                 filter.setConverter(converter);
