@@ -13,6 +13,7 @@ import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import at.ac.tuwien.qse.sepm.util.IOHandler;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
@@ -22,7 +23,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -41,7 +41,6 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
@@ -447,45 +446,45 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
 
     private class DownloadProgressControl extends PopupControl{
 
-        private BorderPane borderPane;
+        private final BorderPane borderPane = new BorderPane();
+        private final ProgressBar progressBar = new ProgressBar();
         private Button button;
-        private ProgressBar progressBar;
         private FadeTransition ft;
         private String buttonStyle;
         private Tooltip buttonTooltip;
         private EventHandler buttonOnAction;
-        final Circle circle = new Circle(25, 25, 50, Color.RED);
 
         public DownloadProgressControl(Button button){
             super();
-            this.borderPane = new BorderPane();
             this.button = button;
-            this.progressBar = new ProgressBar();
             this.buttonStyle = button.getGraphic().getStyle();
             this.buttonTooltip = button.getTooltip();
             this.buttonOnAction = button.getOnAction();
-
             this.ft = new FadeTransition(Duration.millis(1000), button);
+
             ft.setFromValue(1.0);
             ft.setToValue(0.3);
             ft.setCycleCount(Animation.INDEFINITE);
-            ft.setAutoReverse(true);
+            ft.setAutoReverse(false);
             ft.play();
-            progressBar.setProgress(0.0);
-            HBox hBox = new HBox(5.0);
-            hBox.setAlignment(Pos.CENTER);
 
-            hBox.setPadding(new Insets(5.0,5.0,5.0,5.0));
-            hBox.getChildren().add(progressBar);
-            borderPane.setStyle("-fx-background-color: white");
-            borderPane.setPadding(new Insets(5.0, 5.0, 5.0, 5.0));
             Label label = new Label("Fotos werden heruntergeladen");
             label.setAlignment(Pos.CENTER);
+
+            HBox hBox = new HBox();
+            hBox.setAlignment(Pos.CENTER);
+            hBox.setPadding(new Insets(5.0,5.0,5.0,5.0));
+            hBox.getChildren().add(progressBar);
+            progressBar.setProgress(0.0);
+
+            borderPane.setStyle("-fx-background-color: #f5f5b5; -fx-background-radius: 5.0; -fx-border-radius: 5.0; -fx-border-color: black; -fx-border-width: 0.5;");
+            borderPane.setPadding(new Insets(2.0, 2.0, 2.0, 2.0));
             borderPane.setCenter(label);
             borderPane.setBottom(hBox);
-            button.setOnMouseEntered(event -> handleShow());
-            button.setOnMouseExited(event -> hide());
             getScene().setRoot(borderPane);
+
+            button.setOnMouseEntered(event -> handleShow());
+            button.setOnMouseExited(event -> fadeOut());
         }
 
         public void setProgress(double progress){
@@ -495,56 +494,46 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         public void finish(boolean interrupted){
             ft.stop();
             borderPane.getChildren().clear();
+
             HBox hBox = new HBox();
             hBox.setPadding(new Insets(5.0,5.0,5.0,5.0));
             hBox.setAlignment(Pos.CENTER);
             if(!interrupted){
                 hBox.getChildren().add(new Label("Fotos heruntergeladen "));
-                FontAwesomeIconView checkIcon = new FontAwesomeIconView();
-                checkIcon.setGlyphName("CHECK");
-                hBox.getChildren().add(checkIcon);
+                hBox.getChildren().add(new FontAwesomeIconView(FontAwesomeIcon.CHECK));
             }
             else{
                 hBox.getChildren().add(new Label("Herunterladen fehlgeschlagen "));
-                FontAwesomeIconView timesIcon = new FontAwesomeIconView();
-                timesIcon.setGlyphName("TIMES");
-                hBox.getChildren().add(timesIcon);
+                hBox.getChildren().add(new FontAwesomeIconView(FontAwesomeIcon.TIMES));
             }
-            button.setOnMouseExited(e -> {
-                button.setOnMouseEntered(null);
-                hide();
-                button.setTooltip(buttonTooltip);
-            });
+
             borderPane.setCenter(hBox);
 
-            button.getGraphic().setStyle(buttonStyle);
+            button.setOnMouseExited(e -> {
+                fadeOut();
+                button.setOnMouseEntered(null);
+                button.setOnMouseExited(null);
+                button.setTooltip(buttonTooltip);
+                button.getGraphic().setStyle(buttonStyle);
+            });
+
             button.setOnAction(buttonOnAction);
         }
 
         private void handleShow(){
             Point2D p = button.localToScene(button.getLayoutBounds().getMinX(), button.getLayoutBounds().getMinY());
-            show(button,p.getX() + button.getScene().getX() + button.getScene().getWindow().getX()+35.0,p.getY() + button.getScene().getY() + button.getScene().getWindow().getY()-35.0);
+            show(button,p.getX() + button.getScene().getX() + button.getScene().getWindow().getX()+55.0,p.getY() + button.getScene().getY() + button.getScene().getWindow().getY()-35.0);
+            FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), borderPane);
+            fadeTransition.setFromValue(0.0);
+            fadeTransition.setToValue(1.0);
+            fadeTransition.play();
         }
 
-        public void fadeTrans() {
-            FadeTransition ft = new FadeTransition(Duration.millis(1000), circle);
-            ft.setFromValue(1.0);
-            ft.setToValue(0.0);
-            ft.setCycleCount(1);
-            ft.setAutoReverse(false);
-
-            ft.play();
-
-
-            ft.setOnFinished(new EventHandler<ActionEvent>() {
-                public void handle(ActionEvent t) {
-                    hide();
-                    System.out.println("Hiding");
-                }
-            });
-
-
-
+        private void fadeOut(){
+            FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), borderPane);
+            fadeTransition.setFromValue(1.0);
+            fadeTransition.setToValue(0.0);
+            fadeTransition.play();
         }
 
     }
