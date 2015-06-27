@@ -187,8 +187,7 @@ public class OrganizerImpl implements Organizer {
     // This Method let's the User switch to the folder-view
     private void folderViewClicked() {
         LOGGER.debug("Switch view");
-
-        filterContainer.getChildren().clear();
+        
         buildTreeView();
 
         usedFilter = new PhotoPathFilter();
@@ -211,6 +210,8 @@ public class OrganizerImpl implements Organizer {
             findFiles(dirPath.toFile(), root);
         }
         directoryChoiceBox.setItems(FXCollections.observableArrayList(workspaceDirectories));
+
+        filterContainer.getChildren().clear();
         filterContainer.getChildren().addAll(buttonBox, directoryDeleteMenu, filesTree);
         VBox.setVgrow(filesTree, Priority.ALWAYS);
     }
