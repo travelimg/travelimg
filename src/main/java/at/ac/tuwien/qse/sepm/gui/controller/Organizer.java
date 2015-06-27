@@ -1,7 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui.controller;
 
 import at.ac.tuwien.qse.sepm.entities.Place;
-import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
+import at.ac.tuwien.qse.sepm.service.PhotoFilter;
 
 /**
  * View for browsing and filtering photos by various criteria.
