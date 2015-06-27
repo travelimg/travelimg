@@ -152,7 +152,6 @@ public class OrganizerImpl implements Organizer {
     }
     private void handleCategoriesChange() {
         LOGGER.debug("category usedFilter changed");
-        Set<Tag> included = tagFilter.getIncludedValues();
         usedFilter.getTags().getRequired().clear();
         usedFilter.getTags().getRequired().addAll(tagFilter.getIncludedValues());
         handleFilterChange();
