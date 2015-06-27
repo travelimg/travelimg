@@ -420,6 +420,126 @@
     -fx-background-color: -tmg-bg2-dark;
 }
 
+.filter {
+    -fx-padding: 4px 14px;
+    -fx-font-size: 14;
+}
+.filter:hover {
+    -fx-background-color: -tmg-bg1-light;
+}
+.filter:pressed {
+    -fx-background-color: -tmg-bg1-dark;
+}
+.filter .label {
+    -fx-padding: 0 0 0 12px;
+    -fx-text-fill: -tmg-text-dark;
+}
+.filter:hover .label {
+    -fx-text-fill: -tmg-text-light;
+}
+.filter:pressed .label {
+    -fx-text-fill: -tmg-text-bright;
+}
+.filter.included .label {
+    -fx-text-fill: -tmg-text-bright;
+}
+.filter.inactive .label {
+    -fx-text-fill: -tmg-text-dark;
+}
+.filter.inactive:hover .label {
+    -fx-text-fill: -tmg-text-light;
+}
+.filter.inactive:pressed .label {
+    -fx-text-fill: -tmg-text-bright;
+}
+.filter .icon {
+    -glyph-size: 14px;
+    -fx-fill: -tmg-bg0;
+    -glyph-name: "SQUARE";
+}
+.filter.included .icon {
+    -fx-fill: -tmg-primary;
+    -glyph-name: "CHECK_SQUARE";
+}
+.filter.inactive .icon {
+    -fx-fill: -tmg-text-dark;
+}
+
+.filter-group {
+    -fx-background-color: -tmg-bg1;
+}
+.filter-group .placeholder {
+    -fx-font-size: 12;
+    -fx-text-fill: -tmg-text-dark;
+    -fx-alignment: center;
+    -fx-padding: 16px;
+}
+.filter-group .header {
+    -fx-background-color: -tmg-bg2;
+    -fx-font-size: 16;
+    -fx-padding: 8px 12px;
+}
+.filter-group .header:hover {
+    -fx-background-color: -tmg-bg2-light;
+}
+.filter-group .header:pressed {
+    -fx-background-color: -tmg-bg2-dark;
+}
+.filter-group .header .left {
+    -fx-spacing: 12px;
+    -fx-alignment: center-left;
+}
+.filter-group .header .label {
+    -fx-text-fill: -tmg-text;
+}
+.filter-group .header:hover .label {
+    -fx-text-fill: -tmg-text-light;
+}
+.filter-group .header:pressed .label {
+    -fx-text-fill: -tmg-text-bright;
+}
+.filter-group.all-included .header .label {
+    -fx-text-fill: -tmg-text-bright;
+}
+.filter-group.all-excluded .label {
+    -fx-text-fill: -tmg-text-dark;
+}
+.filter-group .header .check-icon {
+    -glyph-size: 20px;
+    -fx-fill: -tmg-bg1;
+    -glyph-name: "SQUARE";
+}
+.filter-group.all-included .header .check-icon {
+    -fx-fill: -tmg-primary;
+    -glyph-name: "CHECK_SQUARE";
+}
+.filter-group.indetermined .header .check-icon {
+    -fx-fill: -tmg-secondary;
+    -glyph-name: "MINUS_SQUARE";
+}
+.filter-group.indetermined .header .check-icon:hover {
+    -fx-fill: -tmg-secondary;
+    -glyph-name: "CHECK_SQUARE";
+}
+.filter-group .header .expand-button .icon {
+    -fx-fill: -tmg-text;
+    -glyph-name: "PLUS_SQUARE";
+    -glyph-size: 14px;
+}
+.filter-group .header:hover .expand-button .icon {
+    -fx-fill: -tmg-text-light;
+}
+.filter-group .header:pressed .expand-button .icon {
+    -fx-fill: -tmg-text-bright;
+}
+.filter-group.expanded .header .expand-button .icon {
+    -fx-fill: -tmg-text;
+    -glyph-name: "MINUS_SQUARE";
+}
+.filter-group .list {
+    -fx-spacing: 2px;
+}
+
 .tab-pane {
     -fx-padding: 0;
 }

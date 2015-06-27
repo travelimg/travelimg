@@ -33,10 +33,7 @@ public class Filter<T> extends Control {
         if (included == null) {
             included = new SimpleBooleanProperty(this, "included") {
                 @Override public void invalidated() {
-                    getStyleClass().removeAll("included");
-                    if (get()) {
-                        getStyleClass().add("included");
-                    }
+                    update();
                 }
             };
         }
@@ -52,7 +49,11 @@ public class Filter<T> extends Control {
      */
     public final IntegerProperty countProperty() {
         if (count == null) {
-            count = new SimpleIntegerProperty(this, "count");
+            count = new SimpleIntegerProperty(this, "count") {
+                @Override public void invalidated() {
+                    update();
+                }
+            };
         }
         return count;
     }
@@ -74,24 +75,12 @@ public class Filter<T> extends Control {
     public final void setValue(T value) { valueProperty().set(value); }
 
     /**
-     * Value indicating that there is at least one photo in a result that matches this filter. This
-     * value is {@code true} if {@link #isIncluded()} is {@code true} and {@link #getCount()} is
-     * greater than zero.
+     * Value indicating that there is no photo in the result that matches the filter. This is the
+     * case if {@link #isIncluded()} is {@code true} and {@link #getCount()} is zero or less.
      */
-    public final ReadOnlyBooleanProperty activeProperty() {
-        if (active == null) {
-            active = new ReadOnlyBooleanWrapper(this, "active") {
-                @Override public void invalidated() {
-                }
-            };
-            active.bind(Bindings.and(
-                    includedProperty(),
-                    countProperty().greaterThan(0)));
-        }
-        return active.getReadOnlyProperty();
+    public final boolean isInactive() {
+        return isIncluded() && getCount() == 0;
     }
-    private ReadOnlyBooleanWrapper active;
-    public final boolean isActive() { return activeProperty().get(); }
 
     public void toggle() {
         setIncluded(!isIncluded());
@@ -107,5 +96,15 @@ public class Filter<T> extends Control {
 
     @Override protected Skin<?> createDefaultSkin() {
         return new FilterSkin<T>(this);
+    }
+
+    private void update() {
+        getStyleClass().removeAll("included", "inactive");
+        if (isIncluded()) {
+            getStyleClass().add("included");
+        }
+        if (isInactive()) {
+            getStyleClass().add("inactive");
+        }
     }
 }
