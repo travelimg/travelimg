@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene?>
@@ -14,9 +13,9 @@
             <center>
                 <VBox styleClass="body">
                     <HBox spacing="16">
-                        <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefHeight="350" maxHeight="350" maxWidth="300" vbarPolicy="AS_NEEDED">
+                        <ScrollPane minWidth="500" fx:id="scrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefHeight="350" maxHeight="350" maxWidth="300" vbarPolicy="AS_NEEDED">
                             <content>
-                                <FlowPane alignment="CENTER" fx:id="photosFlowPane" hgap="15" styleClass="image-grid" vgap="15" style="-fx-background-color: -tmg-bg0">
+                                <FlowPane fx:id="photosFlowPane" hgap="15" styleClass="image-grid" vgap="15" style="-fx-background-color: -tmg-bg0">
 
                                 </FlowPane>
                             </content>
@@ -35,7 +34,7 @@
                             </children>
                         </VBox>
                     </HBox>
-                    <HBox spacing="85.0">
+                    <HBox spacing="285.0">
                         <children>
                             <HBox>
                                 <Button fx:id="searchButton" styleClass="btn,primary">

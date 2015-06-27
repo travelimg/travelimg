@@ -369,6 +369,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             }
             ImageView imageView = new ImageView(image);
             imageView.setFitWidth(150);
+            imageView.setFitHeight(150);
             getChildren().add(imageView);
 
             setAlignment(overlay,Pos.BOTTOM_CENTER);
