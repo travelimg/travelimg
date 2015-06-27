@@ -186,10 +186,10 @@ public class OrganizerImpl implements Organizer {
     private List<Rating> getAllRatings() {
         LOGGER.debug("fetching ratings");
         List<Rating> list = new LinkedList<Rating>();
+        list.add(Rating.NONE);
         list.add(Rating.GOOD);
         list.add(Rating.NEUTRAL);
         list.add(Rating.BAD);
-        list.add(Rating.NONE);
         LOGGER.debug("fetching ratings succeeded with {} items", list.size());
         return list;
     }
@@ -199,7 +199,7 @@ public class OrganizerImpl implements Organizer {
             List<Tag> list = tagService.getAllTags();
             LOGGER.debug("fetching categories succeeded with {} items", list.size());
             list.sort((a, b) -> a.getName().compareTo(b.getName()));
-            list.add(null);
+            list.add(0, null);
             return list;
         } catch (ServiceException ex) {
             LOGGER.error("fetching categories failed", ex);
@@ -213,6 +213,7 @@ public class OrganizerImpl implements Organizer {
         try {
             List<Photographer> list = photographerService.readAll();
             LOGGER.debug("fetching photographers succeeded with {} items", list.size());
+            list.add(0, null);
             return list;
         } catch (ServiceException ex) {
             LOGGER.error("fetching photographers failed", ex);
@@ -225,7 +226,7 @@ public class OrganizerImpl implements Organizer {
         try {
             List<Journey> list = clusterService.getAllJourneys();
             list.sort((a, b) -> a.getName().compareTo(b.getName()));
-            list.add(null);
+            list.add(0, null);
             return list;
         } catch (ServiceException ex) {
             LOGGER.error("fetching journeys failed", ex);
@@ -241,7 +242,13 @@ public class OrganizerImpl implements Organizer {
         LOGGER.debug("fetching journeys");
         try {
             List<Place> list = clusterService.getAllPlaces();
-            //list.sort((a, b) -> a.getName().compareTo(b.getName()));
+            list.sort((a, b) -> {
+                int c = a.getCountry().compareTo(b.getCountry());
+                if (c != 0)
+                    return c;
+                return a.getCity().compareTo(b.getCity());
+            });
+            list.add(0, null);
             return list;
         } catch (ServiceException ex) {
             LOGGER.error("fetching journeys failed", ex);
@@ -286,31 +293,31 @@ public class OrganizerImpl implements Organizer {
                 case BAD:
                     return "Schlecht";
                 default:
-                    return "Unbewertet";
+                    return "Keine Bewertung";
             }
         });
     }
     private void refreshTags() {
         refreshFilter(tagFilter, getAllTags(), value -> {
-            if (value == null) return "Keinen Kategorien zugehörig";
+            if (value == null) return "Keinen Kategorien";
             return value.getName();
         });
     }
     private void refreshJourneys() {
         refreshFilter(journeyFilter, getAllJourneys(), value -> {
-            if (value == null) return "Keiner Reise zugehörig";
+            if (value == null) return "Keine Reise";
             return value.getName();
         });
     }
     private void refreshPlaces() {
         refreshFilter(placeFilter, getAllPlaces(), value -> {
-            if (value == null) return "Keinem Ort zugehörig";
+            if (value == null) return "Kein Ort";
             return value.getCountry() + ", " + value.getCity();
         });
     }
     private void refreshPhotographers() {
         refreshFilter(photographerFilter, getAllPhotographers(), value -> {
-            if (value == null) return "Keinem Fotografen zugehörig";
+            if (value == null) return "Kein Fotograf";
             return value.getName();
         });
     }
