@@ -33,10 +33,12 @@ public class FilterSkin<T> extends SkinBase<Filter<T>> {
 
     private void update() {
 
-        // label with count
-        String labelText = getSkinnable().getValue().toString();
-        if (getSkinnable().getConverter() != null) {
-            labelText = getSkinnable().getConverter().apply(getSkinnable().getValue());
+        String labelText = "Unbekannt";
+        if (getSkinnable().getValue() != null) {
+            labelText = getSkinnable().getValue().toString();
+            if (getSkinnable().getConverter() != null) {
+                labelText = getSkinnable().getConverter().apply(getSkinnable().getValue());
+            }
         }
         if (getSkinnable().isIncluded()) {
             labelText += String.format(" (%d)", getSkinnable().getCount());
