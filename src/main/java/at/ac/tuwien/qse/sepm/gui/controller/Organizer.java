@@ -28,26 +28,6 @@ public interface Organizer {
     PhotoFilter getUsedFilter();
 
     /**
-     * Refreshes the category list in the organizer
-     */
-    void refreshCategoryList(Tag tag);
-
-    /**
-     * Refreshes the place list in the organizer
-     */
-    void refreshPlaceList(Place place);
-
-    /**
-     * Refreshes the journey list in the organizer
-     */
-    void refreshJourneyList(Journey journey);
-
-    /**
-     * Refreshes the photographer list in the organizer
-     */
-    void refreshPhotographerList(Photographer photographer);
-
-    /**
      * only check Place pl
      * @param pl the Place
      */

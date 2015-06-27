@@ -170,6 +170,7 @@ public class OrganizerImpl implements Organizer {
 
         handlePlacesChange(placeListView.getChecked());
     }
+
     // This Method let's the User switch to the usedFilter-view
     private void filterViewClicked() {
         filterContainer.getChildren().clear();
@@ -379,7 +380,7 @@ public class OrganizerImpl implements Organizer {
         filterChangeCallback = savedCallback;
     }
 
-    public void refreshCategoryList(Tag tag) {
+    private void refreshCategoryList(Tag tag) {
         Platform.runLater(() -> {
             inspectorController.refresh();
             categoryListView.setValues(getAllCategories());
@@ -388,7 +389,7 @@ public class OrganizerImpl implements Organizer {
         });
     }
 
-    public void refreshJourneyList(Journey journey) {
+    private void refreshJourneyList(Journey journey) {
         Platform.runLater(() -> {
             journeyListView.setValues(getAllJourneys());
             journeyListView.checkAll();
@@ -396,7 +397,7 @@ public class OrganizerImpl implements Organizer {
         });
     }
 
-    public void refreshPlaceList(Place place) {
+    private void refreshPlaceList(Place place) {
         Platform.runLater(() -> {
             placeListView.setValues(getAllPlaces());
             placeListView.checkAll();
@@ -404,7 +405,7 @@ public class OrganizerImpl implements Organizer {
         });
     }
 
-    public void refreshPhotographerList(Photographer photographer) {
+    private void refreshPhotographerList(Photographer photographer) {
         Platform.runLater(() -> {
             photographerListView.setValues(getAllPhotographers());
             photographerListView.checkAll();
