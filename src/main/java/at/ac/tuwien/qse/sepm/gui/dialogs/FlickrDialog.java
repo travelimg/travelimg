@@ -418,6 +418,9 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
 
     }
 
+    /**
+     * A simple keyword with a close button.
+     */
     private class Keyword extends HBox{
 
         private String name;
@@ -449,6 +452,9 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
 
     }
 
+    /**
+     * A special popup control showing progress using a progressbar.
+     */
     private class DownloadProgressControl extends PopupControl{
 
         private final BorderPane borderPane = new BorderPane();
