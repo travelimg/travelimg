@@ -1,48 +1,147 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
-import at.ac.tuwien.qse.sepm.entities.MapSlide;
-import at.ac.tuwien.qse.sepm.entities.PhotoSlide;
-import at.ac.tuwien.qse.sepm.entities.Slide;
-import at.ac.tuwien.qse.sepm.entities.Slideshow;
+import at.ac.tuwien.qse.sepm.dao.PhotoDAO;
+import at.ac.tuwien.qse.sepm.dao.WithData;
+import at.ac.tuwien.qse.sepm.entities.*;
+import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 
 public class SlideServiceTest extends ServiceTestBase {
 
     @Autowired
+    private PhotoService photoService;
+    @Autowired
     private SlideServiceImpl slideService;
     @Autowired
     private SlideshowServiceImpl slideshowService;
-    @Test
-    public void test_create() throws ServiceException {
-        Slideshow s1 =new Slideshow(-1,"test",5.0);
-        slideshowService.create(s1);
 
-        slideService.create(new MapSlide(33,slideshowService.getAllSlideshows().get(0).getId(),45,"test",5.77,4.234,6));
-
-
-
+    private PhotoSlide createPhotoSlide() throws ServiceException {
+        return new PhotoSlide(1, 1, 1, "caption", photoService.getAllPhotos().get(0));
+    }
+    private MapSlide createMapSlide() throws ServiceException {
+        return new MapSlide(1, 1, 1, "caption", 0.0, 0.0, 10);
+    }
+    private TitleSlide createTitleSlide() throws ServiceException {
+        return new TitleSlide(1, 1, 1, "caption", 0);
+    }
+    private Slideshow getDefaultSlideshow() throws ServiceException {
+        return slideshowService.getAllSlideshows().get(0);
     }
 
-
     @Test
-    public void test_update_should_persist() throws ServiceException {
-        Slideshow s1 =new Slideshow(-1,"test",5.0);
-        slideshowService.create(s1);
-        MapSlide m = new MapSlide(33,slideshowService.getAllSlideshows().get(0).getId(),45,"test3",5.77,4.234,6);
+    @WithData
+    public void test_create_photoSlide_persists() throws ServiceException {
+        PhotoSlide slide = createPhotoSlide();
+        slideService.create(slide);
 
-
-        slideService.create(m);
-        m.setCaption("hallo");
-
-        slideService.update(m);
+        assertThat(getDefaultSlideshow().getPhotoSlides(), contains(slide));
     }
-    @Test
-    public void test_delete_should_persist() throws ServiceException {
 
-        slideService.delete(new MapSlide(4,4,4,"test2",4.555,5.33,5));
+    @Test
+    @WithData
+    public void test_create_mapSlide_persists() throws ServiceException {
+        MapSlide slide = createMapSlide();
+        slideService.create(slide);
+
+        assertThat(getDefaultSlideshow().getMapSlides(), contains(slide));
+    }
+
+    @Test
+    @WithData
+    public void test_create_titleSlide_persists() throws ServiceException {
+        TitleSlide slide = createTitleSlide();
+        slideService.create(slide);
+
+        assertThat(getDefaultSlideshow().getTitleSlides(), contains(slide));
+    }
+
+    @Test
+    @WithData
+    public void test_update_photoSlide_persists() throws ServiceException {
+        PhotoSlide slide = createPhotoSlide();
+        slideService.create(slide);
+
+        assertThat(getDefaultSlideshow().getPhotoSlides(), contains(slide));
+
+        slide.setPhoto(photoService.getAllPhotos().get(2));
+        slideService.update(slide);
+
+        assertThat(getDefaultSlideshow().getPhotoSlides(), contains(slide));
+    }
+
+    @Test
+    @WithData
+    public void test_update_mapSlide_persists() throws ServiceException {
+        MapSlide slide = createMapSlide();
+        slideService.create(slide);
+
+        assertThat(getDefaultSlideshow().getMapSlides(), contains(slide));
+
+        slide.setLatitude(42);
+        slide.setLongitude(30);
+        slide.setZoomLevel(15);
+        slideService.update(slide);
+
+        assertThat(getDefaultSlideshow().getMapSlides(), contains(slide));
+    }
+
+    @Test
+    @WithData
+    public void test_update_titleSlide_persists() throws ServiceException {
+        TitleSlide slide = createTitleSlide();
+        slideService.create(slide);
+
+        assertThat(getDefaultSlideshow().getTitleSlides(), contains(slide));
+
+        slide.setColor(100);
+        slideService.update(slide);
+
+        assertThat(getDefaultSlideshow().getTitleSlides(), contains(slide));
+    }
+
+    @Test
+    @WithData
+    public void test_delete_photoSlide_persists() throws ServiceException {
+        PhotoSlide slide = createPhotoSlide();
+        slideService.create(slide);
+
+        assertThat(getDefaultSlideshow().getPhotoSlides(), contains(slide));
+
+        slideService.delete(slide);
+
+        assertThat(getDefaultSlideshow().getPhotoSlides(), empty());
+    }
+
+    @Test
+    @WithData
+    public void test_delete_mapSlide_persists() throws ServiceException {
+        MapSlide slide = createMapSlide();
+        slideService.create(slide);
+
+        assertThat(getDefaultSlideshow().getMapSlides(), contains(slide));
+
+        slideService.delete(slide);
+
+        assertThat(getDefaultSlideshow().getMapSlides(), empty());
+    }
+
+    @Test
+    @WithData
+    public void test_delete_titleSlide_persists() throws ServiceException {
+        TitleSlide slide = createTitleSlide();
+        slideService.create(slide);
+
+        assertThat(getDefaultSlideshow().getTitleSlides(), contains(slide));
+
+        slideService.delete(slide);
+
+        assertThat(getDefaultSlideshow().getTitleSlides(), empty());
     }
 }
