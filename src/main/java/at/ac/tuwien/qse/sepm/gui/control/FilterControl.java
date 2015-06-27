@@ -21,11 +21,11 @@ import java.util.function.Function;
  *
  * Usually there would be one such control for every possible value of the filtered property.
  */
-public class Filter<T> extends Control {
+public class FilterControl<T> extends Control {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public Filter() {
+    public FilterControl() {
         getStyleClass().setAll("filter");
     }
 

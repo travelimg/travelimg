@@ -1,21 +1,15 @@
 package at.ac.tuwien.qse.sepm.gui.control.skin;
 
-import at.ac.tuwien.qse.sepm.gui.control.Filter;
+import at.ac.tuwien.qse.sepm.gui.control.FilterControl;
 import at.ac.tuwien.qse.sepm.gui.control.FilterGroup;
 import at.ac.tuwien.qse.sepm.gui.control.OptionalContent;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
 import javafx.scene.layout.*;
-
-import java.util.Collection;
-import java.util.Set;
 
 public class FilterGroupSkin<T> extends SkinBase<FilterGroup<T>> {
 
@@ -60,7 +54,7 @@ public class FilterGroupSkin<T> extends SkinBase<FilterGroup<T>> {
         getSkinnable().titleProperty().addListener((observable) -> update());
         getSkinnable().expandedProperty().addListener((observable) -> update());
         getSkinnable().getItems().addListener(
-                (ListChangeListener.Change<? extends Filter<T>> change) -> updateList());
+                (ListChangeListener.Change<? extends FilterControl<T>> change) -> updateList());
 
         expand.setOnAction(event -> getSkinnable().toggleExpansion());
         header.setOnMouseClicked(event -> getSkinnable().toggleExpansion());
@@ -85,7 +79,7 @@ public class FilterGroupSkin<T> extends SkinBase<FilterGroup<T>> {
     private void updateList() {
         body.setAvailable(!getSkinnable().getItems().isEmpty());
         list.getChildren().clear();
-        for (Filter<T> filter : getSkinnable().getItems()) {
+        for (FilterControl<T> filter : getSkinnable().getItems()) {
             list.getChildren().add(filter);
         }
     }

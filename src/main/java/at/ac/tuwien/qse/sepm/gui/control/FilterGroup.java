@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -26,8 +25,8 @@ public class FilterGroup<T> extends Control {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final ObservableList<Filter<T>> items = FXCollections.observableArrayList();
-    private final Map<Filter, InvalidationListener> listeners = new HashMap<>();
+    private final ObservableList<FilterControl<T>> items = FXCollections.observableArrayList();
+    private final Map<FilterControl, InvalidationListener> listeners = new HashMap<>();
     private Runnable onUpdate;
 
     public FilterGroup() {
@@ -35,7 +34,7 @@ public class FilterGroup<T> extends Control {
 
         // Always clean up the listeners.
         getItems().addListener((Observable observable) -> {
-            for (Filter<T> item : getItems()) {
+            for (FilterControl<T> item : getItems()) {
                 InvalidationListener listener = listeners.get(item);
                 if (listener != null) {
                     item.includedProperty().removeListener(listener);
@@ -46,7 +45,7 @@ public class FilterGroup<T> extends Control {
         });
     }
 
-    public final ObservableList<Filter<T>> getItems() {
+    public final ObservableList<FilterControl<T>> getItems() {
         return this.items;
     }
 
@@ -105,21 +104,21 @@ public class FilterGroup<T> extends Control {
 
     public Set<T> getValues() {
         return getItems().stream()
-                .map(Filter::getValue)
+                .map(FilterControl::getValue)
                 .collect(Collectors.toSet());
     }
 
     public Set<T> getIncludedValues() {
         return getItems().stream()
-                .filter(Filter::isIncluded)
-                .map(Filter::getValue)
+                .filter(FilterControl::isIncluded)
+                .map(FilterControl::getValue)
                 .collect(Collectors.toSet());
     }
 
     public Set<T> getExcludedValues() {
         return getItems().stream()
                 .filter((item) -> !item.isIncluded())
-                .map(Filter::getValue)
+                .map(FilterControl::getValue)
                 .collect(Collectors.toSet());
     }
 
@@ -148,11 +147,11 @@ public class FilterGroup<T> extends Control {
     }
 
     public void includeAll() {
-        getItems().forEach(Filter::include);
+        getItems().forEach(FilterControl::include);
     }
 
     public void excludeAll() {
-        getItems().forEach(Filter::exclude);
+        getItems().forEach(FilterControl::exclude);
     }
 
     public void expand() {

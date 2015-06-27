@@ -1,7 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 import at.ac.tuwien.qse.sepm.entities.*;
-import at.ac.tuwien.qse.sepm.gui.control.Filter;
+import at.ac.tuwien.qse.sepm.gui.control.FilterControl;
 import at.ac.tuwien.qse.sepm.gui.control.FilterGroup;
 import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
@@ -320,8 +320,8 @@ public class OrganizerImpl implements Organizer {
             // That way the filter stays the same and new values are included automatically.
             Set<T> excluded = filterGroup.getExcludedValues();
             filterGroup.getItems().clear();
-            values.forEach(p -> {
-                Filter<T> filter = new Filter<>();
+            filter.getValues().forEach(p -> {
+                FilterControl<T> filter = new FilterControl<>();
                 filter.setValue(p);
                 filter.setConverter(converter);
                 filter.setIncluded(!excluded.contains(p));

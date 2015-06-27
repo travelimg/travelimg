@@ -1,20 +1,19 @@
 package at.ac.tuwien.qse.sepm.gui.control.skin;
 
-import at.ac.tuwien.qse.sepm.gui.control.Filter;
+import at.ac.tuwien.qse.sepm.gui.control.FilterControl;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
-public class FilterSkin<T> extends SkinBase<Filter<T>> {
+public class FilterSkin<T> extends SkinBase<FilterControl<T>> {
 
     private final FontAwesomeIconView icon = new FontAwesomeIconView();
     private final Label label = new Label();
 
 
-    public FilterSkin(Filter control) {
+    public FilterSkin(FilterControl control) {
         super(control);
 
         HBox container = new HBox();
