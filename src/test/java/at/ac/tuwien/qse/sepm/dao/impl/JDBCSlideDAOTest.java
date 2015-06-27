@@ -3,13 +3,14 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 import at.ac.tuwien.qse.sepm.dao.AbstractJDBCDAOTest;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.SlideDAO;
+import at.ac.tuwien.qse.sepm.dao.UsingTable;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-
+@UsingTable("slide")
 public class JDBCSlideDAOTest extends AbstractJDBCDAOTest {
 
     @Autowired
