@@ -12,10 +12,7 @@ import javafx.scene.layout.StackPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -73,19 +70,36 @@ public class PaginatedImageGrid extends StackPane {
      * @param photo The photo to be added
      */
     public void addPhoto(Photo photo) {
+        addPhoto(photo, true);
+    }
+
+    private void addPhoto(Photo photo, boolean update) {
         // insert sorted
         int index = 0;
+
         for (Photo p : photos) {
             if (p.getData().getDatetime().isBefore(photo.getData().getDatetime())) {
                 photos.add(index, photo);
-                setPhotos(photos);
+
+                if (update) {
+                    setPhotos(photos);
+                }
                 return;
             }
         }
 
         // photo is the oldest, insert at end
         photos.add(photo);
-        setPhotos(photos);
+
+        if (update) {
+            setPhotos(photos);
+        }
+    }
+
+    public void addPhotos(List<Photo> photos) {
+        photos.forEach(p -> addPhoto(p, false));
+
+        setPhotos(this.photos);
     }
 
     public void setSelectionChangeAction(Consumer<Set<Photo>> selectionChangeAction) {

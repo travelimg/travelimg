@@ -8,10 +8,10 @@ import at.ac.tuwien.qse.sepm.gui.controller.Menu;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.*;
 import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid;
+import at.ac.tuwien.qse.sepm.gui.util.BufferedBatchOperation;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.util.IOHandler;
 import javafx.application.Platform;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.input.*;
@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 public class GridViewImpl implements GridView {
@@ -65,6 +66,12 @@ public class GridViewImpl implements GridView {
     private PaginatedImageGrid grid;
     private boolean disableReload = false;
     private boolean treeViewActive = false;
+
+    private BufferedBatchOperation<Photo> addedPhotoBuffer = null;
+
+    @Autowired public void setScheduler(ScheduledExecutorService scheduler) {
+        addedPhotoBuffer = new BufferedBatchOperation<>(this::addPhotosToGrid, scheduler);
+    }
 
     @FXML
     private void initialize() {
@@ -113,34 +120,32 @@ public class GridViewImpl implements GridView {
 
         folderDropTarget.setVisible(false);
 
-        try {
+        /*try {
             if (workspaceService.getDirectories().isEmpty()) {
                 folderDropTarget.setVisible(true);
             }
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Laden der Bildordner", "");
-        }
+        }*/
     }
 
-    private void handleImportError(Throwable error) {
-        LOGGER.error("import error", error);
+    private void addPhotosToGrid(List<Photo> photos) {
+        System.out.println("adding " + photos.size() + " photos to grid");
 
-        // queue an update in the main gui
-        Platform.runLater(() -> ErrorDialog.show(root, "Import fehlgeschlagen", "Fehlermeldung: " + error.getMessage()));
+        Platform.runLater(() -> {
+            // todo filter with organizer filter
+            grid.addPhotos(photos);
+        });
     }
 
     private void handlePhotoCreated(Photo photo) {
-        Platform.runLater(() -> {
-            if (organizer.getUsedFilter().test(photo)) {
-                grid.addPhoto(photo);
-            }
-        });
+        addedPhotoBuffer.add(photo);
     }
 
     private void handlePhotoUpdated(Photo photo) {
         Platform.runLater(() -> {
             // TODO: should we update filter
-            grid.updatePhoto(photo);
+            //grid.updatePhoto(photo);
         });
     }
 
@@ -149,12 +154,12 @@ public class GridViewImpl implements GridView {
             // TODO: should we update filter
 
             // lookup photo by path
-            Optional<Photo> photo = grid.getPhotos().stream()
+            /*Optional<Photo> photo = grid.getPhotos().stream()
                     .filter(p -> p.getFile().equals(file))
                     .findFirst();
 
             if (photo.isPresent())
-                grid.removePhoto(photo.get());
+                grid.removePhoto(photo.get());*/
         });
     }
 
@@ -165,7 +170,7 @@ public class GridViewImpl implements GridView {
     }
 
     private void reloadImages() {
-        try {
+        /*try {
 
             grid.setPhotos(photoService.getAllPhotos(organizer.getUsedFilter()).stream()
                             .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
@@ -174,7 +179,7 @@ public class GridViewImpl implements GridView {
             LOGGER.error("failed loading fotos", ex);
             ErrorDialog.show(root, "Laden von Fotos fehlgeschlagen",
                     "Fehlermeldung: " + ex.getMessage());
-        }
+        }*/
     }
 
     private void handleDragEntered(DragEvent event) {
