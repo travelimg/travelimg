@@ -336,17 +336,6 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         close();
     }
 
-    private void handleInterruptDownload(DownloadProgressControl downloadProgressControl){
-        //ConfirmationDialog confirmationDialog = new ConfirmationDialog(borderPane, "Download abbrechen", "Download abbrechen?");
-        //Optional<Boolean> confirmed = confirmationDialog.showForResult();
-        //if (!confirmed.isPresent() || !confirmed.get()) return;
-        if(downloadTask!=null){
-            downloadTask.cancel();
-            downloadProgressControl.finish(true);
-            logger.debug("Interrupting download...");
-        }
-    }
-
     /**
      * Widget for one widget in the image grid. Can either be in a selected or an unselected state.
      */
@@ -483,21 +472,17 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             ft.setAutoReverse(true);
             ft.play();
             progressBar.setProgress(0.0);
-            FontAwesomeIconView stopIcon = new FontAwesomeIconView();
-            stopIcon.setGlyphName("TIMES");
             HBox hBox = new HBox(5.0);
             hBox.setAlignment(Pos.CENTER);
 
             hBox.setPadding(new Insets(5.0,5.0,5.0,5.0));
             hBox.getChildren().add(progressBar);
-            hBox.getChildren().add(stopIcon);
             borderPane.setStyle("-fx-background-color: white");
             borderPane.setPadding(new Insets(5.0, 5.0, 5.0, 5.0));
             Label label = new Label("Fotos werden heruntergeladen");
             label.setAlignment(Pos.CENTER);
             borderPane.setCenter(label);
             borderPane.setBottom(hBox);
-            stopIcon.setOnMouseClicked(event -> handleInterruptDownload(this));
             button.setOnMouseEntered(event -> handleShow());
             button.setOnMouseExited(event -> hide());
             getScene().setRoot(borderPane);
@@ -520,7 +505,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                 hBox.getChildren().add(checkIcon);
             }
             else{
-                hBox.getChildren().add(new Label("Herunterladen abgebrochen "));
+                hBox.getChildren().add(new Label("Herunterladen fehlgeschlagen "));
                 FontAwesomeIconView timesIcon = new FontAwesomeIconView();
                 timesIcon.setGlyphName("TIMES");
                 hBox.getChildren().add(timesIcon);
