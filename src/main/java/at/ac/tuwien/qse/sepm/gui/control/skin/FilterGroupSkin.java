@@ -62,6 +62,7 @@ public class FilterGroupSkin<T> extends SkinBase<FilterGroup<T>> {
         getSkinnable().getItems().addListener(
                 (ListChangeListener.Change<? extends Filter<T>> change) -> updateList());
 
+        expand.setOnAction(event -> getSkinnable().toggleExpansion());
         header.setOnMouseClicked(event -> getSkinnable().toggleExpansion());
         icon.setOnMouseClicked(event -> {
             getSkinnable().toggleAll();
