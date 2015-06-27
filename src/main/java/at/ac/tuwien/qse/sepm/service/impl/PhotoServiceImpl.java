@@ -41,6 +41,9 @@ public class PhotoServiceImpl implements PhotoService {
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> watcherSchedule = null;
 
+    private final ExecutorService executor = Executors.newFixedThreadPool(1);
+
+
     @Autowired
     private void initializeListeners(AsyncPhotoRepository repository) {
         listener = new Listener();
@@ -87,7 +90,7 @@ public class PhotoServiceImpl implements PhotoService {
             watcherSchedule.cancel(true);
         }
         scheduler.shutdown();
-        listener.close();
+        executor.shutdown();
     }
 
     @Override
@@ -182,12 +185,6 @@ public class PhotoServiceImpl implements PhotoService {
     private class Listener implements
             AsyncPhotoRepository.AsyncListener,
             PhotoRepository.Listener {
-
-        private final ExecutorService executor = Executors.newFixedThreadPool(1);
-
-        public void close() {
-            executor.shutdown();
-        }
 
         @Override public void onError(PhotoRepository repository, DAOException error) {
             LOGGER.error("repository error {}", error);

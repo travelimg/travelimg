@@ -45,7 +45,7 @@ public class FlickrServiceImpl implements FlickrService {
     @Autowired
     private PhotographerService photographerService;
     @Autowired
-    private ExecutorService executorService;
+    private ExecutorService executor;
 
 
     public FlickrServiceImpl() {
@@ -57,7 +57,7 @@ public class FlickrServiceImpl implements FlickrService {
         if (i == 0) {
             downloader = new AsyncDownloader(tags, latitude, longitude, useGeoData, callback, progressCallback, errorHandler);
         }
-        executorService.submit(downloader);
+        executor.submit(downloader);
         return downloader;
     }
 
