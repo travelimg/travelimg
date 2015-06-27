@@ -32,9 +32,9 @@ public class WorkspaceServiceTest extends ServiceTestBase {
                             .getPath());
 
     @Before
-    public void setUp() {
-        watcher.register(sourceDir1);
+    public void setUp() throws ServiceException{
         watcher.getExtensions().add("jpg");
+        workspaceService.addDirectory(sourceDir1);
     }
 
     /**
@@ -51,22 +51,30 @@ public class WorkspaceServiceTest extends ServiceTestBase {
     public void testAddDirectory_shouldPersist() throws ServiceException {
         int initiallyWatched = watcher.index().size();
         int watchedAfterAdd;
+        int initialDirectories = workspaceService.getDirectories().size();
+        int directoriesAfterAdd;
 
         workspaceService.addDirectory(sourceDir2);
         watchedAfterAdd = watcher.index().size();
+        directoriesAfterAdd = workspaceService.getDirectories().size();
 
         assertEquals(initiallyWatched + 2, watchedAfterAdd);
+        assertEquals(initialDirectories + 1, directoriesAfterAdd);
     }
 
     @Test
     public void testRemoveDirectory_shouldPersist() throws ServiceException {
         int initiallyWatched = watcher.index().size();
         int watchedAfterRemove;
+        int initialDirectories = workspaceService.getDirectories().size();
+        int directoriesAfterRemove;
 
         workspaceService.removeDirectory(sourceDir1);
         watchedAfterRemove = watcher.index().size();
+        directoriesAfterRemove = workspaceService.getDirectories().size();
 
         assertEquals(initiallyWatched - 3, watchedAfterRemove);
+        assertEquals(initialDirectories - 1, directoriesAfterRemove);
     }
 
     @Test (expected = ServiceException.class)
@@ -116,12 +124,16 @@ public class WorkspaceServiceTest extends ServiceTestBase {
                         ImportTest.class.getClassLoader().getResource("db/testimages/directory3")
                                 .getPath());
 
+        int initiallyWatched = watcher.index().size();
+        int watchedAfterRemove;
         int initialDirectories = workspaceService.getDirectories().size();
         int noOfDirectoriesAfterCall = -1;
 
         workspaceService.removeDirectory(sourceDir3);
+        watchedAfterRemove = watcher.index().size();
         noOfDirectoriesAfterCall = workspaceService.getDirectories().size();
 
+        assertEquals(initiallyWatched, watchedAfterRemove);
         assertEquals(initialDirectories, noOfDirectoriesAfterCall);
     }
 }
