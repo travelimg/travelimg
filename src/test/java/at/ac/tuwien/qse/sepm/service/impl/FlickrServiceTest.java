@@ -40,31 +40,31 @@ public class FlickrServiceTest extends ServiceTestBase {
 
         //spy the flickrService so that we can take control over single calls of methods without touching the rest
         flickrService = Mockito.spy(flickrService);
-        Mockito.doNothing().when(flickrService).downloadPhotoFromFlickr(eq(existingUrl),
-                eq(existingId), eq("format"));
-        Mockito.doThrow(new ServiceException()).when(flickrService).downloadPhotoFromFlickr(
+        Mockito.doNothing().when(flickrService).downloadPhoto(eq(existingUrl), eq(existingId),
+                eq("format"));
+        Mockito.doThrow(new ServiceException()).when(flickrService).downloadPhoto(
                 eq(nonExistingUrl), Mockito.anyString(), Mockito.anyString());
 
     }
 
     @Test(expected = ServiceException.class)
      public void testDownloadPhotoFromFlickrIdIsNull() throws ServiceException {
-        flickrService.downloadPhotoFromFlickr(existingUrl,null,"jpg");
+        flickrService.downloadPhoto(existingUrl, null, "jpg");
     }
 
     @Test(expected = ServiceException.class)
     public void testDownloadPhotoFromFlickrIdIsEmpty() throws ServiceException {
-        flickrService.downloadPhotoFromFlickr(existingUrl,"    ","jpg");
+        flickrService.downloadPhoto(existingUrl, "    ", "jpg");
     }
 
     @Test(expected = ServiceException.class)
     public void testDownloadPhotoFromFlickrFormatIsNull() throws ServiceException {
-        flickrService.downloadPhotoFromFlickr(existingUrl,existingId,null);
+        flickrService.downloadPhoto(existingUrl, existingId, null);
     }
 
     @Test(expected = ServiceException.class)
     public void testDownloadPhotoFromFlickrFormatIsEmpty() throws ServiceException {
-        flickrService.downloadPhotoFromFlickr(existingUrl,existingId,"    ");
+        flickrService.downloadPhoto(existingUrl, existingId, "    ");
     }
 
 }

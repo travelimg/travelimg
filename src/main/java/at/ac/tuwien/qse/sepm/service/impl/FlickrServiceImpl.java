@@ -87,27 +87,27 @@ public class FlickrServiceImpl implements FlickrService {
     }
 
     /**
-     * Downloads a photo from flickr
+     * Downloads a photo from a given url
      *
      * @param url                  the url of the photo
-     * @param id                   the id of the photo
+     * @param filename             the filename of the photo
      * @param format               the format of the photo
      * @throws ServiceException    if the photo can't be downloaded.
      */
-    public void downloadPhotoFromFlickr(String url, String id, String format) throws ServiceException {
-        if(id == null || id.trim().isEmpty() || format == null || format.trim().isEmpty()){
+    public void downloadPhoto(String url, String filename, String format) throws ServiceException {
+        if(filename == null || filename.trim().isEmpty() || format == null || format.trim().isEmpty()){
             throw new ServiceException("Photo id or format invalid.");
         }
         HttpURLConnection httpConnection = null;
         try {
             httpConnection = (HttpURLConnection) (new URL(url).openConnection());
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.debug(e.getMessage());
             throw new ServiceException(e.getMessage(), e);
         }
 
         try(BufferedInputStream in = new BufferedInputStream((httpConnection.getInputStream()));
-                FileOutputStream fout = new FileOutputStream(tmpDir + id + "." + format);)
+                FileOutputStream fout = new FileOutputStream(tmpDir + filename + "." + format);)
         {
             long completeFileSize = httpConnection.getContentLength();
             logger.debug("Size of the photo is {} MB", (double)completeFileSize/oneMB);
@@ -120,8 +120,9 @@ public class FlickrServiceImpl implements FlickrService {
                 // maybe produces too much output
                 // logger.debug("Downloaded {} MB", (double)downloadedFileSize/oneMB);
             }
-            logger.debug("Downloaded photo {}", id+"."+format);
+            logger.debug("Downloaded photo {}", filename+"."+format);
         } catch (IOException e) {
+            logger.debug(e.getMessage());
             throw new ServiceException(e.getMessage(), e);
         }
     }
@@ -194,7 +195,7 @@ public class FlickrServiceImpl implements FlickrService {
                     p.setTags(photoWithOriginalSecret.getTags());
                     if (!p.getOriginalSecret().isEmpty()) {
                         String mediumSizeUrl = "https://farm" + p.getFarm() + ".staticflickr.com/" + p.getServer() + "/" + p.getId() + "_" + p.getSecret() + "_z." + p.getOriginalFormat();
-                        downloadPhotoFromFlickr(mediumSizeUrl, p.getId(), p.getOriginalFormat());
+                        downloadPhoto(mediumSizeUrl, p.getId(), p.getOriginalFormat());
                         if(!isRunning()){
                             logger.debug("Download interrupted");
                             break;
@@ -238,7 +239,7 @@ public class FlickrServiceImpl implements FlickrService {
                     String url = "https://farm" + p.getFarm() + ".staticflickr.com/" + p.getServer()
                             + "/" + p.getId() + "_" + p.getOriginalSecret() + "_o." + p
                             .getOriginalFormat();
-                    downloadPhotoFromFlickr(url, p.getId() + "_o", p.getOriginalFormat());
+                    downloadPhoto(url, p.getId() + "_o", p.getOriginalFormat());
                     GeoData geoData = flickr.getPhotosInterface().getGeoInterface()
                             .getLocation(p.getId());
                     p.setGeoData(geoData);
