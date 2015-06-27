@@ -16,6 +16,7 @@ import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -53,12 +54,12 @@ public class OrganizerImpl implements Organizer {
     @FXML private FilterGroup<Journey> journeyFilter;
     @FXML private FilterGroup<Place> placeFilter;
 
-    private ToggleButton folderViewButton = new ToggleButton("Ordneransicht");
-    private ToggleButton filterViewButton = new ToggleButton("Filteransicht");
+    @FXML private ToggleButton listTab;
+    @FXML private ToggleButton folderTab;
+    @FXML private Node listTabContent;
+    @FXML private Node folderTabContent;
 
-    @FXML private TreeView<String> filesTree;
-
-    private HBox buttonBox;
+    @FXML private TreeView<String> folderTree;
 
     private PhotoFilter usedFilter = new PhotoFilter();
     private PhotoFilter photoFilter = usedFilter;
@@ -75,17 +76,24 @@ public class OrganizerImpl implements Organizer {
     }
 
     @FXML private void initialize() {
-        filesTree = new TreeView<>();
-        filesTree.setOnMouseClicked(event -> handleFolderChange());
-        folderViewButton.setOnAction(event -> folderViewClicked());
-        filterViewButton.setOnAction(event -> filterViewClicked());
+        folderTree.setOnMouseClicked(event -> handleFolderChange());
 
-        ToggleGroup toggleGroup = new ToggleGroup();
-        filterViewButton.setToggleGroup(toggleGroup);
-        folderViewButton.setToggleGroup(toggleGroup);
+        listTabContent.visibleProperty().bind(listTab.selectedProperty());
+        folderTabContent.visibleProperty().bind(folderTab.selectedProperty());
+        listTab.setOnAction(event -> {
+            listTab.setSelected(true);
+            folderTab.setSelected(false);
+            handleFilterChange();
+        });
+        folderTab.setOnAction(event -> {
+            listTab.setSelected(false);
+            folderTab.setSelected(true);
 
-        buttonBox = new HBox(filterViewButton, folderViewButton);
-        buttonBox.setAlignment(Pos.CENTER);
+            Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
+            findFiles(rootDirectories.toFile(), null);
+            usedFilter = new PhotoPathFilter();
+            handleFilterChange();
+        });
 
         ratingFilter.setOnUpdate(this::handleRatingsChange);
         tagFilter.setOnUpdate(this::handleCategoriesChange);
@@ -93,8 +101,9 @@ public class OrganizerImpl implements Organizer {
         journeyFilter.setOnUpdate(this::handleJourneysChange);
         placeFilter.setOnUpdate(this::handlePlacesChange);
 
-        refreshLists();
+        refresh();
         resetFilter();
+        listTab.fire();
 
         tagService.subscribeTagChanged((p) -> refreshTags());
         clusterService.subscribeJourneyChanged((p) -> refreshJourneys());
@@ -102,51 +111,26 @@ public class OrganizerImpl implements Organizer {
         photographerService.subscribeChanged((p) -> refreshPhotographers());
     }
 
-
-    @Override
-    public void setWorldMapPlace(Place place) {
+    @Override public void setWorldMapPlace(Place place) {
         placeFilter.excludeAll();
         placeFilter.include(place);
         handlePlacesChange();
-    }
-    // This Method let's the User switch to the usedFilter-view
-    private void filterViewClicked() {
-        usedFilter = photoFilter;
-        handleFilterChange();
-    }
-
-    // This Method let's the User switch to the folder-view
-    private void folderViewClicked() {
-        LOGGER.debug("Switch view");
-
-        Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
-        findFiles(rootDirectories.toFile(), null);
-
-        VBox.setVgrow(filesTree, Priority.ALWAYS);
-        usedFilter = new PhotoPathFilter();
-        handleFilterChange();
     }
 
     private void findFiles(File dir, FilePathTreeItem parent) {
         FilePathTreeItem rootNode = new FilePathTreeItem(dir.toPath());
         rootNode.setExpanded(true);
-        try {
-            File[] files = dir.listFiles();
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    System.out.println("directory:" + file.getCanonicalPath());
-                    findFiles(file, rootNode);
-                }
+        File[] files = dir.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                findFiles(file, rootNode);
             }
-            if (parent == null) {
-                filesTree.setRoot(rootNode);
-            } else {
-                parent.getChildren().add(rootNode);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
+        if (parent == null) {
+            folderTree.setRoot(rootNode);
+        } else {
+            parent.getChildren().add(rootNode);
+        }
     }
 
     private void handleFilterChange() {
@@ -155,10 +139,9 @@ public class OrganizerImpl implements Organizer {
             return;
         filterChangeCallback.run();
     }
-
     private void handleFolderChange() {
         LOGGER.debug("handle folder");
-        FilePathTreeItem item = (FilePathTreeItem) filesTree.getSelectionModel().getSelectedItem();
+        FilePathTreeItem item = (FilePathTreeItem) folderTree.getSelectionModel().getSelectedItem();
         if (item != null) {
             if (usedFilter instanceof PhotoPathFilter)
                 ((PhotoPathFilter) usedFilter).setIncludedPath(Paths.get(item.getFullPath()));
@@ -172,7 +155,6 @@ public class OrganizerImpl implements Organizer {
         usedFilter.getIncludedRatings().addAll(ratingFilter.getIncludedValues());
         handleFilterChange();
     }
-
     private void handleCategoriesChange() {
         LOGGER.debug("category usedFilter changed");
         Set<Tag> included = tagFilter.getIncludedValues();
@@ -182,36 +164,23 @@ public class OrganizerImpl implements Organizer {
         usedFilter.getIncludedCategories().addAll(included);
         handleFilterChange();
     }
-
     private void handlePhotographersChange() {
         LOGGER.debug("photographer usedFilter changed");
         usedFilter.getIncludedPhotographers().clear();
         usedFilter.getIncludedPhotographers().addAll(photographerFilter.getIncludedValues());
         handleFilterChange();
     }
-
     private void handleJourneysChange() {
         LOGGER.debug("journey usedFilter changed");
         usedFilter.getIncludedJourneys().clear();
         usedFilter.getIncludedJourneys().addAll(journeyFilter.getIncludedValues());
         handleFilterChange();
     }
-
     private void handlePlacesChange() {
         LOGGER.debug("place usedFilter changed");
         usedFilter.getIncludedPlaces().clear();
         usedFilter.getIncludedPlaces().addAll(placeFilter.getIncludedValues());
         handleFilterChange();
-    }
-
-    private void refreshLists() {
-        LOGGER.debug("refreshing usedFilter");
-
-        refreshRatings();
-        refreshTags();
-        refreshJourneys();
-        refreshPlaces();
-        refreshPhotographers();
     }
 
     private List<Rating> getAllRatings() {
@@ -224,7 +193,6 @@ public class OrganizerImpl implements Organizer {
         LOGGER.debug("fetching ratings succeeded with {} items", list.size());
         return list;
     }
-
     private List<Tag> getAllTags() {
         LOGGER.debug("fetching categories");
         try {
@@ -240,7 +208,6 @@ public class OrganizerImpl implements Organizer {
             return new ArrayList<>();
         }
     }
-
     private List<Photographer> getAllPhotographers() {
         LOGGER.debug("fetching photographers");
         try {
@@ -253,7 +220,6 @@ public class OrganizerImpl implements Organizer {
             return new ArrayList<>();
         }
     }
-
     private List<Journey> getAllJourneys() {
         LOGGER.debug("fetching journeys");
         try {
@@ -271,7 +237,6 @@ public class OrganizerImpl implements Organizer {
             return new ArrayList<>();
         }
     }
-
     private List<Place> getAllPlaces() {
         LOGGER.debug("fetching journeys");
         try {
@@ -290,7 +255,7 @@ public class OrganizerImpl implements Organizer {
         Runnable savedCallback = filterChangeCallback;
         filterChangeCallback = null;
 
-        refreshLists();
+        refresh();
         inspectorController.refresh();
         tagFilter.includeAll();
         ratingFilter.includeAll();
@@ -302,6 +267,15 @@ public class OrganizerImpl implements Organizer {
         filterChangeCallback = savedCallback;
     }
 
+    private void refresh() {
+        LOGGER.debug("refreshing filter");
+
+        refreshRatings();
+        refreshTags();
+        refreshJourneys();
+        refreshPlaces();
+        refreshPhotographers();
+    }
     private void refreshRatings() {
         refreshFilter(ratingFilter, getAllRatings(), value -> {
             switch (value) {
@@ -316,28 +290,24 @@ public class OrganizerImpl implements Organizer {
             }
         });
     }
-
     private void refreshTags() {
         refreshFilter(tagFilter, getAllTags(), value -> {
             if (value == null) return "Keinen Kategorien zugehörig";
             return value.getName();
         });
     }
-
     private void refreshJourneys() {
         refreshFilter(journeyFilter, getAllJourneys(), value -> {
             if (value == null) return "Keiner Reise zugehörig";
             return value.getName();
         });
     }
-
     private void refreshPlaces() {
         refreshFilter(placeFilter, getAllPlaces(), value -> {
             if (value == null) return "Keinem Ort zugehörig";
             return value.getCountry() + ", " + value.getCity();
         });
     }
-
     private void refreshPhotographers() {
         refreshFilter(photographerFilter, getAllPhotographers(), value -> {
             if (value == null) return "Keinem Fotografen zugehörig";

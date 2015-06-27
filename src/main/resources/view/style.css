@@ -537,7 +537,6 @@
     -glyph-name: "MINUS_SQUARE";
 }
 .filter-group .list {
-    -fx-spacing: 2px;
     -fx-padding: 8px 0 8px 0;
 }
 
@@ -892,24 +891,6 @@
     -fx-background-color: -tmg-text-bright;
 }
 
-.toggle-button {
-    -fx-background-color: transparent;
-    -fx-padding: 11px 8px;
-    -fx-background-radius: 3px;
-    -fx-font-size: 14px;
-    -fx-text-fill: -tmg-text;
-}
-.toggle-button:hover {
-    -fx-background-color: -tmg-bg2-light;
-}
-.toggle-button:focused {
-    -fx-background-color: -tmg-bg2-light;
-}
-.toggle-button:pressed {
-    -fx-background-color: -tmg-bg2-dark;
-}
-
-
 .tree-view * {
     -fx-padding: 0;
     -fx-background-color: transparent;
@@ -982,6 +963,25 @@
 
 .organizer, .organizer .list-view {
     -fx-background-color: -tmg-bg1;
+}
+.organizer .tabs .toggle-button {
+    -fx-background-color: transparent;
+    -fx-padding: 12px 12px;
+}
+.organizer .tabs .toggle-button .glyph-icon {
+    -glyph-size: 20px;
+    -fx-fill: -tmg-text;
+    -fx-opacity: 0.5;
+}
+.organizer .tabs .toggle-button:hover .glyph-icon {
+    -fx-fill: -tmg-text-light;
+}
+.organizer .tabs .toggle-button:pressed .glyph-icon {
+    -fx-fill: -tmg-text-bright;
+}
+.organizer .tabs .toggle-button:selected .glyph-icon {
+    -fx-fill: -tmg-primary;
+    -fx-opacity: 1;
 }
 
 .scroll-bar, .scroll-bar * {
