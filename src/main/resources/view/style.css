@@ -103,7 +103,7 @@
     -tmg-text-bright: rgba(255, 255, 255, 1);
     -tmg-text-dark: rgba(255, 255, 255, 0.5);
 
-    -tmg-primary: rgba(233, 30, 90, 1);
+    -tmg-primary: rgba(236, 64, 122, 1);
     -tmg-secondary: rgba(33, 150, 243, 1);
     -tmg-danger: #FFA726;
 
@@ -111,16 +111,16 @@
     -tmg-control-hover: rgba(255, 255, 255, 0.08);
     -tmg-control-pressed: rgba(255, 255, 255, 0.15);
     -tmg-control-primary: transparent;
-    -tmg-control-primary-hover: rgba(233, 30, 90, 0.1);
-    -tmg-control-primary-pressed: rgba(233, 30, 90, 0.2);
+    -tmg-control-primary-hover: rgba(236, 64, 122, 0.1);
+    -tmg-control-primary-pressed: rgba(236, 64, 122, 0.2);
 
     -tmg-overlay: rgba(0, 0, 0, 0.5);
     -tmg-overlay-dark: rgba(0, 0, 0, 0.75);
 
     -tmg-highlight: rgba(255, 255, 255, 0.5);
 
-    -tmg-slide-tile-width: 200px;
-    -tmg-slide-tile-height: 200px;
+    -tmg-slide-tile-width: 150px;
+    -tmg-slide-tile-height: 150px;
 
     -google-map-marker: rgb(247, 92, 87);
     -google-map-bg: rgb(233, 229, 220);
@@ -130,7 +130,7 @@
     -fx-text-fill: -tmg-text;
 }
 
-.border-pane, .scroll-pane {
+.border-pane, .scroll-pane, .scroll-pane > * {
     -fx-padding: 0;
     -fx-background-color: transparent;
 }
@@ -361,11 +361,11 @@
 }
 
 .filter-list {
-    -fx-padding: 8px 0 16px 0;
+    -fx-padding: 8px 0 8px 0;
     -fx-background-color: -tmg-bg1;
 }
 .filter-list .check-item {
-    -fx-padding: 8px 14px;
+    -fx-padding: 4px 14px;
     -fx-font-size: 14;
 }
 .filter-list .check-item:hover {
@@ -391,7 +391,7 @@
     -fx-text-fill: -tmg-text-bright;
 }
 .filter-list .check-item .glyph-icon {
-    -glyph-size: 16;
+    -glyph-size: 14px;
     -fx-fill: -tmg-bg0;
 }
 .filter-list .check-item.checked .glyph-icon {
@@ -656,25 +656,32 @@
 .inspector-pane .placeholder {
     -fx-spacing: 16px;
     -fx-alignment: center;
-    -fx-padding: 80px 0 0 0;
 }
 .inspector-pane .placeholder .label {
-    -fx-text-fill: -tmg-text;
+    -fx-text-fill: -tmg-text-dark;
 }
 .inspector-pane .placeholder .glyph-icon {
     -fx-fill: -tmg-bg0;
-    -glyph-name: "CAMERA";
+    -glyph-name: "PICTURE_ALT";
     -glyph-size: 80px;
 }
 .inspector-pane .selection-info {
-    -fx-background-color: -tmg-secondary;
-    -fx-text-fill: -tmg-text-bright;
+    -fx-background-color: -tmg-bg1-light;
     -fx-padding: 16px 16px;
 }
 .inspector-pane .selection-info .label {
     -fx-font-size: 20px;
-    -fx-text-fill: -tmg-text-bright;
+    -fx-text-fill: -tmg-text-dark;
     -fx-alignment: center;
+}
+.inspector-pane.multiple .selection-info {
+    -fx-background-color: -tmg-secondary;
+}
+.inspector-pane.multiple .selection-info .label {
+    -fx-text-fill: -tmg-text-bright;
+}
+.inspector-pane .body {
+    -fx-padding: 16px;
 }
 
 .rating-picker * {
@@ -868,4 +875,203 @@
 }
 .scroll-bar > .thumb:pressed {
     -fx-background-color: -tmg-control-pressed;
+}
+
+.tag-picker .list {
+    -fx-spacing: 2px;
+}
+.tag-picker .tag {
+    -fx-padding: 4px 8px 4px 4px;
+    -fx-background-color: -tmg-bg1-light;
+}
+.tag-picker .tag .label-container {
+    -fx-spacing: 16px;
+}
+.tag-picker .tag .label {
+    -fx-text-fill: -tmg-text;
+}
+.tag-picker .tag .check-icon {
+    -glyph-size: 20;
+    -fx-fill: -tmg-bg0;
+}
+.tag-picker .tag.applied .check-icon {
+    -fx-fill: -tmg-primary;
+}
+.tag-picker .tag.partial .check-icon {
+    -fx-fill: -tmg-secondary;
+}
+.tag-picker .tag.partial .check-icon:hover {
+    -glyph-name: "CHECK_SQUARE";
+}
+.tag-picker .tag .remove-icon {
+    -fx-fill: -tmg-text;
+    -glyph-size: 16px;
+}
+.tag-picker .tag .remove-icon:hover {
+    -fx-fill: -tmg-text-light;
+}
+.tag-picker .tag .remove-icon:pressed {
+    -fx-fill: -tmg-text-bright;
+}
+.tag-picker .placeholder {
+    -fx-background-color: -tmg-bg1-dark;
+    -fx-text-fill: -tmg-text-dark;
+    -fx-padding: 5px 0 6px 0;
+}
+
+.suggestion-field {
+    -fx-font-size: 14px;
+}
+.suggestion-field .suggestion {
+    -fx-text-fill: -tmg-primary;
+    -fx-cursor: hand;
+}
+.suggestion-field .suggestion:hover {
+    -fx-underline: true;
+}
+.suggestion-field .label {
+    -fx-font-size: 12px;
+}
+
+.key-value-cell {
+    -fx-padding: 4px 8px;
+    -fx-background-color: -tmg-bg1-light;
+}
+.key-value-cell .key {
+    -fx-text-fill: -tmg-text;
+}
+.key-value-cell .value {
+    -fx-text-fill: -tmg-text-light;
+}
+.key-value-cell.empty .key {
+    -fx-text-fill: -tmg-text-dark;
+    -fx-text-alignment: left;
+}
+.key-value-cell.empty .value {
+    -fx-text-fill: -tmg-text-dark;
+    -fx-font-style: italic;
+    -fx-text-alignment: right;
+}
+.key-value-cell.indetermined .key {
+    -fx-text-fill: -tmg-text-dark;
+    -fx-text-alignment: left;
+}
+.key-value-cell.indetermined .value {
+    -fx-text-fill: -tmg-secondary;
+    -fx-font-style: italic;
+    -fx-text-alignment: right;
+}
+.check-list-view .check-box:selected {
+    -fx-padding: 0;
+    -fx-background-color: -tmg-primary;
+}
+
+.folder-drop-target {
+    -fx-background-color: -tmg-overlay-dark;
+    -fx-spacing: 32px;
+    -fx-alignment: center;
+}
+.folder-drop-target .glyph-icon {
+    -glyph-size: 200px;
+    -glyph-name: "FOLDER_ALT";
+    -fx-fill: -tmg-text;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+.folder-drop-target .label {
+    -fx-text-fill: -tmg-text;
+    -fx-font-size: 32px;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
+.imageTile .smart-image {
+    -fx-background-color: rgba(255, 255, 255, 0);
+}
+
+.imageTile .glyph-icon {
+    -fx-fill: -tmg-text-dark;
+}
+
+.highlights .hoverlay {
+    -fx-padding: 15px;
+    -fx-font-size: 25px;
+    -fx-fill: -tmg-text-bright;
+    -fx-background-color: -tmg-overlay;
+    -fx-background-radius: 10 10 10 10;
+}
+
+.highlights HBox.hoverlay {
+    -fx-spacing: 10px;
+}
+
+.highlights .hoverlay .glyph-icon {
+    -fx-fill: -tmg-text-bright;
+}
+
+.highlights .hoverlay:hover {
+    -fx-background-color: -tmg-overlay-dark;
+}
+
+.wikipedia {
+    -fx-padding: 10 0 0 10;
+    -fx-font-size: 15px;
+}
+.wikipedia #placeLabel {
+    -fx-font-size: 25px;
+}
+.wikipedia #countryLabel {
+    -fx-font-size: 18px;
+    -fx-padding: 0 0 20 0;
+}
+.wikipedia #descriptionText {
+    -fx-fill: -tmg-text-bright;
+}
+.wikipedia-placeholder {
+    -fx-fill: -tmg-text-bright;
+}
+
+.journey-places-list {
+    -fx-background-color: -tmg-bg1;
+}
+
+.place-radio-button *.radio  {
+    -fx-padding: 4;
+    -fx-background-color: -fx-shadow-highlight-color, -fx-body-color;
+    -fx-background-insets: 0 0 -1 0, 0, 1, 2;
+}
+
+.place-radio-button {
+    -fx-font-size: 15px;
+}
+
+.rect {
+    -fx-fill: -tmg-primary;
+}
+.journey-places-list #journeyHeader {
+    -fx-padding: 5 0 0 5;
+}
+.journey-places-list #backButton {
+    -fx-background-color: transparent;
+}
+.journey-places-list #backButton .glyph-icon {
+    -fx-fill: -tmg-text-bright;
+}
+.journey-places-list #journeyLabel {
+    -fx-font-size: 20px;
+}
+.journey-places-list .journey-entry {
+    -fx-background-color: transparent;
+    -fx-font-size: 15px;
+}
+.journey-entry {
+    -fx-spacing: 10px;
+}
+
+.date-picker-popup > * > .spinner > .label {
+    -fx-text-fill: black;
+}
+
+.date-picker-popup > * > .date-cell {
+    -fx-text-fill: black;
 }

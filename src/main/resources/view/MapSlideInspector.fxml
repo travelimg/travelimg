@@ -1,23 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene?>
 <?import at.ac.tuwien.qse.sepm.gui.control.InspectorPane?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import at.ac.tuwien.qse.sepm.gui.control.AwesomeMapScene?>
-<?import javafx.scene.control.Button?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<?import javafx.scene.control.ToggleButton?>
-<InspectorPane fx:id="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<InspectorPane fx:id="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
+               xmlns:fx="http://javafx.com/fxml/1"
                fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.MapSlideInspectorImpl">
-    <children>
+    <VBox>
         <Label>Beschriftung</Label>
         <TextField fx:id="captionField"/>
 
-        <AwesomeMapScene fx:id="map" maxHeight="300" minHeight="100" maxWidth="300" minWidth="100"/>
-        <ToggleButton fx:id="chooseLocationButton">
+        <GoogleMapScene fx:id="map" maxHeight="300" minHeight="100" maxWidth="300" minWidth="100"
+                        style="-fx-padding: 20 0 0 0"/>
+
+        <HBox spacing="10" alignment="CENTER">
+            <children>
+                <Label fx:id="choosePrompt" alignment="CENTER">Zum Ändern klicken:</Label>
+                <ToggleButton fx:id="chooseLocationButton">
+                    <graphic>
+                        <FontAwesomeIconView glyphName="MAP_MARKER"
+                                             style="-fx-fill: -tmg-text-light"/>
+                    </graphic>
+                </ToggleButton>
+            </children>
+        </HBox>
+
+        <Label style="-fx-padding: 20 0 0 0">Zoomstufe</Label>
+        <Slider fx:id="zoomSlider" min="1" max="20" value="10" showTickLabels="false"
+                showTickMarks="0" blockIncrement="1" style="-fx-padding: 5 0 0 0"/>
+
+        <Button fx:id="deleteButton"
+                style="-fx-background-color: transparent">
             <graphic>
-                <FontAwesomeIconView glyphName="PLUS"></FontAwesomeIconView>
+                <FontAwesomeIconView glyphName="TRASH" glyphSize="25"
+                                     style="-fx-fill: -tmg-text-light"/>
             </graphic>
-        </ToggleButton>
-    </children>
+        </Button>
+    </VBox>
 </InspectorPane>

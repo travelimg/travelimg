@@ -25,7 +25,7 @@ public class InspectorImpl<E> implements Inspector<E> {
     private Runnable updateHandler;
 
     @Override public Collection<E> getEntities() {
-        LOGGER.debug("retrieveing {} entites", entities.size());
+        LOGGER.debug("retrieving {} entities", entities.size());
         return new ArrayList<>(entities);
     }
 

@@ -45,7 +45,7 @@ public interface PhotoTagDAO {
      * @throws DAOException:        if an exception occurs on persistence layer
      * @throws ValidationException: if parameter validation fails
      */
-    void deleteAllEntriesOfSpecificPhoto(Photo photo) throws DAOException, ValidationException;
+    void deleteAllEntriesOfSpecificPhoto(Photo photo) throws DAOException;
 
     /**
      * Return list of all tags which are currently set for <tt>photo</tt>.

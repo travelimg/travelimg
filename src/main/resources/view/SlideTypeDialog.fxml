@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.Button?>
+<?import javafx.geometry.Insets?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" styleClass="dialog,slide-type-dialog" stylesheets="@style.css"
          type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8">
     <children>
-        <HBox>
+        <HBox spacing="32">
+            <padding>
+                <Insets top="32" bottom="32" left="32" right="32"/>
+            </padding>
             <children>
-                <Button fx:id="mapButton" text="Kartenfolie"></Button>
-                <Button fx:id="titleButton" text="Titelfolie"></Button>
+                <Button fx:id="mapButton" text="KARTENFOLIE" styleClass="btn"></Button>
+                <Button fx:id="titleButton" text="TITELFOLIE" styleClass="btn"></Button>
             </children>
         </HBox>
     </children>

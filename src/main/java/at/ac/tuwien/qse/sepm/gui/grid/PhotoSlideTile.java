@@ -20,8 +20,8 @@ public class PhotoSlideTile extends SlideTileBase<PhotoSlide> {
         getStyleClass().add("photo");
         getChildren().add(0, imageView);
 
-        setMaxHeight(ImageSize.inPixels(ImageSize.MEDIUM));
-        setMaxWidth(ImageSize.inPixels(ImageSize.MEDIUM));
+        setMaxHeight(ImageSize.MEDIUM.pixels());
+        setMaxWidth(ImageSize.MEDIUM.pixels());
         imageView.setImage(slide.getPhoto().getFile());
     }
 }

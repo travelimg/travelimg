@@ -29,6 +29,7 @@ import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -64,7 +65,7 @@ public class PresentationWindow extends StackPane {
         Background background = new Background(new BackgroundFill(Paint.valueOf("black"), null, null));
         setBackground(background);
 
-        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+        setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(final KeyEvent keyEvent) {
                 if (keyEvent.getCode() == KeyCode.RIGHT) {
                     showNextSlide(null);
@@ -118,15 +119,22 @@ public class PresentationWindow extends StackPane {
     }
 
     private void showNextSlide(ActionEvent event) {
-        if (activeIndex == slideshow.getSlides().size() - 1)
+        if (activeIndex == slideshow.getAllSlides().size() - 1)
             return;
-        activeIndex = Math.min(slideshow.getSlides().size() - 1, activeIndex + 1);
+        activeIndex = Math.min(slideshow.getAllSlides().size() - 1, activeIndex + 1);
         loadSlide();
 
     }
 
+    private Slide getCurrentSlide() {
+        return slideshow.getAllSlides().stream()
+                .filter(slide -> slide.getOrder().equals(activeIndex + 1))
+                .findFirst()
+                .orElse(null);
+    }
+
     private void loadSlide() {
-        List<Slide> slides = slideshow.getSlides();
+        List<Slide> slides = (List<Slide>) slideshow.getAllSlides();
         if (slides.size() == 0 || slides.size() <= activeIndex) {
             // out of bounds
             return;

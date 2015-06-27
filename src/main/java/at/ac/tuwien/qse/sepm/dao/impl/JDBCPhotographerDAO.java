@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.EntityWatcher;
 import at.ac.tuwien.qse.sepm.dao.PhotographerDAO;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.validators.PhotographerValidator;
@@ -16,12 +17,11 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.IllegalFormatCodePointException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Consumer;
 
-public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO {
+public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO,
+        EntityWatcher<Photographer> {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -31,6 +31,8 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
     private static final String READ_ALL_STATEMENT = "SELECT ID, name FROM Photographer;";
 
     private SimpleJdbcInsert insertPhotographer;
+
+    private Collection<Consumer<Photographer>> addedCallbacks = new ArrayList<>();
 
     @Override
     @Autowired
@@ -52,6 +54,9 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
             parameters.put("name", photographer.getName());
             Number newId = insertPhotographer.executeAndReturnKey(parameters);
             photographer.setId((int) newId.longValue());
+
+            addedCallbacks.forEach(cb -> cb.accept(photographer));
+
             return photographer;
         } catch (DataAccessException ex) {
             logger.error("Failed to create photographer", ex);
@@ -102,6 +107,11 @@ public class JDBCPhotographerDAO extends JDBCDAOBase implements PhotographerDAO 
             throw new DAOException("Failed to read all photographers", ex);
         }
     }
+
+    @Override public void subscribeAdded(Consumer<Photographer> callback) {
+        addedCallbacks.add(callback);
+    }
+
 
     private class PhotographerMapper implements RowMapper<Photographer> {
         @Override

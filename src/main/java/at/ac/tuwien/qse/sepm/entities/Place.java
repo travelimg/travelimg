@@ -8,6 +8,8 @@ public class Place {
     private double latitude;
     private double longitude;
 
+    private WikiPlaceInfo wikiPlaceInfo;
+
     public Place(Integer id, String city, String country, double latitude, double longitude) {
         this.id = id;
         this.city = city;
@@ -56,6 +58,12 @@ public class Place {
         this.longitude = longitude;
     }
 
+    public WikiPlaceInfo getWikiPlaceInfo() { return wikiPlaceInfo; }
+
+    public void setWikiPlaceInfo(WikiPlaceInfo wikiPlaceInfo) {
+        this.wikiPlaceInfo = wikiPlaceInfo;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -68,7 +76,6 @@ public class Place {
         if (!city.equals(place.city))
             return false;
         return country.equals(place.country);
-
     }
 
     @Override
@@ -78,8 +85,7 @@ public class Place {
         return result;
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
         return "Place{" +
                 "city='" + city + '\'' +
                 ", country='" + country + '\'' +

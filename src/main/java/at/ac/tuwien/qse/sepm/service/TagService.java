@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public interface TagService {
 
@@ -28,15 +29,6 @@ public interface TagService {
      *                          delete the record.
      */
     void delete(Tag tag) throws ServiceException;
-
-    /**
-     * Retrieve an existing Tag
-     *
-     * @param tag Specifies which Tag to retrieve by providing the name.
-     * @return the Tag-Objekt
-     * @throws ServiceException If the Tag can not be retrieved or the data store fails to select the record.
-     */
-    Tag readName(Tag tag) throws ServiceException;
 
     /**
      * Return a list of all existing tags.
@@ -86,4 +78,10 @@ public interface TagService {
      * @throws ServiceException if retrieval failed
      */
     List<Tag> getMostFrequentTags(List<Photo> photos) throws ServiceException;
+
+    /**
+     * Subscribe a callback to refresh tags
+     * @param callback
+     */
+    void subscribeTagChanged(Consumer<Tag> callback);
 }

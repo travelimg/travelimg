@@ -1,11 +1,10 @@
 package at.ac.tuwien.qse.sepm.gui;
 
-
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.gui.control.RatingPicker;
+import at.ac.tuwien.qse.sepm.gui.control.SmartImage;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
-import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -15,14 +14,11 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,8 +37,6 @@ public class FullscreenWindow extends StackPane {
     @FXML
     private StackPane root;
     @FXML
-    private ImageView imageView;
-    @FXML
     private Button bt_previous, bt_next;
     @FXML
     private VBox ratingContainer;
@@ -53,16 +47,13 @@ public class FullscreenWindow extends StackPane {
     private PhotoService photoservice;
 
     private List<Photo> photos;
-    private Image image;
+    private SmartImage image = new SmartImage(ImageSize.ORIGINAL);
 
     private int activeIndex = 0;
     private RatingPicker ratingPicker = new RatingPicker();
-    private ImageCache imageCache;
 
-    public FullscreenWindow(ImageCache imageCache) {
+    public FullscreenWindow() {
         FXMLLoadHelper.load(this, this, FullscreenWindow.class, "view/FullScreenDialog.fxml");
-
-        this.imageCache = imageCache;
     }
 
     @FXML
@@ -72,12 +63,9 @@ public class FullscreenWindow extends StackPane {
 
         stage.setScene(scene);
 
-        int width = (int) Screen.getPrimary().getVisualBounds().getWidth();
-        int height = (int) Screen.getPrimary().getVisualBounds().getHeight();
+        image.setPreserveRatio(true);
+        getChildren().add(0, image);
 
-        imageView.setPreserveRatio(true);
-        imageView.setFitWidth(width);
-        imageView.setFitHeight(height);
 
         root.setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(final KeyEvent keyEvent) {
@@ -95,6 +83,8 @@ public class FullscreenWindow extends StackPane {
 
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
         ratingContainer.getChildren().add(ratingPicker);
+
+        StackPane.setAlignment(bottomBar, Pos.BOTTOM_CENTER);
     }
 
     public void present(List<Photo> photos, Photo initial) {
@@ -174,8 +164,7 @@ public class FullscreenWindow extends StackPane {
             return;
         }
 
-        image = imageCache.get(photos.get(activeIndex).getFile(), ImageSize.ORIGINAL);
-        imageView.setImage(image);
+        image.setImage(photos.get(activeIndex).getFile());
 
         // handling of images in original size can consume a lot of memory so collect it here
         System.gc();
