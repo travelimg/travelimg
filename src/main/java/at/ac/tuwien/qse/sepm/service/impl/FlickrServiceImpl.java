@@ -35,7 +35,7 @@ public class FlickrServiceImpl implements FlickrService {
     private static final String SECRET = "f58343bd30c130b6";
     private static final String tmpDir = System.getProperty("java.io.tmpdir");
     private static final Logger logger = LogManager.getLogger();
-    private static int nrOfPhotosToDownload = 10;
+    private static int nrOfPhotosToDownload = 9;
     public static long oneMB = 1048576;
     private AsyncSearcher searcher;
     private Flickr flickr;
@@ -77,7 +77,7 @@ public class FlickrServiceImpl implements FlickrService {
     @Override
     public void reset() {
         i = 0;
-        nrOfPhotosToDownload = 10;
+        nrOfPhotosToDownload = 9;
     }
 
     @Override
@@ -155,7 +155,7 @@ public class FlickrServiceImpl implements FlickrService {
         }
 
         /**
-         * Downloads 10 photos( beginning at index i ) from flickr using tags and/or geo data.
+         * Downloads 9 photos( beginning at index i ) from flickr using tags and/or geo data.
          */
         @Override
         protected void execute() {

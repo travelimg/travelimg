@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 public interface FlickrService {
 
     /**
-     * Downloads (if possible) 10 new photos(in medium size) every time it is called. This is a non-blocking operation
+     * Downloads (if possible) 9 new photos(in medium size) every time it is called. This is a non-blocking operation
      *
      * @param tags         a list of tags used as keywords inorder to perform the search
      * @param latitude     used to find photos near to it
