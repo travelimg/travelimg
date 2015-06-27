@@ -53,7 +53,7 @@ public class FilterGroup<T> extends Control {
         if (title == null) {
             title = new SimpleStringProperty(this, "title") {
                 @Override protected void invalidated() {
-                    update();
+                    updateCssClasses();
                 }
             };
         }
@@ -67,7 +67,7 @@ public class FilterGroup<T> extends Control {
         if (expanded == null) {
             expanded = new SimpleBooleanProperty(this, "expanded") {
                 @Override protected void invalidated() {
-                    update();
+                    updateCssClasses();
                 }
             };
         }
@@ -171,15 +171,18 @@ public class FilterGroup<T> extends Control {
     }
 
     private void update() {
+        updateCssClasses();
+        if (onUpdate != null) {
+            onUpdate.run();
+        }
+    }
+
+    private void updateCssClasses() {
         getStyleClass().removeAll("indetermined", "all-included", "all-excluded", "expanded", "empty");
         if (isIndetermined()) getStyleClass().add("indetermined");
         if (isAllIncluded()) getStyleClass().add("all-included");
         if (isAllExcluded()) getStyleClass().add("all-excluded");
         if (isExpanded()) getStyleClass().add("expanded");
         if (isEmpty()) getStyleClass().add("empty");
-        LOGGER.debug(getStyleClass());
-        if (onUpdate != null) {
-            onUpdate.run();
-        }
     }
 }
