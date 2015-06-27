@@ -17,6 +17,7 @@ import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import at.ac.tuwien.qse.sepm.util.IOHandler;
+import com.flickr4java.flickr.tags.Tag;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -45,8 +46,11 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -323,12 +327,19 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                             p.getData().setLatitude(flickrPhoto.getGeoData().getLatitude());
                             p.getData().setLongitude(flickrPhoto.getGeoData().getLongitude());
                             p.getData().setDatetime(datePicker.getValue().atStartOfDay());
-                            //TODO set tags
-                            //need a setter for that in photo entity
-                            //Path path = Paths.get(p.getPath());
-                            //TODO method which alters exif data (date, tags, geodata)
-                            //exifService.setDateAndGeoData(p);
-                            //ioHandler.copyFromTo(Paths.get(p.getPath()),Paths.get(System.getProperty("user.home"),"travelimg/"+path.getFileName()));
+                            HashSet<at.ac.tuwien.qse.sepm.entities.Tag> tags = new HashSet<>();
+                            for(Tag t: flickrPhoto.getTags()){
+                                tags.add(new at.ac.tuwien.qse.sepm.entities.Tag(0,t.getValue()));
+                            }
+                            p.getData().setTags(tags);
+                            try {
+                                exifService.setMetaData(p);
+                                ioHandler.copyFromTo(Paths.get(p.getPath()),Paths.get(System.getProperty("user.home"),"travelimg/"+flickrPhoto.getId()+"."+flickrPhoto.getOriginalFormat()));
+                            } catch (ServiceException e) {
+                                logger.debug(e);
+                            } catch (IOException e) {
+                                logger.debug(e);
+                            }
                         }
                     }
                     ,
