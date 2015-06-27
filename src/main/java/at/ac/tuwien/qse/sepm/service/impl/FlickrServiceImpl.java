@@ -84,7 +84,7 @@ public class FlickrServiceImpl implements FlickrService {
      * @param format               the format of the photo
      * @throws ServiceException    if the photo can't be downloaded.
      */
-    public void downloadPhoto(String url, String filename, String format) throws ServiceException {
+    public void downloadTempPhoto(String url, String filename, String format) throws ServiceException {
         if(filename == null || filename.trim().isEmpty() || format == null || format.trim().isEmpty()){
             throw new ServiceException("Photo id or format invalid.");
         }
@@ -186,7 +186,7 @@ public class FlickrServiceImpl implements FlickrService {
                     p.setTags(photoWithOriginalSecret.getTags());
                     if (!p.getOriginalSecret().isEmpty()) {
                         String mediumSizeUrl = "https://farm" + p.getFarm() + ".staticflickr.com/" + p.getServer() + "/" + p.getId() + "_" + p.getSecret() + "_z." + p.getOriginalFormat();
-                        downloadPhoto(mediumSizeUrl, p.getId(), p.getOriginalFormat());
+                        downloadTempPhoto(mediumSizeUrl, p.getId(), p.getOriginalFormat());
                         if(!isRunning()){
                             logger.debug("Download interrupted");
                             break;
@@ -230,7 +230,7 @@ public class FlickrServiceImpl implements FlickrService {
                     String url = "https://farm" + p.getFarm() + ".staticflickr.com/" + p.getServer()
                             + "/" + p.getId() + "_" + p.getOriginalSecret() + "_o." + p
                             .getOriginalFormat();
-                    downloadPhoto(url, p.getId() + "_o", p.getOriginalFormat());
+                    downloadTempPhoto(url, p.getId() + "_o", p.getOriginalFormat());
                     GeoData geoData = flickr.getPhotosInterface().getGeoInterface()
                             .getLocation(p.getId());
                     p.setGeoData(geoData);
