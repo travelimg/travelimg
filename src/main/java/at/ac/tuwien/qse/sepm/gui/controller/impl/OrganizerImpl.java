@@ -10,6 +10,8 @@ import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -17,10 +19,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.xml.ws.Service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -60,7 +64,9 @@ public class OrganizerImpl implements Organizer {
     @FXML private TreeView<String> filesTree;
 
     private HBox buttonBox;
-
+    private HBox directoryDeleteMenu = new HBox();
+    private ChoiceBox<Path> directoryChoiceBox = new ChoiceBox<>();
+    private Button deleteBtn = new Button("-");
     private PhotoFilter usedFilter = new PhotoFilter();
     private PhotoFilter photoFilter = usedFilter;
     private PhotoFilter folderFilter = new PhotoPathFilter();
@@ -138,6 +144,22 @@ public class OrganizerImpl implements Organizer {
         clusterService.subscribeJourneyChanged(this::refreshJourneyList);
         clusterService.subscribePlaceChanged(this::refreshPlaceList);
         photographerService.subscribeChanged(this::refreshPhotographerList);
+
+        deleteBtn.setOnAction(event -> handleDeleteDirectory());
+        directoryDeleteMenu.getChildren().add(directoryChoiceBox);
+        directoryDeleteMenu.getChildren().add(deleteBtn);
+    }
+
+    private void handleDeleteDirectory() {
+        Path directory = directoryChoiceBox.getSelectionModel().getSelectedItem();
+        if (directory != null) {
+            try {
+                workspaceService.removeDirectory(directory);
+            } catch (ServiceException ex) {
+                LOGGER.error("Could not delete directory");
+            }
+        }
+        folderViewClicked(); //refresh
     }
 
 
@@ -176,8 +198,8 @@ public class OrganizerImpl implements Organizer {
         for (Path dirPath : workspaceDirectories) {
             findFiles(dirPath.toFile(), root);
         }
-
-        filterContainer.getChildren().addAll(buttonBox, filesTree);
+        directoryChoiceBox.setItems(FXCollections.observableArrayList(workspaceDirectories));
+        filterContainer.getChildren().addAll(buttonBox, directoryDeleteMenu, filesTree);
         VBox.setVgrow(filesTree, Priority.ALWAYS);
         usedFilter = new PhotoPathFilter();
         handleFilterChange();
