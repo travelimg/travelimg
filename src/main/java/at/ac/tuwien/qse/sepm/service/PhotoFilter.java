@@ -69,4 +69,12 @@ public class PhotoFilter implements Predicate<Photo> {
                 getJourneyFilter().test(photo.getData().getJourney()) &&
                 getPlaceFilter().test(photo.getData().getPlace());
     }
+
+    public void reset() {
+        getTagFilter().reset();
+        getRatingFilter().reset();
+        getPhotographerFilter().reset();
+        getJourneyFilter().reset();
+        getPlaceFilter().reset();
+    }
 }

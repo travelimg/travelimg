@@ -142,7 +142,7 @@ public class GridViewImpl implements GridView {
 
     private void reloadImages() {
         try {
-
+            organizer.getUsedFilter().reset();
             grid.setPhotos(photoService.getAllPhotos(organizer.getUsedFilter()).stream()
                             .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
                             .collect(Collectors.toList()));
