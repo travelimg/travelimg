@@ -684,7 +684,7 @@
 }
 .page-selector .page-button .glyph-icon {
     -glyph-size: 13px;
-    -fx-fill: -tmg-text;
+    -fx-fill: -tmg-text-dark;
 }
 .page-selector .page-button:hover .glyph-icon {
     -glyph-size: 13px;
@@ -970,8 +970,7 @@
 }
 .organizer .tabs .toggle-button .glyph-icon {
     -glyph-size: 20px;
-    -fx-fill: -tmg-text;
-    -fx-opacity: 0.5;
+    -fx-fill: -tmg-text-dark;
 }
 .organizer .tabs .toggle-button:hover .glyph-icon {
     -fx-fill: -tmg-text-light;
@@ -981,7 +980,6 @@
 }
 .organizer .tabs .toggle-button:selected .glyph-icon {
     -fx-fill: -tmg-primary;
-    -fx-opacity: 1;
 }
 
 .scroll-bar, .scroll-bar * {
