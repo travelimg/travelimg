@@ -1,8 +1,10 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.EntityWatcher;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.dao.TagDAO;
+import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.TagValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
@@ -17,11 +19,10 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Consumer;
 
-public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
+public class JDBCTagDAO extends JDBCDAOBase implements TagDAO, EntityWatcher<Tag> {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -31,8 +32,11 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
     private static final String deleteStatement = "DELETE FROM TAG WHERE ID=?;";
 
     private SimpleJdbcInsert insertTag;
+
     @Autowired
     private PhotoTagDAO photoTagDao;
+
+    private Collection<Consumer<Tag>> addedCallbacks = new ArrayList<>();
 
     @Override
     @Autowired
@@ -62,6 +66,9 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
             parameters.put("name", t.getName());
             Number newId = insertTag.executeAndReturnKey(parameters);
             t.setId((int) newId.longValue());
+
+            addedCallbacks.forEach(cb -> cb.accept(t));
+
             return t;
         } catch (DataAccessException e) {
             throw new DAOException("Failed to create Tag", e);
@@ -114,7 +121,7 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
                         }
                     });
         } catch (DataAccessException e) {
-            logger.error("Failed to read a tag", e);
+            logger.error("failed to read tag {}", e);
             throw new DAOException("Failed to read a Tag", e);
         }
     }
@@ -171,5 +178,9 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO {
         } catch (DataAccessException e) {
             throw new DAOException("Failed to read all Tag's", e);
         }
+    }
+
+    @Override public void subscribeAdded(Consumer<Tag> callback) {
+        addedCallbacks.add(callback);
     }
 }

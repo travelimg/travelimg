@@ -2,83 +2,78 @@ package at.ac.tuwien.qse.sepm.gui.grid;
 
 
 import at.ac.tuwien.qse.sepm.entities.*;
-import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
-import javafx.geometry.Pos;
-import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
-
-import at.ac.tuwien.qse.sepm.entities.MapSlide;
-import at.ac.tuwien.qse.sepm.entities.Slide;
-import at.ac.tuwien.qse.sepm.entities.TitleSlide;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ResultDialog;
-import at.ac.tuwien.qse.sepm.service.SlideshowService;
+import at.ac.tuwien.qse.sepm.gui.slide.SlideCallback;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.TilePane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SlideGrid extends TilePane {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final List<SlideGridNode> nodes = new LinkedList<>();
-    private List<Slide> slides = new LinkedList<>();
+    private final Collection<SlideGridNode> nodes = new LinkedList<>();
+    private Slideshow slideshow = null;
 
-    private Consumer<Slide> slideChangedCallback = null;
-    private BiConsumer<Slide, Integer> slideAddedCallback = null;
+    private SlideCallback<Void> slideSelectedCallback = null;
+    private SlideCallback<Integer> slideAddedCallback = null;
+    private SlideCallback<Void> slideChangedCallback = null;
 
     public SlideGrid() {
         getStyleClass().add("slide-grid");
         setAlignment(Pos.TOP_CENTER);
     }
 
-    public void addSlide(Slide slide) {
-        SlideTile tile;
-        if (slide instanceof PhotoSlide) {
-            tile = new PhotoSlideTile((PhotoSlide)slide);
-        } else if (slide instanceof MapSlide) {
-            tile = new MapSlideTile((MapSlide)slide);
-        } else if (slide instanceof TitleSlide) {
-            tile = new TitleSlideTile((TitleSlide)slide);
-        } else {
-            throw new RuntimeException("Unknow slide type.");
-        }
+    public void addSlide(PhotoSlide slide) {
+        PhotoSlideTile tile = new PhotoSlideTile(slide);
+        addTile(tile);
+    }
+
+    public void addSlide(MapSlide slide) {
+        MapSlideTile tile = new MapSlideTile(slide);
+        addTile(tile);
+    }
+
+    public void addSlide(TitleSlide slide) {
+        TitleSlideTile tile = new TitleSlideTile(slide);
+        addTile(tile);
+    }
+
+    private void addTile(SlideTile tile) {
         tile.setOnMouseClicked(event -> handleTileClicked(tile, event));
         SlideGridNode node = new SlideGridNode(tile);
         node.setSlidePositionChangeCallback(this::handleSlidePositionChange);
         node.setSlideAddedCallback(this::handleSlideAdded);
 
         nodes.add(node);
-        getChildren().add(node);
     }
 
-    public List<Slide> getSlides() {
-        return slides;
-    }
+    public void setSlideshow(Slideshow slideshow) {
+        this.slideshow = slideshow;
 
-    public void setSlides(List<Slide> slides) {
         nodes.clear();
         getChildren().clear();
 
-        this.slides = slides;
-        slides.forEach(this::addSlide);
-    }
+        if (slideshow == null) {
+            return;
+        }
 
-    public void setSlideChangedCallback(Consumer<Slide> slideChangedCallback) {
-        this.slideChangedCallback = slideChangedCallback;
+        slideshow.getPhotoSlides().forEach(this::addSlide);
+        slideshow.getMapSlides().forEach(this::addSlide);
+        slideshow.getTitleSlides().forEach(this::addSlide);
+
+        nodes.stream()
+                .sorted((n1, n2) -> n1.getTile().getSlide().getOrder().compareTo(n2.getTile().getSlide().getOrder()))
+                .forEach((node) -> getChildren().add(node));
     }
 
     public void deselectAll() {
@@ -86,14 +81,16 @@ public class SlideGrid extends TilePane {
         nodes.forEach(n -> n.getTile().deselect());
     }
 
-    public void setSlideAddedCallback(BiConsumer<Slide, Integer> slideAddedCallback) {
-        this.slideAddedCallback = slideAddedCallback;
+    public void setSlideSelectedCallback(SlideCallback<Void> callback) {
+        this.slideSelectedCallback = callback;
     }
 
-    private void handleSlideChange(Slide slide) {
-        if (slideChangedCallback != null) {
-            slideChangedCallback.accept(slide);
-        }
+    public void setSlideAddedCallback(SlideCallback<Integer> callback) {
+        this.slideAddedCallback = callback;
+    }
+
+    public void setSlideChangedCallback(SlideCallback<Void> callback) {
+        this.slideChangedCallback = callback;
     }
 
     private void handleSlidePositionChange(SlideTile target, Integer sourceId) {
@@ -142,25 +139,54 @@ public class SlideGrid extends TilePane {
         getChildren().clear();
         getChildren().addAll(nodes);
 
-        // update all slides in order to persist the order change
-        nodes.forEach(n -> handleSlideChange(n.getTile().getSlide()));
+        // notify changes
+        if (slideChangedCallback != null) {
+            for (SlideGridNode node : nodes) {
+                Slide slide = node.getTile().getSlide();
+
+                if (slide instanceof PhotoSlide) {
+                    slideChangedCallback.handle((PhotoSlide) slide);
+                } else if (slide instanceof MapSlide) {
+                    slideChangedCallback.handle((MapSlide) slide);
+                } else if (slide instanceof TitleSlide) {
+                    slideChangedCallback.handle((TitleSlide) slide);
+                }
+            }
+        }
     }
 
     private void handleSlideAdded(SlideGridNode successor) {
         LOGGER.debug("Added slide before {}", successor.getTile().getSlide().getId());
 
-        int index = nodes.indexOf(successor);
+        int index = successor.getTile().getSlide().getOrder() - 1;
 
         SlideTypeDialog dialog = new SlideTypeDialog(this);
         Optional<SlideType> type = dialog.showForResult();
 
         if (type.isPresent()) {
             if (type.get() == SlideType.MAP) {
-                MapSlide slide = new MapSlide(-1, 0, 0, "", 0, 0);
-                slideAddedCallback.accept(slide, index);
+                MapSlide slide = new MapSlide(-1, 0, 0, "", 0, 0, 10);
+                slideAddedCallback.handle(slide, index);
             } else {
                 TitleSlide slide = new TitleSlide(-1, 0, 0, "", 0);
-                slideAddedCallback.accept(slide, index);
+                slideAddedCallback.handle(slide, index);
+            }
+        }
+    }
+
+    private void handleTileClicked(SlideTile tile, MouseEvent event) {
+        deselectAll();
+        tile.select();
+
+        if (slideSelectedCallback != null) {
+            Slide slide = tile.getSlide();
+
+            if (slide instanceof PhotoSlide) {
+                slideSelectedCallback.handle((PhotoSlide) slide);
+            } else if (slide instanceof MapSlide) {
+                slideSelectedCallback.handle((MapSlide) slide);
+            } else if (slide instanceof TitleSlide) {
+                slideSelectedCallback.handle((TitleSlide) slide);
             }
         }
     }
@@ -189,19 +215,6 @@ public class SlideGrid extends TilePane {
                 setResult(SlideType.TITLE);
                 close();
             });
-        }
-    }
-
-    private void handleTileClicked(SlideTile tile, MouseEvent event) {
-        if (event.isControlDown()) {
-            if (tile.isSelected()) {
-                tile.deselect();
-            } else {
-                tile.select();
-            }
-        } else {
-            deselectAll();
-            tile.select();
         }
     }
 }

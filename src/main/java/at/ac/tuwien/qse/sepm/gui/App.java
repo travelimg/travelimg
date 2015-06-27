@@ -5,8 +5,8 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -29,12 +29,7 @@ public class App extends Application {
         logger.info("Application started.");
 
         FXMLLoader loader = new FXMLLoader();
-        loader.setControllerFactory(new Callback<Class<?>, Object>() {
-            @Override
-            public Object call(Class<?> param) {
-                return context.getBean(param);
-            }
-        });
+        loader.setControllerFactory(context::getBean);
 
         // set base location so that resources can be loaded using relative paths
         loader.setLocation(getClass().getClassLoader().getResource("view"));
@@ -42,12 +37,13 @@ public class App extends Application {
         Parent root = loader.load(getClass().getClassLoader().getResourceAsStream("view/Main.fxml"));
 
         stage.setScene(new Scene(root));
-        stage.setMaximized(true);
+
         stage.setTitle("travelimg");
+        stage.getIcons().add(getApplicationIcon());
         stage.show();
 
         PhotoService photoService = (PhotoService)context.getBean("photoService");
-        photoService.synchronize();
+        photoService.initializeRepository();
     }
 
     @Override
@@ -55,5 +51,9 @@ public class App extends Application {
         super.stop();
 
         context.close();
+    }
+
+    private Image getApplicationIcon() {
+        return new Image(App.class.getClassLoader().getResourceAsStream("graphics/tmg_logo.png"));
     }
 }

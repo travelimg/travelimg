@@ -1,56 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import at.ac.tuwien.qse.sepm.gui.control.*?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="280.0" styleClass="inspector"
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ToggleButton?>
+<InspectorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="280.0" styleClass="inspector"
             stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
-            fx:controller="at.ac.tuwien.qse.sepm.gui.controller.Inspector">
-    <center>
-        <StackPane>
-            <children>
-                <VBox fx:id="placeholder" styleClass="placeholder" alignment="CENTER">
-                    <children>
-                        <FontAwesomeIconView/>
-                        <Label text="Kein Foto ausgewählt."/>
-                    </children>
-                </VBox>
-                <VBox fx:id="details" alignment="TOP_CENTER">
-                    <children>
-                        <VBox fx:id="multiAlert" alignment="CENTER" spacing="16.0" styleClass="alert, warning">
-                            <children>
-                                <Label fx:id="multiCount" styleClass="count" VBox.vgrow="ALWAYS"/>
-                            </children>
-                        </VBox>
-                        <VBox fx:id="ratingPickerContainer"></VBox>
-                        <VBox fx:id="mapContainer" styleClass="map" maxHeight="200.0"/>
-                        <VBox fx:id="tagSelectionContainer">
-                            <VBox.margin>
-                                <Insets bottom="5"/>
-                            </VBox.margin>
-                        </VBox>
-                        <TableView fx:id="exifTable" prefWidth="Infinity" prefHeight="260">
-                            <columns>
-                                <TableColumn fx:id="exifName" prefWidth="100.0" text="Name"/>
-                                <TableColumn fx:id="exifValue" prefWidth="135.0" text="Wert"/>
-                            </columns>
-                        </TableView>
+            fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.PhotoInspectorImpl"
+            entityName="Fotos">
+    <header>
+        <VBox>
+            <RatingPicker fx:id="ratingPicker"/>
+            <GoogleMapScene fx:id="mapScene" styleClass="map" maxHeight="200.0"/>
 
-                        <VBox>
-                            <children>
-                                <Label text="Zu Präsentation hinzufügen:"></Label>
-                                <HBox>
-                                    <children>
-                                        <ComboBox fx:id="slideshowsCombobox" />
-                                        <Button fx:id="addToSlideshowButton" text="Add" styleClass="add"></Button>
-                                    </children>
-                                </HBox>
-                            </children>
-                        </VBox>
-                    </children>
-                </VBox>
-            </children>
-        </StackPane>
-    </center>
-</BorderPane>
+            <HBox>
+                <children>
+                    <Label>
+                        Koordinaten ändern:
+                    </Label>
+                    <ToggleButton fx:id="changeCoordinatesButton">
+                        <graphic>
+                            <FontAwesomeIconView glyphName="MAP_MARKER" />
+                        </graphic>
+                    </ToggleButton>
+                </children>
+            </HBox>
+        </VBox>
+    </header>
+    <VBox spacing="16">
+        <SuggestionField fx:id="tagField" label="Neue Kategorie:"/>
+        <TagPicker fx:id="tagPicker"/>
+        <SuggestionField fx:id="photographerField" label="Fotograf setzen:"/>
+        <VBox fx:id="exifList" spacing="2"/>
+        <Label text="Zu Präsentation hinzufügen:"/>
+
+        <!-- FIXME: somehow the width of all other elements is dictated by this HBox -->
+        <HBox maxWidth="232">
+            <ComboBox fx:id="slideshowsCombobox" />
+            <Button fx:id="addToSlideshowButton" styleClass="btn">
+                <graphic>
+                    <FontAwesomeIconView glyphName="PLUS"/>
+                </graphic>
+            </Button>
+        </HBox>
+    </VBox>
+</InspectorPane>

@@ -45,13 +45,6 @@ public interface Menu {
         default void onPresent(Menu sender) { }
 
         /**
-         * Notify the listener that the user wants to import photos.
-         *
-         * @param sender menu instance sending the notification
-         */
-        default void onImport(Menu sender) { }
-
-        /**
          * Notify the listener that the user wants to import photos from flickr.
          *
          * @param sender menu instance sending the notification

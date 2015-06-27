@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.EntityWatcher;
 import at.ac.tuwien.qse.sepm.dao.JourneyDAO;
 import at.ac.tuwien.qse.sepm.dao.PlaceDAO;
 import at.ac.tuwien.qse.sepm.entities.Journey;
@@ -15,18 +16,18 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Consumer;
 
-public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
+public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO, EntityWatcher<Place> {
     private static final String readStatement = "SELECT id, city, country, latitude, longitude FROM PLACE WHERE id=?;";
     private static final String readAllStatement = "SELECT id, city, country, latitude, longitude FROM PLACE;";
     private static final String updateStatement = "UPDATE PLACE SET city = ?, country = ?, latitude = ?, longitude = ? WHERE id = ?";
     private static final String readByCountryCityStatement = "SELECT id, city, country, latitude, longitude FROM PLACE WHERE country=? AND city=?;";
-    @Autowired
-    JourneyDAO journeyDAO;
+
     private SimpleJdbcInsert insertPlace;
+
+    private Collection<Consumer<Place>> addedCallbacks = new ArrayList<>();
 
     @Override
     @Autowired
@@ -56,6 +57,9 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
         try {
             Number newId = insertPlace.executeAndReturnKey(parameters);
             place.setId((int) newId.longValue());
+
+            addedCallbacks.forEach(cb -> cb.accept(place));
+
             return place;
         } catch (DataAccessException ex) {
             logger.error("Failed to create place", ex);
@@ -118,6 +122,11 @@ public class JDBCPlaceDAO extends JDBCDAOBase implements PlaceDAO {
             throw new DAOException("Failed to read a Place", ex);
         }
     }
+
+    @Override public void subscribeAdded(Consumer<Place> callback) {
+        addedCallbacks.add(callback);
+    }
+
 
     private class PlaceMapper implements RowMapper<Place> {
         @Override

@@ -36,16 +36,15 @@ public class SlideshowServiceTest extends ServiceTestBase {
     private PhotoService photo;
 
     private Slideshow createAmerika() throws ServiceException {
-        return slideshowService.create(new Slideshow(1,"Amerika",1.0,new ArrayList<Slide>()));
+
+        return slideshowService.create(new Slideshow(1,"Amerika",5.0));
     }
 
     @Test
     public void test_create() throws ServiceException {
 
-        Slideshow slideshow = new Slideshow();
-        slideshow.setName("Testslideshow");
-        slideshow.setDurationBetweenPhotos(5.0);
-        slideshow.setSlides(null);
+        Slideshow slideshow = new Slideshow(6,"Testslideshow",5.0);
+
 
 
         assertThat(slideshowService.getAllSlideshows(), not(hasItem(slideshow)));
@@ -58,8 +57,8 @@ public class SlideshowServiceTest extends ServiceTestBase {
 
     @Test(expected = ServiceException.class)
     public void test_create_null_slideshow() throws ServiceException{
-        Slideshow slideshow = new Slideshow();
-        slideshowService.create(slideshow);
+
+        slideshowService.create(null);
 
     }
 
@@ -94,11 +93,11 @@ public class SlideshowServiceTest extends ServiceTestBase {
     @Test
     public void test_return_all_created_slideshows () throws ServiceException {
         Slideshow s1 = slideshowService
-                .create(new Slideshow(-1, "Amerika", 5.0, new ArrayList<Slide>()));
+                .create(new Slideshow(-1, "Amerika", 5.0));
         Slideshow s2 = slideshowService
-                .create(new Slideshow(-1, "Europa", 10.0, new ArrayList<Slide>()));
+                .create(new Slideshow(-1, "Europa", 10.0));
         Slideshow s3 = slideshowService
-                .create(new Slideshow(-1, "China", 1.0, new ArrayList<Slide>()));
+                .create(new Slideshow(-1, "China", 1.0));
 
         assertThat(slideshowService.getAllSlideshows(), containsInAnyOrder(s1,s2,s3));
     }
@@ -124,8 +123,8 @@ public class SlideshowServiceTest extends ServiceTestBase {
     @Test(expected = NullPointerException.class)
     public void add_slides_to_slideshow_with_empty_list_should_fail() throws ServiceException {
 
-        Slideshow s1 = new Slideshow();
-        s1.setName("Testlsideshow");
+        Slideshow s1 = new Slideshow(8,"Testlsideshow",5.0);
+
         List<Photo> photos = photo.getAllPhotos();
 
         slideshowService.addPhotosToSlideshow(photos,s1);
@@ -135,7 +134,8 @@ public class SlideshowServiceTest extends ServiceTestBase {
     @Test
     public void delete_slideshow_should_persist() throws ServiceException {
 
-        Slideshow s1 = createAmerika();
+        Slideshow s1 = new Slideshow(99,"SlideShow99",5.0);
+        slideshowService.create(s1);
 
         slideshowService.delete(s1);
     }

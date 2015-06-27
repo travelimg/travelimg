@@ -4,6 +4,7 @@ package at.ac.tuwien.qse.sepm.service;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Service for managing photographers.
@@ -34,4 +35,10 @@ public interface PhotographerService {
      * @throws ServiceException If the reading all photographers fails.
      */
     List<Photographer> readAll() throws ServiceException;
+
+    /**
+     * Subscribe a callback to refresh photographers
+     * @param callback
+     */
+    void subscribeChanged(Consumer<Photographer> callback);
 }

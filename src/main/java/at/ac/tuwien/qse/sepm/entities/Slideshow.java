@@ -1,5 +1,8 @@
 package at.ac.tuwien.qse.sepm.entities;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Slideshow {
@@ -7,17 +10,15 @@ public class Slideshow {
     private Integer id;
     private String name;
     private Double durationBetweenPhotos;
-    private List<Slide> slides;
 
-    public Slideshow() {
+    private Collection<PhotoSlide> photoSlides = new ArrayList<>();
+    private Collection<MapSlide> mapSlides = new ArrayList<>();
+    private Collection<TitleSlide> titleSlides = new ArrayList<>();
 
-    }
-
-    public Slideshow(Integer id, String name, Double durationBetweenPhotos, List<Slide> slides) {
+    public Slideshow(Integer id, String name, Double durationBetweenPhotos) {
         this.id = id;
         this.name = name;
         this.durationBetweenPhotos = durationBetweenPhotos;
-        this.slides = slides;
     }
 
     public Integer getId() {
@@ -45,12 +46,23 @@ public class Slideshow {
         this.name = name;
     }
 
-    public List<Slide> getSlides() {
-        return slides;
+    public Collection<PhotoSlide> getPhotoSlides() {
+        return photoSlides;
+    }
+    public Collection<MapSlide> getMapSlides() {
+        return mapSlides;
+    }
+    public Collection<TitleSlide> getTitleSlides() {
+        return titleSlides;
     }
 
-    public void setSlides(List<Slide> slides) {
-        this.slides = slides;
+    public Collection<Slide> getAllSlides() {
+        List<Slide> slides = new ArrayList<>();
+        slides.addAll(getPhotoSlides());
+        slides.addAll(getMapSlides());
+        slides.addAll(getTitleSlides());
+
+        return slides;
     }
 
     @Override
@@ -59,7 +71,6 @@ public class Slideshow {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", durationBetweenPhotos=" + durationBetweenPhotos +
-                ", slides=" + slides +
                 '}';
     }
 

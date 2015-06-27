@@ -183,6 +183,8 @@ public class JpegSerializer implements PhotoSerializer {
                 return;
             LOGGER.debug("Tags in exif found: " + tags);
             tags = tags.replace("'", "");
+        } else {
+            return;
         }
         String[] tagArray = tags.split("/");
         for (String element : tagArray) {

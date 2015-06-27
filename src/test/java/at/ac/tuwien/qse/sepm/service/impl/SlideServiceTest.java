@@ -1,5 +1,7 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
+import at.ac.tuwien.qse.sepm.entities.MapSlide;
+import at.ac.tuwien.qse.sepm.entities.PhotoSlide;
 import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
@@ -14,28 +16,26 @@ public class SlideServiceTest extends ServiceTestBase {
 
     @Test
     public void test_create() throws ServiceException {
-        Slide s = new Slide();
-        s.setId(-1);
-        s.setCaption("Test");
-        s.setOrder(1);
-        s.setSlideshowId(1);
+        PhotoSlide p = new PhotoSlide(-1,1,1,"Test",null);
 
-        slideService.create(s);
+
+        slideService.create(p);
     }
 
 
     @Test
     public void test_update_should_persist() throws ServiceException {
-        Slide s= new Slide();
-        s.setId(2);
+        PhotoSlide p = new PhotoSlide(-1,1,1,"Test",null);
 
-        slideService.update(s);
+
+        slideService.create(p);
+        p.setId(2);
+
+        slideService.update(p);
     }
     @Test
     public void test_delete_should_persist() throws ServiceException {
-        Slide s= new Slide();
-        s.setId(1);
 
-        slideService.delete(s);
+        slideService.delete(new MapSlide(4,4,4,"test2",4.555,5.33,5));
     }
 }

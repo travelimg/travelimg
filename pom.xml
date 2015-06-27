@@ -35,7 +35,6 @@
         <hamcrest.all.version>1.3</hamcrest.all.version>
         <flickr.version>2.12</flickr.version>
         <fontawesome.version>8.4</fontawesome.version>
-        <gmapsfx.version>1.1.1</gmapsfx.version>
         <commons.imaging.version>1.0-SNAPSHOT</commons.imaging.version>
         <controlsfx.version>8.20.8</controlsfx.version>
     </properties>
@@ -119,11 +118,6 @@
             <version>${fontawesome.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.lynden</groupId>
-            <artifactId>GMapsFX</artifactId>
-            <version>${gmapsfx.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>${json.version}</version>
@@ -148,6 +142,12 @@
             <groupId>com.flickr4java</groupId>
             <artifactId>flickr4java</artifactId>
             <version>${flickr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>apache-jena-libs</artifactId>
+            <type>pom</type>
+            <version>2.13.0</version>
         </dependency>
     </dependencies>
 </project>

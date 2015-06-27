@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.dao.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.EntityWatcher;
 import at.ac.tuwien.qse.sepm.dao.JourneyDAO;
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.validators.JourneyValidator;
@@ -16,11 +17,10 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Consumer;
 
-public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
+public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO, EntityWatcher<Journey> {
     private static final Logger logger = LogManager.getLogger(JDBCJourneyDAO.class);
 
     private static final String readByNameStatement = "SELECT id, name, start, end FROM JOURNEY WHERE name=?;";
@@ -29,6 +29,8 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
     private static final String deleteStatement = "DELETE FROM JOURNEY WHERE id=?;";
     private static final String updateStatement = "UPDATE Journey SET name = ?, start = ?, end = ? WHERE id = ?";
     private SimpleJdbcInsert insertJourney;
+
+    private Collection<Consumer<Journey>> addedCallbacks = new ArrayList<>();
 
     @Override
     @Autowired
@@ -58,6 +60,9 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         try {
             Number newId = insertJourney.executeAndReturnKey(parameters);
             journey.setId((int) newId.longValue());
+
+            addedCallbacks.forEach(cb -> cb.accept(journey));
+
             return journey;
         } catch (DataAccessException ex) {
             logger.error("Failed to create journey", ex);
@@ -137,6 +142,9 @@ public class JDBCJourneyDAO extends JDBCDAOBase implements JourneyDAO {
         }
     }
 
+    @Override public void subscribeAdded(Consumer<Journey> callback) {
+        addedCallbacks.add(callback);
+    }
 
     private class JourneyMapper implements RowMapper<Journey> {
         @Override

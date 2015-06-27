@@ -42,24 +42,21 @@ public class JDBCSlideshowDAOTest extends AbstractJDBCDAOTest {
 
     @Test
     public void update_should_persist() throws ValidationException,DAOException {
-        Slideshow s1 = new Slideshow();
-        s1.setId(1);
-        s1.setName("Testname");
-        s1.setDurationBetweenPhotos(5.0);
+        Slideshow s1 = new Slideshow(1,"Testname",5.0);
+
         slideshowDAO.update(s1);
     }
 
     @Test(expected = ValidationException.class)
     public void update_with_null_should() throws ValidationException, DAOException {
-        Slideshow s1 = new Slideshow();
-        s1.setName(null);
+        Slideshow s1 = new Slideshow(1,null,5.0);
+
         slideshowDAO.update(s1);
 
     }
     @Test
     public void delete_should_persist() throws ValidationException,DAOException {
-        Slideshow s1 = new Slideshow();
-        s1.setId(1);
+        Slideshow s1 = new Slideshow(1,"test",5.0);
         slideshowDAO.delete(s1);
     }
     @Test
@@ -69,10 +66,8 @@ public class JDBCSlideshowDAOTest extends AbstractJDBCDAOTest {
     }
     @Test(expected = AssertionError.class)
     public void get_slideshow_by_id_should_throw() throws ValidationException,DAOException {
-        Slideshow s2 = new Slideshow();
-        s2.setName("Test");
-        s2.setId(1);
-        s2.setDurationBetweenPhotos(5.0);
+        Slideshow s2 = new Slideshow(1,"Test",5.0);
+
         slideshowDAO.create(s2);
 
         assertThat(slideshowDAO.getById(1),is(s2));

@@ -1,10 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui.grid;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
-import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import javafx.geometry.Pos;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.TilePane;
 import org.apache.logging.log4j.LogManager;
@@ -27,6 +24,8 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
     protected List<Photo> photos = new ArrayList<>();
     protected final List<T> tiles = new LinkedList<>();
     private Consumer<Set<Photo>> selectionChangeAction = null;
+
+    private boolean suppressSelectEvent = false;
 
     public ImageGrid(Supplier<T> tileFactory) {
         this.tileFactory = tileFactory;
@@ -116,6 +115,8 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
     }
 
     private void handleTileClicked(T tile, MouseEvent event) {
+        suppressSelectEvent = true;
+
         if (event.isControlDown()) {
             if (tile.isSelected()) {
                 deselect(tile);
@@ -126,6 +127,9 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
             deselectAll();
             select(tile);
         }
+
+        suppressSelectEvent = false;
+        onSelectionChange();
     }
 
     protected void select(T tile) {
@@ -141,7 +145,7 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
     }
 
     protected void onSelectionChange() {
-        if (selectionChangeAction == null) return;
+        if (selectionChangeAction == null || suppressSelectEvent) return;
 
         selectionChangeAction.accept(getSelectedItems());
     }

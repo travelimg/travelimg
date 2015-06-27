@@ -8,14 +8,6 @@ public class FormatException extends DAOException {
         super(cause);
     }
 
-    public FormatException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public FormatException(String message) {
-        super(message);
-    }
-
     public FormatException() {
     }
 }

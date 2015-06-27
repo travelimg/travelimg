@@ -2,7 +2,6 @@ package at.ac.tuwien.qse.sepm.gui.grid;
 
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
