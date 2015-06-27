@@ -4,7 +4,9 @@ import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.gui.FullscreenWindow;
+import at.ac.tuwien.qse.sepm.gui.control.DownloadProgressControl;
 import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
+import at.ac.tuwien.qse.sepm.gui.control.Keyword;
 import at.ac.tuwien.qse.sepm.gui.controller.Menu;
 import at.ac.tuwien.qse.sepm.gui.controller.impl.MenuImpl;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
@@ -15,10 +17,7 @@ import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import at.ac.tuwien.qse.sepm.util.IOHandler;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import javafx.animation.Animation;
-import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -27,10 +26,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -40,12 +36,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.util.Callback;
-import javafx.util.Duration;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -88,7 +80,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     private ClusterService clusterService;
     private IOHandler ioHandler;
     private LatLong actualLatLong;
-    private ImageTile lastSelected;
+    private FlickrImageTile lastSelected;
     private ArrayList<Photo> photos = new ArrayList<>();
     private Cancelable searchTask;
     private Cancelable downloadTask;
@@ -132,8 +124,8 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             public void handle(KeyEvent event) {
                 if (event.isControlDown() && event.getCode() == KeyCode.A) {
                     for (Node n : photosFlowPane.getChildren()) {
-                        if (n instanceof ImageTile) {
-                            ((ImageTile) n).select();
+                        if (n instanceof FlickrImageTile) {
+                            ((FlickrImageTile) n).select();
                         }
                     }
                 }
@@ -143,12 +135,12 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             @Override public void handle(MouseEvent event) {
                 if (!event.isControlDown()) {
                     for (Node n : photosFlowPane.getChildren()) {
-                        if(n instanceof ImageTile){
+                        if(n instanceof FlickrImageTile){
                             if(n==lastSelected) {
-                                ((ImageTile) n).select();
+                                ((FlickrImageTile) n).select();
                             }
                             else {
-                                ((ImageTile) n).deselect();
+                                ((FlickrImageTile) n).deselect();
                             }
                         }
                     }
@@ -246,14 +238,14 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                 public void accept(com.flickr4java.flickr.photos.Photo photo) {
                     Platform.runLater(new Runnable() {
                         public void run() {
-                            ImageTile imageTile = new ImageTile(photo);
+                            FlickrImageTile flickrImageTile = new FlickrImageTile(photo);
                             Photo p = new Photo();
                             p.setPath(tmpDir+photo.getId()+"."+photo.getOriginalFormat());
                             photos.add(p);
                             if(photos.size()==1){
                                 fullscreenButton.setDisable(false);
                             }
-                            photosFlowPane.getChildren().add(imageTile);
+                            photosFlowPane.getChildren().add(flickrImageTile);
                         }
                     });
                 }
@@ -304,9 +296,9 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         flickrService.reset();
         ArrayList<com.flickr4java.flickr.photos.Photo> flickrPhotos = new ArrayList<>();
         for (int i = 0; i<photosFlowPane.getChildren().size(); i++) {
-            ImageTile imageTile = (ImageTile) photosFlowPane.getChildren().get(i);
-            if(imageTile.isSelected()){
-                flickrPhotos.add(imageTile.getFlickrPhoto());
+            FlickrImageTile flickrImageTile = (FlickrImageTile) photosFlowPane.getChildren().get(i);
+            if(flickrImageTile.isSelected()){
+                flickrPhotos.add(flickrImageTile.getFlickrPhoto());
             }
         }
         if(flickrPhotos.isEmpty()){
@@ -381,13 +373,13 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     /**
      * Widget for one widget in the image grid. Can either be in a selected or an unselected state.
      */
-    private class ImageTile extends StackPane {
+    private class FlickrImageTile extends StackPane {
 
         private final BorderPane overlay = new BorderPane();
         private BooleanProperty selected = new SimpleBooleanProperty(false);
         private com.flickr4java.flickr.photos.Photo flickrPhoto;
 
-        public ImageTile(com.flickr4java.flickr.photos.Photo flickrPhoto) {
+        public FlickrImageTile(com.flickr4java.flickr.photos.Photo flickrPhoto) {
             super();
             this.flickrPhoto = flickrPhoto;
             Image image = null;
@@ -456,134 +448,4 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
 
     }
 
-    /**
-     * A simple keyword with a close button.
-     */
-    private class Keyword extends HBox{
-
-        private String name;
-        private Text x;
-
-        public Keyword(String name){
-            super();
-            this.name = name;
-            setStyle("-fx-background-radius: 5; -fx-background-color: -tmg-primary; ");
-            Text text = new Text(name);
-            text.setFill(Color.WHITE);
-            setAlignment(Pos.CENTER);
-            setPadding(new Insets(3, 5, 5, 5));
-            getChildren().add(text);
-            this.x = new Text("x");
-            x.setOnMouseEntered(event -> keywordsFlowPane.setCursor(Cursor.HAND));
-            x.setOnMouseExited(event -> keywordsFlowPane.setCursor(Cursor.DEFAULT));
-            getChildren().add(new Text("  "));
-            getChildren().add(x);
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setOnClosed(EventHandler eventHandler){
-            x.setOnMouseClicked(eventHandler);
-        }
-
-    }
-
-    /**
-     * A special popup control showing progress using a progressbar.
-     */
-    private class DownloadProgressControl extends PopupControl{
-
-        private final BorderPane borderPane = new BorderPane();
-        private final ProgressBar progressBar = new ProgressBar();
-        private Button button;
-        private FadeTransition ft;
-        private String buttonStyle;
-        private Tooltip buttonTooltip;
-        private EventHandler buttonOnAction;
-
-        public DownloadProgressControl(Button button){
-            super();
-            this.button = button;
-            this.buttonStyle = button.getGraphic().getStyle();
-            this.buttonTooltip = button.getTooltip();
-            this.buttonOnAction = button.getOnAction();
-            this.ft = new FadeTransition(Duration.millis(1000), button);
-
-            ft.setFromValue(1.0);
-            ft.setToValue(0.3);
-            ft.setCycleCount(Animation.INDEFINITE);
-            ft.setAutoReverse(false);
-            ft.play();
-
-            Label label = new Label("Fotos werden heruntergeladen");
-            label.setAlignment(Pos.CENTER);
-
-            HBox hBox = new HBox();
-            hBox.setAlignment(Pos.CENTER);
-            hBox.setPadding(new Insets(5.0,5.0,5.0,5.0));
-            hBox.getChildren().add(progressBar);
-            progressBar.setProgress(0.0);
-
-            borderPane.setStyle("-fx-background-color: #f5f5b5; -fx-background-radius: 5.0; -fx-border-radius: 5.0; -fx-border-color: black; -fx-border-width: 0.5;");
-            borderPane.setPadding(new Insets(2.0, 2.0, 2.0, 2.0));
-            borderPane.setCenter(label);
-            borderPane.setBottom(hBox);
-            getScene().setRoot(borderPane);
-
-            button.setOnMouseEntered(event -> handleShow());
-            button.setOnMouseExited(event -> fadeOut());
-        }
-
-        public void setProgress(double progress){
-            progressBar.setProgress(progress);
-        }
-
-        public void finish(boolean interrupted){
-            ft.stop();
-            borderPane.getChildren().clear();
-
-            HBox hBox = new HBox();
-            hBox.setPadding(new Insets(5.0,5.0,5.0,5.0));
-            hBox.setAlignment(Pos.CENTER);
-            if(!interrupted){
-                hBox.getChildren().add(new Label("Fotos heruntergeladen "));
-                hBox.getChildren().add(new FontAwesomeIconView(FontAwesomeIcon.CHECK));
-            }
-            else{
-                hBox.getChildren().add(new Label("Herunterladen fehlgeschlagen "));
-                hBox.getChildren().add(new FontAwesomeIconView(FontAwesomeIcon.TIMES));
-            }
-
-            borderPane.setCenter(hBox);
-
-            button.setOnMouseExited(e -> {
-                fadeOut();
-                button.setOnMouseEntered(null);
-                button.setOnMouseExited(null);
-                button.setTooltip(buttonTooltip);
-                button.getGraphic().setStyle(buttonStyle);
-            });
-
-            button.setOnAction(buttonOnAction);
-        }
-
-        private void handleShow(){
-            Point2D p = button.localToScene(button.getLayoutBounds().getMinX(), button.getLayoutBounds().getMinY());
-            show(button,p.getX() + button.getScene().getX() + button.getScene().getWindow().getX()+55.0,p.getY() + button.getScene().getY() + button.getScene().getWindow().getY()-35.0);
-            FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), borderPane);
-            fadeTransition.setFromValue(0.0);
-            fadeTransition.setToValue(1.0);
-            fadeTransition.play();
-        }
-
-        private void fadeOut(){
-            FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), borderPane);
-            fadeTransition.setFromValue(1.0);
-            fadeTransition.setToValue(0.0);
-            fadeTransition.play();
-        }
-
-    }
 }
