@@ -34,9 +34,9 @@ public class FlickrServiceImpl implements FlickrService {
     private static final String API_KEY = "206f4ffa559e5e48301f84f046bf208b";
     private static final String SECRET = "f58343bd30c130b6";
     private static final String tmpDir = System.getProperty("java.io.tmpdir");
+    private static final long oneMB = 1048576;
     private static final Logger logger = LogManager.getLogger();
     private static int nrOfPhotosToDownload = 9;
-    public static long oneMB = 1048576;
     private AsyncSearcher searcher;
     private Flickr flickr;
     private int i = 0;
