@@ -11,23 +11,18 @@ import at.ac.tuwien.qse.sepm.service.ClusterService;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.TagService;
-import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
+import at.ac.tuwien.qse.sepm.service.PhotoFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
@@ -151,35 +146,33 @@ public class OrganizerImpl implements Organizer {
 
     private void handleRatingsChange() {
         LOGGER.debug("rating usedFilter changed");
-        usedFilter.getIncludedRatings().clear();
-        usedFilter.getIncludedRatings().addAll(ratingFilter.getIncludedValues());
+        usedFilter.getRatings().getIncluded().clear();
+        usedFilter.getRatings().getIncluded().addAll(ratingFilter.getIncludedValues());
         handleFilterChange();
     }
     private void handleCategoriesChange() {
         LOGGER.debug("category usedFilter changed");
         Set<Tag> included = tagFilter.getIncludedValues();
-        usedFilter.setUntaggedIncluded(included.contains(null));
-        included.remove(null);
-        usedFilter.getIncludedCategories().clear();
-        usedFilter.getIncludedCategories().addAll(included);
+        usedFilter.getTags().getRequired().clear();
+        usedFilter.getTags().getRequired().addAll(tagFilter.getIncludedValues());
         handleFilterChange();
     }
     private void handlePhotographersChange() {
         LOGGER.debug("photographer usedFilter changed");
-        usedFilter.getIncludedPhotographers().clear();
-        usedFilter.getIncludedPhotographers().addAll(photographerFilter.getIncludedValues());
+        usedFilter.getPhotographers().getIncluded().clear();
+        usedFilter.getPhotographers().getIncluded().addAll(photographerFilter.getIncludedValues());
         handleFilterChange();
     }
     private void handleJourneysChange() {
         LOGGER.debug("journey usedFilter changed");
-        usedFilter.getIncludedJourneys().clear();
-        usedFilter.getIncludedJourneys().addAll(journeyFilter.getIncludedValues());
+        usedFilter.getJourneys().getIncluded().clear();
+        usedFilter.getJourneys().getIncluded().addAll(journeyFilter.getIncludedValues());
         handleFilterChange();
     }
     private void handlePlacesChange() {
         LOGGER.debug("place usedFilter changed");
-        usedFilter.getIncludedPlaces().clear();
-        usedFilter.getIncludedPlaces().addAll(placeFilter.getIncludedValues());
+        usedFilter.getPlaces().getIncluded().clear();
+        usedFilter.getPlaces().getIncluded().addAll(placeFilter.getIncludedValues());
         handleFilterChange();
     }
 

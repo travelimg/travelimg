@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.entities.*;
+import at.ac.tuwien.qse.sepm.service.PhotoFilter;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
@@ -32,46 +33,12 @@ public class PhotoFilterTest {
 
     private PhotoFilter createFilter() {
         PhotoFilter filter = new PhotoFilter();
-        filter.getIncludedPhotographers().add(new Photographer(1, "John"));
-        filter.getIncludedRatings().add(Rating.NONE);
-        filter.setUntaggedIncluded(true);
-        filter.getIncludedJourneys().add(createJourney());
-        filter.getIncludedPlaces().add(createPlace());
-        filter.getIncludedJourneys().add(createJourney());
+        filter.getPhotographers().getIncluded().add(new Photographer(1, "John"));
+        filter.getRatings().getIncluded().add(Rating.NONE);
+        filter.getJourneys().getIncluded().add(createJourney());
+        filter.getPlaces().getIncluded().add(createPlace());
+        filter.getJourneys().getIncluded().add(createJourney());
         return filter;
-    }
-
-    @Test
-    public void filter_untaggedIncludedAndPhotoIsUntagged_isMatch() {
-        PhotoFilter filter = createFilter();
-        Photo photo = createMatchingPhoto();
-
-        photo.getData().getTags().clear();
-        filter.setUntaggedIncluded(true);
-        assertTrue(filter.test(photo));
-    }
-
-    @Test
-    public void filter_untaggedIncludedAndPhotoIsTagged_noMatch() {
-        PhotoFilter filter = createFilter();
-        Photo photo = createMatchingPhoto();
-
-        photo.getData().getTags().add(new Tag(1, "blue"));
-        filter.setUntaggedIncluded(true);
-        filter.getIncludedCategories().clear();
-
-        assertFalse(filter.test(photo));
-    }
-
-    @Test
-    public void filter_untaggedNotIncludedAndPhotoIsUntagged_noMatch() {
-        PhotoFilter filter = createFilter();
-        Photo photo = createMatchingPhoto();
-
-        photo.getData().getTags().clear();
-        filter.setUntaggedIncluded(false);
-
-        assertFalse(filter.test(photo));
     }
 
     @Test
@@ -79,9 +46,9 @@ public class PhotoFilterTest {
         PhotoFilter filter = createFilter();
         Photo photo = createMatchingPhoto();
 
-        filter.getIncludedCategories().clear();
-        filter.getIncludedCategories().add(new Tag(1, "blue"));
-        filter.getIncludedCategories().add(new Tag(2, "red"));
+        filter.getTags().getRequired().clear();
+        filter.getTags().getRequired().add(new Tag(1, "blue"));
+        filter.getTags().getRequired().add(new Tag(2, "red"));
         photo.getData().getTags().clear();
         photo.getData().getTags().add(new Tag(3, "green"));
         photo.getData().getTags().add(new Tag(3, "pink"));
@@ -94,9 +61,9 @@ public class PhotoFilterTest {
         PhotoFilter filter = createFilter();
         Photo photo = createMatchingPhoto();
 
-        filter.getIncludedCategories().clear();
-        filter.getIncludedCategories().add(new Tag(1, "blue"));
-        filter.getIncludedCategories().add(new Tag(2, "red"));
+        filter.getTags().getRequired().clear();
+        filter.getTags().getRequired().add(new Tag(1, "blue"));
+        filter.getTags().getRequired().add(new Tag(2, "red"));
         photo.getData().getTags().clear();
         photo.getData().getTags().add(new Tag(1, "blue"));
         photo.getData().getTags().add(new Tag(2, "red"));
@@ -105,18 +72,18 @@ public class PhotoFilterTest {
     }
 
     @Test
-    public void filter_categoriesPhotoHasOverlap_isMatch() {
+    public void filter_categoriesPhotoHasOverlap_noMatch() {
         PhotoFilter filter = createFilter();
         Photo photo = createMatchingPhoto();
 
-        filter.getIncludedCategories().clear();
-        filter.getIncludedCategories().add(new Tag(1, "blue"));
-        filter.getIncludedCategories().add(new Tag(2, "red"));
+        filter.getTags().getRequired().clear();
+        filter.getTags().getRequired().add(new Tag(1, "blue"));
+        filter.getTags().getRequired().add(new Tag(2, "red"));
         photo.getData().getTags().clear();
         photo.getData().getTags().add(new Tag(2, "red"));
         photo.getData().getTags().add(new Tag(3, "green"));
 
-        assertTrue(filter.test(photo));
+        assertFalse(filter.test(photo));
     }
 
     @Test
@@ -124,9 +91,9 @@ public class PhotoFilterTest {
         PhotoFilter filter = createFilter();
         Photo photo = createMatchingPhoto();
 
-        filter.getIncludedRatings().clear();
-        filter.getIncludedRatings().add(Rating.GOOD);
-        filter.getIncludedRatings().add(Rating.NEUTRAL);
+        filter.getRatings().getIncluded().clear();
+        filter.getRatings().getIncluded().add(Rating.GOOD);
+        filter.getRatings().getIncluded().add(Rating.NEUTRAL);
         photo.getData().setRating(Rating.NONE);
 
         assertFalse(filter.test(photo));
@@ -137,9 +104,9 @@ public class PhotoFilterTest {
         PhotoFilter filter = createFilter();
         Photo photo = createMatchingPhoto();
 
-        filter.getIncludedRatings().clear();
-        filter.getIncludedRatings().add(Rating.GOOD);
-        filter.getIncludedRatings().add(Rating.NEUTRAL);
+        filter.getRatings().getIncluded().clear();
+        filter.getRatings().getIncluded().add(Rating.GOOD);
+        filter.getRatings().getIncluded().add(Rating.NEUTRAL);
         photo.getData().setRating(Rating.GOOD);
 
         assertTrue(filter.test(photo));
@@ -150,9 +117,9 @@ public class PhotoFilterTest {
         PhotoFilter filter = createFilter();
         Photo photo = createMatchingPhoto();
 
-        filter.getIncludedPhotographers().clear();
-        filter.getIncludedPhotographers().add(new Photographer(1, "John"));
-        filter.getIncludedPhotographers().add(new Photographer(2, "Bill"));
+        filter.getPhotographers().getIncluded().clear();
+        filter.getPhotographers().getIncluded().add(new Photographer(1, "John"));
+        filter.getPhotographers().getIncluded().add(new Photographer(2, "Bill"));
         photo.getData().setPhotographer(new Photographer(3, "Tina"));
 
         assertFalse(filter.test(photo));
@@ -163,9 +130,9 @@ public class PhotoFilterTest {
         PhotoFilter filter = createFilter();
         Photo photo = createMatchingPhoto();
 
-        filter.getIncludedPhotographers().clear();
-        filter.getIncludedPhotographers().add(new Photographer(1, "John"));
-        filter.getIncludedPhotographers().add(new Photographer(2, "Bill"));
+        filter.getPhotographers().getIncluded().clear();
+        filter.getPhotographers().getIncluded().add(new Photographer(1, "John"));
+        filter.getPhotographers().getIncluded().add(new Photographer(2, "Bill"));
         photo.getData().setPhotographer(new Photographer(2, "Bill"));
 
         assertTrue(filter.test(photo));
@@ -178,10 +145,10 @@ public class PhotoFilterTest {
 
         photo.getData().setPlace(null);
         photo.getData().setJourney(null);
-        filter.getIncludedJourneys().clear();
-        filter.getIncludedJourneys().add(null);
-        filter.getIncludedPlaces().clear();
-        filter.getIncludedPlaces().add(null);
+        filter.getJourneys().getIncluded().clear();
+        filter.getJourneys().getIncluded().add(null);
+        filter.getPlaces().getIncluded().clear();
+        filter.getPlaces().getIncluded().add(null);
 
         assertTrue(filter.test(photo));
     }
@@ -193,8 +160,8 @@ public class PhotoFilterTest {
 
         Place place = createPlace();
         place.setCity("Mubai");
-        filter.getIncludedPlaces().clear();
-        filter.getIncludedPlaces().add(place);
+        filter.getPlaces().getIncluded().clear();
+        filter.getPlaces().getIncluded().add(place);
 
         assertFalse(filter.test(photo));
     }
@@ -206,8 +173,8 @@ public class PhotoFilterTest {
 
         Journey journey = createJourney();
         journey.setName("White Lodge");
-        filter.getIncludedJourneys().clear();
-        filter.getIncludedJourneys().add(journey);
+        filter.getJourneys().getIncluded().clear();
+        filter.getJourneys().getIncluded().add(journey);
 
         assertFalse(filter.test(photo));
     }
