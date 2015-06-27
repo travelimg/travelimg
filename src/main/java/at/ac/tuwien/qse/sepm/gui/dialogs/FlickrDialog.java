@@ -1,5 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui.dialogs;
 
+import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.gui.FullscreenWindow;
@@ -7,6 +8,7 @@ import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.controller.Menu;
 import at.ac.tuwien.qse.sepm.gui.controller.impl.MenuImpl;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
+import at.ac.tuwien.qse.sepm.service.ClusterService;
 import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.FlickrService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
@@ -42,7 +44,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.util.Callback;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -73,12 +77,15 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     @FXML
     private DatePicker datePicker;
     @FXML
+    private ComboBox journeysComboBox;
+    @FXML
     private GoogleMapScene mapScene;
 
     private static final Logger logger = LogManager.getLogger();
     private static final String tmpDir = System.getProperty("java.io.tmpdir");
     private FlickrService flickrService;
     private ExifService exifService;
+    private ClusterService clusterService;
     private IOHandler ioHandler;
     private LatLong actualLatLong;
     private ImageTile lastSelected;
@@ -88,7 +95,8 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     private Menu sender;
     private boolean newSearch = false;
 
-    public FlickrDialog(Node origin, String title, FlickrService flickrService, ExifService exifService, IOHandler ioHandler,
+    public FlickrDialog(Node origin, String title, FlickrService flickrService, ExifService exifService,
+            ClusterService clusterService, IOHandler ioHandler,
             Menu sender) {
         super(origin, title);
         FXMLLoadHelper.load(this, this, FlickrDialog.class, "view/FlickrDialog.fxml");
@@ -96,6 +104,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         this.flickrService = flickrService;
         this.exifService = exifService;
         this.ioHandler = ioHandler;
+        this.clusterService = clusterService;
         this.sender = sender;
 
         flickrService.reset();
@@ -146,9 +155,41 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                 }
             }
         });
+        journeysComboBox.setCellFactory(new Callback<ListView<Journey>, ListCell<Journey>>() {
+            @Override public ListCell<Journey> call(ListView<Journey> l) {
+                return new ListCell<Journey>() {
+                    @Override protected void updateItem(Journey j, boolean empty) {
+                        super.updateItem(j, empty);
+                        if(j!=null)
+                            setText(j.getName());
+                    }
+                };
+            }
+        });
+        journeysComboBox.setConverter(new StringConverter<Journey>() {
+            @Override public String toString(Journey journey) {
+                if (journey == null) {
+                    return null;
+                } else {
+                    return journey.getName();
+                }
+            }
 
+            @Override public Journey fromString(String string) {
+                return null;
+            }
+
+        });
+        try {
+            Journey j = new Journey(-1,"Keine Reise",null,null);
+            List<Journey> journeys = clusterService.getAllJourneys();
+            journeysComboBox.getItems().add(j);
+            journeysComboBox.getItems().addAll(journeys);
+        } catch (ServiceException e) {
+            logger.debug(e);
+        }
+        journeysComboBox.getSelectionModel().selectFirst();
         datePicker.setValue(LocalDate.now());
-        datePicker.setTooltip(new Tooltip("Wählen Sie ein Datum für die Fotos aus"));
         mapScene.setDoubleClickCallback((position) -> dropMarker(position));
         cancelButton.setOnAction(e -> handleLeaveFlickrDialog());
         importButton.setOnAction(e -> handleImport());
