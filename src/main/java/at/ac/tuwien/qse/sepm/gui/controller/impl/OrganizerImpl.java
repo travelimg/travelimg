@@ -1,7 +1,8 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 import at.ac.tuwien.qse.sepm.entities.*;
-import at.ac.tuwien.qse.sepm.gui.control.FilterList;
+import at.ac.tuwien.qse.sepm.gui.control.Filter;
+import at.ac.tuwien.qse.sepm.gui.control.FilterGroup;
 import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
@@ -28,11 +29,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 
 /**
  * Controller for organizer view which is used for browsing photos by month.
@@ -48,12 +47,11 @@ public class OrganizerImpl implements Organizer {
     @Autowired private TagService tagService;
 
     @FXML private BorderPane root;
-    @FXML private VBox filterContainer;
-    @FXML private FilterList<Rating> ratingListView;
-    @FXML private FilterList<Tag> categoryListView;
-    @FXML private FilterList<Photographer> photographerListView;
-    @FXML private FilterList<Journey> journeyListView;
-    @FXML private FilterList<Place> placeListView;
+    @FXML private FilterGroup<Rating> ratingFilter;
+    @FXML private FilterGroup<Tag> tagFilter;
+    @FXML private FilterGroup<Photographer> photographerFilter;
+    @FXML private FilterGroup<Journey> journeyFilter;
+    @FXML private FilterGroup<Place> placeFilter;
 
     private ToggleButton folderViewButton = new ToggleButton("Ordneransicht");
     private ToggleButton filterViewButton = new ToggleButton("Filteransicht");
@@ -89,72 +87,30 @@ public class OrganizerImpl implements Organizer {
         buttonBox = new HBox(filterViewButton, folderViewButton);
         buttonBox.setAlignment(Pos.CENTER);
 
-        ratingListView = new FilterList<>(value -> {
-            switch (value) {
-                case GOOD:
-                    return "Gut";
-                case NEUTRAL:
-                    return "Neutral";
-                case BAD:
-                    return "Schlecht";
-                default:
-                    return "Unbewertet";
-            }
-        });
-        ratingListView.setTitle("Bewertungen");
-        ratingListView.setChangeHandler(this::handleRatingsChange);
-        categoryListView = new FilterList<>(value -> {
-            if (value == null)
-                return "Nicht kategorisiert";
-            return value.getName();
-        });
-        categoryListView.setTitle("Kategorien");
-        categoryListView.setChangeHandler(this::handleCategoriesChange);
-        photographerListView = new FilterList<>(value -> value.getName());
-        photographerListView.setTitle("Fotografen");
-        photographerListView.setChangeHandler(this::handlePhotographersChange);
-        journeyListView = new FilterList<>(value -> {
-            if (value == null)
-                return "Keiner Reise zugeordnet";
-            return value.getName();
-        });
-        journeyListView.setTitle("Reisen");
-        journeyListView.setChangeHandler(this::handleJourneysChange);
-        placeListView = new FilterList<Place>(value -> {
-            if (value == null)
-                return "Keinem Ort zugeordnet";
-            return value.getCountry() + ", " + value.getCity();
-        });
-        placeListView.setTitle("Orte");
-        placeListView.setChangeHandler(this::handlePlacesChange);
-
-        filterContainer.getChildren()
-                .addAll(buttonBox, ratingListView, categoryListView, photographerListView,
-                        journeyListView, placeListView);
+        ratingFilter.setOnUpdate(this::handleRatingsChange);
+        tagFilter.setOnUpdate(this::handleCategoriesChange);
+        photographerFilter.setOnUpdate(this::handlePhotographersChange);
+        journeyFilter.setOnUpdate(this::handleJourneysChange);
+        placeFilter.setOnUpdate(this::handlePlacesChange);
 
         refreshLists();
         resetFilter();
 
-        tagService.subscribeTagChanged(this::refreshCategoryList);
-        clusterService.subscribeJourneyChanged(this::refreshJourneyList);
-        clusterService.subscribePlaceChanged(this::refreshPlaceList);
-        photographerService.subscribeChanged(this::refreshPhotographerList);
+        tagService.subscribeTagChanged((p) -> refreshTags());
+        clusterService.subscribeJourneyChanged((p) -> refreshJourneys());
+        clusterService.subscribePlaceChanged((p) -> refreshPlaces());
+        photographerService.subscribeChanged((p) -> refreshPhotographers());
     }
 
 
     @Override
     public void setWorldMapPlace(Place place) {
-        placeListView.uncheckAll();
-        placeListView.check(place);
-
-        handlePlacesChange(placeListView.getChecked());
+        placeFilter.excludeAll();
+        placeFilter.include(place);
+        handlePlacesChange();
     }
     // This Method let's the User switch to the usedFilter-view
     private void filterViewClicked() {
-        filterContainer.getChildren().clear();
-        filterContainer.getChildren()
-                .addAll(buttonBox, ratingListView, categoryListView, photographerListView,
-                        journeyListView, placeListView);
         usedFilter = photoFilter;
         handleFilterChange();
     }
@@ -162,12 +118,10 @@ public class OrganizerImpl implements Organizer {
     // This Method let's the User switch to the folder-view
     private void folderViewClicked() {
         LOGGER.debug("Switch view");
-        filterContainer.getChildren().clear();
 
         Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
         findFiles(rootDirectories.toFile(), null);
 
-        filterContainer.getChildren().addAll(buttonBox, filesTree);
         VBox.setVgrow(filesTree, Priority.ALWAYS);
         usedFilter = new PhotoPathFilter();
         handleFilterChange();
@@ -212,51 +166,52 @@ public class OrganizerImpl implements Organizer {
         }
     }
 
-    private void handleRatingsChange(List<Rating> values) {
+    private void handleRatingsChange() {
         LOGGER.debug("rating usedFilter changed");
         usedFilter.getIncludedRatings().clear();
-        usedFilter.getIncludedRatings().addAll(values);
+        usedFilter.getIncludedRatings().addAll(ratingFilter.getIncludedValues());
         handleFilterChange();
     }
 
-    private void handleCategoriesChange(List<Tag> values) {
+    private void handleCategoriesChange() {
         LOGGER.debug("category usedFilter changed");
-        usedFilter.setUntaggedIncluded(values.contains(null));
-        values.remove(null);
+        Set<Tag> included = tagFilter.getIncludedValues();
+        usedFilter.setUntaggedIncluded(included.contains(null));
+        included.remove(null);
         usedFilter.getIncludedCategories().clear();
-        usedFilter.getIncludedCategories().addAll(values);
+        usedFilter.getIncludedCategories().addAll(included);
         handleFilterChange();
     }
 
-    private void handlePhotographersChange(List<Photographer> values) {
+    private void handlePhotographersChange() {
         LOGGER.debug("photographer usedFilter changed");
         usedFilter.getIncludedPhotographers().clear();
-        usedFilter.getIncludedPhotographers().addAll(values);
+        usedFilter.getIncludedPhotographers().addAll(photographerFilter.getIncludedValues());
         handleFilterChange();
     }
 
-    private void handleJourneysChange(List<Journey> values) {
+    private void handleJourneysChange() {
         LOGGER.debug("journey usedFilter changed");
         usedFilter.getIncludedJourneys().clear();
-        usedFilter.getIncludedJourneys().addAll(values);
+        usedFilter.getIncludedJourneys().addAll(journeyFilter.getIncludedValues());
         handleFilterChange();
     }
 
-    private void handlePlacesChange(List<Place> values) {
+    private void handlePlacesChange() {
         LOGGER.debug("place usedFilter changed");
         usedFilter.getIncludedPlaces().clear();
-        usedFilter.getIncludedPlaces().addAll(values);
+        usedFilter.getIncludedPlaces().addAll(placeFilter.getIncludedValues());
         handleFilterChange();
     }
 
     private void refreshLists() {
         LOGGER.debug("refreshing usedFilter");
 
-        ratingListView.setValues(getAllRatings());
-        categoryListView.setValues(getAllCategories());
-        photographerListView.setValues(getAllPhotographers());
-        journeyListView.setValues(getAllJourneys());
-        placeListView.setValues(getAllPlaces());
+        refreshRatings();
+        refreshTags();
+        refreshJourneys();
+        refreshPlaces();
+        refreshPhotographers();
     }
 
     private List<Rating> getAllRatings() {
@@ -270,7 +225,7 @@ public class OrganizerImpl implements Organizer {
         return list;
     }
 
-    private List<Tag> getAllCategories() {
+    private List<Tag> getAllTags() {
         LOGGER.debug("fetching categories");
         try {
             List<Tag> list = tagService.getAllTags();
@@ -337,46 +292,73 @@ public class OrganizerImpl implements Organizer {
 
         refreshLists();
         inspectorController.refresh();
-        categoryListView.checkAll();
-        ratingListView.checkAll();
-        photographerListView.checkAll();
-        journeyListView.checkAll();
-        placeListView.checkAll();
+        tagFilter.includeAll();
+        ratingFilter.includeAll();
+        photographerFilter.includeAll();
+        journeyFilter.includeAll();
+        placeFilter.includeAll();
 
         // restore the callback and handle the change
         filterChangeCallback = savedCallback;
     }
 
-    public void refreshCategoryList(Tag tag) {
-        Platform.runLater(() -> {
-            inspectorController.refresh();
-            categoryListView.setValues(getAllCategories());
-            categoryListView.checkAll();
-            LOGGER.info("refresh tag-filterlist");
+    private void refreshRatings() {
+        refreshFilter(ratingFilter, getAllRatings(), value -> {
+            switch (value) {
+                case GOOD:
+                    return "Gut";
+                case NEUTRAL:
+                    return "Neutral";
+                case BAD:
+                    return "Schlecht";
+                default:
+                    return "Unbewertet";
+            }
         });
     }
 
-    public void refreshJourneyList(Journey journey) {
-        Platform.runLater(() -> {
-            journeyListView.setValues(getAllJourneys());
-            journeyListView.checkAll();
-            LOGGER.info("refresh journey-filterlist");
+    private void refreshTags() {
+        refreshFilter(tagFilter, getAllTags(), value -> {
+            if (value == null) return "Keinen Kategorien zugehörig";
+            return value.getName();
         });
     }
 
-    public void refreshPlaceList(Place place) {
-        Platform.runLater(() -> {
-            placeListView.setValues(getAllPlaces());
-            placeListView.checkAll();
-            LOGGER.info("refresh place-filterlist");
+    private void refreshJourneys() {
+        refreshFilter(journeyFilter, getAllJourneys(), value -> {
+            if (value == null) return "Keiner Reise zugehörig";
+            return value.getName();
         });
     }
 
-    public void refreshPhotographerList(Photographer photographer) {
+    private void refreshPlaces() {
+        refreshFilter(placeFilter, getAllPlaces(), value -> {
+            if (value == null) return "Keinem Ort zugehörig";
+            return value.getCountry() + ", " + value.getCity();
+        });
+    }
+
+    private void refreshPhotographers() {
+        refreshFilter(photographerFilter, getAllPhotographers(), value -> {
+            if (value == null) return "Keinem Fotografen zugehörig";
+            return value.getName();
+        });
+    }
+
+    private static <T> void refreshFilter(FilterGroup<T> filterGroup, Collection<T> values, Function<T, String> converter) {
         Platform.runLater(() -> {
-            photographerListView.setValues(getAllPhotographers());
-            photographerListView.checkAll();
-            LOGGER.info("refresh photographer-filterlist");
+            // NOTE: Remember the values that were excluded before the refresh and exclude them.
+            // That way the filter stays the same and new values are included automatically.
+            Set<T> excluded = filterGroup.getExcludedValues();
+            filterGroup.getItems().clear();
+            values.forEach(p -> {
+                Filter<T> filter = new Filter<>();
+                filter.setValue(p);
+                filter.setConverter(converter);
+                filter.setIncluded(!excluded.contains(p));
+                filterGroup.getItems().add(filter);
+            });
+            LOGGER.info("refreshing filter");
         });
     }
 }

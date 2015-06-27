@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import at.ac.tuwien.qse.sepm.gui.control.*?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="240.0"
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="240.0" styleClass="organizer"
             stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
             fx:controller="at.ac.tuwien.qse.sepm.gui.controller.Organizer">
     <center>
         <ScrollPane hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
-            <VBox fx:id="filterContainer" style="-fx-background-color: -tmg-bg1"/>
+            <VBox>
+                <FilterGroup fx:id="tagFilter" title="Kategorien" expanded="true"/>
+                <FilterGroup fx:id="ratingFilter" title="Bewertungen"/>
+                <FilterGroup fx:id="photographerFilter" title="Fotografen"/>
+                <FilterGroup fx:id="journeyFilter" title="Reisen"/>
+                <FilterGroup fx:id="placeFilter" title="Orte"/>
+            </VBox>
         </ScrollPane>
     </center>
 </BorderPane>
