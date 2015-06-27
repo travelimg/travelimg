@@ -126,12 +126,14 @@ public class FlickrServiceImpl implements FlickrService {
                 // maybe produces too much output
                 // logger.debug("Downloaded {} MB", (double)downloadedFileSize/oneMB);
             }
+            logger.debug("Downloaded photo {}", id+"."+format);
         } catch (IOException e) {
             throw new ServiceException(e.getMessage(), e);
         }
     }
 
     private class AsyncSearcher extends CancelableTask {
+
         private String[] tags;
         private double latitude;
         private double longitude;
@@ -193,21 +195,17 @@ public class FlickrServiceImpl implements FlickrService {
                         break;
                     }
                     logger.debug("Downloading photo nr {} ...", i + 1);
-                    p.setOriginalSecret(
-                            flickr.getPhotosInterface().getInfo(p.getId(), p.getSecret())
-                                    .getOriginalSecret());
+                    Photo photoWithOriginalSecret = flickr.getPhotosInterface().getInfo(p.getId(), p.getSecret());
+                    p.setOriginalSecret(photoWithOriginalSecret.getOriginalSecret());
+                    p.setTags(photoWithOriginalSecret.getTags());
                     if (!p.getOriginalSecret().isEmpty()) {
                         String mediumSizeUrl = "https://farm" + p.getFarm() + ".staticflickr.com/" + p.getServer() + "/" + p.getId() + "_" + p.getSecret() + "_z." + p.getOriginalFormat();
-                        GeoData geoData = flickr.getPhotosInterface().getGeoInterface().getLocation(p.getId());
-                        Photo photoWIthTags = flickr.getTagsInterface().getListPhoto(p.getId());
-                        p.setTags(photoWIthTags.getTags());
-                        p.setGeoData(geoData);
                         downloadPhotoFromFlickr(mediumSizeUrl, p.getId(), p.getOriginalFormat());
                         if(!isRunning()){
                             logger.debug("Download interrupted");
                             break;
                         }
-                        logger.debug("Downloaded photo id={}, geodata=[{},{}], tags={}", p.getId(),p.getGeoData().getLatitude(),p.getGeoData().getLongitude(),p.getTags());
+                        logger.debug("Downloaded photo id={}, tags={}", p.getId(),p.getTags());
                         callback.accept(p);
                         progressCallback.accept((double) nrOfDownloadedPhotos / (double) nrOfPhotosToDownload);
                         nrOfDownloadedPhotos++;
@@ -231,6 +229,7 @@ public class FlickrServiceImpl implements FlickrService {
         private ErrorHandler<ServiceException> errorHandler;
 
         public AsyncDownloader(List<Photo> photos, Consumer<Photo> callback, Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler){
+            super();
             this.photos = photos;
             this.callback = callback;
             this.progressCallback = progressCallback;
@@ -239,21 +238,29 @@ public class FlickrServiceImpl implements FlickrService {
 
         @Override
         protected void execute() {
-
-            for(int i=0; i<photos.size();i++){
-                try {
+            try {
+                for(int i=0; i<photos.size();i++) {
                     Photo p = photos.get(i);
-                    String url = "https://farm" + p.getFarm() + ".staticflickr.com/" + p.getServer() + "/" + p.getId() + "_" + p.getOriginalSecret() + "_o." + p.getOriginalFormat();
-                    downloadPhotoFromFlickr(url,p.getId()+"_o",p.getOriginalFormat());
-                    if(!isRunning()){
+                    String url = "https://farm" + p.getFarm() + ".staticflickr.com/" + p.getServer()
+                            + "/" + p.getId() + "_" + p.getOriginalSecret() + "_o." + p
+                            .getOriginalFormat();
+                    downloadPhotoFromFlickr(url, p.getId() + "_o", p.getOriginalFormat());
+                    GeoData geoData = flickr.getPhotosInterface().getGeoInterface()
+                            .getLocation(p.getId());
+                    p.setGeoData(geoData);
+                    logger.debug("Got geodata=[{},{}]", p.getGeoData().getLatitude(),p.getGeoData().getLongitude());
+
+                    if (!isRunning()) {
                         logger.debug("Download interrupted.");
                         return;
                     }
                     callback.accept(p);
-                    progressCallback.accept((double)(i+1)/(double)photos.size());
-                } catch (ServiceException e) {
-                    progressCallback.accept(1.0);
+                    progressCallback.accept((double) (i + 1) / (double) photos.size());
                 }
+            }
+            catch (FlickrException | ServiceException e) {
+                errorHandler.propagate(new ServiceException("Failed to download photo", e));
+                progressCallback.accept(1.0);
             }
             progressCallback.accept(1.0);
         }
