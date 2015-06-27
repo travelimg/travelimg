@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class PaginatedImageGrid extends StackPane {
 
@@ -39,11 +38,13 @@ public class PaginatedImageGrid extends StackPane {
         activePageProperty.addListener(this::handlePageChange);
         setAlignment(Pos.CENTER);
 
-        getChildren().add(getPage(0)); // set the initial page
-
         menu.addListener(new PageSwitchListener());
     }
 
+    /**
+     * Get a list of photos which are currently being displayed in the grid.
+     * @return The list of photos in the grid.
+     */
     public List<Photo> getPhotos() {
         return photos;
     }
@@ -54,52 +55,67 @@ public class PaginatedImageGrid extends StackPane {
      * @param photos The photos to show in the grid
      */
     public void setPhotos(List<Photo> photos) {
-        LOGGER.debug("setPhotos {}", photos);
-        this.photos = photos;
+        this.photos.clear();
+        this.photos.addAll(photos);
 
-        pageCache.clear();
-
-        // set the new page count
-        menu.setPageCount(calculatePageCount());
-        updatePage();
+        Collections.sort(this.photos, new PhotoTimeComparator());
+        refresh();
     }
 
     /**
-     * Add a photo to the grid.
-     *
-     * @param photo The photo to be added
+     * Add a collection of photos to the grid.
+     * @param photos The photos to be added.
      */
-    public void addPhoto(Photo photo) {
-        addPhoto(photo, true);
+    public void addPhotos(Collection<Photo> photos) {
+        this.photos.addAll(photos);
+
+        Collections.sort(this.photos, new PhotoTimeComparator());
+        refresh();
     }
 
-    private void addPhoto(Photo photo, boolean update) {
-        // insert sorted
+    /**
+     * Update the list of photos in the grid.
+     * @param photos The photos to be updated
+     */
+    public void updatePhotos(List<Photo> photos) {
+        photos.forEach(this::updatePhoto);
+    }
+
+    private void updatePhoto(Photo photo) {
         int index = 0;
-
+        boolean found = false;
         for (Photo p : photos) {
-            if (p.getData().getDatetime().isBefore(photo.getData().getDatetime())) {
-                photos.add(index, photo);
-
-                if (update) {
-                    setPhotos(photos);
-                }
-                return;
+            if (p.getId().equals(photo.getId())) {
+                found = true;
+                break;
             }
+
+            index++;
         }
 
-        // photo is the oldest, insert at end
-        photos.add(photo);
+        if (found) {
+            this.photos.set(index, photo);
 
-        if (update) {
-            setPhotos(photos);
+            ImageGridPage page = getPageForIndex(index);
+            page.updatePhoto(photo);
         }
     }
 
-    public void addPhotos(List<Photo> photos) {
-        photos.forEach(p -> addPhoto(p, false));
+    /**
+     * Remove a collection of photos from the grid.
+     * @param photos The photos to be removed.
+     */
+    public void removePhotos(Collection<Photo> photos) {
+        if (photos.isEmpty()) {
+            return;
+        }
 
-        setPhotos(this.photos);
+        photos.forEach(this::removePhoto);
+        refresh();
+    }
+
+    private void removePhoto(Photo photo) {
+        photos.removeIf(p -> p.getId().equals(photo.getId()));
     }
 
     public void setSelectionChangeAction(Consumer<Set<Photo>> selectionChangeAction) {
@@ -117,7 +133,6 @@ public class PaginatedImageGrid extends StackPane {
         }
 
         return activePageProperty.get().getActivePhoto();
-
     }
 
     /**
@@ -141,56 +156,6 @@ public class PaginatedImageGrid extends StackPane {
         return activePageProperty.get().getSelected();
     }
 
-    /**
-     * Remove a photo from the grid
-     *
-     * @param photo The photo to be removed.
-     */
-    public void removePhoto(Photo photo) {
-        int oldPageCount = calculatePageCount();
-
-        photos.remove(photo);
-        pageCache.clear();
-
-        int newPageCount = calculatePageCount();
-
-        menu.setPageCount(newPageCount);
-
-        if (oldPageCount == newPageCount) {
-            updatePage();
-        }
-    }
-
-    /**
-     * Update the tile for given photo in the grid.
-     *
-     * @param photo The photo to be updated.
-     */
-    public void updatePhoto(Photo photo) {
-        int index = 0;
-        boolean found = false;
-
-        for (Photo p : photos) {
-            if (p.getPath().equals(photo.getPath())) {
-                found = true;
-                break;
-            }
-            index++;
-        }
-
-        if (!found) {
-            LOGGER.debug("Photo not in grid {}", photo);
-            addPhoto(photo);
-            return;
-        }
-
-        ImageGridPage page = getPageForPhoto(photo);
-        page.updatePhoto(photo);
-
-        // update photo in list
-        photos.set(index, photo);
-    }
-
     private ImageGridPage createPage(int pageIndex) {
         if (pageCache.containsKey(pageIndex))
             return pageCache.get(pageIndex);
@@ -198,7 +163,9 @@ public class PaginatedImageGrid extends StackPane {
         int endIndex = Math.min((pageIndex + 1) * photosPerPage, photos.size());
         int startIndex = Math.min(pageIndex * photosPerPage, endIndex);
 
-        ImageGridPage page = new ImageGridPage(photos.subList(startIndex, endIndex));
+        List<Photo> slice = photos.subList(startIndex, endIndex);
+
+        ImageGridPage page = new ImageGridPage(slice);
         pageCache.put(pageIndex, page);
         return page;
     }
@@ -216,24 +183,17 @@ public class PaginatedImageGrid extends StackPane {
     private int getIndexForPhoto(Photo photo) {
         int i = 0;
         for (Photo p : photos) {
-            i++;
             if (photo.getPath().equals(p.getPath())) {
                 return i;
             }
+            i++;
         }
         return -1;
     }
 
-    private int getPageIndexForPhoto(Photo photo) {
-        int index = getIndexForPhoto(photo);
-        LOGGER.debug("index of photo is {}", index);
-        int result = (int) Math.floor(index / (double) photosPerPage);
-        LOGGER.debug("page index for photo is {}", result);
-        return result;
-    }
-
-    private ImageGridPage getPageForPhoto(Photo photo) {
-        return getPage(getPageIndexForPhoto(photo));
+    private ImageGridPage getPageForIndex(int index) {
+        int pageIndex = (int) Math.floor(index / (double) photosPerPage);
+        return getPage(pageIndex);
     }
 
     private int calculatePageCount() {
@@ -244,50 +204,54 @@ public class PaginatedImageGrid extends StackPane {
      * Calculate how many photos we can fit inside the page.
      */
     private void handleSizeChange(Object observable) {
-        // (over) estimate tile size
+        // estimate tile size
         int size = ImageSize.MEDIUM.pixels();
-        int tileSize = (int)Math.ceil(PADDING + GAP + 1.1 * size);
+        double tileSize = GAP + size;
 
-        int photosPerRow = (int) getWidth() / tileSize;
-        int photosPerCol = (int) getHeight() / tileSize;
+        int photosPerRow = (int) ((getWidth() - 2 * PADDING) / tileSize);
+        int photosPerCol = (int) ((getHeight() - 2 * PADDING) / (1.2 * tileSize));
 
         int totalPhotos = Math.max(photosPerRow * photosPerCol, 1);
 
         if (totalPhotos != photosPerPage) {
             photosPerPage = totalPhotos;
-            pageCache.clear();
-
-            menu.setPageCount(calculatePageCount());
-            updatePage();
-        }
-    }
-
-    private void handlePageChange(Object observable, ImageGridPage oldValue, ImageGridPage newValue) {
-        if (oldValue == null) {
-            return;
-        }
-
-        // carry the selection from the old page to the new page
-        // if more than one photo is selected then only select the first photo from the previous selection
-        int index = oldValue.getFirstSelectedIndex();
-
-        oldValue.deselectAll();
-
-        if (index != -1) {
-            newValue.selectAt(index);
+            refresh();
         }
     }
 
     private void updatePage() {
         ImageGridPage page = getPage(menu.getCurrentPage());
+        getChildren().clear();
+        getChildren().add(page);
+    }
 
-        getChildren().set(0, page);
+    private void handlePageChange(Object observable, ImageGridPage oldValue, ImageGridPage newValue) {
+        if (oldValue != null) {
+            oldValue.deselectAll();
+        }
+    }
+
+    private void refresh() {
+        pageCache.clear();
+        menu.setPageCount(calculatePageCount());
+        updatePage();
     }
 
     private class PageSwitchListener implements Menu.Listener {
         @Override
         public void onPageSwitch(Menu sender) {
             updatePage();
+        }
+    }
+
+    private class PhotoTimeComparator implements Comparator<Photo> {
+        @Override public int compare(Photo photo, Photo t1) {
+            int res = t1.getData().getDatetime().compareTo(photo.getData().getDatetime());
+            if (res == 0) {
+                return photo.getId().compareTo(t1.getId());
+            }
+
+            return res;
         }
     }
 }
