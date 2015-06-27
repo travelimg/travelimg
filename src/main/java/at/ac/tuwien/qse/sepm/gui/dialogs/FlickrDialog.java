@@ -421,7 +421,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         public Keyword(String name){
             super();
             this.name = name;
-            setStyle("-fx-background-radius: 5; -fx-background-color: #E91E63; ");
+            setStyle("-fx-background-radius: 5; -fx-background-color: -tmg-primary; ");
             Text text = new Text(name);
             text.setFill(Color.WHITE);
             setAlignment(Pos.CENTER);
