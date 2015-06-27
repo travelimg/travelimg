@@ -49,8 +49,10 @@ public class WorldmapViewImpl implements WorldmapView {
             return;
         }
 
-        places.forEach((place) -> mapScene
-                .addMarker(new LatLong(place.getLatitude(), place.getLongitude())));
+        places.forEach(place -> {
+            String caption = String.format("%s, %s", place.getCity(), place.getCountry());
+            mapScene.addMarker(new LatLong(place.getLatitude(), place.getLongitude()), caption);
+        });
         mapScene.fitToMarkers();
     }
 

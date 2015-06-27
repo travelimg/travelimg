@@ -82,11 +82,11 @@
                 document.map.setCenter(new google.maps.LatLng(latitude, longitude));
             };
 
-            document.addMarker = function addMarker(latitude, longitude) {
+            document.addMarker = function addMarker(latitude, longitude, caption) {
                 var marker = new google.maps.Marker({
                     position: new google.maps.LatLng(latitude, longitude),
-                    map: document.map
-
+                    map: document.map,
+                    title: caption
                 });
                 google.maps.event.addListener(marker, 'click', function() {
                      var lat = marker.getPosition().lat();

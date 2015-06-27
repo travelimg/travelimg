@@ -72,7 +72,12 @@ public class GoogleMapScene extends VBox {
 
     public void addMarker(LatLong position) {
         LOGGER.debug("Adding marker at ({}, {})", position.getLatitude(), position.getLongitude());
-        callJS(String.format(Locale.US, "document.addMarker(%f, %f);", position.getLatitude(), position.getLongitude()));
+        callJS(String.format(Locale.US, "document.addMarker(%f, %f, '');", position.getLatitude(), position.getLongitude()));
+    }
+
+    public void addMarker(LatLong position, String caption) {
+        LOGGER.debug("Adding marker at ({}, {}) with caption {}", position.getLatitude(), position.getLongitude(), caption);
+        callJS(String.format(Locale.US, "document.addMarker(%f, %f, '%s');", position.getLatitude(), position.getLongitude(), caption));
     }
 
     public void fitToMarkers() {

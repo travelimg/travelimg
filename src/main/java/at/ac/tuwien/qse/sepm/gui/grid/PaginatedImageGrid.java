@@ -57,18 +57,14 @@ public class PaginatedImageGrid extends StackPane {
      * @param photos The photos to show in the grid
      */
     public void setPhotos(List<Photo> photos) {
-        int oldPageCount = calculatePageCount();
+        LOGGER.debug("setPhotos {}", photos);
         this.photos = photos;
-        int newPageCount = calculatePageCount();
 
         pageCache.clear();
 
         // set the new page count
-        menu.setPageCount(newPageCount);
-
-        if (oldPageCount == newPageCount) {
-            updatePage();
-        }
+        menu.setPageCount(calculatePageCount());
+        updatePage();
     }
 
     /**

@@ -242,9 +242,6 @@ public class OrganizerImpl implements Organizer {
                 ((PhotoPathFilter) usedFilter).setIncludedPath(Paths.get(item.getFullPath()));
             handleFilterChange();
         }
-        //        Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
-        //        findFiles(rootDirectories.toFile(), null);
-        //        filesTree.getSelectionModel().select(item);
     }
 
     private void handleRatingsChange(List<Rating> values) {
