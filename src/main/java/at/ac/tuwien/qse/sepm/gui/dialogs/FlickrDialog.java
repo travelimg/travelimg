@@ -117,8 +117,8 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         keywordTextField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(final ObservableValue<? extends String> ov, final String oldValue, final String newValue) {
-                if (keywordTextField.getText().length() > 20) {
-                    String s = keywordTextField.getText().substring(0, 20);
+                if (keywordTextField.getText().length() > 25) {
+                    String s = keywordTextField.getText().substring(0, 25);
                     keywordTextField.setText(s);
                 }
             }
