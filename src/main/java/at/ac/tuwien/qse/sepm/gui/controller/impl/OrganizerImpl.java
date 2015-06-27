@@ -49,6 +49,7 @@ public class OrganizerImpl implements Organizer {
     @Autowired private Inspector<Photo> inspectorController;
     @Autowired private TagService tagService;
     @Autowired private WorkspaceService workspaceService;
+    @Autowired private PhotoService photoService;
 
     @FXML private BorderPane root;
     @FXML private VBox filterContainer;
@@ -145,6 +146,8 @@ public class OrganizerImpl implements Organizer {
         clusterService.subscribePlaceChanged(this::refreshPlaceList);
         photographerService.subscribeChanged(this::refreshPhotographerList);
 
+        photoService.subscribeCreate(this::handlePhotoAdded);
+
         deleteBtn.setOnAction(event -> handleDeleteDirectory());
         directoryDeleteMenu.getChildren().add(directoryChoiceBox);
         directoryDeleteMenu.getChildren().add(deleteBtn);
@@ -184,7 +187,15 @@ public class OrganizerImpl implements Organizer {
     // This Method let's the User switch to the folder-view
     private void folderViewClicked() {
         LOGGER.debug("Switch view");
+
         filterContainer.getChildren().clear();
+        buildTreeView();
+
+        usedFilter = new PhotoPathFilter();
+        handleFilterChange();
+    }
+
+    private void buildTreeView() {
         Collection<Path> workspaceDirectories;
         try {
             workspaceDirectories = workspaceService.getDirectories();
@@ -202,8 +213,6 @@ public class OrganizerImpl implements Organizer {
         directoryChoiceBox.setItems(FXCollections.observableArrayList(workspaceDirectories));
         filterContainer.getChildren().addAll(buttonBox, directoryDeleteMenu, filesTree);
         VBox.setVgrow(filesTree, Priority.ALWAYS);
-        usedFilter = new PhotoPathFilter();
-        handleFilterChange();
     }
 
     private void findFiles(File dir, FilePathTreeItem parent) {
@@ -411,5 +420,40 @@ public class OrganizerImpl implements Organizer {
             photographerListView.checkAll();
             LOGGER.info("refresh photographer-filterlist");
         });
+    }
+
+
+    private void handlePhotoAdded(Photo photo) {
+        Platform.runLater(() -> {
+            FilePathTreeItem root = (FilePathTreeItem) filesTree.getRoot();
+
+            Path directory = photo.getFile().getParent();
+
+            if (isPathAlreadyKnown(directory, root)) {
+                return;
+            }
+
+            buildTreeView();
+        });
+    }
+
+    private boolean isPathAlreadyKnown(Path directory, FilePathTreeItem node) {
+        if (node == null) {
+            return false;
+        }
+
+        if (node.getFullPath().equals(directory.toString())) {
+            return true;
+        }
+
+        for (TreeItem<String> child : node.getChildren()) {
+            FilePathTreeItem item = (FilePathTreeItem)child;
+
+            if (isPathAlreadyKnown(directory, item)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
