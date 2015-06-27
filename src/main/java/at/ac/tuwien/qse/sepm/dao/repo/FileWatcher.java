@@ -47,6 +47,12 @@ public interface FileWatcher {
     void unregister(Path directory);
 
     /**
+     * Return the workspace directories. //TODO remove after DB implementation
+     * @return workspace directories
+     */
+    Collection<Path> getDirectories();
+
+    /**
      * Add a listener that is notified about file operations.
      *
      * @param listener listener that should be added

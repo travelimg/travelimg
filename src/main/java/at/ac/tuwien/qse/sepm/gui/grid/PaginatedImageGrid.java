@@ -57,18 +57,14 @@ public class PaginatedImageGrid extends StackPane {
      * @param photos The photos to show in the grid
      */
     public void setPhotos(List<Photo> photos) {
-        int oldPageCount = calculatePageCount();
+        LOGGER.debug("setPhotos {}", photos);
         this.photos = photos;
-        int newPageCount = calculatePageCount();
 
         pageCache.clear();
 
         // set the new page count
-        menu.setPageCount(newPageCount);
-
-        if (oldPageCount == newPageCount) {
-            updatePage();
-        }
+        menu.setPageCount(calculatePageCount());
+        updatePage();
     }
 
     /**
@@ -234,9 +230,9 @@ public class PaginatedImageGrid extends StackPane {
      * Calculate how many photos we can fit inside the page.
      */
     private void handleSizeChange(Object observable) {
-        // estimate tile size
+        // (over) estimate tile size
         int size = ImageSize.MEDIUM.pixels();
-        int tileSize = PADDING + GAP + size;
+        int tileSize = (int)Math.ceil(PADDING + GAP + 1.1 * size);
 
         int photosPerRow = (int) getWidth() / tileSize;
         int photosPerCol = (int) getHeight() / tileSize;

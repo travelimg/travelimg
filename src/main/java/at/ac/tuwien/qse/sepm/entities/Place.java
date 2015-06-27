@@ -76,7 +76,6 @@ public class Place {
         if (!city.equals(place.city))
             return false;
         return country.equals(place.country);
-
     }
 
     @Override

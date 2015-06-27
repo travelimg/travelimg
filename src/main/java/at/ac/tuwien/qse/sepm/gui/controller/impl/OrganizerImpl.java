@@ -6,12 +6,12 @@ import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
-import at.ac.tuwien.qse.sepm.service.ClusterService;
-import at.ac.tuwien.qse.sepm.service.PhotographerService;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.service.TagService;
+import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -19,16 +19,20 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.xml.ws.Service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,6 +48,8 @@ public class OrganizerImpl implements Organizer {
     @Autowired private ClusterService clusterService;
     @Autowired private Inspector<Photo> inspectorController;
     @Autowired private TagService tagService;
+    @Autowired private WorkspaceService workspaceService;
+    @Autowired private PhotoService photoService;
 
     @FXML private BorderPane root;
     @FXML private VBox filterContainer;
@@ -59,7 +65,9 @@ public class OrganizerImpl implements Organizer {
     @FXML private TreeView<String> filesTree;
 
     private HBox buttonBox;
-
+    private HBox directoryDeleteMenu = new HBox();
+    private ChoiceBox<Path> directoryChoiceBox = new ChoiceBox<>();
+    private Button deleteBtn = new Button("-");
     private PhotoFilter usedFilter = new PhotoFilter();
     private PhotoFilter photoFilter = usedFilter;
     private PhotoFilter folderFilter = new PhotoPathFilter();
@@ -83,7 +91,6 @@ public class OrganizerImpl implements Organizer {
         ToggleGroup toggleGroup = new ToggleGroup();
         filterViewButton.setToggleGroup(toggleGroup);
         folderViewButton.setToggleGroup(toggleGroup);
-
 
         buttonBox = new HBox(filterViewButton, folderViewButton);
         buttonBox.setAlignment(Pos.CENTER);
@@ -133,6 +140,38 @@ public class OrganizerImpl implements Organizer {
 
         refreshLists();
         resetFilter();
+
+        tagService.subscribeTagChanged(this::refreshCategoryList);
+        clusterService.subscribeJourneyChanged(this::refreshJourneyList);
+        clusterService.subscribePlaceChanged(this::refreshPlaceList);
+        photographerService.subscribeChanged(this::refreshPhotographerList);
+
+        photoService.subscribeCreate(this::handlePhotoAdded);
+
+        deleteBtn.setOnAction(event -> handleDeleteDirectory());
+        directoryDeleteMenu.getChildren().add(directoryChoiceBox);
+        directoryDeleteMenu.getChildren().add(deleteBtn);
+    }
+
+    private void handleDeleteDirectory() {
+        Path directory = directoryChoiceBox.getSelectionModel().getSelectedItem();
+        if (directory != null) {
+            try {
+                workspaceService.removeDirectory(directory);
+            } catch (ServiceException ex) {
+                LOGGER.error("Could not delete directory");
+            }
+        }
+        folderViewClicked(); //refresh
+    }
+
+
+    @Override
+    public void setWorldMapPlace(Place place) {
+        placeListView.uncheckAll();
+        placeListView.check(place);
+
+        handlePlacesChange(placeListView.getChecked());
     }
 
     // This Method let's the User switch to the usedFilter-view
@@ -148,15 +187,32 @@ public class OrganizerImpl implements Organizer {
     // This Method let's the User switch to the folder-view
     private void folderViewClicked() {
         LOGGER.debug("Switch view");
+
         filterContainer.getChildren().clear();
+        buildTreeView();
 
-        Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
-        findFiles(rootDirectories.toFile(), null);
-
-        filterContainer.getChildren().addAll(buttonBox, filesTree);
-        VBox.setVgrow(filesTree, Priority.ALWAYS);
         usedFilter = new PhotoPathFilter();
         handleFilterChange();
+    }
+
+    private void buildTreeView() {
+        Collection<Path> workspaceDirectories;
+        try {
+            workspaceDirectories = workspaceService.getDirectories();
+        } catch (ServiceException ex) {
+            workspaceDirectories = new LinkedList<>();
+        }
+
+        FilePathTreeItem root = new FilePathTreeItem(Paths.get("workspace"));
+        root.setExpanded(true);
+        filesTree.setRoot(root);
+        filesTree.setShowRoot(false);
+        for (Path dirPath : workspaceDirectories) {
+            findFiles(dirPath.toFile(), root);
+        }
+        directoryChoiceBox.setItems(FXCollections.observableArrayList(workspaceDirectories));
+        filterContainer.getChildren().addAll(buttonBox, directoryDeleteMenu, filesTree);
+        VBox.setVgrow(filesTree, Priority.ALWAYS);
     }
 
     private void findFiles(File dir, FilePathTreeItem parent) {
@@ -196,9 +252,6 @@ public class OrganizerImpl implements Organizer {
                 ((PhotoPathFilter) usedFilter).setIncludedPath(Paths.get(item.getFullPath()));
             handleFilterChange();
         }
-        //        Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
-        //        findFiles(rootDirectories.toFile(), null);
-        //        filesTree.getSelectionModel().select(item);
     }
 
     private void handleRatingsChange(List<Rating> values) {
@@ -334,5 +387,73 @@ public class OrganizerImpl implements Organizer {
 
         // restore the callback and handle the change
         filterChangeCallback = savedCallback;
+    }
+
+    private void refreshCategoryList(Tag tag) {
+        Platform.runLater(() -> {
+            inspectorController.refresh();
+            categoryListView.setValues(getAllCategories());
+            categoryListView.checkAll();
+            LOGGER.info("refresh tag-filterlist");
+        });
+    }
+
+    private void refreshJourneyList(Journey journey) {
+        Platform.runLater(() -> {
+            journeyListView.setValues(getAllJourneys());
+            journeyListView.checkAll();
+            LOGGER.info("refresh journey-filterlist");
+        });
+    }
+
+    private void refreshPlaceList(Place place) {
+        Platform.runLater(() -> {
+            placeListView.setValues(getAllPlaces());
+            placeListView.checkAll();
+            LOGGER.info("refresh place-filterlist");
+        });
+    }
+
+    private void refreshPhotographerList(Photographer photographer) {
+        Platform.runLater(() -> {
+            photographerListView.setValues(getAllPhotographers());
+            photographerListView.checkAll();
+            LOGGER.info("refresh photographer-filterlist");
+        });
+    }
+
+
+    private void handlePhotoAdded(Photo photo) {
+        Platform.runLater(() -> {
+            FilePathTreeItem root = (FilePathTreeItem) filesTree.getRoot();
+
+            Path directory = photo.getFile().getParent();
+
+            if (isPathAlreadyKnown(directory, root)) {
+                return;
+            }
+
+            buildTreeView();
+        });
+    }
+
+    private boolean isPathAlreadyKnown(Path directory, FilePathTreeItem node) {
+        if (node == null) {
+            return false;
+        }
+
+        if (node.getFullPath().equals(directory.toString())) {
+            return true;
+        }
+
+        for (TreeItem<String> child : node.getChildren()) {
+            FilePathTreeItem item = (FilePathTreeItem)child;
+
+            if (isPathAlreadyKnown(directory, item)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

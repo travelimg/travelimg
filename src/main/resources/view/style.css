@@ -403,7 +403,7 @@
 .filter-list .header {
     -fx-background-color: -tmg-bg2;
     -fx-font-size: 16;
-    -fx-padding: 4px 12px;
+    -fx-padding: 8px 12px;
 }
 .filter-list .header .label {
     -fx-text-fill: -tmg-text;
@@ -966,6 +966,25 @@
     -fx-background-color: -tmg-primary;
 }
 
+.folder-drop-target {
+    -fx-background-color: -tmg-overlay-dark;
+    -fx-spacing: 32px;
+    -fx-alignment: center;
+}
+.folder-drop-target .glyph-icon {
+    -glyph-size: 200px;
+    -glyph-name: "FOLDER_ALT";
+    -fx-fill: -tmg-text;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+.folder-drop-target .label {
+    -fx-text-fill: -tmg-text;
+    -fx-font-size: 32px;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
 .imageTile .smart-image {
     -fx-background-color: rgba(255, 255, 255, 0);
 }
@@ -1047,4 +1066,12 @@
 }
 .journey-entry {
     -fx-spacing: 10px;
+}
+
+.date-picker-popup > * > .spinner > .label {
+    -fx-text-fill: black;
+}
+
+.date-picker-popup > * > .date-cell {
+    -fx-text-fill: black;
 }

@@ -4,6 +4,7 @@ import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotoTagDAO;
 import at.ac.tuwien.qse.sepm.dao.TagDAO;
 import at.ac.tuwien.qse.sepm.dao.repo.AsyncPhotoRepository;
+import at.ac.tuwien.qse.sepm.dao.EntityWatcher;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Tag;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
@@ -17,33 +18,41 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class TagServiceImpl implements TagService {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired
-    private TagDAO tagDAO;
-    @Autowired
-    private PhotoTagDAO photoTagDAO;
-    @Autowired
-    private AsyncPhotoRepository photoRepository;
+    @Autowired private TagDAO tagDAO;
+    @Autowired private PhotoTagDAO photoTagDAO;
+    @Autowired private AsyncPhotoRepository photoRepository;
+    private Consumer<Tag> refreshTags;
 
-    @Override
-    public Tag create(Tag tag) throws ServiceException {
+    @Autowired
+    private void setWatcher(EntityWatcher<Tag> watcher) {
+        watcher.subscribeAdded(this::tagAdded);
+    }
+
+    @Override public Tag create(Tag tag) throws ServiceException {
         try {
-            return tagDAO.create(tag);
+            tag = tagDAO.create(tag);
+            tagAdded(tag);
+            return tag;
         } catch (DAOException | ValidationException ex) {
             LOGGER.error("Failed to create tag", ex);
             throw new ServiceException("Failed to create tag", ex);
         }
     }
 
-    @Override
-    public void delete(Tag tag) throws ServiceException {
+    @Override public void delete(Tag tag) throws ServiceException {
         try {
             tagDAO.delete(tag);
+
+            if (refreshTags != null) {
+                refreshTags.accept(tag);
+            }
         } catch (DAOException ex) {
             LOGGER.error("Failed to delete tag", ex);
             throw new ServiceException("Failed to delete tag", ex);
@@ -61,8 +70,7 @@ public class TagServiceImpl implements TagService {
         }
     }
 
-    @Override
-    public void addTagToPhotos(List<Photo> photos, Tag tag) throws ServiceException {
+    @Override public void addTagToPhotos(List<Photo> photos, Tag tag) throws ServiceException {
         LOGGER.debug("Entering addTagToPhotos with {}, {}", photos, tag);
         if (photos == null) {
             throw new ServiceException("List<Photo> photos is null");
@@ -82,8 +90,7 @@ public class TagServiceImpl implements TagService {
         LOGGER.debug("Leaving addTagToPhotos");
     }
 
-    @Override
-    public void removeTagFromPhotos(List<Photo> photos, Tag tag) throws ServiceException {
+    @Override public void removeTagFromPhotos(List<Photo> photos, Tag tag) throws ServiceException {
         LOGGER.debug("Entering removeTagFromPhotos with {}, {}", photos, tag);
         if (photos == null) {
             throw new ServiceException("List<Photo> photos is null");
@@ -103,8 +110,7 @@ public class TagServiceImpl implements TagService {
         LOGGER.debug("Leaving removeTagFromPhotos");
     }
 
-    @Override
-    public List<Tag> getTagsForPhoto(Photo photo) throws ServiceException {
+    @Override public List<Tag> getTagsForPhoto(Photo photo) throws ServiceException {
         LOGGER.debug("Entering getTagsForPhoto with {}", photo);
         List<Tag> tagList;
         try {
@@ -120,8 +126,7 @@ public class TagServiceImpl implements TagService {
         return tagList;
     }
 
-    @Override
-    public List<Tag> getMostFrequentTags(List<Photo> photos) throws ServiceException {
+    @Override public List<Tag> getMostFrequentTags(List<Photo> photos) throws ServiceException {
         LOGGER.debug("Entering getMostFrequentTags with {}", photos);
 
         HashMap<Tag, Integer> counter = new HashMap<>();
@@ -143,9 +148,17 @@ public class TagServiceImpl implements TagService {
 
         // return the most frequent tags
         return counter.entrySet().stream()
-                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                .limit(5)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(5)
+                .map(Map.Entry::getKey).collect(Collectors.toList());
+    }
+
+    private void tagAdded(Tag tag) {
+        if (refreshTags != null) {
+            refreshTags.accept(tag);
+        }
+    }
+
+    public void subscribeTagChanged(Consumer<Tag> callback) {
+        this.refreshTags = callback;
     }
 }
