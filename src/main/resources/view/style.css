@@ -538,6 +538,7 @@
 }
 .filter-group .list {
     -fx-spacing: 2px;
+    -fx-padding: 8px 0 8px 0;
 }
 
 .tab-pane {
