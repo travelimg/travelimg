@@ -86,6 +86,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     private Cancelable searchTask;
     private Cancelable downloadTask;
     private Menu sender;
+    private boolean newSearch = false;
 
     public FlickrDialog(Node origin, String title, FlickrService flickrService, ExifService exifService, IOHandler ioHandler,
             Menu sender) {
@@ -162,7 +163,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         }
         this.actualLatLong = ll;
         mapScene.addMarker(ll);
-        flickrService.reset();
+        newSearch = true;
     }
 
     public void addKeyword(String name) {
@@ -170,18 +171,21 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         keyword.setOnClosed(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent event) {
                 keywordsFlowPane.getChildren().remove(keyword);
-                flickrService.reset();
+                newSearch = true;
             }
         });
         keywordsFlowPane.getChildren().add(keyword);
-        flickrService.reset();
+        newSearch = true;
     }
 
     private void handleSearch() {
+        if(newSearch){
+            flickrService.reset();
+        }
+        newSearch = false;
         searchButton.setDisable(true);
         progressIndicator.setVisible(true);
         importButton.setDisable(true);
-        keywordTextField.setDisable(true);
 
         ObservableList<Node> keywords = keywordsFlowPane.getChildren();
         String[] tags = keywords.stream().map(keyword -> ((Keyword)keyword).getName()).toArray(String[]::new);
@@ -218,7 +222,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                     Platform.runLater(new Runnable() {
                         public void run() {
                             if (downloadProgress == 1.0) {
-                                reActivateButtons();
+                                reActivateElements();
                             }
                         }
                     });
@@ -226,11 +230,11 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             }
                     , new ErrorHandler<ServiceException>() {
                 public void handle(ServiceException exception) {
-                    reActivateButtons();
+                    reActivateElements();
                 }
             });
         } catch (ServiceException e) {
-            reActivateButtons();
+            reActivateElements();
         }
     }
 
@@ -330,11 +334,10 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         close();
     }
 
-    private void reActivateButtons(){
+    private void reActivateElements(){
         searchButton.setDisable(false);
         progressIndicator.setVisible(false);
         importButton.setDisable(false);
-        keywordTextField.setDisable(false);
     }
 
     /**
