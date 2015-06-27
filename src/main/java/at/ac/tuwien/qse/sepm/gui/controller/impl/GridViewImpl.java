@@ -33,8 +33,6 @@ public class GridViewImpl implements GridView {
     @Autowired
     private PhotoService photoService;
     @Autowired
-    private ImportService importService;
-    @Autowired
     private FlickrService flickrService;
     @Autowired
     private DropboxService dropboxService;
