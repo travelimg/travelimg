@@ -112,7 +112,16 @@ public class GridViewImpl implements GridView {
         root.setOnDragOver(this::handleDragOver);
         root.setOnDragDropped(this::handleDragDropped);
         root.setOnDragExited(this::handleDragExited);
+
         folderDropTarget.setVisible(false);
+
+        try {
+            if (workspaceService.getDirectories().isEmpty()) {
+                folderDropTarget.setVisible(true);
+            }
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Laden der Bildordner", "");
+        }
     }
 
     private void handleImportError(Throwable error) {
