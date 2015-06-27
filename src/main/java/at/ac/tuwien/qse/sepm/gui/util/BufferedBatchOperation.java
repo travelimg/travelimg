@@ -19,8 +19,6 @@ public class BufferedBatchOperation<T> {
     public BufferedBatchOperation(Consumer<List<T>> callback, ScheduledExecutorService scheduler) {
         this.callback = callback;
         this.scheduler = scheduler;
-
-        future = scheduler.schedule(this::commit, 900, TimeUnit.MILLISECONDS);
     }
 
     public void add(T element) {
@@ -28,7 +26,7 @@ public class BufferedBatchOperation<T> {
             buffer.add(element);
 
             if (future == null) {
-                future = scheduler.schedule(this::commit, 900, TimeUnit.MILLISECONDS);
+                future = scheduler.schedule(this::commit, 2, TimeUnit.SECONDS);
             }
         }
     }
@@ -43,7 +41,7 @@ public class BufferedBatchOperation<T> {
             callback.accept(new ArrayList<>(buffer));
             buffer.clear();
 
-            future = scheduler.schedule(this::commit, 900, TimeUnit.MILLISECONDS);
+            future = scheduler.schedule(this::commit, 2, TimeUnit.SECONDS);
         }
     }
 
