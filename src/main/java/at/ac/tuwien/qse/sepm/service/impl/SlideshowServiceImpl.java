@@ -91,6 +91,10 @@ public class SlideshowServiceImpl implements SlideshowService {
             throw new ServiceException("Failed to create slide", ex);
         }
 
-        return slides;
+        if(slides.size()==0){
+            throw new ServiceException("List is empty");
+        }else {
+            return slides;
+        }
     }
 }

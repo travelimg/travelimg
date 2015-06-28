@@ -43,7 +43,7 @@ public class App extends Application {
         stage.show();
 
         PhotoService photoService = (PhotoService)context.getBean("photoService");
-        photoService.synchronize();
+        photoService.initializeRepository();
     }
 
     @Override

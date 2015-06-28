@@ -121,8 +121,7 @@ public class DropboxExportTest extends ServiceTestBase {
                 .collect(Collectors.toList());
         // expected dest path is selected dropbox directory/filename
         List<Path> expectedDestPaths = photos.stream()
-                .map(p -> Paths.get(p.getPath()).getFileName().toString())
-                .map(filename -> Paths.get(root, destination, filename))
+                .map(p -> Paths.get(p.getPath()).getFileName())
                 .collect(Collectors.toList());
 
         List<TestIOHandler.CopyOperation> copyOperations = ioHandler.copiedFiles;

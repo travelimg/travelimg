@@ -8,19 +8,23 @@ import at.ac.tuwien.qse.sepm.gui.controller.Menu;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.*;
 import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid;
+import at.ac.tuwien.qse.sepm.gui.util.BufferedBatchOperation;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.util.IOHandler;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.Node;
+import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 public class GridViewImpl implements GridView {
@@ -29,8 +33,6 @@ public class GridViewImpl implements GridView {
 
     @Autowired
     private PhotoService photoService;
-    @Autowired
-    private ImportService importService;
     @Autowired
     private FlickrService flickrService;
     @Autowired
@@ -50,22 +52,41 @@ public class GridViewImpl implements GridView {
     @Autowired
     private ExifService exifService;
 
+    @Autowired
+    private WorkspaceService workspaceService;
+
     @FXML
-    private BorderPane root;
+    private StackPane root;
+
+    @FXML
+    private BorderPane content;
+
+    @FXML
+    private Node folderDropTarget;
 
     private PaginatedImageGrid grid;
     private boolean disableReload = false;
     private boolean treeViewActive = false;
+
+    private BufferedBatchOperation<Photo> addOperation = null;
+    private BufferedBatchOperation<Photo> updateOperation = null;
+    private BufferedBatchOperation<Path> deleteOperation = null;
+
+    @Autowired public void setScheduler(ScheduledExecutorService scheduler) {
+        addOperation = new BufferedBatchOperation<>(this::handleAddPhotos, scheduler);
+        updateOperation = new BufferedBatchOperation<>(this::handleUpdatePhotos, scheduler);
+        deleteOperation = new BufferedBatchOperation<>(this::handleDeletePhotos, scheduler);
+    }
 
     @FXML
     private void initialize() {
         LOGGER.debug("initializing");
 
         this.grid = new PaginatedImageGrid(menu);
-        root.setCenter(grid);
+        content.setCenter(grid);
         menu.addListener(new MenuListener());
         organizer.setFilterChangeAction(this::handleFilterChange);
-        root.setCenter(grid);
+        content.setCenter(grid);
 
         // Selected photos are shown in the inspector.
         grid.setSelectionChangeAction(inspector::setEntities);
@@ -81,12 +102,12 @@ public class GridViewImpl implements GridView {
         inspector.setUpdateHandler(() -> {
             Collection<Photo> photos = inspector.getEntities();
 
-            photos.stream()
-                    .filter(organizer.getUsedFilter().negate())
-                    .forEach(grid::removePhoto);
-            photos.stream()
-                    .filter(organizer.getUsedFilter())
-                    .forEach(grid::updatePhoto);
+            grid.removePhotos(photos.stream()
+                            .filter(organizer.getUsedFilter().negate())
+                            .collect(Collectors.toList()));
+            grid.updatePhotos(photos.stream()
+                            .filter(organizer.getUsedFilter())
+                            .collect(Collectors.toList()));
         });
 
         // Apply the initial filter.
@@ -96,44 +117,79 @@ public class GridViewImpl implements GridView {
         photoService.subscribeCreate(this::handlePhotoCreated);
         photoService.subscribeUpdate(this::handlePhotoUpdated);
         photoService.subscribeDelete(this::handlePhotoDeleted);
+
+        root.setOnDragEntered(this::handleDragEntered);
+        root.setOnDragOver(this::handleDragOver);
+        root.setOnDragDropped(this::handleDragDropped);
+        root.setOnDragExited(this::handleDragExited);
+
+        folderDropTarget.setVisible(false);
+
+        try {
+            if (workspaceService.getDirectories().isEmpty()) {
+                folderDropTarget.setVisible(true);
+            }
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Laden der Bildordner", "");
+        }
     }
 
-    private void handleImportError(Throwable error) {
-        LOGGER.error("import error", error);
-
-        // queue an update in the main gui
-        Platform.runLater(() -> ErrorDialog.show(root, "Import fehlgeschlagen", "Fehlermeldung: " + error.getMessage()));
+    private void handleAddPhotos(List<Photo> photos) {
+        LOGGER.debug("adding {} photos to grid", photos.size());
+        Platform.runLater(() -> grid.addPhotos(photos));
     }
 
-    private void handlePhotoCreated(Photo photo) {
+    private void handleUpdatePhotos(List<Photo> photos) {
+        LOGGER.debug("updating {} photos in grid", photos.size());
         Platform.runLater(() -> {
-            if (organizer.getUsedFilter().test(photo)) {
-                grid.addPhoto(photo);
+            grid.updatePhotos(photos);
+
+            // update the inspector selection
+            Collection<Photo> entities = inspector.getEntities();
+
+            boolean updated = false;
+            for (Photo photo : photos) {
+                Optional<Photo> entity = entities.stream().filter(p -> p.getId().equals(photo.getId())).findFirst();
+                if (entity.isPresent()) {
+                    entities.remove(entity.get());
+                    entities.add(photo);
+                    updated = true;
+                }
+            }
+
+            if (updated) {
+                inspector.setEntities(entities);
             }
         });
     }
 
-    private void handlePhotoUpdated(Photo photo) {
+    private void handleDeletePhotos(List<Path> paths) {
+        LOGGER.debug("deleting {} photos in grid", paths.size());
+
         Platform.runLater(() -> {
-            // TODO: should we update filter
-            grid.updatePhoto(photo);
+            List<Photo> photos = grid.getPhotos().stream()
+                    .filter(p -> paths.contains(p.getFile()))
+                    .collect(Collectors.toList());
+
+            grid.removePhotos(photos);
         });
+    }
+
+    private void handlePhotoCreated(Photo photo) {
+        if (organizer.getUsedFilter().test(photo)) {
+            addOperation.add(photo);
+        }
+    }
+
+    private void handlePhotoUpdated(Photo photo) {
+        if (organizer.getUsedFilter().test(photo)) {
+            updateOperation.add(photo);
+        }
     }
 
     private void handlePhotoDeleted(Path file) {
-        Platform.runLater(() -> {
-            // TODO: should we update filter
-
-            // lookup photo by path
-            Optional<Photo> photo = grid.getPhotos().stream()
-                    .filter(p -> p.getFile().equals(file))
-                    .findFirst();
-
-            if (photo.isPresent())
-                grid.removePhoto(photo.get());
-        });
+        deleteOperation.add(file);
     }
-
 
     private void handleFilterChange() {
         if (!disableReload)
@@ -142,7 +198,6 @@ public class GridViewImpl implements GridView {
 
     private void reloadImages() {
         try {
-
             grid.setPhotos(photoService.getAllPhotos(organizer.getUsedFilter()).stream()
                             .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
                             .collect(Collectors.toList()));
@@ -153,10 +208,46 @@ public class GridViewImpl implements GridView {
         }
     }
 
+    private void handleDragEntered(DragEvent event) {
+        LOGGER.debug("drag entered");
+        folderDropTarget.setVisible(true);
+        event.consume();
+    }
+
+    private void handleDragOver(DragEvent event) {
+        event.acceptTransferModes(TransferMode.LINK);
+        event.consume();
+    }
+
+    private void handleDragDropped(DragEvent event) {
+        LOGGER.debug("drag dropped");
+
+        Dragboard dragboard = event.getDragboard();
+        boolean success = dragboard.hasFiles();
+        if (success) {
+            dragboard.getFiles().forEach(f -> LOGGER.debug("dropped file {}", f));
+            for (File file : dragboard.getFiles()) {
+                try {
+                    workspaceService.addDirectory(file.toPath());
+                } catch (ServiceException ex) {
+                    LOGGER.error("Couldn't add directory {}");
+                }
+            }
+        }
+        event.setDropCompleted(success);
+        event.consume();
+    }
+
+    private void handleDragExited(DragEvent event) {
+        LOGGER.debug("drag exited");
+        folderDropTarget.setVisible(false);
+        event.consume();
+    }
+
     private class MenuListener implements Menu.Listener {
 
         @Override public void onPresent(Menu sender) {
-            FullscreenWindow fullscreen = new FullscreenWindow();
+            FullscreenWindow fullscreen = new FullscreenWindow(photoService);
 
             Set<Photo> selected = grid.getSelected();
 
@@ -199,7 +290,7 @@ public class GridViewImpl implements GridView {
                 ErrorDialog.show(root, "Fehler beim Löschen", "Die ausgewählten Fotos konnten nicht gelöscht werden.");
             }
 
-            selection.forEach(grid::removePhoto);
+            grid.removePhotos(selection);
         }
 
         @Override public void onExport(Menu sender) {

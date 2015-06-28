@@ -6,13 +6,14 @@ import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
-import at.ac.tuwien.qse.sepm.service.ClusterService;
-import at.ac.tuwien.qse.sepm.service.PhotographerService;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.service.TagService;
+import at.ac.tuwien.qse.sepm.gui.util.BufferedBatchOperation;
+import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -28,11 +29,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Controller for organizer view which is used for browsing photos by month.
@@ -46,6 +48,8 @@ public class OrganizerImpl implements Organizer {
     @Autowired private ClusterService clusterService;
     @Autowired private Inspector<Photo> inspectorController;
     @Autowired private TagService tagService;
+    @Autowired private WorkspaceService workspaceService;
+    @Autowired private PhotoService photoService;
 
     @FXML private BorderPane root;
     @FXML private VBox filterContainer;
@@ -61,11 +65,20 @@ public class OrganizerImpl implements Organizer {
     @FXML private TreeView<String> filesTree;
 
     private HBox buttonBox;
-
+    private ChoiceBox<Path> directoryChoiceBox = new ChoiceBox<>();
     private PhotoFilter usedFilter = new PhotoFilter();
     private PhotoFilter photoFilter = usedFilter;
     private PhotoFilter folderFilter = new PhotoPathFilter();
     private Runnable filterChangeCallback;
+    private boolean suppressChangeEvent = false;
+
+    private BufferedBatchOperation<Photo> addOperation;
+
+    @Autowired public void setScheduler(ScheduledExecutorService scheduler) {
+        addOperation = new BufferedBatchOperation<>(photos -> {
+            Platform.runLater(() -> {/*TODO*/});
+        }, scheduler);
+    }
 
     @Override public void setFilterChangeAction(Runnable callback) {
         LOGGER.debug("setting usedFilter change action");
@@ -77,8 +90,8 @@ public class OrganizerImpl implements Organizer {
     }
 
     @FXML private void initialize() {
-        filesTree = new TreeView<>();
-        filesTree.setOnMouseClicked(event -> handleFolderChange());
+        initializeFilesTree();
+
         folderViewButton.setOnAction(event -> folderViewClicked());
         filterViewButton.setOnAction(event -> filterViewClicked());
 
@@ -139,16 +152,87 @@ public class OrganizerImpl implements Organizer {
         clusterService.subscribeJourneyChanged(this::refreshJourneyList);
         clusterService.subscribePlaceChanged(this::refreshPlaceList);
         photographerService.subscribeChanged(this::refreshPhotographerList);
+
+        photoService.subscribeCreate(this::handlePhotoAdded);
     }
 
+    private void initializeFilesTree() {
+        filesTree = new TreeView<>();
+        filesTree.setOnMouseClicked(event -> handleFolderChange());
+        filesTree.setCellFactory(treeView -> {
+            HBox hbox = new HBox();
+            hbox.setMaxWidth(200);
+            hbox.setPrefWidth(200);
+            hbox.setSpacing(7);
 
-    @Override
-    public void setWorldMapPlace(Place place) {
+            FontAwesomeIconView openFolderIcon = new FontAwesomeIconView(
+                    FontAwesomeIcon.FOLDER_OPEN_ALT);
+            openFolderIcon.setTranslateY(7);
+            FontAwesomeIconView closedFolderIcon = new FontAwesomeIconView(
+                    FontAwesomeIcon.FOLDER_ALT);
+            closedFolderIcon.setTranslateY(7);
+
+            Label dirName = new Label();
+            dirName.setMaxWidth(150);
+
+            FontAwesomeIconView removeIcon = new FontAwesomeIconView(FontAwesomeIcon.REMOVE);
+
+            Tooltip deleteToolTip = new Tooltip();
+            deleteToolTip.setText("Verzeichnis aus Workspace entfernen");
+
+            Button button = new Button(null, removeIcon);
+            button.setTooltip(deleteToolTip);
+            button.setTranslateX(8);
+
+            return new TreeCell<String>() {
+                @Override public void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null) {
+                        setGraphic(null);
+                        setText(null);
+                    } else if (getTreeItem() instanceof FilePathTreeItem) {
+                        hbox.getChildren().clear();
+                        dirName.setText(item);
+                        if (getTreeItem().isExpanded()) {
+                            hbox.getChildren().add(openFolderIcon);
+                        } else {
+                            hbox.getChildren().add(closedFolderIcon);
+                        }
+                        hbox.getChildren().add(dirName);
+                        if (getTreeItem().getParent().equals(filesTree.getRoot())) {
+                            String path = ((FilePathTreeItem) getTreeItem()).getFullPath();
+                            button.setOnAction(event -> handleDeleteDirectory(Paths.get(path)));
+                            hbox.getChildren().add(button);
+                        }
+                        setGraphic(hbox);
+                    }
+                }
+            };
+        });
+    }
+
+    private void handleDeleteDirectory() {
+        Path directory = directoryChoiceBox.getSelectionModel().getSelectedItem();
+        handleDeleteDirectory(directory);
+    }
+
+    private void handleDeleteDirectory(Path directory) {
+        if (directory != null) {
+            try {
+                workspaceService.removeDirectory(directory);
+            } catch (ServiceException ex) {
+                LOGGER.error("Could not delete directory");
+            }
+        }
+    }
+
+    @Override public void setWorldMapPlace(Place place) {
         placeListView.uncheckAll();
         placeListView.check(place);
 
         handlePlacesChange(placeListView.getChecked());
     }
+
     // This Method let's the User switch to the usedFilter-view
     private void filterViewClicked() {
         filterContainer.getChildren().clear();
@@ -162,15 +246,35 @@ public class OrganizerImpl implements Organizer {
     // This Method let's the User switch to the folder-view
     private void folderViewClicked() {
         LOGGER.debug("Switch view");
+
         filterContainer.getChildren().clear();
-
-        Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
-        findFiles(rootDirectories.toFile(), null);
-
         filterContainer.getChildren().addAll(buttonBox, filesTree);
         VBox.setVgrow(filesTree, Priority.ALWAYS);
+
         usedFilter = new PhotoPathFilter();
         handleFilterChange();
+    }
+
+    private void buildTreeView() {
+        Collection<Path> workspaceDirectories;
+        try {
+            workspaceDirectories = workspaceService.getDirectories();
+        } catch (ServiceException ex) {
+            workspaceDirectories = new LinkedList<>();
+        }
+
+        FilePathTreeItem root = new FilePathTreeItem(Paths.get("workspace"));
+        root.setExpanded(true);
+        filesTree.setRoot(root);
+        filesTree.setShowRoot(false);
+
+        for (Path dirPath : workspaceDirectories) {
+            findFiles(dirPath.toFile(), root);
+        }
+
+        directoryChoiceBox.setItems(FXCollections.observableArrayList(workspaceDirectories));
+        filterContainer.getChildren().addAll(buttonBox, filesTree);
+        VBox.setVgrow(filesTree, Priority.ALWAYS);
     }
 
     private void findFiles(File dir, FilePathTreeItem parent) {
@@ -197,7 +301,7 @@ public class OrganizerImpl implements Organizer {
 
     private void handleFilterChange() {
         LOGGER.debug("usedFilter changed");
-        if (filterChangeCallback == null)
+        if (filterChangeCallback == null || suppressChangeEvent)
             return;
         filterChangeCallback.run();
     }
@@ -347,36 +451,63 @@ public class OrganizerImpl implements Organizer {
         filterChangeCallback = savedCallback;
     }
 
-    public void refreshCategoryList(Tag tag) {
+    private void refreshCategoryList(Tag tag) {
         Platform.runLater(() -> {
-            inspectorController.refresh();
-            categoryListView.setValues(getAllCategories());
-            categoryListView.checkAll();
+            suppressChangeEvent = true;
+            List<Tag> all = categoryListView.getValues();
+            all.add(tag);
+            List<Tag> checked = categoryListView.getChecked();
+            checked.add(tag);
+            categoryListView.setValues(all);
+            categoryListView.checkAll(checked);
             LOGGER.info("refresh tag-filterlist");
+            suppressChangeEvent = false;
         });
     }
 
-    public void refreshJourneyList(Journey journey) {
+    private void refreshJourneyList(Journey journey) {
         Platform.runLater(() -> {
-            journeyListView.setValues(getAllJourneys());
-            journeyListView.checkAll();
+            suppressChangeEvent = true;
+            List<Journey> all = journeyListView.getValues();
+            all.add(journey);
+            List<Journey> checked = journeyListView.getChecked();
+            checked.add(journey);
+            journeyListView.setValues(all);
+            journeyListView.checkAll(checked);
             LOGGER.info("refresh journey-filterlist");
+            suppressChangeEvent = false;
         });
     }
 
-    public void refreshPlaceList(Place place) {
+    private void refreshPlaceList(Place place) {
         Platform.runLater(() -> {
-            placeListView.setValues(getAllPlaces());
-            placeListView.checkAll();
+            suppressChangeEvent = true;
+            List<Place> all = placeListView.getValues();
+            all.add(place);
+            List<Place> checked = placeListView.getChecked();
+            checked.add(place);
+            placeListView.setValues(all);
+            placeListView.checkAll(checked);
             LOGGER.info("refresh place-filterlist");
+            suppressChangeEvent = false;
         });
     }
 
-    public void refreshPhotographerList(Photographer photographer) {
+    private void refreshPhotographerList(Photographer photographer) {
         Platform.runLater(() -> {
-            photographerListView.setValues(getAllPhotographers());
-            photographerListView.checkAll();
+            suppressChangeEvent = true;
+            List<Photographer> all = photographerListView.getValues();
+            all.add(photographer);
+            List<Photographer> checked = photographerListView.getChecked();
+            checked.add(photographer);
+            photographerListView.setValues(all);
+            photographerListView.checkAll(checked);
             LOGGER.info("refresh photographer-filterlist");
+            suppressChangeEvent = false;
         });
+    }
+
+    private void handlePhotoAdded(Photo photo) {
+        addOperation.add(photo);
     }
 }
