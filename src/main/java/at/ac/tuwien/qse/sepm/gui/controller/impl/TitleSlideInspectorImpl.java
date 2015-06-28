@@ -90,7 +90,7 @@ public class TitleSlideInspectorImpl extends SlideInspectorImpl<TitleSlide> {
             slideService.delete(slide);
             onDelete(slide);
         } catch (ServiceException ex) {
-            ErrorDialog.show(root, "Fehler beim Ändern des Textes", "");
+            ErrorDialog.show(root, "Fehler beim Löschen der Folie", "");
         }
     }
 }
