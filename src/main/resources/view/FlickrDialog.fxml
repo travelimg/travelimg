@@ -6,6 +6,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import at.ac.tuwien.qse.sepm.gui.control.FlickrJourneysComboBox?>
 <fx:root fx:id="root" styleClass="dialog,import-dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <BorderPane>
@@ -78,11 +79,11 @@
                     <left>
                         <HBox spacing="25.0">
                             <HBox>
-                                <ComboBox fx:id="journeysComboBox" prefWidth="200" maxWidth="200">
+                                <FlickrJourneysComboBox fx:id="journeysComboBox" prefWidth="200" maxWidth="200">
                                     <tooltip>
                                         <Tooltip text="Wählen Sie eine Reise für die Fotos aus" />
                                     </tooltip>
-                                </ComboBox>
+                                </FlickrJourneysComboBox>
                                 <padding>
                                     <Insets top="3"></Insets>
                                 </padding>
