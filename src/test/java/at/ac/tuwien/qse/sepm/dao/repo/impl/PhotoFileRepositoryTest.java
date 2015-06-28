@@ -41,6 +41,11 @@ public class PhotoFileRepositoryTest extends PhotoRepositoryTest {
         return object;
     }
 
+    @Override protected void add(PhotoProvider object, Photo photo) throws DAOException {
+        super.add(object, photo);
+        watcher.refresh();
+    }
+
     @Test
     @Override public void create_valid_notifiesListener() throws DAOException {
         Path file = getContext().getFile1();
