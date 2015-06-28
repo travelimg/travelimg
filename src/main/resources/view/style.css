@@ -1218,3 +1218,36 @@
 .fullscreen .rating-picker .button:pressed {
     -fx-background-color: -tmg-bg2-dark;
 }
+
+.inspector-pane .action {
+    -fx-background-color: -tmg-bg2;
+    -fx-padding: 8px 16px;
+    -fx-max-width: 99999;
+    -fx-text-fill: -tmg-text;
+    -fx-font-size: 14px;
+}
+.inspector-pane .action:hover {
+    -fx-text-fill: -tmg-text-light;
+    -fx-background-color: -tmg-bg2-light;
+}
+.inspector-pane .action:pressed {
+    -fx-background-color: -tmg-bg2-dark;
+    -fx-text-fill: -tmg-text-bright;
+}
+.inspector-pane .action:selected {
+    -fx-background-color: -tmg-primary;
+    -fx-text-fill: -tmg-text-bright;
+}
+.inspector-pane .action .glyph-icon {
+    -fx-fill: -tmg-text;
+    -glyph-size: 18px;
+}
+.inspector-pane .action:hover .glyph-icon {
+    -fx-fill: -tmg-text-light;
+}
+.inspector-pane .action:pressed .glyph-icon {
+    -fx-fill: -tmg-text-bright;
+}
+.inspector-pane .action:selected .glyph-icon {
+    -fx-fill: -tmg-text-bright;
+}
