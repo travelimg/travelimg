@@ -27,12 +27,14 @@ public class MainControllerImpl implements MainController{
     @FXML
     private void initialize() {
         root.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
-            @Override public void changed(ObservableValue<? extends Tab> ov, Tab t, Tab t1) {
-                if(t1.equals(highlights)){
 
+            @Override
+            public void changed(ObservableValue<? extends Tab> arg0,
+                    Tab arg1, Tab arg2) {
+                if (arg2.getText().equals("highlights")) {
+                    System.out.println("Test");
                     highlightsViewController.reloadJourneys();
                 }
-
             }
         });
     }
