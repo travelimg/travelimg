@@ -41,8 +41,7 @@ public class FullscreenWindow extends StackPane {
     private Button bt_previous, bt_next;
     @FXML
     private RatingPicker ratingPicker;
-
-    @Autowired
+    
     private PhotoService photoService;
     private List<Photo> photos;
     private SmartImage image = new SmartImage(ImageSize.ORIGINAL);
