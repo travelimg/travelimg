@@ -2,7 +2,9 @@ package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.entities.*;
 
-public class PhotoAggregator extends Aggregator<Photo> {
+import java.util.HashSet;
+
+public class PhotoAggregator extends HashSet<Photo> {
 
     private final Aggregator<Tag> tags = new Aggregator<>();
     private final Aggregator<Rating> ratings = new Aggregator<>();
@@ -40,8 +42,9 @@ public class PhotoAggregator extends Aggregator<Photo> {
         return true;
     }
 
-    @Override public boolean remove(Photo photo) {
-        if (!super.remove(photo)) return false;
+    @Override public boolean remove(Object o) {
+        if (!super.remove(o)) return false;
+        Photo photo = (Photo)o;
         photo.getData().getTags().forEach(getTags()::remove);
         getRatings().remove(photo.getData().getRating());
         getPhotographers().remove(photo.getData().getPhotographer());
