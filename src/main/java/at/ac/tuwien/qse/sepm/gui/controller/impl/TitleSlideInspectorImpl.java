@@ -88,7 +88,7 @@ public class TitleSlideInspectorImpl extends SlideInspectorImpl<TitleSlide> {
 
         try {
             slideService.delete(slide);
-            onUpdate();
+            onDelete(slide);
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Ändern des Textes", "");
         }

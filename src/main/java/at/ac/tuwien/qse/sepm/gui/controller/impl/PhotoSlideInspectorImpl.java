@@ -64,7 +64,7 @@ public class PhotoSlideInspectorImpl extends SlideInspectorImpl<PhotoSlide> {
 
         try {
             slideService.delete(slide);
-            onUpdate();
+            onDelete(slide);
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Ändern des Textes", "");
         }

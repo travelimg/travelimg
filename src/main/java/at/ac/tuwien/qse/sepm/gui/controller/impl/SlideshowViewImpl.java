@@ -101,6 +101,21 @@ public class SlideshowViewImpl implements SlideshowView {
         mapSlideInspector.setUpdateHandler(() -> grid.setSlideshow(slideshowOrganizer.getSelected()));
         titleSlideInspector.setUpdateHandler(() -> grid.setSlideshow(slideshowOrganizer.getSelected()));
 
+        photoSlideInspector.setDeleteHandler(slide -> {
+            slideshowOrganizer.getSelected().getPhotoSlides().remove(slide);
+            grid.setSlideshow(slideshowOrganizer.getSelected());
+        });
+
+        mapSlideInspector.setDeleteHandler(slide -> {
+            slideshowOrganizer.getSelected().getMapSlides().remove(slide);
+            grid.setSlideshow(slideshowOrganizer.getSelected());
+        });
+
+        titleSlideInspector.setDeleteHandler(slide -> {
+            slideshowOrganizer.getSelected().getTitleSlides().remove(slide);
+            grid.setSlideshow(slideshowOrganizer.getSelected());
+        });
+
         photoService.subscribeDelete(photo -> {
             deletedOperation.add(photo);
         });
