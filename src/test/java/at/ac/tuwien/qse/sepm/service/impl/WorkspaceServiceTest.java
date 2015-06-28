@@ -19,16 +19,16 @@ public class WorkspaceServiceTest extends ServiceTestBase {
 
     private static final Path sourceDir1 = Paths
             .get(System.getProperty("os.name").contains("indow") ?
-                    ImportTest.class.getClassLoader().getResource("db/testimages/directory1").getPath()
+                    WorkspaceService.class.getClassLoader().getResource("db/testimages/directory1").getPath()
                             .substring(1) :
-                    ImportTest.class.getClassLoader().getResource("db/testimages/directory1")
+                    WorkspaceService.class.getClassLoader().getResource("db/testimages/directory1")
                             .getPath());
 
     private static final Path sourceDir2 = Paths
             .get(System.getProperty("os.name").contains("indow") ?
-                    ImportTest.class.getClassLoader().getResource("db/testimages/directory2").getPath()
+                    WorkspaceService.class.getClassLoader().getResource("db/testimages/directory2").getPath()
                             .substring(1) :
-                    ImportTest.class.getClassLoader().getResource("db/testimages/directory2")
+                    WorkspaceServiceTest.class.getClassLoader().getResource("db/testimages/directory2")
                             .getPath());
 
     @Before
@@ -118,10 +118,10 @@ public class WorkspaceServiceTest extends ServiceTestBase {
             throws ServiceException {
         //Existing directory which, however, has not been added before
         Path sourceDir3 = Paths.get(System.getProperty("os.name").contains("indow") ?
-                        ImportTest.class.getClassLoader().
+                        WorkspaceServiceTest.class.getClassLoader().
                                 getResource("db/testimages/directory3").getPath()
                                 .substring(1) :
-                        ImportTest.class.getClassLoader().getResource("db/testimages/directory3")
+                        WorkspaceServiceTest.class.getClassLoader().getResource("db/testimages/directory3")
                                 .getPath());
 
         int initiallyWatched = watcher.index().size();
