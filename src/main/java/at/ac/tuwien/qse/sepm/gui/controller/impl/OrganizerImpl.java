@@ -27,6 +27,7 @@ import javafx.scene.paint.Paint;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.glyphfont.FontAwesome;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.xml.ws.Service;
@@ -70,9 +71,7 @@ public class OrganizerImpl implements Organizer {
     @FXML private TreeView<String> filesTree;
 
     private HBox buttonBox;
-    private HBox directoryDeleteMenu = new HBox();
     private ChoiceBox<Path> directoryChoiceBox = new ChoiceBox<>();
-    private Button deleteBtn = new Button("-");
     private PhotoFilter usedFilter = new PhotoFilter();
     private PhotoFilter photoFilter = usedFilter;
     private PhotoFilter folderFilter = new PhotoPathFilter();
@@ -88,43 +87,7 @@ public class OrganizerImpl implements Organizer {
     }
 
     @FXML private void initialize() {
-        filesTree = new TreeView<>();
-        filesTree.setOnMouseClicked(event -> handleFolderChange());
-        filesTree.setCellFactory(treeView -> {
-            HBox hbox = new HBox();
-            FontAwesomeIconView openFolderIcon = new FontAwesomeIconView(
-                    FontAwesomeIcon.FOLDER_OPEN_ALT);
-            FontAwesomeIconView closedFolderIcon = new FontAwesomeIconView(
-                    FontAwesomeIcon.FOLDER_ALT);
-            Label dirName = new Label();
-            Button button = new Button();
-
-            return new TreeCell<String>() {
-                @Override public void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (item == null) {
-                        setGraphic(null);
-                    } else if (getTreeItem() instanceof FilePathTreeItem) {
-                        hbox.getChildren().clear();
-                        dirName.setText(item);
-                        if (getTreeItem().isExpanded()) {
-                            hbox.getChildren().add(openFolderIcon);
-                        } else {
-                            hbox.getChildren().add(closedFolderIcon);
-                        }
-                        hbox.getChildren().add(dirName);
-                        if (getTreeItem().getParent().equals(filesTree.getRoot())) {
-                            String path = ((FilePathTreeItem) getTreeItem()).getFullPath();
-                            button.setText("x");
-                            //button.setOnAction(event -> handleDeleteDirectory(Paths.get(path)));
-                            hbox.getChildren().add(button);
-                        }
-                        setText(item);
-                        setGraphic(hbox);
-                    }
-                }
-            };
-        });
+        initializeFilesTree();
 
         folderViewButton.setOnAction(event -> folderViewClicked());
         filterViewButton.setOnAction(event -> filterViewClicked());
@@ -188,10 +151,61 @@ public class OrganizerImpl implements Organizer {
         photographerService.subscribeChanged(this::refreshPhotographerList);
 
         photoService.subscribeCreate(this::handlePhotoAdded);
+    }
 
-        deleteBtn.setOnAction(event -> handleDeleteDirectory());
-        directoryDeleteMenu.getChildren().add(directoryChoiceBox);
-        directoryDeleteMenu.getChildren().add(deleteBtn);
+    private void initializeFilesTree() {
+        filesTree = new TreeView<>();
+        filesTree.setOnMouseClicked(event -> handleFolderChange());
+        filesTree.setCellFactory(treeView -> {
+            HBox hbox = new HBox();
+            hbox.setMaxWidth(200);
+            hbox.setPrefWidth(200);
+            hbox.setSpacing(7);
+
+            FontAwesomeIconView openFolderIcon = new FontAwesomeIconView(
+                    FontAwesomeIcon.FOLDER_OPEN_ALT);
+            openFolderIcon.setTranslateY(7);
+            FontAwesomeIconView closedFolderIcon = new FontAwesomeIconView(
+                    FontAwesomeIcon.FOLDER_ALT);
+            closedFolderIcon.setTranslateY(7);
+
+            Label dirName = new Label();
+            dirName.setMaxWidth(150);
+
+            FontAwesomeIconView removeIcon = new FontAwesomeIconView(FontAwesomeIcon.REMOVE);
+
+            Tooltip deleteToolTip = new Tooltip();
+            deleteToolTip.setText("Verzeichnis aus Workspace entfernen");
+
+            Button button = new Button(null, removeIcon);
+            button.setTooltip(deleteToolTip);
+            button.setTranslateX(8);
+
+            return new TreeCell<String>() {
+                @Override public void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null) {
+                        setGraphic(null);
+                        setText(null);
+                    } else if (getTreeItem() instanceof FilePathTreeItem) {
+                        hbox.getChildren().clear();
+                        dirName.setText(item);
+                        if (getTreeItem().isExpanded()) {
+                            hbox.getChildren().add(openFolderIcon);
+                        } else {
+                            hbox.getChildren().add(closedFolderIcon);
+                        }
+                        hbox.getChildren().add(dirName);
+                        if (getTreeItem().getParent().equals(filesTree.getRoot())) {
+                            String path = ((FilePathTreeItem) getTreeItem()).getFullPath();
+                            button.setOnAction(event -> handleDeleteDirectory(Paths.get(path)));
+                            hbox.getChildren().add(button);
+                        }
+                        setGraphic(hbox);
+                    }
+                }
+            };
+        });
     }
 
     private void handleDeleteDirectory() {
@@ -256,7 +270,7 @@ public class OrganizerImpl implements Organizer {
         }
 
         directoryChoiceBox.setItems(FXCollections.observableArrayList(workspaceDirectories));
-        filterContainer.getChildren().addAll(buttonBox, directoryDeleteMenu, filesTree);
+        filterContainer.getChildren().addAll(buttonBox, filesTree);
         VBox.setVgrow(filesTree, Priority.ALWAYS);
     }
 

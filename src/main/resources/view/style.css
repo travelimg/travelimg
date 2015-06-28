@@ -836,6 +836,20 @@
 .tree-view .tree-cell:selected .glyph-icon {
     -fx-fill: -tmg-text-bright;
 }
+.tree-view .tree-cell .button {
+        -fx-text-alignment: right;
+        -fx-background-color: -tmg-bg2-light;
+        -fx-padding: 2.5px 8px;
+        -fx-background-radius: 3px;
+        -fx-font-size: 14px;
+        -fx-text-fill: -tmg-text;
+}
+.tree-view .tree-cell .button:hover {
+    -fx-background-color: -tmg-bg2;
+}
+.tree-view .tree-cell .button:pressed {
+    -fx-background-color: -tmg-primary;
+}
 
 .combo-box .combo-box-popup {
     -fx-background-color: -tmg-bg2;
