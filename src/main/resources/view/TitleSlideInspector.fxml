@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import at.ac.tuwien.qse.sepm.gui.control.InspectorPane?>
-<?import javafx.scene.control.ColorPicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.VBox?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.VBox?>
 <InspectorPane fx:id="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-               fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.TitleSlideInspectorImpl">
-    <VBox>
-        <Label>Beschriftung</Label>
-        <TextField fx:id="captionField"/>
-        <ColorPicker fx:id="colorPicker"/>
-
-        <Button fx:id="deleteButton"
-                style="-fx-background-color: transparent">
+               fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.TitleSlideInspectorImpl"
+        styleClass="slide-inspector">
+    <VBox spacing="15">
+        <Button fx:id="deleteButton" styleClass="delete">
             <graphic>
-                <FontAwesomeIconView glyphName="TRASH" glyphSize="25"
-                                     style="-fx-fill: -tmg-text-light"/>
+                <FontAwesomeIconView glyphName="TRASH" />
             </graphic>
+            <tooltip>
+                <Tooltip text="Folie löschen" />
+            </tooltip>
         </Button>
+
+        <TextField fx:id="captionField" promptText="Titeltext..."/>
+        <ColorPicker fx:id="colorPicker" maxWidth="Infinity"/>
     </VBox>
 </InspectorPane>

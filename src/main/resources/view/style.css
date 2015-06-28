@@ -723,7 +723,8 @@
 
 .text-field,
 .combo-box,
-.date-picker {
+.date-picker,
+.color-picker {
     -fx-background-color: transparent;
     -fx-background-radius: 0;
     -fx-border-color: -tmg-text-dark;
@@ -1153,4 +1154,20 @@
     -fx-border-width: 3px 0 0 0;
     -fx-border-inset: 3px;
     -fx-border-color: -tmg-secondary;
+}
+
+.slide-inspector .delete {
+    -fx-background-color: transparent;
+}
+.slide-inspector .delete .glyph-icon {
+    -glyph-size: 25px;
+    -fx-fill: -tmg-text-light;
+}
+.slide-inspector .map #map {
+    -fx-padding: 20px 0 0 0;
+}
+
+.slide-inspector .marker-icon {
+    -glyph-size: 25px;
+    -fx-fill: -google-map-marker;
 }
