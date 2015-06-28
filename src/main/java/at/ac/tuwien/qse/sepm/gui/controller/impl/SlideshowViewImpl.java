@@ -86,6 +86,7 @@ public class SlideshowViewImpl implements SlideshowView {
             slideshows.remove(slideshows.size() - 1); // remove placeholder
             slideshows.add(slideshow); // add created slideshow
             slideshows.add(createNewSlideshowPlaceholder()); // re-add placeholder
+            slideshowOrganizer.setSelected(slideshows.size() - 2);
         });
 
         slideshowOrganizer.setDeleteAction(this::handleDeleteSlideshow);
