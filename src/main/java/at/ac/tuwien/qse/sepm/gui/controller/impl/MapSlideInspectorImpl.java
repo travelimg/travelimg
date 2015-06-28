@@ -110,6 +110,7 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
         }
 
         slide.setZoomLevel(zoomLevel);
+        map.setZoom(zoomLevel);
 
         try {
             slideService.update(slide);
