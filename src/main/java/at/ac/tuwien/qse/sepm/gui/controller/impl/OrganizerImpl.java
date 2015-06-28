@@ -12,14 +12,26 @@ import at.ac.tuwien.qse.sepm.service.impl.Aggregator;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoSet;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.layout.BorderPane;
+
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
+import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.glyphfont.FontAwesome;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -46,6 +58,7 @@ public class OrganizerImpl implements Organizer {
     @Autowired private PhotoService photoService;
 
     @FXML private BorderPane root;
+
     @FXML private FilterGroup<Rating> ratingFilter;
     @FXML private FilterGroup<Tag> tagFilter;
     @FXML private FilterGroup<Photographer> photographerFilter;
@@ -58,8 +71,6 @@ public class OrganizerImpl implements Organizer {
     @FXML private Node folderTabContent;
 
     @FXML private TreeView<String> folderTree;
-    @FXML private ChoiceBox<Path> directoryChoiceBox;
-    @FXML private Button deleteFolderButton;
 
     private final PhotoSet allPhotos = new PhotoSet();
     private final PhotoSet acceptedPhotos = new PhotoSet();
@@ -95,23 +106,15 @@ public class OrganizerImpl implements Organizer {
     }
 
     @FXML private void initialize() {
+
+        initializeFilesTree();
+
         folderTree.setOnMouseClicked(event -> handleFolderChange());
 
         listTabContent.visibleProperty().bind(listTab.selectedProperty());
         folderTabContent.visibleProperty().bind(folderTab.selectedProperty());
-        listTab.setOnAction(event -> {
-            listTab.setSelected(true);
-            folderTab.setSelected(false);
-            usedFilter = photoFilter;
-            handleFilterChange();
-        });
-        folderTab.setOnAction(event -> {
-            listTab.setSelected(false);
-            folderTab.setSelected(true);
-            usedFilter = new PhotoPathFilter();
-            buildTreeView();
-            handleFilterChange();
-        });
+        listTab.setOnAction(event -> filterViewClicked());
+        folderTab.setOnAction(event -> folderViewClicked());
 
         ratingFilter.setOnUpdate(this::handleRatingsChange);
         tagFilter.setOnUpdate(this::handleCategoriesChange);
@@ -128,18 +131,69 @@ public class OrganizerImpl implements Organizer {
         clusterService.subscribePlaceChanged((p) -> refreshPlaces());
         photographerService.subscribeChanged((p) -> refreshPhotographers());
         photoService.subscribeCreate(this::handlePhotoAdded);
-
-        deleteFolderButton.setOnAction(event -> handleDeleteDirectory());
     }
 
-    @Override public void setWorldMapPlace(Place place) {
+    @Override public void setWorldMapPlace(Place place){
         placeFilter.excludeAll();
         placeFilter.include(place);
         handlePlacesChange();
     }
 
-    private void handleDeleteDirectory() {
-        Path directory = directoryChoiceBox.getSelectionModel().getSelectedItem();
+    private void initializeFilesTree() {
+        folderTree.setOnMouseClicked(event -> handleFolderChange());
+        folderTree.setCellFactory(treeView -> {
+            HBox hbox = new HBox();
+            hbox.setMaxWidth(200);
+            hbox.setPrefWidth(200);
+            hbox.setSpacing(7);
+
+            FontAwesomeIconView openFolderIcon = new FontAwesomeIconView(
+                    FontAwesomeIcon.FOLDER_OPEN_ALT);
+            openFolderIcon.setTranslateY(7);
+            FontAwesomeIconView closedFolderIcon = new FontAwesomeIconView(
+                    FontAwesomeIcon.FOLDER_ALT);
+            closedFolderIcon.setTranslateY(7);
+
+            Label dirName = new Label();
+            dirName.setMaxWidth(150);
+
+            FontAwesomeIconView removeIcon = new FontAwesomeIconView(FontAwesomeIcon.REMOVE);
+
+            Tooltip deleteToolTip = new Tooltip();
+            deleteToolTip.setText("Verzeichnis aus Workspace entfernen");
+
+            Button button = new Button(null, removeIcon);
+            button.setTooltip(deleteToolTip);
+            button.setTranslateX(8);
+
+            return new TreeCell<String>() {
+                @Override public void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null) {
+                        setGraphic(null);
+                        setText(null);
+                    } else if (getTreeItem() instanceof FilePathTreeItem) {
+                        hbox.getChildren().clear();
+                        dirName.setText(item);
+                        if (getTreeItem().isExpanded()) {
+                            hbox.getChildren().add(openFolderIcon);
+                        } else {
+                            hbox.getChildren().add(closedFolderIcon);
+                        }
+                        hbox.getChildren().add(dirName);
+                        if (getTreeItem().getParent().equals(folderTree.getRoot())) {
+                            String path = ((FilePathTreeItem) getTreeItem()).getFullPath();
+                            button.setOnAction(event -> handleDeleteDirectory(Paths.get(path)));
+                            hbox.getChildren().add(button);
+                        }
+                        setGraphic(hbox);
+                    }
+                }
+            };
+        });
+    }
+
+    private void handleDeleteDirectory(Path directory) {
         if (directory != null) {
             try {
                 workspaceService.removeDirectory(directory);
@@ -147,25 +201,43 @@ public class OrganizerImpl implements Organizer {
                 LOGGER.error("Could not delete directory");
             }
         }
+        folderViewClicked(); //refresh
+    }
+
+    // This Method let's the User switch to the usedFilter-view
+    private void filterViewClicked() {listTab.setSelected(true);
+        folderTab.setSelected(false);
+        usedFilter = photoFilter;
+        handleFilterChange();
+    }
+
+    // This Method let's the User switch to the folder-view
+    private void folderViewClicked() {
+        listTab.setSelected(false);
+        folderTab.setSelected(true);
+        usedFilter = new PhotoPathFilter();
         buildTreeView();
+        handleFilterChange();
     }
 
     private void buildTreeView() {
         Collection<Path> workspaceDirectories;
         try {
             workspaceDirectories = workspaceService.getDirectories();
+            LOGGER.debug("found directories {}", workspaceDirectories);
         } catch (ServiceException ex) {
             workspaceDirectories = new LinkedList<>();
         }
 
         FilePathTreeItem root = new FilePathTreeItem(Paths.get("workspace"));
         root.setExpanded(true);
+
         folderTree.setRoot(root);
         folderTree.setShowRoot(false);
+
         for (Path dirPath : workspaceDirectories) {
             findFiles(dirPath.toFile(), root);
         }
-        directoryChoiceBox.setItems(FXCollections.observableArrayList(workspaceDirectories));
     }
 
     private void findFiles(File dir, FilePathTreeItem parent) {
@@ -416,7 +488,7 @@ public class OrganizerImpl implements Organizer {
         }
 
         for (TreeItem<String> child : node.getChildren()) {
-            FilePathTreeItem item = (FilePathTreeItem)child;
+            FilePathTreeItem item = (FilePathTreeItem) child;
 
             if (isPathAlreadyKnown(directory, item)) {
                 return true;
