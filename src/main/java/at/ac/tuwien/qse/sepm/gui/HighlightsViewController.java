@@ -110,7 +110,7 @@ public class HighlightsViewController {
 
     private void handleJourneySelected(Journey journey) {
         // load photos for the selected journey
-        System.out.println("SELECT JOURNEY");
+
         try {
             JourneyFilter filter = new JourneyFilter();
             filter.getIncludedJourneys().add(journey);
@@ -129,9 +129,7 @@ public class HighlightsViewController {
     private void handlePlaceSelected(Place place) {
 
         List<Place> places = journeyPlaceList.getPlacesForJourney(journeyPlaceList.getSelectedJourney());
-        for(Place p: places){
-            System.out.println(p.toString());
-        }
+
         if(place==null){
             // draw journey for all places
             wikipediaInfoPane.setVisible(false);
@@ -155,7 +153,7 @@ public class HighlightsViewController {
         //handlePlaceSelected(null);
         handlePlaceSelected(null);
         handleJourneySelected(journey);
-        System.out.println(journeyPlaceList.getPlacesForJourney(journey).toString());
+
 
 
     }

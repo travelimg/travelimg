@@ -52,11 +52,12 @@ public class FullscreenWindow extends StackPane {
     public FullscreenWindow(PhotoService photoService){
         FXMLLoadHelper.load(this, this, FullscreenWindow.class, "view/FullScreenDialog.fxml");
         this.photoService=photoService;
+
     }
 
     @FXML
     private void initialize() {
-
+        LOGGER.debug("INITIALIZED");
         this.stage = new Stage();
         this.scene = new Scene(this);
 
