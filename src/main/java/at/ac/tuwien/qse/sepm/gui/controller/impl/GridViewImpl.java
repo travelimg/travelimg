@@ -127,8 +127,7 @@ public class GridViewImpl implements GridView {
             // TODO: should we update filter
 
             // lookup photo by path
-            Optional<Photo> photo = grid.getPhotos().stream()
-                    .filter(p -> p.getFile().equals(file))
+            Optional<Photo> photo = grid.getPhotos().stream().filter(p -> p.getFile().equals(file))
                     .findFirst();
 
             if (photo.isPresent())
@@ -179,7 +178,7 @@ public class GridViewImpl implements GridView {
     private class MenuListener implements Menu.Listener {
 
         @Override public void onPresent(Menu sender) {
-            FullscreenWindow fullscreen = new FullscreenWindow();
+            FullscreenWindow fullscreen = new FullscreenWindow(photoService);
 
             Set<Photo> selected = grid.getSelected();
 
