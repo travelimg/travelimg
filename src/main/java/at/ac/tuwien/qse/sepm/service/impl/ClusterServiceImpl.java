@@ -155,6 +155,26 @@ public class ClusterServiceImpl implements ClusterService {
         return places;
     }
 
+    @Override public Place getPlaceNearTo(Photo photo) throws ServiceException{
+
+        final double latitude = photo.getData().getLatitude();
+        final double longitude = photo.getData().getLongitude();
+
+        List<Place> places = getAllPlaces();
+        double epsilon = 1.0;
+        Optional<Place> place = places.stream().filter(p -> Math.abs(p.getLatitude() - latitude)
+                    < epsilon)   // find an existing place in lateral proximity
+                    .filter(p -> Math.abs(p.getLongitude() - longitude)
+                            < epsilon) // find an existing place in longitudinal proximity
+                    .findFirst();
+
+        if (!place.isPresent()) {
+            // if we don't already know a place in close proximity look it up
+            return lookupPlace(photo);
+        }
+        return place.get();
+    }
+
     private Place lookupPlace(Photo photo) throws ServiceException {
         Place place = geoService
                 .getPlaceByGeoData(photo.getData().getLatitude(), photo.getData().getLongitude());
