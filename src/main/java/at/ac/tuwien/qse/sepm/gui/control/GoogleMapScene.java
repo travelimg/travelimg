@@ -1,6 +1,10 @@
 package at.ac.tuwien.qse.sepm.gui.control;
 
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
+import javafx.event.Event;
+import javafx.event.EventDispatchChain;
+import javafx.event.EventDispatcher;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
@@ -30,6 +34,8 @@ public class GoogleMapScene extends VBox {
 
     public GoogleMapScene() {
         webView = new WebView();
+        EventDispatcher originalDispatcher = webView.getEventDispatcher();
+        webView.setEventDispatcher(new CustomizedEventDispatcher(originalDispatcher));
         webEngine = webView.getEngine();
 
         webEngine.setOnAlert(this::handleAlert);
@@ -38,6 +44,7 @@ public class GoogleMapScene extends VBox {
         getChildren().add(webView);
         
         setVgrow(webView, Priority.ALWAYS);
+
     }
 
     public void setOnLoaded(Runnable callback) {
@@ -147,6 +154,28 @@ public class GoogleMapScene extends VBox {
             } catch (NumberFormatException ex) {
                 LOGGER.debug("Failed to parse click event from map");
             }
+        }
+    }
+
+    private class CustomizedEventDispatcher implements EventDispatcher {
+
+        private EventDispatcher originalDispatcher;
+
+        public CustomizedEventDispatcher(EventDispatcher originalDispatcher) {
+            this.originalDispatcher = originalDispatcher;
+        }
+
+        @Override
+        public Event dispatchEvent(Event event, EventDispatchChain tail) {
+            if (event instanceof MouseEvent) {
+                MouseEvent mouseEvent = (MouseEvent) event;
+                //workaround to deny doubleclicks. this is
+                // a jdk related bug: https://bugs.openjdk.java.net/browse/JDK-8092649
+                if(mouseEvent.getClickCount()>=2){
+                    mouseEvent.consume();
+                }
+            }
+            return originalDispatcher.dispatchEvent(event, tail);
         }
     }
 }
