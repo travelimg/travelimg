@@ -26,9 +26,9 @@
         </VBox>
     </center>
     <bottom>
-        <HBox styleClass="navbar">
+        <HBox styleClass="slide-bottom-bar">
             <children>
-                <Button fx:id="addButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                <Button fx:id="addButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
                     <graphic>
                         <FontAwesomeIconView glyphName="PLUS"/>
                     </graphic>
@@ -36,7 +36,7 @@
                         <Tooltip text="Diashow hinzufügen"/>
                     </tooltip>
                 </Button>
-                <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
                     <graphic>
                         <FontAwesomeIconView glyphName="TRASH"/>
                     </graphic>
@@ -44,7 +44,7 @@
                         <Tooltip text="Diashow entfernen"/>
                     </tooltip>
                 </Button>
-                <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
                     <graphic>
                         <FontAwesomeIconView glyphName="EXPAND"/>
                     </graphic>
