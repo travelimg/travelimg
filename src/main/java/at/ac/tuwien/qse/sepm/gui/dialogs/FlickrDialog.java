@@ -3,6 +3,7 @@ package at.ac.tuwien.qse.sepm.gui.dialogs;
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
+import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.gui.FullscreenWindow;
 import at.ac.tuwien.qse.sepm.gui.control.*;
@@ -36,8 +37,6 @@ import javafx.scene.layout.FlowPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -297,17 +296,20 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                             p.getData().setTags(tags);
                             try {
                                 p.getData().setPhotographer(new Photographer(2,"Flickr"));
-                                if (journeysComboBox.getSelectedJourney().getId() != -1) {
-                                    //TODO cluster photos and add them to journey
+                                Journey selectedJourney = journeysComboBox.getSelectedJourney();
+                                if (selectedJourney.getId() != -1) {
+                                    p.getData().setJourney(selectedJourney);
+                                    Place place = clusterService.getPlaceNearTo(p);
+                                    p.getData().setPlace(place);
                                 }
-                                exifService.setMetaData(p);
+                                logger.debug("Photo {} ready for the exifservice.",p);
+                                //TODO
+                                /*exifService.setMetaData(p);
                                 ioHandler.copyFromTo(Paths.get(p.getPath()),
                                         Paths.get(System.getProperty("user.home"),
                                                 "travelimg/" + flickrPhoto.getId() + "."
-                                                        + flickrPhoto.getOriginalFormat()));
+                                                        + flickrPhoto.getOriginalFormat()));*/
                             } catch (ServiceException e) {
-                                logger.debug(e);
-                            } catch (IOException e) {
                                 logger.debug(e);
                             }
                         }
