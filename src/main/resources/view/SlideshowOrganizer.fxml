@@ -19,6 +19,7 @@
                         <Label>Slideshow Titel</Label>
                         <TextField fx:id="slideshowNameTextField"/>
                     </VBox>
+                    <Label>Dauer zwischen Folien</Label>
                     <RadioButton fx:id="shortDurationButton" mnemonicParsing="false" text="5 Sekunden" />
                     <RadioButton fx:id="mediumDurationButton" mnemonicParsing="false" text="15 Sekunden" />
                     <RadioButton fx:id="longDurationButton" mnemonicParsing="false" text="30 Sekunden" />
@@ -36,7 +37,7 @@
                     <Tooltip text="Diashow hinzufügen"/>
                 </tooltip>
             </Button>
-            <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
+            <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action" disable="true">
                 <graphic>
                     <FontAwesomeIconView glyphName="TRASH"/>
                 </graphic>
@@ -44,7 +45,7 @@
                     <Tooltip text="Diashow entfernen"/>
                 </tooltip>
             </Button>
-            <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
+            <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action" disable="true">
                 <graphic>
                     <FontAwesomeIconView glyphName="EXPAND"/>
                 </graphic>

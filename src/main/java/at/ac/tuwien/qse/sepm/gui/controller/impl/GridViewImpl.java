@@ -141,7 +141,26 @@ public class GridViewImpl implements GridView {
 
     private void handleUpdatePhotos(List<Photo> photos) {
         LOGGER.debug("updating {} photos in grid", photos.size());
-        Platform.runLater(() -> grid.updatePhotos(photos));
+        Platform.runLater(() -> {
+            grid.updatePhotos(photos);
+
+            // update the inspector selection
+            Collection<Photo> entities = inspector.getEntities();
+
+            boolean updated = false;
+            for (Photo photo : photos) {
+                Optional<Photo> entity = entities.stream().filter(p -> p.getId().equals(photo.getId())).findFirst();
+                if (entity.isPresent()) {
+                    entities.remove(entity.get());
+                    entities.add(photo);
+                    updated = true;
+                }
+            }
+
+            if (updated) {
+                inspector.setEntities(entities);
+            }
+        });
     }
 
     private void handleDeletePhotos(List<Path> paths) {
@@ -229,6 +248,7 @@ public class GridViewImpl implements GridView {
     private class MenuListener implements Menu.Listener {
 
         @Override public void onPresent(Menu sender) {
+
             FullscreenWindow fullscreen = new FullscreenWindow(photoService);
 
             Set<Photo> selected = grid.getSelected();
@@ -237,7 +257,7 @@ public class GridViewImpl implements GridView {
             if (selected.size() == 1) {
                 start = selected.iterator().next();
             }
-            
+
             fullscreen.present(grid.getPhotos(), start);
         }
 

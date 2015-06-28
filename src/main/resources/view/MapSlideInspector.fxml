@@ -6,8 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<InspectorPane fx:id="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
-               xmlns:fx="http://javafx.com/fxml/1"
+<InspectorPane fx:id="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
                fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.MapSlideInspectorImpl">
     <VBox spacing="16">
         <Button fx:id="deleteButton" styleClass="action">

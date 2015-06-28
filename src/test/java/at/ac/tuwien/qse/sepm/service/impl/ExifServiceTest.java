@@ -18,9 +18,9 @@ public class ExifServiceTest extends ServiceTestBase {
 
     private static final String sourceDir = Paths.get(
             System.getProperty("os.name").contains("indow") ?
-                    ImportTest.class.getClassLoader().getResource("db/testimages").getPath()
+                    ExifServiceTest.class.getClassLoader().getResource("db/testimages").getPath()
                             .substring(1) :
-                    ImportTest.class.getClassLoader().getResource("db/testimages").getPath())
+                    ExifServiceTest.class.getClassLoader().getResource("db/testimages").getPath())
             .toString() + "/";
 
     private Exif expected = new Exif(6, "1/410", 2.8, 5.7, 125, true, "'RICOH'", "'Caplio Pro G3'", 1577.0);
