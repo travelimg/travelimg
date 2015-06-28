@@ -83,14 +83,13 @@ public class PresentationWindow extends StackPane {
                 if (keyEvent.getCode() == KeyCode.ESCAPE) {
                     close();
                 }
-                if (keyEvent.getCode()==KeyCode.SPACE) {
-                    if(!isPaused) {
+                if (keyEvent.getCode() == KeyCode.SPACE) {
+                    if (!isPaused) {
                         timeline.pause();
-                        isPaused=true;
-                    }
-                    else {
+                        isPaused = true;
+                    } else {
                         timeline.play();
-                        isPaused=false;
+                        isPaused = false;
                     }
                 }
             }
