@@ -110,6 +110,7 @@ public class HighlightsViewController {
 
     private void handleJourneySelected(Journey journey) {
         // load photos for the selected journey
+        System.out.println("SELECT JOURNEY");
         try {
             JourneyFilter filter = new JourneyFilter();
             filter.getIncludedJourneys().add(journey);
@@ -126,6 +127,7 @@ public class HighlightsViewController {
     }
 
     private void handlePlaceSelected(Place place) {
+
         List<Place> places = journeyPlaceList.getPlacesForJourney(journeyPlaceList.getSelectedJourney());
         for(Place p: places){
             System.out.println(p.toString());
@@ -149,10 +151,11 @@ public class HighlightsViewController {
     }
 
     private void handleAllPlacesSelected(Journey journey) {
+        LOGGER.debug("All places selected");
         //handlePlaceSelected(null);
         handlePlaceSelected(null);
 
-        LOGGER.debug("All places selected");
+
     }
 
     private Map<Place, List<Photo>> getPhotosByPlace(Set<Place> places, List<Photo> photos) {
