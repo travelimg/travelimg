@@ -18,10 +18,12 @@
                 </HBox>
             </graphic>
         </Button>
-        <Label>Beschriftung</Label>
-        <TextField fx:id="captionField"/>
+        <VBox>
+            <Label>Beschriftung</Label>
+            <TextField fx:id="captionField"/>
+        </VBox>
 
-        <GoogleMapScene fx:id="map" maxHeight="300" minHeight="100" maxWidth="300" minWidth="100"/>
+        <GoogleMapScene fx:id="map" prefHeight="300" maxWidth="248"/>
 
         <ToggleButton fx:id="chooseLocationButton" styleClass="action">
             <graphic>

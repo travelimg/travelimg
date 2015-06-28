@@ -19,8 +19,10 @@
                 </HBox>
             </graphic>
         </Button>
-        <Label>Beschriftung</Label>
-        <TextField fx:id="captionField"/>
+        <VBox>
+            <Label>Beschriftung</Label>
+            <TextField fx:id="captionField"/>
+        </VBox>
         <ColorPicker fx:id="colorPicker"/>
     </VBox>
 </InspectorPane>
