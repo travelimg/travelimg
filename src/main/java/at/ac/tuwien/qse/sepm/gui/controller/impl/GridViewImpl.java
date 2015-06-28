@@ -141,7 +141,26 @@ public class GridViewImpl implements GridView {
 
     private void handleUpdatePhotos(List<Photo> photos) {
         LOGGER.debug("updating {} photos in grid", photos.size());
-        Platform.runLater(() -> grid.updatePhotos(photos));
+        Platform.runLater(() -> {
+            grid.updatePhotos(photos);
+
+            // update the inspector selection
+            Collection<Photo> entities = inspector.getEntities();
+
+            boolean updated = false;
+            for (Photo photo : photos) {
+                Optional<Photo> entity = entities.stream().filter(p -> p.getId().equals(photo.getId())).findFirst();
+                if (entity.isPresent()) {
+                    entities.remove(entity.get());
+                    entities.add(photo);
+                    updated = true;
+                }
+            }
+
+            if (updated) {
+                inspector.setEntities(entities);
+            }
+        });
     }
 
     private void handleDeletePhotos(List<Path> paths) {
