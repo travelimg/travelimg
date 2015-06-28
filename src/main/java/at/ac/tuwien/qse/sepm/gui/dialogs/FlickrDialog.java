@@ -10,10 +10,7 @@ import at.ac.tuwien.qse.sepm.gui.control.*;
 import at.ac.tuwien.qse.sepm.gui.controller.Menu;
 import at.ac.tuwien.qse.sepm.gui.controller.impl.MenuImpl;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
-import at.ac.tuwien.qse.sepm.service.ClusterService;
-import at.ac.tuwien.qse.sepm.service.ExifService;
-import at.ac.tuwien.qse.sepm.service.FlickrService;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import at.ac.tuwien.qse.sepm.util.IOHandler;
@@ -68,6 +65,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     private FlickrService flickrService;
     private ExifService exifService;
     private ClusterService clusterService;
+    private PhotoService photoService;
     private IOHandler ioHandler;
     private LatLong actualLatLong;
     private ArrayList<Photo> photos = new ArrayList<>();
@@ -76,15 +74,16 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     private boolean newSearch = false;
 
     public FlickrDialog(Node origin, String title, FlickrService flickrService, ExifService exifService,
-            ClusterService clusterService, IOHandler ioHandler,
+            ClusterService clusterService, PhotoService photoService, IOHandler ioHandler,
             Menu sender) {
         super(origin, title);
         FXMLLoadHelper.load(this, this, FlickrDialog.class, "view/FlickrDialog.fxml");
 
         this.flickrService = flickrService;
         this.exifService = exifService;
-        this.ioHandler = ioHandler;
         this.clusterService = clusterService;
+        this.photoService = photoService;
+        this.ioHandler = ioHandler;
         this.sender = sender;
 
         flickrService.reset();
@@ -237,7 +236,8 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     }
 
     private void handleFullscreen() {
-        FullscreenWindow fullscreenWindow = new FullscreenWindow();
+        FullscreenWindow fullscreenWindow = new FullscreenWindow(photoService);
+        fullscreenWindow.setElementsVisible(false);
         fullscreenWindow.present(photos, photos.get(0));
     }
 

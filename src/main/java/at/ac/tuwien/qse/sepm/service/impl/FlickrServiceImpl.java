@@ -40,7 +40,7 @@ public class FlickrServiceImpl implements FlickrService {
     private int i = 0;
 
     @Autowired
-    private ExecutorService executorService;
+    private ExecutorService executor;
 
     public FlickrServiceImpl() {
         this.flickr = new Flickr(API_KEY, SECRET, new REST());
@@ -53,7 +53,7 @@ public class FlickrServiceImpl implements FlickrService {
         if (i == 0) {
             searcher = new AsyncSearcher(tags, latitude, longitude, useGeoData, callback, progressCallback, errorHandler);
         }
-        executorService.submit(searcher);
+        executor.submit(searcher);
         return searcher;
     }
 
@@ -61,7 +61,7 @@ public class FlickrServiceImpl implements FlickrService {
     public Cancelable downloadPhotos(List<Photo> photos, Consumer<Photo> callback, Consumer<Double> progressCallback,
             ErrorHandler<ServiceException> errorHandler){
         AsyncDownloader downloader = new AsyncDownloader(photos, callback, progressCallback, errorHandler);
-        executorService.submit(downloader);
+        executor.submit(downloader);
         return downloader;
     }
 
