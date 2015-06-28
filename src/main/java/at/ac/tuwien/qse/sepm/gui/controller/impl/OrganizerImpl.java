@@ -169,7 +169,7 @@ public class OrganizerImpl implements Organizer {
             return new TreeCell<String>() {
                 @Override public void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
-                    if (item == null) {
+                    if (item == null || empty) {
                         setGraphic(null);
                         setText(null);
                     } else if (getTreeItem() instanceof FilePathTreeItem) {
@@ -181,7 +181,9 @@ public class OrganizerImpl implements Organizer {
                             hbox.getChildren().add(closedFolderIcon);
                         }
                         hbox.getChildren().add(dirName);
-                        if (getTreeItem().getParent().equals(folderTree.getRoot())) {
+                        TreeItem<String> treeItem = getTreeItem();
+                        TreeItem<String> parent = treeItem != null ? treeItem.getParent() : null;
+                        if (parent != null && parent.equals(folderTree.getRoot())) {
                             String path = ((FilePathTreeItem) getTreeItem()).getFullPath();
                             button.setOnAction(event -> handleDeleteDirectory(Paths.get(path)));
                             hbox.getChildren().add(button);
