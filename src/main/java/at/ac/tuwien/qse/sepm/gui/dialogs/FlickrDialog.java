@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.gui.dialogs;
 
 import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.gui.FullscreenWindow;
 import at.ac.tuwien.qse.sepm.gui.control.*;
@@ -295,7 +296,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                             }
                             p.getData().setTags(tags);
                             try {
-                                //TODO set 'flickr' as the photographer.
+                                p.getData().setPhotographer(new Photographer(2,"Flickr"));
                                 if (journeysComboBox.getSelectedJourney().getId() != -1) {
                                     //TODO cluster photos and add them to journey
                                 }
