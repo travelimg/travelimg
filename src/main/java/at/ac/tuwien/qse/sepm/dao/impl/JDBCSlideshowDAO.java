@@ -114,11 +114,6 @@ public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
     }
 
     @Override
-    public Slideshow getById(int id) throws DAOException {
-        return null;
-    }
-
-    @Override
     public List<Slideshow> readAll() throws DAOException {
         logger.debug("retrieving all slideshows");
 
