@@ -142,6 +142,9 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
                 longDurationButton.setSelected(true);
             }
         }
+
+        presentButton.setDisable(selected == null);
+        deleteButton.setDisable(selected == null);
     }
 
     private void handleAddSlideshow(Event event) {
