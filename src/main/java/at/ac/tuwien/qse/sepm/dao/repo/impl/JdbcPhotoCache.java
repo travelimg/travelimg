@@ -13,7 +13,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Photo cache that stores photo instances in an SQLite database.
@@ -40,7 +39,7 @@ public class JdbcPhotoCache implements PhotoCache {
     @Autowired
     private PhotographerDAO photographerDAO;
 
-    @Override public void put(Photo photo) throws DAOException {
+    @Override public synchronized void put(Photo photo) throws DAOException {
         if (photo == null) throw new IllegalArgumentException();
         LOGGER.debug("putting {}", photo);
 
@@ -87,7 +86,7 @@ public class JdbcPhotoCache implements PhotoCache {
         LOGGER.debug("put {}", photo);
     }
 
-    @Override public void remove(Path file) throws DAOException {
+    @Override public synchronized void remove(Path file) throws DAOException {
         if (file == null) throw new IllegalArgumentException();
         LOGGER.debug("removing {}", file);
         if (!contains(file)) {
@@ -104,6 +103,8 @@ public class JdbcPhotoCache implements PhotoCache {
         photoDAO.delete(photo);
         LOGGER.debug("removed {}", file);
     }
+
+
 
     @Override public Collection<Path> index() throws DAOException {
         LOGGER.debug("indexing");
@@ -165,6 +166,7 @@ public class JdbcPhotoCache implements PhotoCache {
                 LOGGER.debug("reading journey {}", journey);
                 journey = journeyDAO.getByName(journey.getName());
                 LOGGER.debug("read journey {}", journey);
+
                 return journey;
             } catch (DAOException ex) {
                 try {

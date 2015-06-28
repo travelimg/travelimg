@@ -9,11 +9,13 @@ import at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import at.ac.tuwien.qse.sepm.service.WorkspaceService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
@@ -32,10 +34,16 @@ public class PhotoServiceImpl implements PhotoService {
     private PollingFileWatcher watcher;
     @Autowired
     private AsyncPhotoRepository photoRepository;
+    @Autowired
+    private WorkspaceService workspaceService;
+    @Autowired
+    private ScheduledExecutorService scheduler;
 
     private Listener listener;
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> watcherSchedule = null;
+
+    private final ExecutorService operationExecutor = Executors.newFixedThreadPool(4);
+
 
     @Autowired
     private void initializeListeners(AsyncPhotoRepository repository) {
@@ -45,15 +53,29 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public void synchronize() {
+    public void initializeRepository() {
         LOGGER.debug("Synchronizing repository");
+
+        watcher.getExtensions().add("jpeg");
+        watcher.getExtensions().add("jpg");
+        watcher.getExtensions().add("JPEG");
+        watcher.getExtensions().add("JPG");
 
         // schedule the update in a separate thread with a little delay
         scheduler.schedule(this::synchronizeAndSchedule, 2, TimeUnit.SECONDS);
     }
 
     private void synchronizeAndSchedule() {
+        // register saved directories
+        try {
+            workspaceService.getDirectories().forEach(watcher::register);
+        } catch (ServiceException ex) {
+            LOGGER.error("Failed to register directory", ex);
+        }
+
+        // refresh the watcher and synchronize the repository
         watcher.refresh();
+        photoRepository.clearQueue();
         try {
             photoRepository.synchronize();
         } catch (DAOException ex) {
@@ -68,8 +90,7 @@ public class PhotoServiceImpl implements PhotoService {
         if (watcherSchedule != null) {
             watcherSchedule.cancel(true);
         }
-        scheduler.shutdown();
-        listener.close();
+        operationExecutor.shutdown();
     }
 
     @Override
@@ -165,12 +186,6 @@ public class PhotoServiceImpl implements PhotoService {
             AsyncPhotoRepository.AsyncListener,
             PhotoRepository.Listener {
 
-        private final ExecutorService executor = Executors.newFixedThreadPool(1);
-
-        public void close() {
-            executor.shutdown();
-        }
-
         @Override public void onError(PhotoRepository repository, DAOException error) {
             LOGGER.error("repository error {}", error);
         }
@@ -183,7 +198,7 @@ public class PhotoServiceImpl implements PhotoService {
         @Override public void onQueue(AsyncPhotoRepository repository, Operation operation) {
             LOGGER.info("queued {}", operation);
             LOGGER.info("queue length {}", repository.getQueue().size());
-            executor.execute(repository::completeNext);
+            operationExecutor.execute(repository::completeNext);
         }
     }
 }

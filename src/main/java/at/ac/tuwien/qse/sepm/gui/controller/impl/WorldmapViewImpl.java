@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 
 import at.ac.tuwien.qse.sepm.entities.Place;
+import at.ac.tuwien.qse.sepm.gui.MainControllerImpl;
 import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
@@ -15,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Optional;
 
 public class WorldmapViewImpl implements WorldmapView {
 
@@ -26,16 +28,20 @@ public class WorldmapViewImpl implements WorldmapView {
     private GoogleMapScene mapScene;
 
     @Autowired
-
     private ClusterService clusterService;
+    @Autowired
+    private MainControllerImpl mainController;
+
+    private List<Place> places;
 
     @FXML
     private void initialize() {
+
         mapScene.setOnLoaded(this::showPlaces);
+        mapScene.setMarkerClickCallback(this::handleMarkerClicked);
     }
 
     private void showPlaces() {
-        List<Place> places;
         try {
             places = clusterService.getAllPlaces();
         } catch (ServiceException ex) {
@@ -43,7 +49,22 @@ public class WorldmapViewImpl implements WorldmapView {
             return;
         }
 
-        places.forEach((place) -> mapScene.addMarker(new LatLong(place.getLatitude(), place.getLongitude())));
+        places.forEach(place -> {
+            String caption = String.format("%s, %s", place.getCity(), place.getCountry());
+            mapScene.addMarker(new LatLong(place.getLatitude(), place.getLongitude()), caption);
+        });
         mapScene.fitToMarkers();
+    }
+
+    private void handleMarkerClicked(LatLong position) {
+        // find place whose marker was selected
+        Optional<Place> selected = places.stream()
+                .filter(p -> Math.abs(p.getLatitude() - position.getLatitude()) < 0.9)
+                .filter(p -> Math.abs(p.getLongitude() - position.getLongitude()) < 0.9)
+                .findFirst();
+
+        if (selected.isPresent()) {
+            mainController.showGridWithPlace(selected.get());
+        }
     }
 }

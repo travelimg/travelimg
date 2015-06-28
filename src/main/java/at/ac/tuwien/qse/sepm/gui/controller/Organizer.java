@@ -1,5 +1,10 @@
 package at.ac.tuwien.qse.sepm.gui.controller;
 
+import at.ac.tuwien.qse.sepm.entities.Journey;
+import at.ac.tuwien.qse.sepm.entities.Photographer;
+import at.ac.tuwien.qse.sepm.entities.Place;
+import at.ac.tuwien.qse.sepm.entities.Tag;
+import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 
 /**
@@ -21,4 +26,10 @@ public interface Organizer {
      * @return current filter
      */
     PhotoFilter getUsedFilter();
+
+    /**
+     * only check Place pl
+     * @param pl the Place
+     */
+    void setWorldMapPlace(Place pl);
 }

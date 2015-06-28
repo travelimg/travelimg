@@ -17,7 +17,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseDragEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -26,7 +25,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.awt.event.MouseEvent;
 import java.util.List;
 
 
@@ -42,18 +40,14 @@ public class FullscreenWindow extends StackPane {
     @FXML
     private Button bt_previous, bt_next;
     @FXML
-    private VBox ratingContainer;
-    @FXML
-    private HBox bottomBar;
+    private RatingPicker ratingPicker;
 
     @Autowired
     private PhotoService photoService;
-    private Tooltip tooltip = new Tooltip();
     private List<Photo> photos;
     private SmartImage image = new SmartImage(ImageSize.ORIGINAL);
 
     private int activeIndex = 0;
-    private RatingPicker ratingPicker = new RatingPicker();
 
     public FullscreenWindow(PhotoService photoService){
         FXMLLoadHelper.load(this, this, FullscreenWindow.class, "view/FullScreenDialog.fxml");
@@ -96,10 +90,6 @@ public class FullscreenWindow extends StackPane {
         });
 
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
-        ratingContainer.getChildren().add(ratingPicker);
-        tooltip.setText(" press [1] for a BAD-Raiting /b press [2] git a NEUTRAL-Raiting /b press [3] git a GOOD-Raiting");
-
-        StackPane.setAlignment(bottomBar, Pos.BOTTOM_CENTER);
     }
 
 
@@ -177,6 +167,7 @@ public class FullscreenWindow extends StackPane {
     }
 
     private void loadImage() {
+
         if (photos.size() == 0 || photos.size() <= activeIndex) {
             // out of bounds
             return;
