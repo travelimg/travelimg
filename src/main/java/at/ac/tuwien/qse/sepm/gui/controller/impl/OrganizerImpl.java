@@ -6,6 +6,7 @@ import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
+import at.ac.tuwien.qse.sepm.gui.util.BufferedBatchOperation;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
@@ -13,34 +14,27 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Paint;
-import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.controlsfx.glyphfont.FontAwesome;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.xml.ws.Service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Controller for organizer view which is used for browsing photos by month.
@@ -76,6 +70,15 @@ public class OrganizerImpl implements Organizer {
     private PhotoFilter photoFilter = usedFilter;
     private PhotoFilter folderFilter = new PhotoPathFilter();
     private Runnable filterChangeCallback;
+    private boolean suppressChangeEvent = false;
+
+    private BufferedBatchOperation<Photo> addOperation;
+
+    @Autowired public void setScheduler(ScheduledExecutorService scheduler) {
+        addOperation = new BufferedBatchOperation<>(photos -> {
+            Platform.runLater(() -> {/*TODO*/});
+        }, scheduler);
+    }
 
     @Override public void setFilterChangeAction(Runnable callback) {
         LOGGER.debug("setting usedFilter change action");
@@ -221,7 +224,6 @@ public class OrganizerImpl implements Organizer {
                 LOGGER.error("Could not delete directory");
             }
         }
-        folderViewClicked(); //refresh
     }
 
     @Override public void setWorldMapPlace(Place place) {
@@ -246,7 +248,8 @@ public class OrganizerImpl implements Organizer {
         LOGGER.debug("Switch view");
 
         filterContainer.getChildren().clear();
-        buildTreeView();
+        filterContainer.getChildren().addAll(buttonBox, filesTree);
+        VBox.setVgrow(filesTree, Priority.ALWAYS);
 
         usedFilter = new PhotoPathFilter();
         handleFilterChange();
@@ -298,7 +301,7 @@ public class OrganizerImpl implements Organizer {
 
     private void handleFilterChange() {
         LOGGER.debug("usedFilter changed");
-        if (filterChangeCallback == null)
+        if (filterChangeCallback == null || suppressChangeEvent)
             return;
         filterChangeCallback.run();
     }
@@ -450,68 +453,61 @@ public class OrganizerImpl implements Organizer {
 
     private void refreshCategoryList(Tag tag) {
         Platform.runLater(() -> {
-            inspectorController.refresh();
-            categoryListView.setValues(getAllCategories());
-            categoryListView.checkAll();
+            suppressChangeEvent = true;
+            List<Tag> all = categoryListView.getValues();
+            all.add(tag);
+            List<Tag> checked = categoryListView.getChecked();
+            checked.add(tag);
+            categoryListView.setValues(all);
+            categoryListView.checkAll(checked);
             LOGGER.info("refresh tag-filterlist");
+            suppressChangeEvent = false;
         });
     }
 
     private void refreshJourneyList(Journey journey) {
         Platform.runLater(() -> {
-            journeyListView.setValues(getAllJourneys());
-            journeyListView.checkAll();
+            suppressChangeEvent = true;
+            List<Journey> all = journeyListView.getValues();
+            all.add(journey);
+            List<Journey> checked = journeyListView.getChecked();
+            checked.add(journey);
+            journeyListView.setValues(all);
+            journeyListView.checkAll(checked);
             LOGGER.info("refresh journey-filterlist");
+            suppressChangeEvent = false;
         });
     }
 
     private void refreshPlaceList(Place place) {
         Platform.runLater(() -> {
-            placeListView.setValues(getAllPlaces());
-            placeListView.checkAll();
+            suppressChangeEvent = true;
+            List<Place> all = placeListView.getValues();
+            all.add(place);
+            List<Place> checked = placeListView.getChecked();
+            checked.add(place);
+            placeListView.setValues(all);
+            placeListView.checkAll(checked);
             LOGGER.info("refresh place-filterlist");
+            suppressChangeEvent = false;
         });
     }
 
     private void refreshPhotographerList(Photographer photographer) {
         Platform.runLater(() -> {
-            photographerListView.setValues(getAllPhotographers());
-            photographerListView.checkAll();
+            suppressChangeEvent = true;
+            List<Photographer> all = photographerListView.getValues();
+            all.add(photographer);
+            List<Photographer> checked = photographerListView.getChecked();
+            checked.add(photographer);
+            photographerListView.setValues(all);
+            photographerListView.checkAll(checked);
             LOGGER.info("refresh photographer-filterlist");
+            suppressChangeEvent = false;
         });
     }
 
     private void handlePhotoAdded(Photo photo) {
-        Platform.runLater(() -> {
-            FilePathTreeItem root = (FilePathTreeItem) filesTree.getRoot();
-
-            Path directory = photo.getFile().getParent();
-
-            if (isPathAlreadyKnown(directory, root)) {
-                return;
-            }
-
-            buildTreeView();
-        });
-    }
-
-    private boolean isPathAlreadyKnown(Path directory, FilePathTreeItem node) {
-        if (node == null) {
-            return false;
-        }
-
-        if (node.getFullPath().equals(directory.toString())) {
-            return true;
-        }
-
-        for (TreeItem<String> child : node.getChildren()) {
-            FilePathTreeItem item = (FilePathTreeItem) child;
-
-            if (isPathAlreadyKnown(directory, item)) {
-                return true;
-            }
-        }
-
-        return false;
+        addOperation.add(photo);
     }
 }
