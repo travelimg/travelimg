@@ -58,11 +58,6 @@ public class FilePathTreeItem extends TreeItem<String> {
         this.addEventHandler(TreeItem.<Object>branchExpandedEvent(), new EventHandler() {
             @Override public void handle(Event e) {
                 FilePathTreeItem source = (FilePathTreeItem) e.getSource();
-                if (source.isDirectory() && source.isExpanded()) {
-                    FontAwesomeIconView icon = new FontAwesomeIconView(
-                            FontAwesomeIcon.FOLDER_OPEN_ALT);
-                    source.setGraphic(icon);
-                }
                 try {
                     if (source.getChildren().isEmpty()) {
                         Path path = Paths.get(source.getFullPath());
@@ -81,16 +76,5 @@ public class FilePathTreeItem extends TreeItem<String> {
                 }
             }
         });
-
-        this.addEventHandler(TreeItem.<Object>branchCollapsedEvent(), new EventHandler() {
-            @Override public void handle(Event e) {
-                FilePathTreeItem source = (FilePathTreeItem) e.getSource();
-                if (source.isDirectory() && !source.isExpanded()) {
-                    FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.FOLDER_ALT);
-                    source.setGraphic(icon);
-                }
-            }
-        });
-
     }
 }

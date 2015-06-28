@@ -51,6 +51,7 @@ public class GridViewImpl implements GridView {
     private IOHandler ioHandler;
     @Autowired
     private ExifService exifService;
+
     @Autowired
     private WorkspaceService workspaceService;
 
@@ -227,7 +228,7 @@ public class GridViewImpl implements GridView {
     private class MenuListener implements Menu.Listener {
 
         @Override public void onPresent(Menu sender) {
-            FullscreenWindow fullscreen = new FullscreenWindow();
+            FullscreenWindow fullscreen = new FullscreenWindow(photoService);
 
             Set<Photo> selected = grid.getSelected();
 

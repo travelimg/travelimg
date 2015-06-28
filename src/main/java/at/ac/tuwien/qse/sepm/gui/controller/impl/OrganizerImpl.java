@@ -6,12 +6,14 @@ import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
+import at.ac.tuwien.qse.sepm.gui.util.BufferedBatchOperation;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -19,22 +21,20 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Paint;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.xml.ws.Service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Controller for organizer view which is used for browsing photos by month.
@@ -65,14 +65,20 @@ public class OrganizerImpl implements Organizer {
     @FXML private TreeView<String> filesTree;
 
     private HBox buttonBox;
-    private HBox directoryDeleteMenu = new HBox();
     private ChoiceBox<Path> directoryChoiceBox = new ChoiceBox<>();
-    private Button deleteBtn = new Button("-");
     private PhotoFilter usedFilter = new PhotoFilter();
     private PhotoFilter photoFilter = usedFilter;
     private PhotoFilter folderFilter = new PhotoPathFilter();
     private Runnable filterChangeCallback;
     private boolean suppressChangeEvent = false;
+
+    private BufferedBatchOperation<Photo> addOperation;
+
+    @Autowired public void setScheduler(ScheduledExecutorService scheduler) {
+        addOperation = new BufferedBatchOperation<>(photos -> {
+            Platform.runLater(() -> {/*TODO*/});
+        }, scheduler);
+    }
 
     @Override public void setFilterChangeAction(Runnable callback) {
         LOGGER.debug("setting usedFilter change action");
@@ -84,8 +90,8 @@ public class OrganizerImpl implements Organizer {
     }
 
     @FXML private void initialize() {
-        filesTree = new TreeView<>();
-        filesTree.setOnMouseClicked(event -> handleFolderChange());
+        initializeFilesTree();
+
         folderViewButton.setOnAction(event -> folderViewClicked());
         filterViewButton.setOnAction(event -> filterViewClicked());
 
@@ -148,16 +154,69 @@ public class OrganizerImpl implements Organizer {
         photographerService.subscribeChanged(this::refreshPhotographerList);
 
         photoService.subscribeCreate(this::handlePhotoAdded);
+    }
 
-        deleteBtn.setOnAction(event -> handleDeleteDirectory());
-        directoryDeleteMenu.getChildren().add(directoryChoiceBox);
-        directoryDeleteMenu.getChildren().add(deleteBtn);
+    private void initializeFilesTree() {
+        filesTree = new TreeView<>();
+        filesTree.setOnMouseClicked(event -> handleFolderChange());
+        filesTree.setCellFactory(treeView -> {
+            HBox hbox = new HBox();
+            hbox.setMaxWidth(200);
+            hbox.setPrefWidth(200);
+            hbox.setSpacing(7);
 
-        buildTreeView();
+            FontAwesomeIconView openFolderIcon = new FontAwesomeIconView(
+                    FontAwesomeIcon.FOLDER_OPEN_ALT);
+            openFolderIcon.setTranslateY(7);
+            FontAwesomeIconView closedFolderIcon = new FontAwesomeIconView(
+                    FontAwesomeIcon.FOLDER_ALT);
+            closedFolderIcon.setTranslateY(7);
+
+            Label dirName = new Label();
+            dirName.setMaxWidth(150);
+
+            FontAwesomeIconView removeIcon = new FontAwesomeIconView(FontAwesomeIcon.REMOVE);
+
+            Tooltip deleteToolTip = new Tooltip();
+            deleteToolTip.setText("Verzeichnis aus Workspace entfernen");
+
+            Button button = new Button(null, removeIcon);
+            button.setTooltip(deleteToolTip);
+            button.setTranslateX(8);
+
+            return new TreeCell<String>() {
+                @Override public void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null) {
+                        setGraphic(null);
+                        setText(null);
+                    } else if (getTreeItem() instanceof FilePathTreeItem) {
+                        hbox.getChildren().clear();
+                        dirName.setText(item);
+                        if (getTreeItem().isExpanded()) {
+                            hbox.getChildren().add(openFolderIcon);
+                        } else {
+                            hbox.getChildren().add(closedFolderIcon);
+                        }
+                        hbox.getChildren().add(dirName);
+                        if (getTreeItem().getParent().equals(filesTree.getRoot())) {
+                            String path = ((FilePathTreeItem) getTreeItem()).getFullPath();
+                            button.setOnAction(event -> handleDeleteDirectory(Paths.get(path)));
+                            hbox.getChildren().add(button);
+                        }
+                        setGraphic(hbox);
+                    }
+                }
+            };
+        });
     }
 
     private void handleDeleteDirectory() {
         Path directory = directoryChoiceBox.getSelectionModel().getSelectedItem();
+        handleDeleteDirectory(directory);
+    }
+
+    private void handleDeleteDirectory(Path directory) {
         if (directory != null) {
             try {
                 workspaceService.removeDirectory(directory);
@@ -165,12 +224,9 @@ public class OrganizerImpl implements Organizer {
                 LOGGER.error("Could not delete directory");
             }
         }
-
-        buildTreeView();
     }
 
-    @Override
-    public void setWorldMapPlace(Place place) {
+    @Override public void setWorldMapPlace(Place place) {
         placeListView.uncheckAll();
         placeListView.check(place);
 
@@ -192,7 +248,7 @@ public class OrganizerImpl implements Organizer {
         LOGGER.debug("Switch view");
 
         filterContainer.getChildren().clear();
-        filterContainer.getChildren().addAll(buttonBox, directoryDeleteMenu, filesTree);
+        filterContainer.getChildren().addAll(buttonBox, filesTree);
         VBox.setVgrow(filesTree, Priority.ALWAYS);
 
         usedFilter = new PhotoPathFilter();
@@ -217,6 +273,8 @@ public class OrganizerImpl implements Organizer {
         }
 
         directoryChoiceBox.setItems(FXCollections.observableArrayList(workspaceDirectories));
+        filterContainer.getChildren().addAll(buttonBox, filesTree);
+        VBox.setVgrow(filesTree, Priority.ALWAYS);
     }
 
     private void findFiles(File dir, FilePathTreeItem parent) {
@@ -449,38 +507,7 @@ public class OrganizerImpl implements Organizer {
         });
     }
 
-
     private void handlePhotoAdded(Photo photo) {
-        Platform.runLater(() -> {
-            FilePathTreeItem root = (FilePathTreeItem) filesTree.getRoot();
-
-            Path directory = photo.getFile().getParent();
-
-            if (isPathAlreadyKnown(directory, root)) {
-                return;
-            }
-
-            buildTreeView();
-        });
-    }
-
-    private boolean isPathAlreadyKnown(Path directory, FilePathTreeItem node) {
-        if (node == null) {
-            return false;
-        }
-
-        if (node.getFullPath().equals(directory.toString())) {
-            return true;
-        }
-
-        for (TreeItem<String> child : node.getChildren()) {
-            FilePathTreeItem item = (FilePathTreeItem)child;
-
-            if (isPathAlreadyKnown(directory, item)) {
-                return true;
-            }
-        }
-
-        return false;
+        addOperation.add(photo);
     }
 }

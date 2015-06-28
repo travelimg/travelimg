@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -39,25 +40,23 @@ public class FullscreenWindow extends StackPane {
     @FXML
     private Button bt_previous, bt_next;
     @FXML
-    private VBox ratingContainer;
-    @FXML
-    private HBox bottomBar;
+    private RatingPicker ratingPicker;
 
     @Autowired
-    private PhotoService photoservice;
-
+    private PhotoService photoService;
     private List<Photo> photos;
     private SmartImage image = new SmartImage(ImageSize.ORIGINAL);
 
     private int activeIndex = 0;
-    private RatingPicker ratingPicker = new RatingPicker();
 
-    public FullscreenWindow() {
+    public FullscreenWindow(PhotoService photoService){
         FXMLLoadHelper.load(this, this, FullscreenWindow.class, "view/FullScreenDialog.fxml");
+        this.photoService=photoService;
     }
 
     @FXML
     private void initialize() {
+
         this.stage = new Stage();
         this.scene = new Scene(this);
 
@@ -78,14 +77,22 @@ public class FullscreenWindow extends StackPane {
                 if (keyEvent.getCode() == KeyCode.ESCAPE) {
                     stage.close();
                 }
+                if (keyEvent.getCode() == KeyCode.DIGIT1) {
+                    handleRatingChange(Rating.BAD);
+                }
+                if (keyEvent.getCode() == KeyCode.DIGIT2) {
+                    handleRatingChange(Rating.NEUTRAL);
+                }
+                if (keyEvent.getCode() == KeyCode.DIGIT3) {
+                    handleRatingChange(Rating.GOOD);
+                }
             }
         });
 
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
-        ratingContainer.getChildren().add(ratingPicker);
-
-        StackPane.setAlignment(bottomBar, Pos.BOTTOM_CENTER);
     }
+
+
 
     public void present(List<Photo> photos, Photo initial) {
         this.photos = photos;
@@ -115,7 +122,9 @@ public class FullscreenWindow extends StackPane {
             photos.get(activeIndex).getData().setRating(newRating);
 
             try {
-                photoservice.editPhoto(photos.get(activeIndex));
+                System.out.println(photos.get(activeIndex).toString());
+
+                photoService.editPhoto(photos.get(activeIndex));
             } catch (ServiceException ex) {
                 LOGGER.error("Failed saving photo rating.", ex);
                 LOGGER.debug("Resetting rating from {} to {}.", newRating, oldRating);
@@ -158,6 +167,7 @@ public class FullscreenWindow extends StackPane {
     }
 
     private void loadImage() {
+
         if (photos.size() == 0 || photos.size() <= activeIndex) {
             // out of bounds
             return;
