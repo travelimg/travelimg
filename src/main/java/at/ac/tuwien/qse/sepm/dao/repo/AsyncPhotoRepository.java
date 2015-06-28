@@ -27,11 +27,6 @@ public interface AsyncPhotoRepository extends PhotoRepository {
     void synchronize() throws DAOException;
 
     /**
-     * Drop all contents currently in the queue.
-     */
-    void clearQueue();
-
-    /**
      * Completes the next operation in the queue. Does nothing if the queue is empty.
      *
      * Notifies the listeners that the operation either was completed or that an error occurred.

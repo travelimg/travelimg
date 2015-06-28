@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Async repository that uses a cache as intermediate storage.
@@ -27,8 +26,7 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
     private final Collection<Listener> listeners = new LinkedList<>();
     private final Collection<AsyncListener> asyncListeners = new LinkedList<>();
 
-    private final Queue<OperationBase> queue = new ConcurrentLinkedQueue<>();
-    private final Object writeLock = new Object();
+    private final Queue<OperationBase> queue = new LinkedList<>();
 
     public CachedPhotoRepository(PhotoRepository repository, PhotoCache cache) {
         this.repository = repository;
@@ -73,24 +71,13 @@ public class CachedPhotoRepository implements AsyncPhotoRepository {
         }
     }
 
-    @Override public void clearQueue() {
-        queue.clear();
-    }
-
     @Override public boolean completeNext() {
         if (queue.isEmpty()) return false;
         OperationBase operation = queue.poll();
         LOGGER.debug("completing next operation {}", operation);
 
         try {
-
-            if (operation.getKind() != Operation.Kind.READ) {
-                synchronized (writeLock) {
-                    operation.perform();
-                }
-            } else {
-                operation.perform();
-            }
+            operation.perform();
             LOGGER.debug("successfully performed operation {}", operation);
             notifyOperationComplete(operation);
         } catch (DAOException ex) {

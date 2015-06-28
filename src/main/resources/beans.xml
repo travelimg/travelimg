@@ -30,11 +30,6 @@
         <constructor-arg value="1"></constructor-arg>
     </bean>
 
-    <bean id="scheduler" class="java.util.concurrent.Executors" factory-method="newScheduledThreadPool"
-          destroy-method="shutdown">
-        <constructor-arg value="2"></constructor-arg>
-    </bean>
-
     <bean id="ioHandler" class="at.ac.tuwien.qse.sepm.util.DefaultIOHandler"></bean>
 
     <!-- DAO beans -->
@@ -62,6 +57,7 @@
     </bean>
 
     <!-- Service beans -->
+    <bean id="importService" class="at.ac.tuwien.qse.sepm.service.impl.ImportServiceImpl"></bean>
     <bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl" destroy-method="close"></bean>
     <bean id="synchronizationService" class="at.ac.tuwien.qse.sepm.service.impl.SynchronizationServiceImpl"></bean>
     <bean id="dropboxService" class="at.ac.tuwien.qse.sepm.service.impl.DropboxServiceImpl"></bean>
