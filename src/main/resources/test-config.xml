@@ -24,6 +24,11 @@
         <constructor-arg value="1"></constructor-arg>
     </bean>
 
+    <bean id="scheduler" class="java.util.concurrent.Executors" factory-method="newScheduledThreadPool"
+          destroy-method="shutdown">
+        <constructor-arg value="2"></constructor-arg>
+    </bean>
+
     <bean id="ioHandler" class="at.ac.tuwien.qse.sepm.util.TestIOHandler"></bean>
 
     <!-- DAO beans -->
