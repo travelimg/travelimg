@@ -36,18 +36,6 @@ public class PollingFileWatcher implements FileWatcher {
         this.fileManager = fileManager;
     }
 
-    public static PollingFileWatcher forImageDirectory(String directory) {
-        PollingFileWatcher watcher = new PollingFileWatcher();
-
-        watcher.register(Paths.get(directory));
-        watcher.getExtensions().add("jpeg");
-        watcher.getExtensions().add("jpg");
-        watcher.getExtensions().add("JPEG");
-        watcher.getExtensions().add("JPG");
-
-        return watcher;
-    }
-
     /**
      * Get the a modifiable set of file extensions recognized by this watcher. Only if a file ends
      * with a period and one of these extensions will it trigger notifications.
@@ -63,7 +51,6 @@ public class PollingFileWatcher implements FileWatcher {
     }
 
     @Override public Collection<Path> index() {
-        refresh();
         return new HashSet<>(watched);
     }
 
@@ -197,5 +184,9 @@ public class PollingFileWatcher implements FileWatcher {
             }
         }
         return false;
+    }
+
+    public Collection<Path> getDirectories() {
+        return directories;
     }
 }

@@ -35,6 +35,7 @@
     <!-- DAO beans -->
     <bean id="photoTagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotoTagDAO"></bean>
     <bean id="photographerDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPhotographerDAO"></bean>
+    <bean id="directoryPathDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCDirectoryPathDAO"></bean>
     <bean id="tagDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCTagDAO"></bean>
     <bean id="journeyDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCJourneyDAO"></bean>
     <bean id="placeDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCPlaceDAO"></bean>
@@ -43,9 +44,7 @@
     <bean id="slideshowDAO" class="at.ac.tuwien.qse.sepm.dao.impl.JDBCSlideshowDAO"></bean>
 
     <!-- DAO repository beans -->
-    <bean id="watcher" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher" factory-method="forImageDirectory">
-        <constructor-arg value="${user.home}/travelimg"></constructor-arg>
-    </bean>
+    <bean id="watcher" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PollingFileWatcher"/>
     <bean id="serializer" class="at.ac.tuwien.qse.sepm.dao.repo.impl.JpegSerializer"></bean>
     <bean id="photoRepository" class="at.ac.tuwien.qse.sepm.dao.repo.impl.PhotoFileRepository">
         <constructor-arg ref="watcher"></constructor-arg>
@@ -69,6 +68,7 @@
     <bean id="clusterService" class="at.ac.tuwien.qse.sepm.service.impl.ClusterServiceImpl"></bean>
     <bean id="flickrService" class="at.ac.tuwien.qse.sepm.service.impl.FlickrServiceImpl" destroy-method="close"></bean>
     <bean id="wikipediaService" class="at.ac.tuwien.qse.sepm.service.impl.WikipediaServiceImpl"></bean>
+    <bean id="workspaceService" class="at.ac.tuwien.qse.sepm.service.impl.WorkspaceServiceImpl"></bean>
     <bean id="slideService" class="at.ac.tuwien.qse.sepm.service.impl.SlideServiceImpl"></bean>
     <bean id="slideshowService" class="at.ac.tuwien.qse.sepm.service.impl.SlideshowServiceImpl"></bean>
 
@@ -86,4 +86,5 @@
     <bean id="statusIndicatorController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.StatusIndicatorImpl"></bean>
     <bean id="highlightsViewController" class="at.ac.tuwien.qse.sepm.gui.HighlightsViewController"></bean>
     <bean id="mainController" class="at.ac.tuwien.qse.sepm.gui.MainControllerImpl"></bean>
+
 </beans>

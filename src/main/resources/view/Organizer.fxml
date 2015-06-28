@@ -33,6 +33,10 @@
             <ScrollPane hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
                 <StackPane>
                     <VBox fx:id="folderTabContent" visible="false" managed="false">
+                        <HBox>
+                            <ChoiceBox fx:id="directoryChoiceBox"/>
+                            <Button fx:id="deleteFolderButton" text="-"/>
+                        </HBox>
                         <TreeView fx:id="folderTree"/>
                     </VBox>
                     <VBox fx:id="listTabContent" spacing="2">

@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.BorderPane?>
-<?import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid?>
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root"
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.HBox?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root"
             stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8"
             fx:controller="at.ac.tuwien.qse.sepm.gui.controller.GridView">
 
-    <left>
-        <fx:include source="/view/Organizer.fxml"></fx:include>
-    </left>
-    <right>
-        <fx:include source="/view/Inspector.fxml"></fx:include>
-    </right>
-    <bottom>
-        <fx:include source="/view/Menu.fxml"/>
-    </bottom>
-</BorderPane>
+    <BorderPane fx:id="content">
+        <left>
+            <fx:include source="/view/Organizer.fxml"></fx:include>
+        </left>
+        <right>
+            <fx:include source="/view/Inspector.fxml"></fx:include>
+        </right>
+        <bottom>
+            <fx:include source="/view/Menu.fxml"/>
+        </bottom>
+    </BorderPane>
+    <VBox fx:id="folderDropTarget" styleClass="folder-drop-target" visible="false">
+        <FontAwesomeIconView glyphName="FOLDER_ALT" glyphSize="100"/>
+        <Label text="Ordner ablegen um ihn hinzuzufügen"/>
+    </VBox>
+</StackPane>

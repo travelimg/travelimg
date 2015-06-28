@@ -65,9 +65,10 @@ public interface PhotoService {
     void subscribeDelete(Consumer<Path> callback);
 
     /**
-     * Synchronize the photo repository asynchronously in the background and start watching for changes to the watched files.
+     * Setup the repository to watch the currently managed image directories and synchronize with changes
+     * from the file system.
      *
      * Should only be called once on startup.
      */
-    void synchronize();
+    void initializeRepository();
 }

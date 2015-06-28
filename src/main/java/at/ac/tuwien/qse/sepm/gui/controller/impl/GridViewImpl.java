@@ -11,14 +11,17 @@ import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.util.IOHandler;
 import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.Node;
+import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -50,22 +53,30 @@ public class GridViewImpl implements GridView {
     @Autowired
     private ExifService exifService;
 
+    @Autowired
+    private WorkspaceService workspaceService;
+
     @FXML
-    private BorderPane root;
+    private StackPane root;
+
+    @FXML
+    private BorderPane content;
+
+    @FXML
+    private Node folderDropTarget;
 
     private PaginatedImageGrid grid;
     private boolean disableReload = false;
-    private boolean treeViewActive = false;
 
     @FXML
     private void initialize() {
         LOGGER.debug("initializing");
 
         this.grid = new PaginatedImageGrid(menu);
-        root.setCenter(grid);
+        content.setCenter(grid);
         menu.addListener(new MenuListener());
         organizer.setFilterChangeAction(this::handleFilterChange);
-        root.setCenter(grid);
+        content.setCenter(grid);
 
         // Selected photos are shown in the inspector.
         grid.setSelectionChangeAction(inspector::setEntities);
@@ -96,6 +107,19 @@ public class GridViewImpl implements GridView {
         photoService.subscribeCreate(this::handlePhotoCreated);
         photoService.subscribeUpdate(this::handlePhotoUpdated);
         photoService.subscribeDelete(this::handlePhotoDeleted);
+
+        root.setOnDragEntered(this::handleDragEntered);
+        root.setOnDragOver(this::handleDragOver);
+        root.setOnDragDropped(this::handleDragDropped);
+        root.setOnDragExited(this::handleDragExited);
+
+        try {
+            if (workspaceService.getDirectories().isEmpty()) {
+                folderDropTarget.setVisible(true);
+            }
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Laden der Bildordner", "");
+        }
     }
 
     private void handleImportError(Throwable error) {
@@ -152,10 +176,46 @@ public class GridViewImpl implements GridView {
         }
     }
 
+    private void handleDragEntered(DragEvent event) {
+        LOGGER.debug("drag entered");
+        folderDropTarget.setVisible(true);
+        event.consume();
+    }
+
+    private void handleDragOver(DragEvent event) {
+        event.acceptTransferModes(TransferMode.LINK);
+        event.consume();
+    }
+
+    private void handleDragDropped(DragEvent event) {
+        LOGGER.debug("drag dropped");
+
+        Dragboard dragboard = event.getDragboard();
+        boolean success = dragboard.hasFiles();
+        if (success) {
+            dragboard.getFiles().forEach(f -> LOGGER.debug("dropped file {}", f));
+            for (File file : dragboard.getFiles()) {
+                try {
+                    workspaceService.addDirectory(file.toPath());
+                } catch (ServiceException ex) {
+                    LOGGER.error("Couldn't add directory {}");
+                }
+            }
+        }
+        event.setDropCompleted(success);
+        event.consume();
+    }
+
+    private void handleDragExited(DragEvent event) {
+        LOGGER.debug("drag exited");
+        folderDropTarget.setVisible(false);
+        event.consume();
+    }
+
     private class MenuListener implements Menu.Listener {
 
         @Override public void onPresent(Menu sender) {
-            FullscreenWindow fullscreen = new FullscreenWindow();
+            FullscreenWindow fullscreen = new FullscreenWindow(photoService);
 
             Set<Photo> selected = grid.getSelected();
 

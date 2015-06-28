@@ -39,6 +39,33 @@ public class MapSlide extends Slide {
         this.zoomLevel = zoomLevel;
     }
 
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        MapSlide mapSlide = (MapSlide) o;
+
+        if (Double.compare(mapSlide.latitude, latitude) != 0)
+            return false;
+        if (Double.compare(mapSlide.longitude, longitude) != 0)
+            return false;
+        return zoomLevel == mapSlide.zoomLevel;
+
+    }
+
+    @Override public int hashCode() {
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(latitude);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(longitude);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + zoomLevel;
+        return result;
+    }
+
     @Override public String toString() {
         return "MapSlide{" +
                 "latitude=" + latitude +

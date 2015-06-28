@@ -7,17 +7,16 @@ import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
-import at.ac.tuwien.qse.sepm.service.ClusterService;
-import at.ac.tuwien.qse.sepm.service.PhotographerService;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
-import at.ac.tuwien.qse.sepm.service.TagService;
+import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +27,10 @@ import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Controller for organizer view which is used for browsing photos by month.
@@ -41,6 +44,8 @@ public class OrganizerImpl implements Organizer {
     @Autowired private ClusterService clusterService;
     @Autowired private Inspector<Photo> inspectorController;
     @Autowired private TagService tagService;
+    @Autowired private WorkspaceService workspaceService;
+    @Autowired private PhotoService photoService;
 
     @FXML private BorderPane root;
     @FXML private FilterGroup<Rating> ratingFilter;
@@ -55,6 +60,8 @@ public class OrganizerImpl implements Organizer {
     @FXML private Node folderTabContent;
 
     @FXML private TreeView<String> folderTree;
+    @FXML private ChoiceBox<Path> directoryChoiceBox;
+    @FXML private Button deleteFolderButton;
 
     private PhotoFilter usedFilter = new PhotoFilter();
     private PhotoFilter photoFilter = usedFilter;
@@ -84,10 +91,8 @@ public class OrganizerImpl implements Organizer {
         folderTab.setOnAction(event -> {
             listTab.setSelected(false);
             folderTab.setSelected(true);
-
-            Path rootDirectories = Paths.get(System.getProperty("user.home"), "/travelimg");
-            findFiles(rootDirectories.toFile(), null);
             usedFilter = new PhotoPathFilter();
+            buildTreeView();
             handleFilterChange();
         });
 
@@ -105,12 +110,45 @@ public class OrganizerImpl implements Organizer {
         clusterService.subscribeJourneyChanged((p) -> refreshJourneys());
         clusterService.subscribePlaceChanged((p) -> refreshPlaces());
         photographerService.subscribeChanged((p) -> refreshPhotographers());
+        photoService.subscribeCreate(this::handlePhotoAdded);
+
+        deleteFolderButton.setOnAction(event -> handleDeleteDirectory());
     }
 
     @Override public void setWorldMapPlace(Place place) {
         placeFilter.excludeAll();
         placeFilter.include(place);
         handlePlacesChange();
+    }
+
+    private void handleDeleteDirectory() {
+        Path directory = directoryChoiceBox.getSelectionModel().getSelectedItem();
+        if (directory != null) {
+            try {
+                workspaceService.removeDirectory(directory);
+            } catch (ServiceException ex) {
+                LOGGER.error("Could not delete directory");
+            }
+        }
+        buildTreeView();
+    }
+
+    private void buildTreeView() {
+        Collection<Path> workspaceDirectories;
+        try {
+            workspaceDirectories = workspaceService.getDirectories();
+        } catch (ServiceException ex) {
+            workspaceDirectories = new LinkedList<>();
+        }
+
+        FilePathTreeItem root = new FilePathTreeItem(Paths.get("workspace"));
+        root.setExpanded(true);
+        folderTree.setRoot(root);
+        folderTree.setShowRoot(false);
+        for (Path dirPath : workspaceDirectories) {
+            findFiles(dirPath.toFile(), root);
+        }
+        directoryChoiceBox.setItems(FXCollections.observableArrayList(workspaceDirectories));
     }
 
     private void findFiles(File dir, FilePathTreeItem parent) {
@@ -310,7 +348,8 @@ public class OrganizerImpl implements Organizer {
     }
     private void refreshPhotographers() {
         refreshFilter(photographerFilter, getAllPhotographers(), value -> {
-            if (value == null) return "Kein Fotograf";
+            if (value == null)
+                return "Kein Fotograf";
             return value.getName();
         });
     }
@@ -330,5 +369,40 @@ public class OrganizerImpl implements Organizer {
             });
             LOGGER.info("refreshing filter");
         });
+    }
+
+
+    private void handlePhotoAdded(Photo photo) {
+        Platform.runLater(() -> {
+            FilePathTreeItem root = (FilePathTreeItem) folderTree.getRoot();
+
+            Path directory = photo.getFile().getParent();
+
+            if (isPathAlreadyKnown(directory, root)) {
+                return;
+            }
+
+            buildTreeView();
+        });
+    }
+
+    private boolean isPathAlreadyKnown(Path directory, FilePathTreeItem node) {
+        if (node == null) {
+            return false;
+        }
+
+        if (node.getFullPath().equals(directory.toString())) {
+            return true;
+        }
+
+        for (TreeItem<String> child : node.getChildren()) {
+            FilePathTreeItem item = (FilePathTreeItem)child;
+
+            if (isPathAlreadyKnown(directory, item)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

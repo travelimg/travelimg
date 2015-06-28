@@ -1,16 +1,24 @@
 package at.ac.tuwien.qse.sepm.gui;
 
+import at.ac.tuwien.qse.sepm.entities.PhotoSlide;
 import at.ac.tuwien.qse.sepm.entities.Slide;
 import at.ac.tuwien.qse.sepm.entities.Slideshow;
 import at.ac.tuwien.qse.sepm.gui.slide.SlideView;
+import at.ac.tuwien.qse.sepm.gui.util.ColorUtils;
+import at.ac.tuwien.qse.sepm.gui.util.ImageCache;
+import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.StackPane;
@@ -31,6 +39,7 @@ public class PresentationWindow extends StackPane {
 
     private Stage stage;
     private Scene scene;
+    private boolean isPaused=false;
 
     private int activeIndex = 0;
     private Timeline timeline = null;
@@ -56,16 +65,29 @@ public class PresentationWindow extends StackPane {
         Background background = new Background(new BackgroundFill(Paint.valueOf("black"), null, null));
         setBackground(background);
 
-        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+        setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(final KeyEvent keyEvent) {
                 if (keyEvent.getCode() == KeyCode.RIGHT) {
                     showNextSlide(null);
                 }
                 if (keyEvent.getCode() == KeyCode.LEFT) {
+                    logger.debug("Button pressed");
                     showPrevSlide(null);
+
+
                 }
                 if (keyEvent.getCode() == KeyCode.ESCAPE) {
                     close();
+                }
+                if (keyEvent.getCode()==KeyCode.SPACE) {
+                    if(!isPaused) {
+                        timeline.pause();
+                        isPaused=true;
+                    }
+                    else {
+                        timeline.play();
+                        isPaused=false;
+                    }
                 }
             }
         });
@@ -99,9 +121,9 @@ public class PresentationWindow extends StackPane {
     private void showNextSlide(ActionEvent event) {
         if (activeIndex == slideshow.getAllSlides().size() - 1)
             return;
-
         activeIndex = Math.min(slideshow.getAllSlides().size() - 1, activeIndex + 1);
         loadSlide();
+
     }
 
     private Slide getCurrentSlide() {
@@ -112,7 +134,7 @@ public class PresentationWindow extends StackPane {
     }
 
     private void loadSlide() {
-        Collection<Slide> slides = slideshow.getAllSlides();
+        List<Slide> slides = (List<Slide>) slideshow.getAllSlides();
         if (slides.size() == 0 || slides.size() <= activeIndex) {
             // out of bounds
             return;
@@ -121,9 +143,10 @@ public class PresentationWindow extends StackPane {
         int width = (int)Screen.getPrimary().getVisualBounds().getWidth();
         int height = (int)Screen.getPrimary().getVisualBounds().getHeight();
 
-        SlideView slideView = SlideView.of(getCurrentSlide(), width, height);
+        SlideView slideView = SlideView.of(slides.get(activeIndex), width, height);
 
         getChildren().clear();
         getChildren().add(slideView);
+        logger.debug(slides.get(activeIndex));
     }
 }

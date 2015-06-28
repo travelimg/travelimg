@@ -24,4 +24,20 @@ public class PhotoSlide extends Slide {
                 "photo=" + photo +
                 "} " + super.toString();
     }
+
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        PhotoSlide that = (PhotoSlide) o;
+
+        return !(photo != null ? !photo.equals(that.photo) : that.photo != null);
+
+    }
+
+    @Override public int hashCode() {
+        return photo != null ? photo.hashCode() : 0;
+    }
 }

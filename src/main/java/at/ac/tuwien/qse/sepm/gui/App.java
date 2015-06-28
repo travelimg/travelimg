@@ -6,9 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -45,7 +43,7 @@ public class App extends Application {
         stage.show();
 
         PhotoService photoService = (PhotoService)context.getBean("photoService");
-        photoService.synchronize();
+        photoService.initializeRepository();
     }
 
     @Override
