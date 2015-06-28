@@ -6,9 +6,7 @@ import at.ac.tuwien.qse.sepm.entities.Slideshow;
 
 import java.util.List;
 
-/**
- * Created by mb on 08.06.15.
- */
+
 public interface SlideshowService {
 
     /**
@@ -49,5 +47,12 @@ public interface SlideshowService {
      */
     List<Slideshow> getAllSlideshows() throws ServiceException;
 
+    /**
+     * Add a Photo to a Slideshow
+     * @param photos
+     * @param slideshow
+     * @return
+     * @throws ServiceException
+     */
     List<Slide> addPhotosToSlideshow(List<Photo> photos, Slideshow slideshow) throws ServiceException;
 }

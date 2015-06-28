@@ -77,8 +77,6 @@ public class PresentationWindow extends StackPane {
                 if (keyEvent.getCode() == KeyCode.LEFT) {
                     logger.debug("Button pressed");
                     showPrevSlide(null);
-
-
                 }
                 if (keyEvent.getCode() == KeyCode.ESCAPE) {
                     close();
