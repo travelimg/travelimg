@@ -36,7 +36,7 @@
                         <Tooltip text="Diashow hinzufügen"/>
                     </tooltip>
                 </Button>
-                <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
+                <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action" disable="true">
                     <graphic>
                         <FontAwesomeIconView glyphName="TRASH"/>
                     </graphic>
@@ -44,7 +44,7 @@
                         <Tooltip text="Diashow entfernen"/>
                     </tooltip>
                 </Button>
-                <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
+                <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action" disable="true">
                     <graphic>
                         <FontAwesomeIconView glyphName="EXPAND"/>
                     </graphic>

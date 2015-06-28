@@ -88,7 +88,7 @@ public class SlideshowViewImpl implements SlideshowView {
             slideshows.add(createNewSlideshowPlaceholder()); // re-add placeholder
         });
 
-        slideshowOrganizer.setDeleteAction(slideshows::remove);
+        slideshowOrganizer.setDeleteAction(this::handleDeleteSlideshow);
 
         slideshowOrganizer.setPresentAction(() -> {
             Slideshow selected = slideshowOrganizer.getSelected();
@@ -158,6 +158,16 @@ public class SlideshowViewImpl implements SlideshowView {
             loadAllSlideshows();
             refreshGrid();
         });
+    }
+
+    private void handleDeleteSlideshow(Slideshow slideshow) {
+        slideshows.remove(slideshow);
+
+        try {
+            slideShowService.delete(slideshow);
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Löschen der Diashow", "");
+        }
     }
 
     private Slideshow createNewSlideshowPlaceholder() {
