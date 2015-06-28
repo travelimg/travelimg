@@ -139,7 +139,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             }
         });
         journeysComboBox.bindToFlickrDatePicker(flickrDatePicker);
-        mapScene.setDoubleClickCallback((position) -> dropMarker(position));
+        mapScene.setClickCallback((position) -> dropMarker(position));
         cancelButton.setOnAction(e -> handleLeaveFlickrDialog());
         importButton.setOnAction(e -> handleImport());
         searchButton.setOnAction(e -> handleSearch());
