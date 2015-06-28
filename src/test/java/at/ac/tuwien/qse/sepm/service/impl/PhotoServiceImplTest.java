@@ -51,12 +51,7 @@ public class PhotoServiceImplTest extends ServiceTestBase {
             new Photo(5, Paths.get("5.jpg"),
                 new PhotoMetadata(LocalDateTime.of(2015, 3, 4, 0, 0, 0), 12.0, 12.0, Rating.NONE, defaultPhotographer, defaultPlace, null))
     );
-
-    @Test
-    public void todo() {
-        assertThat(true, is(false));
-    }
-
+    
     @Test
     @WithData
     public void test_deletePhotos_persists() throws ServiceException, DAOException {
