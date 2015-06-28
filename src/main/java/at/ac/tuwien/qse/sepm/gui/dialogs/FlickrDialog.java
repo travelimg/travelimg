@@ -23,12 +23,14 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,8 +44,6 @@ import java.util.function.Consumer;
 
 public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photos.Photo>> {
 
-    @FXML
-    private BorderPane borderPane;
     @FXML
     private ProgressIndicator progressIndicator;
     @FXML
