@@ -1188,7 +1188,6 @@
 .date-picker-popup > * > .spinner > .label {
     -fx-text-fill: black;
 }
-
 .date-picker-popup > * > .date-cell {
     -fx-text-fill: black;
 }
@@ -1253,62 +1252,6 @@
     -fx-fill: -tmg-text-bright;
 }
 
-.slide-bottom-bar, .slide-bottom-bar * {
-    -fx-padding: 0;
-    -fx-background-color: -tmg-bg2;
-    -fx-background-radius: 0;
-    -fx-border-radius: 0;
-    -fx-border-width: 0;
-    -fx-background-insets: 0;
-    -fx-border-insets: 0;
-}
-.slide-bottom-bar .action {
-    -fx-padding: 10px 20px;
-}
-.slide-bottom-bar .action:hover {
-    -fx-background-color: -tmg-bg2-light;
-}
-.slide-bottom-bar .action:pressed {
-    -fx-background-color: -tmg-bg2-dark;
-}
-.slide-bottom-bar .action .glyph-icon {
-    -fx-fill: -tmg-text;
-    -glyph-size: 20px;
-}
-.slide-bottom-bar .action:hover .glyph-icon {
-    -fx-fill: -tmg-text-light;
-}
-.slide-bottom-bar .action:pressed .glyph-icon {
-    -fx-fill: -tmg-text-bright;
-}
-.slide-bottom-bar .action:disabled .glyph-icon {
-    -fx-fill: -tmg-text-dark;
-}
-
 #slideshowPropertiesBox {
-    -fx-padding: 10px;
-    -fx-border-width: 3px 0 0 0;
-    -fx-border-inset: 3px;
-    -fx-border-color: -tmg-secondary;
-}
-
-.slide-inspector .delete {
-    -fx-background-color: transparent;
-}
-.slide-inspector .delete .glyph-icon {
-    -glyph-size: 25px;
-    -fx-fill: -tmg-text-light;
-}
-.slide-inspector .map #map {
-    -fx-padding: 20px 0 0 0;
-}
-
-.slide-inspector .marker-icon {
-    -glyph-size: 25px;
-    -fx-fill: -google-map-marker;
-}
-
-#changeCoordinatesButton .glyph-icon {
-    -glyph-size: 25px;
-    -fx-fill: -google-map-marker;
+    -fx-background-color: -tmg-bg1-light;
 }
