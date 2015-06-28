@@ -3,7 +3,7 @@
 <?import at.ac.tuwien.qse.sepm.gui.control.*?>
 <?import javafx.scene.layout.*?>
 <BorderPane fx:id="root" stylesheets="@/view/style.css" xmlns="http://javafx.com/javafx/8"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.HighlightsViewControllerImpl"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.HighlightsViewControllerImpl"
         styleClass="highlights">
     <left>
         <JourneyPlaceList fx:id="journeyPlaceList" prefWidth="240"/>

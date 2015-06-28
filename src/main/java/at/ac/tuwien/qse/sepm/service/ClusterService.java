@@ -1,10 +1,10 @@
 package at.ac.tuwien.qse.sepm.service;
 
 import at.ac.tuwien.qse.sepm.entities.Journey;
+import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
 
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public interface ClusterService {
@@ -63,6 +63,14 @@ public interface ClusterService {
      * @throws ServiceException If cluster-service fails due to database errors.
      */
     List<Place> clusterJourney(Journey journey) throws ServiceException;
+
+    /**
+     * Finds a place near to where the photo was taken.
+     * @param photo
+     * @return the place
+     * @throws ServiceException
+     */
+    Place getPlaceNearTo(Photo photo) throws ServiceException;
 
     /**
      * Subscribe a callback to refresh places

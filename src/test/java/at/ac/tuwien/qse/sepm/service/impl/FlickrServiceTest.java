@@ -1,7 +1,5 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
-import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
 import com.flickr4java.flickr.Flickr;
@@ -14,12 +12,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.nio.file.Paths;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.eq;
 
 public class FlickrServiceTest extends ServiceTestBase {
@@ -48,58 +40,31 @@ public class FlickrServiceTest extends ServiceTestBase {
 
         //spy the flickrService so that we can take control over single calls of methods without touching the rest
         flickrService = Mockito.spy(flickrService);
-        Mockito.doNothing().when(flickrService).downloadPhotoFromFlickr(eq(existingUrl),
-                eq(existingId), eq("format"));
-        Mockito.doThrow(new ServiceException()).when(flickrService).downloadPhotoFromFlickr(
+        Mockito.doNothing().when(flickrService).downloadTempPhoto(eq(existingUrl), eq(existingId),
+                eq("format"));
+        Mockito.doThrow(new ServiceException()).when(flickrService).downloadTempPhoto(
                 eq(nonExistingUrl), Mockito.anyString(), Mockito.anyString());
 
     }
 
     @Test(expected = ServiceException.class)
-    public void testCreatePhotoWithGeoDataIdIsNull() throws ServiceException {
-        flickrService.createPhotoWithGeoData(null, "jpg");
-    }
-
-    @Test(expected = ServiceException.class)
-    public void testCreatePhotoWithGeoDataFormatIsNull() throws ServiceException {
-        flickrService.createPhotoWithGeoData(existingId, null);
-    }
-
-    @Test(expected = ServiceException.class)
-    public void testCreatePhotoWithGeoDataIdNotFoundAtFlickr() throws ServiceException {
-        flickrService.createPhotoWithGeoData(nonExistingId, "jpg");
-    }
-
-    @Test
-    public void testCreatePhotoWithGeoDataSuccess() throws ServiceException {
-        Photo p = flickrService.createPhotoWithGeoData(existingId, "jpg");
-        assertThat(p.getData().getPhotographer().getId(), is(1));
-        assertThat(p.getFile(), is(Paths.get(tmpDir + existingId + ".jpg")));
-        assertThat(p.getData().getRating(), is(Rating.NONE));
-        assertNull(p.getData().getDatetime());
-        assertThat(p.getData().getLatitude(), not(0.0));
-        assertThat(p.getData().getLongitude(), not(0.0));
-        assertThat(p.getData().getPlace().getId(), is(1));
-    }
-
-    @Test(expected = ServiceException.class)
      public void testDownloadPhotoFromFlickrIdIsNull() throws ServiceException {
-        flickrService.downloadPhotoFromFlickr(existingUrl,null,"jpg");
+        flickrService.downloadTempPhoto(existingUrl, null, "jpg");
     }
 
     @Test(expected = ServiceException.class)
     public void testDownloadPhotoFromFlickrIdIsEmpty() throws ServiceException {
-        flickrService.downloadPhotoFromFlickr(existingUrl,"    ","jpg");
+        flickrService.downloadTempPhoto(existingUrl, "    ", "jpg");
     }
 
     @Test(expected = ServiceException.class)
     public void testDownloadPhotoFromFlickrFormatIsNull() throws ServiceException {
-        flickrService.downloadPhotoFromFlickr(existingUrl,existingId,null);
+        flickrService.downloadTempPhoto(existingUrl, existingId, null);
     }
 
     @Test(expected = ServiceException.class)
     public void testDownloadPhotoFromFlickrFormatIsEmpty() throws ServiceException {
-        flickrService.downloadPhotoFromFlickr(existingUrl,existingId,"    ");
+        flickrService.downloadTempPhoto(existingUrl, existingId, "    ");
     }
 
 }

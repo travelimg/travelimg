@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import at.ac.tuwien.qse.sepm.gui.control.FlickrDatePicker?>
+<?import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene?>
+<?import at.ac.tuwien.qse.sepm.gui.control.FlickrJourneysComboBox?>
 <fx:root fx:id="root" styleClass="dialog,import-dialog" stylesheets="@style.css" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <BorderPane>
@@ -14,42 +16,60 @@
             <center>
                 <VBox styleClass="body">
                     <HBox spacing="16">
-                        <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="300" maxWidth="300" vbarPolicy="AS_NEEDED">
+                        <ScrollPane minWidth="500" fx:id="photosScrollpane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefHeight="350" maxHeight="350" maxWidth="300" vbarPolicy="AS_NEEDED">
                             <content>
-                                <FlowPane fx:id="photosFlowPane" hgap="15" maxHeight="440" styleClass="image-grid" vgap="15" style="-fx-background-color: -tmg-bg0">
-                                    <padding>
-                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                                    </padding>
+                                <FlowPane fx:id="photosFlowPane" hgap="15" styleClass="image-grid" vgap="15" style="-fx-background-color: -tmg-bg0">
+
                                 </FlowPane>
                             </content>
                         </ScrollPane>
-                        <VBox spacing="5.0" maxWidth="300" maxHeight="300">
+                        <VBox spacing="5.0" maxWidth="300" maxHeight="350">
                             <children>
-                                <Label text="Doppelklick um Ort zu wählen" />
-                                <GoogleMapScene fx:id="mapScene" maxHeight="200"/>
+                                <Label text="Klick um Ort zu wählen" />
+                                <GoogleMapScene fx:id="mapScene" maxHeight="250"/>
                                 <Label text="Suchbegriffe" />
-                                <ScrollPane hbarPolicy="NEVER" prefHeight="100" style="-fx-background-color: -tmg-bg0">
+                                <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" prefHeight="150" style="-fx-background-color: -tmg-bg0">
                                     <content>
-                                        <FlowPane fx:id="keywordsFlowPane" hgap="10" vgap="10" style="-fx-background-color: -tmg-bg0"/>
+                                        <FlowPane  fx:id="keywordsFlowPane" hgap="10" vgap="5" style="-fx-background-color: -tmg-bg0"/>
                                     </content>
                                 </ScrollPane>
                                 <TextField fx:id="keywordTextField" promptText="Neuer Suchbegriff" />
                             </children>
                         </VBox>
                     </HBox>
-                    <HBox spacing="16.0">
+                    <HBox spacing="285.0">
                         <children>
-                            <Button fx:id="downloadButton" styleClass="btn,primary" text="Fotos herunterladen" />
-                            <HBox fx:id="progress" spacing="2.0" visible="false" alignment="CENTER">
-                                <children>
-                                    <Button fx:id="stopButton" styleClass="btn,stop">
-                                        <graphic>
-                                            <FontAwesomeIconView/>
-                                        </graphic>
-                                    </Button>
-                                    <ProgressBar fx:id="progressBar" progress="0.0" />
-                                </children>
+                            <HBox>
+                                <Button fx:id="searchButton" styleClass="btn,primary">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="SEARCH" />
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Fotos suchen" />
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="fullscreenButton" styleClass="btn,primary" disable="true">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="EXPAND" />
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Fotos ansehen" />
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="resetButton" styleClass="btn,primary">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="UNDO" />
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Zurücksetzen" />
+                                    </tooltip>
+                                </Button>
                             </HBox>
+                            <ProgressIndicator fx:id="progressIndicator" maxHeight="30" maxWidth="30" styleClass="progress" HBox.hgrow="ALWAYS" visible="false">
+                                <tooltip>
+                                    <Tooltip text="Fotos werden gesucht..." />
+                                </tooltip>
+                            </ProgressIndicator>
                         </children>
                     </HBox>
                 </VBox>
@@ -57,7 +77,23 @@
             <bottom>
                 <BorderPane maxWidth="Infinity" styleClass="footer">
                     <left>
-                        <DatePicker fx:id="datePicker" editable="false" />
+                        <HBox spacing="25.0">
+                            <HBox>
+                                <FlickrJourneysComboBox fx:id="journeysComboBox" prefWidth="200" maxWidth="200">
+                                    <tooltip>
+                                        <Tooltip text="Wählen Sie eine Reise für die Fotos aus" />
+                                    </tooltip>
+                                </FlickrJourneysComboBox>
+                                <padding>
+                                    <Insets top="3"></Insets>
+                                </padding>
+                            </HBox>
+                            <FlickrDatePicker fx:id="flickrDatePicker" editable="false">
+                                <tooltip>
+                                    <Tooltip text="Wählen Sie ein Datum für die Fotos aus" />
+                                </tooltip>
+                            </FlickrDatePicker>
+                        </HBox>
                     </left>
                     <right>
                         <HBox maxWidth="Infinity" spacing="8.0" BorderPane.alignment="CENTER_RIGHT">

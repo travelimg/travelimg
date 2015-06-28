@@ -148,16 +148,10 @@ public class JourneyPlaceList extends VBox {
         List<Place> placesOfJourney = placesByJourney.get(selectedJourney.get());
 
         timeline.getChildren().clear();
-        PlaceEntry prev = null;
 
         for (int i = 0; i < placesOfJourney.size(); i++) {
             Place place = placesOfJourney.get(i);
             PlaceEntry current = new PlaceEntry(place);
-
-            current.setPrev(prev);
-            if (prev != null) {
-                prev.setNext(current);
-            }
 
             timeline.getChildren().add(current);
 
@@ -170,8 +164,6 @@ public class JourneyPlaceList extends VBox {
                 vbox.getChildren().add(rect);
                 timeline.getChildren().add(vbox);
             }
-
-            prev = current;
         }
 
         allPlacesButton.setSelected(true);
@@ -199,60 +191,17 @@ public class JourneyPlaceList extends VBox {
     }
 
     private class PlaceEntry extends RadioButton {
-        private Place place;
-        private PlaceEntry prev = null;
-        private PlaceEntry next = null;
 
         public PlaceEntry(Place place) {
             super(place.getCity());
-            this.place = place;
-
             getStyleClass().add("place-radio-button");
 
             setToggleGroup(toggleGroup);
-            setOnAction(this::handleSelected);
-        }
-
-        public void setPrev(PlaceEntry prev) {
-            this.prev = prev;
-        }
-
-        public void setNext(PlaceEntry next) {
-            this.next = next;
-        }
-
-        public void setVisited() {
-            getStyleClass().removeAll("unvisited");
-
-            if (!getStyleClass().contains("visited")) {
-                getStyleClass().add("visited");
-            }
-
-            if (prev != null) {
-                prev.setVisited();
-            }
-        }
-
-        public void setUnvisited() {
-            getStyleClass().removeAll("visited");
-
-            if (!getStyleClass().contains("unvisited")) {
-                getStyleClass().add("unvisited");
-            }
-
-            if (next != null) {
-                next.setUnvisited();
-            }
-        }
-
-        private void handleSelected(Event event) {
-            selectedPlace.set(this.place);
-
-            setVisited();
-
-            if (next != null) {
-                next.setUnvisited();
-            }
+            selectedProperty().addListener(observable -> {
+                if (isSelected()) {
+                    selectedPlace.set(place);
+                }
+            });
         }
     }
 }
