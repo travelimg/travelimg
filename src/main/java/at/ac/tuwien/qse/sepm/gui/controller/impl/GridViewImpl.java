@@ -99,17 +99,20 @@ public class GridViewImpl implements GridView {
         inspector.setUpdateHandler(() -> {
             Collection<Photo> photos = inspector.getEntities();
 
+            List<Photo> toRemove = new ArrayList<>(photos.size());
+            List<Photo> toUpdate = new ArrayList<>(photos.size());
+
             photos.forEach(p -> {
                 if (!organizer.accept(p)) {
                     organizer.remove(p);
-                    deleteOperation.add(p.getFile());
+                    toRemove.add(p);
+                } else {
+                    toUpdate.add(p);
                 }
             });
-            photos.forEach(p -> {
-                if (organizer.accept(p)) {
-                    updateOperation.add(p);
-                }
-            });
+
+            grid.removePhotos(toRemove);
+            grid.updatePhotos(toUpdate);
         });
 
         // Apply the initial filter.
@@ -198,10 +201,9 @@ public class GridViewImpl implements GridView {
     private void reloadImages() {
         organizer.reset();
         try {
-            List<Photo> photos = photoService.getAllPhotos(organizer::accept).stream()
-                    .sorted((p1, p2) -> p2.getData().getDatetime()
-                            .compareTo(p1.getData().getDatetime())).collect(Collectors.toList());
-            grid.setPhotos(photos);
+            grid.setPhotos(photoService.getAllPhotos(organizer::accept).stream()
+                            .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
+                            .collect(Collectors.toList()));
         } catch (ServiceException ex) {
             LOGGER.error("failed loading fotos", ex);
             ErrorDialog.show(root, "Laden von Fotos fehlgeschlagen",
