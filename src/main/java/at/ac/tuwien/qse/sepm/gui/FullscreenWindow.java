@@ -51,7 +51,7 @@ public class FullscreenWindow extends StackPane {
 
     public FullscreenWindow(PhotoService photoService){
         FXMLLoadHelper.load(this, this, FullscreenWindow.class, "view/FullScreenDialog.fxml");
-        this.photoService=photoService;
+        this.photoService = photoService;
     }
 
     @FXML
@@ -78,13 +78,13 @@ public class FullscreenWindow extends StackPane {
                     stage.close();
                 }
                 if (keyEvent.getCode() == KeyCode.DIGIT1) {
-                    handleRatingChange(Rating.BAD);
+                    ratingPicker.setRating(Rating.BAD);
                 }
                 if (keyEvent.getCode() == KeyCode.DIGIT2) {
-                    handleRatingChange(Rating.NEUTRAL);
+                    ratingPicker.setRating(Rating.NEUTRAL);
                 }
                 if (keyEvent.getCode() == KeyCode.DIGIT3) {
-                    handleRatingChange(Rating.GOOD);
+                    ratingPicker.setRating(Rating.GOOD);
                 }
             }
         });
@@ -162,7 +162,9 @@ public class FullscreenWindow extends StackPane {
             return;
         }
 
-        image.setImage(photos.get(activeIndex).getFile());
+        Photo photo = photos.get(activeIndex);
+        ratingPicker.setRating(photo.getData().getRating());
+        image.setImage(photo.getFile());
 
         // handling of images in original size can consume a lot of memory so collect it here
         System.gc();
