@@ -72,6 +72,10 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
         return selectedSlideshowProperty.get();
     }
 
+    public void setSelected(int index) {
+        slideshowList.getSelectionModel().select(index);
+    }
+
     public void setSlideshows(ObservableList<Slideshow> slideshows) {
         // only display real slideshows (no placeholder)
         FilteredList<Slideshow> filtered = slideshows.filtered(s -> s.getId() >= 0);

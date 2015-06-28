@@ -8,9 +8,12 @@ import at.ac.tuwien.qse.sepm.gui.controller.SlideshowView;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.grid.SlideGrid;
 import at.ac.tuwien.qse.sepm.gui.slide.SlideCallback;
+import at.ac.tuwien.qse.sepm.gui.util.BufferedBatchOperation;
+import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
 import at.ac.tuwien.qse.sepm.service.SlideshowService;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -20,7 +23,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 public class SlideshowViewImpl implements SlideshowView {
@@ -34,6 +39,8 @@ public class SlideshowViewImpl implements SlideshowView {
     private SlideService slideService;
     @Autowired
     private SlideshowService slideShowService;
+    @Autowired
+    private PhotoService photoService;
 
     @Autowired
     private SlideInspectorImpl<PhotoSlide> photoSlideInspector;
@@ -58,6 +65,12 @@ public class SlideshowViewImpl implements SlideshowView {
     private SlideshowService slideshowService;
 
     private ObservableList<Slideshow> slideshows = FXCollections.observableArrayList();
+    private BufferedBatchOperation<Path> deletedOperation;
+
+    @Autowired
+    public void setScheduler(ScheduledExecutorService scheduler) {
+        deletedOperation = new BufferedBatchOperation<>(this::handleDeletedPhotos, scheduler);
+    }
 
     @FXML
     private void initialize() {
@@ -78,9 +91,7 @@ public class SlideshowViewImpl implements SlideshowView {
             slideshows.add(createNewSlideshowPlaceholder()); // re-add placeholder
         });
 
-        slideshowOrganizer.setDeleteAction((slideshow) -> {
-            slideshows.remove(slideshow);
-        });
+        slideshowOrganizer.setDeleteAction(slideshows::remove);
 
         slideshowOrganizer.setPresentAction(() -> {
             Slideshow selected = slideshowOrganizer.getSelected();
@@ -91,6 +102,10 @@ public class SlideshowViewImpl implements SlideshowView {
         photoSlideInspector.setUpdateHandler(() -> grid.setSlideshow(slideshowOrganizer.getSelected()));
         mapSlideInspector.setUpdateHandler(() -> grid.setSlideshow(slideshowOrganizer.getSelected()));
         titleSlideInspector.setUpdateHandler(() -> grid.setSlideshow(slideshowOrganizer.getSelected()));
+
+        photoService.subscribeDelete(photo -> {
+            deletedOperation.add(photo);
+        });
     }
 
     @Override
@@ -126,12 +141,24 @@ public class SlideshowViewImpl implements SlideshowView {
 
     private void loadAllSlideshows() {
         try {
+            int selectedIndex = slideshows.indexOf(slideshowOrganizer.getSelected());
             slideshows.clear();
             slideshows.addAll(slideShowService.getAllSlideshows());
             slideshows.add(createNewSlideshowPlaceholder()); // represents a new slideshow which will be created if the user makes use of it
+
+            if (selectedIndex >= 0) {
+                slideshowOrganizer.setSelected(selectedIndex);
+            }
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Laden aller Slideshows", "Fehlermeldung: " + ex.getMessage());
         }
+    }
+
+    private void handleDeletedPhotos(List<Path> paths) {
+        Platform.runLater(() -> {
+            loadAllSlideshows();
+            refreshGrid();
+        });
     }
 
     private Slideshow createNewSlideshowPlaceholder() {
@@ -301,6 +328,4 @@ public class SlideshowViewImpl implements SlideshowView {
             }
         }
     }
-
-
 }
