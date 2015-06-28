@@ -41,14 +41,14 @@ public class FullscreenWindow extends StackPane {
     private Button bt_previous, bt_next;
     @FXML
     private RatingPicker ratingPicker;
-    
+
     private PhotoService photoService;
     private List<Photo> photos;
     private SmartImage image = new SmartImage(ImageSize.ORIGINAL);
 
     private int activeIndex = 0;
 
-    public FullscreenWindow(PhotoService photoService){
+    public FullscreenWindow(PhotoService photoService) {
         FXMLLoadHelper.load(this, this, FullscreenWindow.class, "view/FullScreenDialog.fxml");
         this.photoService = photoService;
     }
