@@ -16,7 +16,7 @@
             <center>
                 <VBox styleClass="body">
                     <HBox spacing="16">
-                        <ScrollPane minWidth="500" fx:id="scrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefHeight="350" maxHeight="350" maxWidth="300" vbarPolicy="AS_NEEDED">
+                        <ScrollPane minWidth="500" fx:id="photosScrollpane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefHeight="350" maxHeight="350" maxWidth="300" vbarPolicy="AS_NEEDED">
                             <content>
                                 <FlowPane fx:id="photosFlowPane" hgap="15" styleClass="image-grid" vgap="15" style="-fx-background-color: -tmg-bg0">
 

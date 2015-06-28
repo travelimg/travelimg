@@ -45,23 +45,23 @@ import java.util.function.Consumer;
 public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photos.Photo>> {
 
     @FXML
-    private ProgressIndicator progressIndicator;
+    private ScrollPane photosScrollpane;
     @FXML
     private FlowPane photosFlowPane;
     @FXML
-    private Button searchButton, fullscreenButton, resetButton, importButton, cancelButton;
-    @FXML
-    private ScrollPane scrollPane;
+    private GoogleMapScene mapScene;
     @FXML
     private FlowPane keywordsFlowPane;
     @FXML
     private TextField keywordTextField;
     @FXML
-    private FlickrDatePicker flickrDatePicker;
+    private Button searchButton, fullscreenButton, resetButton, importButton, cancelButton;
+    @FXML
+    private ProgressIndicator progressIndicator;
     @FXML
     private FlickrJourneysComboBox journeysComboBox;
     @FXML
-    private GoogleMapScene mapScene;
+    private FlickrDatePicker flickrDatePicker;
 
     private static final Logger logger = LogManager.getLogger();
     private static final String tmpDir = System.getProperty("java.io.tmpdir");
@@ -72,7 +72,6 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     private LatLong actualLatLong;
     private ArrayList<Photo> photos = new ArrayList<>();
     private Cancelable searchTask;
-    private Cancelable downloadTask;
     private Menu sender;
     private boolean newSearch = false;
 
@@ -89,6 +88,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         this.sender = sender;
 
         flickrService.reset();
+
         keywordTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -108,9 +108,8 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                 }
             }
         });
-        scrollPane.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
+        photosScrollpane.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+            @Override public void handle(KeyEvent event) {
                 if (event.isControlDown() && event.getCode() == KeyCode.A) {
                     for (Node n : photosFlowPane.getChildren()) {
                         if (n instanceof FlickrImageTile) {
@@ -120,19 +119,18 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                 }
             }
         });
-        scrollPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        photosScrollpane.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override public void handle(MouseEvent event) {
-                if(!event.isControlDown()){
+                if (!event.isControlDown()) {
                     FlickrImageTile selected = null;
                     Object target = event.getTarget();
-                    if(target instanceof ImageView){
+                    if (target instanceof ImageView) {
                         selected = (FlickrImageTile) ((ImageView) target).getParent();
                     }
-                    for(Node n : photosFlowPane.getChildren()){
-                        if(n!=selected){
+                    for (Node n : photosFlowPane.getChildren()) {
+                        if (n != selected) {
                             ((FlickrImageTile) n).deselect();
-                        }
-                        else{
+                        } else {
                             ((FlickrImageTile) n).select();
                         }
                     }
@@ -140,22 +138,21 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             }
         });
         journeysComboBox.bindToFlickrDatePicker(flickrDatePicker);
-
-        try {
-            Journey j = new Journey(-1,"Keine Reise",null,null);
-            List<Journey> journeys = clusterService.getAllJourneys();
-            journeysComboBox.getItems().add(j);
-            journeysComboBox.getItems().addAll(journeys);
-        } catch (ServiceException e) {
-            logger.debug(e);
-        }
-        journeysComboBox.getSelectionModel().selectFirst();
         mapScene.setDoubleClickCallback((position) -> dropMarker(position));
         cancelButton.setOnAction(e -> handleLeaveFlickrDialog());
         importButton.setOnAction(e -> handleImport());
         searchButton.setOnAction(e -> handleSearch());
         fullscreenButton.setOnAction(e -> handleFullscreen());
         resetButton.setOnAction(e -> handleReset());
+        try {
+            Journey j = new Journey(-1,"Keine Reise",null,null);
+            List<Journey> journeys = clusterService.getAllJourneys();
+            journeysComboBox.getItems().add(j);
+            journeysComboBox.getItems().addAll(journeys);
+            journeysComboBox.getSelectionModel().selectFirst();
+        } catch (ServiceException e) {
+            logger.debug(e);
+        }
     }
 
     private void dropMarker(LatLong ll) {
@@ -282,32 +279,38 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         flickrButton.setOnAction(null);
 
         try {
-
-            downloadTask = flickrService.downloadPhotos(flickrPhotos,
+            flickrService.downloadPhotos(flickrPhotos,
                     new Consumer<com.flickr4java.flickr.photos.Photo>() {
-                        @Override public void accept(com.flickr4java.flickr.photos.Photo flickrPhoto) {
+                        @Override public void accept(
+                                com.flickr4java.flickr.photos.Photo flickrPhoto) {
                             Photo p = new Photo();
-                            p.setPath(tmpDir+flickrPhoto.getId()+"_o."+flickrPhoto.getOriginalFormat());
+                            p.setPath(tmpDir + flickrPhoto.getId() + "_o." + flickrPhoto
+                                    .getOriginalFormat());
                             p.getData().setLatitude(flickrPhoto.getGeoData().getLatitude());
                             p.getData().setLongitude(flickrPhoto.getGeoData().getLongitude());
                             p.getData().setDatetime(flickrDatePicker.getValue().atStartOfDay());
                             HashSet<at.ac.tuwien.qse.sepm.entities.Tag> tags = new HashSet<>();
-                            for(Tag t: flickrPhoto.getTags()){
-                                tags.add(new at.ac.tuwien.qse.sepm.entities.Tag(0,t.getValue()));
+                            for (Tag t : flickrPhoto.getTags()) {
+                                tags.add(new at.ac.tuwien.qse.sepm.entities.Tag(0, t.getValue()));
                             }
                             p.getData().setTags(tags);
                             try {
+                                //TODO set 'flickr' as the photographer.
+                                if (journeysComboBox.getSelectedJourney().getId() != -1) {
+                                    //TODO cluster photos and add them to journey
+                                }
                                 exifService.setMetaData(p);
-                                ioHandler.copyFromTo(Paths.get(p.getPath()),Paths.get(System.getProperty("user.home"),"travelimg/"+flickrPhoto.getId()+"."+flickrPhoto.getOriginalFormat()));
+                                ioHandler.copyFromTo(Paths.get(p.getPath()),
+                                        Paths.get(System.getProperty("user.home"),
+                                                "travelimg/" + flickrPhoto.getId() + "."
+                                                        + flickrPhoto.getOriginalFormat()));
                             } catch (ServiceException e) {
                                 logger.debug(e);
                             } catch (IOException e) {
                                 logger.debug(e);
                             }
                         }
-                    }
-                    ,
-                    new Consumer<Double>() {
+                    }, new Consumer<Double>() {
                         public void accept(Double downloadProgress) {
                             Platform.runLater(new Runnable() {
                                 public void run() {
@@ -321,8 +324,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                             });
 
                         }
-                    }
-                    , new ErrorHandler<ServiceException>() {
+                    }, new ErrorHandler<ServiceException>() {
 
                         public void handle(ServiceException exception) {
                             downloadProgressControl.finish(true);
@@ -344,5 +346,4 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         progressIndicator.setVisible(false);
         importButton.setDisable(false);
     }
-
 }

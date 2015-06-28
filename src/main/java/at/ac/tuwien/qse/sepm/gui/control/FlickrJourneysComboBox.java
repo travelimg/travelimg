@@ -71,6 +71,10 @@ public class FlickrJourneysComboBox extends ComboBox {
         });
     }
 
+    public Journey getSelectedJourney(){
+        return (Journey) getSelectionModel().getSelectedItem();
+    }
+
 }
 
 
