@@ -145,6 +145,8 @@ public class SlideshowViewImpl implements SlideshowView {
 
             if (selectedIndex >= 0) {
                 slideshowOrganizer.setSelected(selectedIndex);
+            } else if (slideshows.size() > 0) {
+                slideshowOrganizer.setSelected(0);
             }
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Laden aller Slideshows", "Fehlermeldung: " + ex.getMessage());
