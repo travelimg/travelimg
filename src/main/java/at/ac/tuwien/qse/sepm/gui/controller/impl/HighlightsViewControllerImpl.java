@@ -1,4 +1,4 @@
-package at.ac.tuwien.qse.sepm.gui;
+package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
@@ -21,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -132,15 +133,15 @@ public class HighlightsViewControllerImpl implements HighlightsViewController {
     }
 
     private void handlePlaceSelected(Place place) {
+        LOGGER.debug("selected place {}", place);
 
         List<Place> places = journeyPlaceList.getPlacesForJourney(journeyPlaceList.getSelectedJourney());
 
-        if(place==null){
+        if (place == null) {
             // draw journey for all places
             wikipediaInfoPane.setVisible(false);
             drawJourney(places, true);
-        }
-        else{
+        } else {
             List<Place> placesUntil = places.subList(0, places.indexOf(place) + 1);
             // draw journey until place
             drawJourney(placesUntil, false);
@@ -155,12 +156,8 @@ public class HighlightsViewControllerImpl implements HighlightsViewController {
 
     private void handleAllPlacesSelected(Journey journey) {
         LOGGER.debug("All places selected");
-        //handlePlaceSelected(null);
+
         handlePlaceSelected(null);
-        handleJourneySelected(journey);
-
-
-
     }
 
     private Map<Place, List<Photo>> getPhotosByPlace(Set<Place> places, List<Photo> photos) {

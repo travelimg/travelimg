@@ -9,7 +9,7 @@
          xmlns="http://javafx.com/javafx/8" maxWidth="Infinity" maxHeight="Infinity">
     <BorderPane>
         <top>
-            <VBox styleClass="menu, top" alignment="CENTER">
+            <VBox fx:id="vBoxTop" styleClass="menu, top" alignment="CENTER">
                 <Label>Drücken Sie ESC, um den Vollbildmodus zu beenden.</Label>
                 <Label styleClass="tip">Navigation mit Pfeiltasten, Bewertung mit 1, 2, und 3.</Label>
             </VBox>
