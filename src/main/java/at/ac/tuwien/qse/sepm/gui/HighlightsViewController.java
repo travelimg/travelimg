@@ -127,9 +127,7 @@ public class HighlightsViewController {
 
     private void handlePlaceSelected(Place place) {
         List<Place> places = journeyPlaceList.getPlacesForJourney(journeyPlaceList.getSelectedJourney());
-        for(Place p: places){
-            System.out.println(p.toString());
-        }
+
         if(place==null){
             // draw journey for all places
             wikipediaInfoPane.setVisible(false);
@@ -149,9 +147,7 @@ public class HighlightsViewController {
     }
 
     private void handleAllPlacesSelected(Journey journey) {
-        //handlePlaceSelected(null);
         handlePlaceSelected(null);
-
         LOGGER.debug("All places selected");
     }
 

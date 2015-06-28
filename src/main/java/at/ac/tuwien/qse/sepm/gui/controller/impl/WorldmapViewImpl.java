@@ -38,7 +38,6 @@ public class WorldmapViewImpl implements WorldmapView {
     private void initialize() {
 
         mapScene.setOnLoaded(this::showPlaces);
-
         mapScene.setMarkerClickCallback(this::handleMarkerClicked);
     }
 
@@ -55,7 +54,6 @@ public class WorldmapViewImpl implements WorldmapView {
             mapScene.addMarker(new LatLong(place.getLatitude(), place.getLongitude()), caption);
         });
         mapScene.fitToMarkers();
-        mapScene.center(new LatLong(46.6503962,10.3555782));
     }
 
     private void handleMarkerClicked(LatLong position) {
