@@ -39,7 +39,7 @@ public class JdbcPhotoCache implements PhotoCache {
     @Autowired
     private PhotographerDAO photographerDAO;
 
-    @Override public synchronized void put(Photo photo) throws DAOException {
+    @Override public void put(Photo photo) throws DAOException {
         if (photo == null) throw new IllegalArgumentException();
         LOGGER.debug("putting {}", photo);
 
@@ -86,7 +86,7 @@ public class JdbcPhotoCache implements PhotoCache {
         LOGGER.debug("put {}", photo);
     }
 
-    @Override public synchronized void remove(Path file) throws DAOException {
+    @Override public void remove(Path file) throws DAOException {
         if (file == null) throw new IllegalArgumentException();
         LOGGER.debug("removing {}", file);
         if (!contains(file)) {

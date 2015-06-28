@@ -38,7 +38,7 @@ public class DropboxServiceImpl implements DropboxService {
     );
 
     @Autowired
-    private ExecutorService executor;
+    private ExecutorService executorService;
 
     @Autowired
     private IOHandler ioHandler;
@@ -83,7 +83,7 @@ public class DropboxServiceImpl implements DropboxService {
     public Cancelable uploadPhotos(Collection<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
         LOGGER.debug("uploading photos to {}", destination);
         AsyncExporter exporter = new AsyncExporter(photos, destination, callback, errorHandler);
-        executor.submit(exporter);
+        executorService.submit(exporter);
 
         return exporter;
     }

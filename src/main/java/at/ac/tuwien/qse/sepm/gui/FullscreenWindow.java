@@ -40,14 +40,18 @@ public class FullscreenWindow extends StackPane {
     @FXML
     private Button bt_previous, bt_next;
     @FXML
-    private RatingPicker ratingPicker;
+    private VBox ratingContainer;
+    @FXML
+    private HBox bottomBar;
 
     @Autowired
     private PhotoService photoService;
+    private Tooltip tooltip = new Tooltip();
     private List<Photo> photos;
     private SmartImage image = new SmartImage(ImageSize.ORIGINAL);
 
     private int activeIndex = 0;
+    private RatingPicker ratingPicker = new RatingPicker();
 
     public FullscreenWindow(PhotoService photoService){
         FXMLLoadHelper.load(this, this, FullscreenWindow.class, "view/FullScreenDialog.fxml");
@@ -90,6 +94,10 @@ public class FullscreenWindow extends StackPane {
         });
 
         ratingPicker.setRatingChangeHandler(this::handleRatingChange);
+        ratingContainer.getChildren().add(ratingPicker);
+        tooltip.setText(" press [1] for a BAD-Raiting /b press [2] git a NEUTRAL-Raiting /b press [3] git a GOOD-Raiting");
+
+        StackPane.setAlignment(bottomBar, Pos.BOTTOM_CENTER);
     }
 
 
