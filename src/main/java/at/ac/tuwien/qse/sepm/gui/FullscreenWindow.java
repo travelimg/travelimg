@@ -4,20 +4,16 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Rating;
 import at.ac.tuwien.qse.sepm.gui.control.RatingPicker;
 import at.ac.tuwien.qse.sepm.gui.control.SmartImage;
-import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.util.ImageSize;
 import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -41,6 +37,8 @@ public class FullscreenWindow extends StackPane {
     private Button bt_previous, bt_next;
     @FXML
     private RatingPicker ratingPicker;
+    @FXML
+    private VBox vBoxTop;
 
     @Autowired
     private PhotoService photoService;
@@ -168,5 +166,10 @@ public class FullscreenWindow extends StackPane {
 
         // handling of images in original size can consume a lot of memory so collect it here
         System.gc();
+    }
+
+    public void setElementsVisible(boolean visible){
+        vBoxTop.setVisible(visible);
+        ratingPicker.setVisible(visible);
     }
 }
