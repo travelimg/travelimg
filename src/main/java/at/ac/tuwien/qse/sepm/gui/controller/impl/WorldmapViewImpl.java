@@ -1,6 +1,7 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 
+import at.ac.tuwien.qse.sepm.dao.EntityWatcher;
 import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.gui.MainControllerImpl;
 import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
@@ -31,7 +32,8 @@ public class WorldmapViewImpl implements WorldmapView {
     private ClusterService clusterService;
     @Autowired
     private MainControllerImpl mainController;
-
+    @Autowired
+    private EntityWatcher<Place> watcher;
     private List<Place> places;
 
     @FXML
@@ -39,9 +41,19 @@ public class WorldmapViewImpl implements WorldmapView {
 
         mapScene.setOnLoaded(this::showPlaces);
         mapScene.setMarkerClickCallback(this::handleMarkerClicked);
+        clusterService.subscribePlaceChanged(this::reloadPlaces);
     }
 
+    private void reloadPlaces(Place place) {
+        String caption = String.format("%s, %s", place.getCity(), place.getCountry());
+        mapScene.addMarker(new LatLong(place.getLatitude(), place.getLongitude()), caption);
+        mapScene.fitToMarkers();
+    }
+
+
+
     private void showPlaces() {
+        LOGGER.debug("new Places");
         try {
             places = clusterService.getAllPlaces();
         } catch (ServiceException ex) {

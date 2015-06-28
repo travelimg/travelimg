@@ -22,10 +22,14 @@ public class MainControllerImpl implements MainController{
     private TabPane root;
     @FXML
     private Tab highlights;
+    @FXML
+    private Tab world;
     @Autowired
     private Organizer organizer;
     @Autowired
     private HighlightsViewController highlightsViewController;
+    @Autowired
+    private WorldmapView worldmapView;
     @FXML
     private void initialize() {
         root.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
@@ -38,6 +42,7 @@ public class MainControllerImpl implements MainController{
                     LOGGER.debug("reload Journeys");
                     highlightsViewController.reloadJourneys();
                 }
+
             }
         });
     }
