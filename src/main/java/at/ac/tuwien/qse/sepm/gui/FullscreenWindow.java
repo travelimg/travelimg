@@ -51,7 +51,9 @@ public class FullscreenWindow extends StackPane {
 
     public FullscreenWindow(PhotoService photoService){
         FXMLLoadHelper.load(this, this, FullscreenWindow.class, "view/FullScreenDialog.fxml");
+        System.out.println("NEUER FULLSCREEN");
         this.photoService=photoService;
+
     }
 
     @FXML
