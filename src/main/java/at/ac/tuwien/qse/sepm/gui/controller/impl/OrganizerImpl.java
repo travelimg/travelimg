@@ -7,31 +7,22 @@ import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
+import at.ac.tuwien.qse.sepm.gui.util.BufferedBatchOperation;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.Aggregator;
-import at.ac.tuwien.qse.sepm.service.impl.PhotoSet;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
+import at.ac.tuwien.qse.sepm.service.impl.PhotoSet;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.layout.BorderPane;
-
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Paint;
-import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.controlsfx.glyphfont.FontAwesome;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -39,11 +30,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 public class OrganizerImpl implements Organizer {
 
@@ -79,6 +67,15 @@ public class OrganizerImpl implements Organizer {
     private PhotoFilter photoFilter = usedFilter;
     private PhotoFilter folderFilter = new PhotoPathFilter();
     private Runnable filterChangeCallback;
+    private boolean suppressChangeEvent = false;
+
+    private BufferedBatchOperation<Photo> addOperation;
+
+    @Autowired public void setScheduler(ScheduledExecutorService scheduler) {
+        addOperation = new BufferedBatchOperation<>(photos -> {
+            Platform.runLater(() -> {/*TODO*/});
+        }, scheduler);
+    }
 
     @Override public void setFilterChangeAction(Runnable callback) {
         LOGGER.debug("setting usedFilter change action");
@@ -203,7 +200,6 @@ public class OrganizerImpl implements Organizer {
                 LOGGER.error("Could not delete directory");
             }
         }
-        folderViewClicked(); //refresh
     }
 
     // This Method let's the User switch to the usedFilter-view
@@ -217,6 +213,7 @@ public class OrganizerImpl implements Organizer {
     private void folderViewClicked() {
         listTab.setSelected(false);
         folderTab.setSelected(true);
+
         usedFilter = new PhotoPathFilter();
         buildTreeView();
         handleFilterChange();
@@ -260,7 +257,7 @@ public class OrganizerImpl implements Organizer {
 
     private void handleFilterChange() {
         LOGGER.debug("usedFilter changed");
-        if (filterChangeCallback == null)
+        if (filterChangeCallback == null || suppressChangeEvent)
             return;
         filterChangeCallback.run();
     }
@@ -468,35 +465,6 @@ public class OrganizerImpl implements Organizer {
     }
 
     private void handlePhotoAdded(Photo photo) {
-        Platform.runLater(() -> {
-            FilePathTreeItem root = (FilePathTreeItem) folderTree.getRoot();
-
-            Path directory = photo.getFile().getParent();
-
-            if (isPathAlreadyKnown(directory, root)) {
-                return;
-            }
-
-            buildTreeView();
-        });
-    }
-    private boolean isPathAlreadyKnown(Path directory, FilePathTreeItem node) {
-        if (node == null) {
-            return false;
-        }
-
-        if (node.getFullPath().equals(directory.toString())) {
-            return true;
-        }
-
-        for (TreeItem<String> child : node.getChildren()) {
-            FilePathTreeItem item = (FilePathTreeItem) child;
-
-            if (isPathAlreadyKnown(directory, item)) {
-                return true;
-            }
-        }
-
-        return false;
+        addOperation.add(photo);
     }
 }

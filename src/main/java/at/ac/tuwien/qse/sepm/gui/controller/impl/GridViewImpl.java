@@ -8,10 +8,10 @@ import at.ac.tuwien.qse.sepm.gui.controller.Menu;
 import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.*;
 import at.ac.tuwien.qse.sepm.gui.grid.PaginatedImageGrid;
+import at.ac.tuwien.qse.sepm.gui.util.BufferedBatchOperation;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.util.IOHandler;
 import javafx.application.Platform;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.input.*;
@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 public class GridViewImpl implements GridView {
@@ -32,8 +33,6 @@ public class GridViewImpl implements GridView {
 
     @Autowired
     private PhotoService photoService;
-    @Autowired
-    private ImportService importService;
     @Autowired
     private FlickrService flickrService;
     @Autowired
@@ -67,6 +66,16 @@ public class GridViewImpl implements GridView {
 
     private PaginatedImageGrid grid;
 
+    private BufferedBatchOperation<Photo> addOperation = null;
+    private BufferedBatchOperation<Photo> updateOperation = null;
+    private BufferedBatchOperation<Path> deleteOperation = null;
+
+    @Autowired public void setScheduler(ScheduledExecutorService scheduler) {
+        addOperation = new BufferedBatchOperation<>(this::handleAddPhotos, scheduler);
+        updateOperation = new BufferedBatchOperation<>(this::handleUpdatePhotos, scheduler);
+        deleteOperation = new BufferedBatchOperation<>(this::handleDeletePhotos, scheduler);
+    }
+
     @FXML
     private void initialize() {
         LOGGER.debug("initializing");
@@ -89,17 +98,21 @@ public class GridViewImpl implements GridView {
         // Updated photos that no longer match the filter are removed from the grid.
         inspector.setUpdateHandler(() -> {
             Collection<Photo> photos = inspector.getEntities();
+
+            List<Photo> toRemove = new ArrayList<Photo>(photos.size());
+            List<Photo> toUpdate = new ArrayList<Photo>(photos.size());
+
             photos.forEach(p -> {
                 if (!organizer.accept(p)) {
                     organizer.remove(p);
-                    grid.removePhoto(p);
+                    toRemove.add(p);
+                } else {
+                    toUpdate.add(p);
                 }
             });
-            photos.forEach(p -> {
-                if (organizer.accept(p)) {
-                    grid.updatePhoto(p);
-                }
-            });
+
+            grid.removePhotos(toRemove);
+            grid.updatePhotos(toUpdate);
         });
 
         // Apply the initial filter.
@@ -124,35 +137,43 @@ public class GridViewImpl implements GridView {
         }
     }
 
-    private void handlePhotoCreated(Photo photo) {
+    private void handleAddPhotos(List<Photo> photos) {
+        LOGGER.debug("adding {} photos to grid", photos.size());
+        Platform.runLater(() -> grid.addPhotos(photos));
+    }
+
+    private void handleUpdatePhotos(List<Photo> photos) {
+        LOGGER.debug("updating {} photos in grid", photos.size());
+        Platform.runLater(() -> grid.updatePhotos(photos));
+    }
+
+    private void handleDeletePhotos(List<Path> paths) {
+        LOGGER.debug("deleting {} photos in grid", paths.size());
+
         Platform.runLater(() -> {
-            if (organizer.accept(photo)) {
-                grid.addPhoto(photo);
-            }
+            List<Photo> photos = grid.getPhotos().stream()
+                    .filter(p -> paths.contains(p.getFile()))
+                    .collect(Collectors.toList());
+
+            grid.removePhotos(photos);
         });
+    }
+
+    private void handlePhotoCreated(Photo photo) {
+        if (organizer.accept(photo)) {
+            addOperation.add(photo);
+        }
     }
 
     private void handlePhotoUpdated(Photo photo) {
-        Platform.runLater(() -> {
-            // TODO: should we update filter
-            grid.updatePhoto(photo);
-        });
+        if (organizer.accept(photo)) {
+            updateOperation.add(photo);
+        }
     }
 
     private void handlePhotoDeleted(Path file) {
-        Platform.runLater(() -> {
-            // TODO: should we update filter
-
-            // lookup photo by path
-            Optional<Photo> photo = grid.getPhotos().stream()
-                    .filter(p -> p.getFile().equals(file))
-                    .findFirst();
-
-            if (photo.isPresent())
-                grid.removePhoto(photo.get());
-        });
+        deleteOperation.add(file);
     }
-
 
     private void handleFilterChange() {
         reloadImages();
@@ -161,10 +182,10 @@ public class GridViewImpl implements GridView {
     private void reloadImages() {
         organizer.reset();
         try {
-            List<Photo> photos = photoService.getAllPhotos(organizer::accept).stream()
-                    .sorted((p1, p2) -> p2.getData().getDatetime()
-                            .compareTo(p1.getData().getDatetime())).collect(Collectors.toList());
-            grid.setPhotos(photos);
+
+            grid.setPhotos(photoService.getAllPhotos(organizer::accept).stream()
+                            .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
+                            .collect(Collectors.toList()));
         } catch (ServiceException ex) {
             LOGGER.error("failed loading fotos", ex);
             ErrorDialog.show(root, "Laden von Fotos fehlgeschlagen",
@@ -251,7 +272,7 @@ public class GridViewImpl implements GridView {
                 ErrorDialog.show(root, "Fehler beim Löschen", "Die ausgewählten Fotos konnten nicht gelöscht werden.");
             }
 
-            selection.forEach(grid::removePhoto);
+            grid.removePhotos(selection);
         }
 
         @Override public void onExport(Menu sender) {
