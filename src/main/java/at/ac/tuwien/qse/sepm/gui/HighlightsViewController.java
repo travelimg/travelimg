@@ -154,7 +154,7 @@ public class HighlightsViewController {
         LOGGER.debug("All places selected");
         //handlePlaceSelected(null);
         handlePlaceSelected(null);
-        reloadJourneys();
+        handleJourneySelected(journey);
         System.out.println(journeyPlaceList.getPlacesForJourney(journey).toString());
 
 

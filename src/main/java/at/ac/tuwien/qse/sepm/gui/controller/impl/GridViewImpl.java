@@ -236,7 +236,7 @@ public class GridViewImpl implements GridView {
             if (selected.size() == 1) {
                 start = selected.iterator().next();
             }
-           
+
             fullscreen.present(grid.getPhotos(), start);
         }
 
