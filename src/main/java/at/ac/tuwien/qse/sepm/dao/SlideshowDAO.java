@@ -5,9 +5,6 @@ import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 
 import java.util.List;
 
-/**
- * Created by mb on 08.06.15.
- */
 public interface SlideshowDAO {
 
     /**
