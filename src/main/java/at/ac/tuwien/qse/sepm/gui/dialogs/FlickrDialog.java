@@ -4,10 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.Journey;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
 import at.ac.tuwien.qse.sepm.gui.FullscreenWindow;
-import at.ac.tuwien.qse.sepm.gui.control.DownloadProgressControl;
-import at.ac.tuwien.qse.sepm.gui.control.FlickrImageTile;
-import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
-import at.ac.tuwien.qse.sepm.gui.control.Keyword;
+import at.ac.tuwien.qse.sepm.gui.control.*;
 import at.ac.tuwien.qse.sepm.gui.controller.Menu;
 import at.ac.tuwien.qse.sepm.gui.controller.impl.MenuImpl;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
@@ -41,6 +38,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -63,7 +61,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
     @FXML
     private TextField keywordTextField;
     @FXML
-    private DatePicker datePicker;
+    private FlickrDatePicker flickrDatePicker;
     @FXML
     private ComboBox journeysComboBox;
     @FXML
@@ -150,8 +148,11 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                 return new ListCell<Journey>() {
                     @Override protected void updateItem(Journey j, boolean empty) {
                         super.updateItem(j, empty);
-                        if(j!=null)
+                        if(j!=null){
                             setText(j.getName());
+                        }
+
+
                     }
                 };
             }
@@ -170,6 +171,20 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             }
 
         });
+        journeysComboBox.valueProperty().addListener(new ChangeListener<Journey>() {
+            @Override public void changed(ObservableValue ov, Journey oldValue, Journey newValue) {
+                if(newValue!=null && newValue.getId()!=-1){
+                    flickrDatePicker.setRanges(newValue.getStartDate(), newValue.getEndDate());
+                    flickrDatePicker.setValue(newValue.getStartDate().toLocalDate());
+                    logger.debug("Date set to {}", newValue.getStartDate().toLocalDate());
+                }
+                else if(newValue!=null && newValue.getId()==-1){
+                    flickrDatePicker.setRanges(LocalDateTime.MIN,LocalDateTime.MAX);
+                    flickrDatePicker.setValue(LocalDate.now());
+                    logger.debug("Today's date set");
+                }
+            }
+        });
         try {
             Journey j = new Journey(-1,"Keine Reise",null,null);
             List<Journey> journeys = clusterService.getAllJourneys();
@@ -179,7 +194,6 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             logger.debug(e);
         }
         journeysComboBox.getSelectionModel().selectFirst();
-        datePicker.setValue(LocalDate.now());
         mapScene.setDoubleClickCallback((position) -> dropMarker(position));
         cancelButton.setOnAction(e -> handleLeaveFlickrDialog());
         importButton.setOnAction(e -> handleImport());
@@ -320,7 +334,7 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                             p.setPath(tmpDir+flickrPhoto.getId()+"_o."+flickrPhoto.getOriginalFormat());
                             p.getData().setLatitude(flickrPhoto.getGeoData().getLatitude());
                             p.getData().setLongitude(flickrPhoto.getGeoData().getLongitude());
-                            p.getData().setDatetime(datePicker.getValue().atStartOfDay());
+                            p.getData().setDatetime(flickrDatePicker.getValue().atStartOfDay());
                             HashSet<at.ac.tuwien.qse.sepm.entities.Tag> tags = new HashSet<>();
                             for(Tag t: flickrPhoto.getTags()){
                                 tags.add(new at.ac.tuwien.qse.sepm.entities.Tag(0,t.getValue()));

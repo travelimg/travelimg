@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import at.ac.tuwien.qse.sepm.gui.control.FlickrDatePicker?>
 <?import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
@@ -86,11 +87,11 @@
                                     <Insets top="3"></Insets>
                                 </padding>
                             </HBox>
-                            <DatePicker fx:id="datePicker" editable="false">
+                            <FlickrDatePicker fx:id="flickrDatePicker" editable="false">
                                 <tooltip>
                                     <Tooltip text="Wählen Sie ein Datum für die Fotos aus" />
                                 </tooltip>
-                            </DatePicker>
+                            </FlickrDatePicker>
                         </HBox>
                     </left>
                     <right>
