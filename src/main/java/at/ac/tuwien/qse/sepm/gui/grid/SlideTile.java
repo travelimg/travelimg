@@ -31,6 +31,7 @@ public class SlideTile extends Tile {
         AnchorPane.setBottomAnchor(caption, 0.0);
         AnchorPane.setLeftAnchor(caption, 0.0);
         overlay.getStyleClass().add("overlay");
+        overlay.getChildren().add(caption);
         border.getStyleClass().add("border");
         getChildren().addAll(border, overlay);
 

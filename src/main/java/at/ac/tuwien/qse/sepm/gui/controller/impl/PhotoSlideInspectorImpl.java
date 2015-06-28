@@ -39,12 +39,13 @@ public class PhotoSlideInspectorImpl extends SlideInspectorImpl<PhotoSlide> {
 
     private void handleCaptionChange(Observable observable) {
         PhotoSlide slide = getSlide();
+        String caption = captionField.getText();
 
-        if (slide == null) {
+        if (slide == null || slide.getCaption().equals(caption)) {
             return;
         }
 
-        slide.setCaption(captionField.getText());
+        slide.setCaption(caption);
 
         try {
             slideService.update(slide);

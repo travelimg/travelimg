@@ -45,12 +45,13 @@ public class TitleSlideInspectorImpl extends SlideInspectorImpl<TitleSlide> {
 
     private void handleCaptionChange(Observable observable) {
         TitleSlide slide = getSlide();
+        String caption = captionField.getText();
 
-        if (slide == null) {
+        if (slide == null || slide.getCaption().equals(caption)) {
             return;
         }
 
-        slide.setCaption(captionField.getText());
+        slide.setCaption(caption);
 
         try {
             slideService.update(slide);
@@ -62,12 +63,13 @@ public class TitleSlideInspectorImpl extends SlideInspectorImpl<TitleSlide> {
 
     private void handleColorChange(Observable observable) {
         TitleSlide slide = getSlide();
+        int color = ColorUtils.toInt(colorPicker.getValue());
 
-        if (slide == null) {
+        if (slide == null || color == slide.getColor()) {
             return;
         }
 
-        slide.setColor(ColorUtils.toInt(colorPicker.getValue()));
+        slide.setColor(color);
 
         try {
             slideService.update(slide);
