@@ -247,6 +247,7 @@ public class GridViewImpl implements GridView {
     private class MenuListener implements Menu.Listener {
 
         @Override public void onPresent(Menu sender) {
+
             FullscreenWindow fullscreen = new FullscreenWindow(photoService);
 
             Set<Photo> selected = grid.getSelected();
@@ -255,7 +256,7 @@ public class GridViewImpl implements GridView {
             if (selected.size() == 1) {
                 start = selected.iterator().next();
             }
-            
+
             fullscreen.present(grid.getPhotos(), start);
         }
 

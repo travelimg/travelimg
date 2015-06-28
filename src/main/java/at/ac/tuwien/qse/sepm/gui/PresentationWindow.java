@@ -31,7 +31,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Collection;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 public class PresentationWindow extends StackPane {
 
@@ -39,12 +39,13 @@ public class PresentationWindow extends StackPane {
 
     private Stage stage;
     private Scene scene;
-    private boolean isPaused=false;
+    private boolean isPaused = false;
 
     private int activeIndex = 0;
     private Timeline timeline = null;
 
     private Slideshow slideshow;
+    private List<Slide> slides;
 
     public PresentationWindow(Slideshow slideshow) {
         FXMLLoadHelper.load(this, this, PresentationWindow.class, "view/PresentationWindow.fxml");
@@ -52,6 +53,9 @@ public class PresentationWindow extends StackPane {
         getStyleClass().add("fullscreen");
 
         this.slideshow = slideshow;
+        this.slides = slideshow.getAllSlides().stream()
+                .sorted((s1, s2) -> s1.getOrder().compareTo(s2.getOrder()))
+                .collect(Collectors.toList());
     }
 
     @FXML
@@ -79,14 +83,13 @@ public class PresentationWindow extends StackPane {
                 if (keyEvent.getCode() == KeyCode.ESCAPE) {
                     close();
                 }
-                if (keyEvent.getCode()==KeyCode.SPACE) {
-                    if(!isPaused) {
+                if (keyEvent.getCode() == KeyCode.SPACE) {
+                    if (!isPaused) {
                         timeline.pause();
-                        isPaused=true;
-                    }
-                    else {
+                        isPaused = true;
+                    } else {
                         timeline.play();
-                        isPaused=false;
+                        isPaused = false;
                     }
                 }
             }
@@ -119,22 +122,14 @@ public class PresentationWindow extends StackPane {
     }
 
     private void showNextSlide(ActionEvent event) {
-        if (activeIndex == slideshow.getAllSlides().size() - 1)
+        if (activeIndex == slides.size() - 1)
             return;
-        activeIndex = Math.min(slideshow.getAllSlides().size() - 1, activeIndex + 1);
+
+        activeIndex = Math.min(slides.size() - 1, activeIndex + 1);
         loadSlide();
-
-    }
-
-    private Slide getCurrentSlide() {
-        return slideshow.getAllSlides().stream()
-                .filter(slide -> slide.getOrder().equals(activeIndex + 1))
-                .findFirst()
-                .orElse(null);
     }
 
     private void loadSlide() {
-        List<Slide> slides = (List<Slide>) slideshow.getAllSlides();
         if (slides.size() == 0 || slides.size() <= activeIndex) {
             // out of bounds
             return;
@@ -147,6 +142,5 @@ public class PresentationWindow extends StackPane {
 
         getChildren().clear();
         getChildren().add(slideView);
-        logger.debug(slides.get(activeIndex));
     }
 }

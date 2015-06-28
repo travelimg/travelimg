@@ -40,21 +40,20 @@ public class FullscreenWindow extends StackPane {
     @FXML
     private VBox vBoxTop;
 
-    @Autowired
     private PhotoService photoService;
     private List<Photo> photos;
     private SmartImage image = new SmartImage(ImageSize.ORIGINAL);
 
     private int activeIndex = 0;
 
-    public FullscreenWindow(PhotoService photoService){
+    public FullscreenWindow(PhotoService photoService) {
         FXMLLoadHelper.load(this, this, FullscreenWindow.class, "view/FullScreenDialog.fxml");
+
         this.photoService = photoService;
     }
 
     @FXML
     private void initialize() {
-
         this.stage = new Stage();
         this.scene = new Scene(this);
 

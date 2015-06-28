@@ -64,13 +64,4 @@ public class JDBCSlideshowDAOTest extends AbstractJDBCDAOTest {
         assertThat(slideshowDAO.readAll().size(), is(countRows()));
 
     }
-    @Test(expected = AssertionError.class)
-    public void get_slideshow_by_id_should_throw() throws ValidationException,DAOException {
-        Slideshow s2 = new Slideshow(1,"Test",5.0);
-
-        slideshowDAO.create(s2);
-
-        assertThat(slideshowDAO.getById(1),is(s2));
-
-    }
 }

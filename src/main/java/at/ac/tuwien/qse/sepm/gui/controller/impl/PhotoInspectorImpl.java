@@ -1,15 +1,15 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
-import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.control.*;
 import at.ac.tuwien.qse.sepm.gui.controller.SlideshowView;
-import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.*;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;

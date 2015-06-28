@@ -5,6 +5,7 @@ import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.control.ImageTile;
 import at.ac.tuwien.qse.sepm.gui.control.JourneyPlaceList;
 import at.ac.tuwien.qse.sepm.gui.control.WikipediaInfoPane;
+import at.ac.tuwien.qse.sepm.gui.controller.HighlightsViewController;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.*;
@@ -12,6 +13,7 @@ import at.ac.tuwien.qse.sepm.service.impl.JourneyFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.layout.*;
@@ -22,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class HighlightsViewController {
+public class HighlightsViewControllerImpl implements HighlightsViewController {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -94,10 +96,13 @@ public class HighlightsViewController {
         gridPane.getRowConstraints().addAll(row1, row2, row3);
 
         reloadJourneys();
+
+        clusterService.subscribeJourneyChanged((journey) -> {
+            Platform.runLater(this::reloadJourneys);
+        });
     }
 
-    public void reloadJourneys() {
-
+    private void reloadJourneys() {
         try {
             for (Journey journey : clusterService.getAllJourneys()) {
                 List<Place> places = clusterService.getPlacesByJourneyChronological(journey);
@@ -110,6 +115,7 @@ public class HighlightsViewController {
 
     private void handleJourneySelected(Journey journey) {
         // load photos for the selected journey
+
         try {
             JourneyFilter filter = new JourneyFilter();
             filter.getIncludedJourneys().add(journey);
@@ -126,6 +132,7 @@ public class HighlightsViewController {
     }
 
     private void handlePlaceSelected(Place place) {
+
         List<Place> places = journeyPlaceList.getPlacesForJourney(journeyPlaceList.getSelectedJourney());
 
         if(place==null){
@@ -147,8 +154,13 @@ public class HighlightsViewController {
     }
 
     private void handleAllPlacesSelected(Journey journey) {
-        handlePlaceSelected(null);
         LOGGER.debug("All places selected");
+        //handlePlaceSelected(null);
+        handlePlaceSelected(null);
+        handleJourneySelected(journey);
+
+
+
     }
 
     private Map<Place, List<Photo>> getPhotosByPlace(Set<Place> places, List<Photo> photos) {
@@ -252,7 +264,7 @@ public class HighlightsViewController {
         }
     }
 
-    public void drawJourney(List<Place> places, boolean allPlaces) {
+    private void drawJourney(List<Place> places, boolean allPlaces) {
         googleMapScene.clear();
 
         if (places.isEmpty()) {
@@ -265,10 +277,9 @@ public class HighlightsViewController {
 
         googleMapScene.drawPolyline(path);
 
-        if(allPlaces){
+        if (allPlaces) {
             googleMapScene.fitToMarkers();
-        }
-        else{
+        } else {
             googleMapScene.fitToLastTwoMarkers();
             LatLong position = new LatLong(places.get(places.size()-1).getLatitude(), places.get(places.size()-1).getLongitude());
             googleMapScene.addMarker(position);

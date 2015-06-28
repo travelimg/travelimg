@@ -18,7 +18,6 @@ public class SlideTile extends Tile {
     private final Slide slide;
     private final Pane border = new Pane();
     private final AnchorPane overlay = new AnchorPane();
-    private final Label slideNumber = new Label();
     private final Label caption = new Label();
 
     public SlideTile(Slide slide) {
@@ -27,15 +26,12 @@ public class SlideTile extends Tile {
 
         getStyleClass().add("tile");
 
-        slideNumber.getStyleClass().add("number");
-        AnchorPane.setLeftAnchor(slideNumber, 0.0);
-        AnchorPane.setTopAnchor(slideNumber, 0.0);
         caption.getStyleClass().add("caption");
         caption.setMaxWidth(Double.MAX_VALUE);
         AnchorPane.setBottomAnchor(caption, 0.0);
         AnchorPane.setLeftAnchor(caption, 0.0);
         overlay.getStyleClass().add("overlay");
-        overlay.getChildren().addAll(slideNumber, caption);
+        overlay.getChildren().add(caption);
         border.getStyleClass().add("border");
         getChildren().addAll(border, overlay);
 
@@ -53,7 +49,6 @@ public class SlideTile extends Tile {
     }
 
     public void update() {
-        slideNumber.setText(slide.getOrder().toString());
         boolean hasCaption = slide.getCaption() != null && !slide.getCaption().isEmpty();
         caption.setVisible(hasCaption);
         caption.setText(slide.getCaption());

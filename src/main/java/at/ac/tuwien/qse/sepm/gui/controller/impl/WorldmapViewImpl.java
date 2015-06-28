@@ -1,14 +1,13 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
-
 import at.ac.tuwien.qse.sepm.entities.Place;
-import at.ac.tuwien.qse.sepm.gui.MainControllerImpl;
 import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
 import at.ac.tuwien.qse.sepm.gui.controller.WorldmapView;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.ClusterService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
@@ -31,17 +30,25 @@ public class WorldmapViewImpl implements WorldmapView {
     private ClusterService clusterService;
     @Autowired
     private MainControllerImpl mainController;
-
     private List<Place> places;
 
     @FXML
     private void initialize() {
-
         mapScene.setOnLoaded(this::showPlaces);
         mapScene.setMarkerClickCallback(this::handleMarkerClicked);
+        clusterService.subscribePlaceChanged(place -> {
+            Platform.runLater(() -> this.addPlace(place));
+        });
+    }
+
+    private void addPlace(Place place) {
+        String caption = String.format("%s, %s", place.getCity(), place.getCountry());
+        mapScene.addMarker(new LatLong(place.getLatitude(), place.getLongitude()), caption);
+        mapScene.fitToMarkers();
     }
 
     private void showPlaces() {
+        LOGGER.debug("new Places");
         try {
             places = clusterService.getAllPlaces();
         } catch (ServiceException ex) {

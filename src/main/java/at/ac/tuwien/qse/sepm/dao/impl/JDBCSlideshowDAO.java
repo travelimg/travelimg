@@ -3,8 +3,7 @@ package at.ac.tuwien.qse.sepm.dao.impl;
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.SlideDAO;
 import at.ac.tuwien.qse.sepm.dao.SlideshowDAO;
-import at.ac.tuwien.qse.sepm.entities.Slide;
-import at.ac.tuwien.qse.sepm.entities.Slideshow;
+import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.entities.validators.SlideshowValidator;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import org.apache.logging.log4j.LogManager;
@@ -27,6 +26,7 @@ public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
 
     private static final String READ_ALL_STATEMENT = "SELECT id, name, durationbetweenphotos FROM SLIDESHOW;";
     private static final String UPDATE_STATEMENT = "UPDATE SLIDESHOW SET name = ?, durationbetweenphotos = ? WHERE id = ?;";
+    private static final String DELETE_STATEMENT = "DELETE FROM SLIDESHOW WHERE id = ?;";
 
     private SimpleJdbcInsert insertSlideshow;
 
@@ -87,12 +87,30 @@ public class JDBCSlideshowDAO extends JDBCDAOBase implements SlideshowDAO{
 
     @Override
     public void delete(Slideshow slideshow) throws DAOException, ValidationException {
+        logger.debug("Deleting slideshow {}", slideshow);
 
+        SlideshowValidator.validateID(slideshow.getId());
+
+        try {
+            deleteSlidesForSlideshow(slideshow);
+            jdbcTemplate.update(DELETE_STATEMENT, slideshow.getId());
+        } catch (DataAccessException ex) {
+            throw new DAOException("Failed to delete slideshow", ex);
+        }
     }
 
-    @Override
-    public Slideshow getById(int id) throws DAOException {
-        return null;
+    private void deleteSlidesForSlideshow(Slideshow slideshow) throws DAOException, ValidationException {
+        for (PhotoSlide slide : slideDAO.getPhotoSlidesForSlideshow(slideshow.getId())) {
+            slideDAO.delete(slide);
+        }
+
+        for (MapSlide slide : slideDAO.getMapSlidesForSlideshow(slideshow.getId())) {
+            slideDAO.delete(slide);
+        }
+
+        for (TitleSlide slide : slideDAO.getTitleSlidesForSlideshow(slideshow.getId())) {
+            slideDAO.delete(slide);
+        }
     }
 
     @Override

@@ -88,7 +88,7 @@
     <bean id="slideshowOrganizer" class="at.ac.tuwien.qse.sepm.gui.controller.impl.SlideshowOrganizerImpl"></bean>
     <bean id="menuController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.MenuImpl"></bean>
     <bean id="statusIndicatorController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.StatusIndicatorImpl"></bean>
-    <bean id="highlightsViewController" class="at.ac.tuwien.qse.sepm.gui.HighlightsViewController"></bean>
-    <bean id="mainController" class="at.ac.tuwien.qse.sepm.gui.MainControllerImpl"></bean>
+    <bean id="highlightsViewController" class="at.ac.tuwien.qse.sepm.gui.HighlightsViewControllerImpl"></bean>
+    <bean id="mainController" class="at.ac.tuwien.qse.sepm.gui.controller.impl.MainControllerImpl"></bean>
 
 </beans>
