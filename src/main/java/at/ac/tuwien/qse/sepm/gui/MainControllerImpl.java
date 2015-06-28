@@ -9,11 +9,13 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
 public class MainControllerImpl implements MainController{
-
+    private static final Logger LOGGER = LogManager.getLogger();
     @FXML
     private Tab grid;
     @FXML
@@ -31,8 +33,9 @@ public class MainControllerImpl implements MainController{
             @Override
             public void changed(ObservableValue<? extends Tab> arg0,
                     Tab arg1, Tab arg2) {
-                if (arg2.getText().equals("highlights")) {
-                    System.out.println("Test");
+
+                if (arg2.equals(highlights)) {
+                    LOGGER.debug("reload Journeys");
                     highlightsViewController.reloadJourneys();
                 }
             }
