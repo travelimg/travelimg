@@ -1171,3 +1171,8 @@
     -glyph-size: 25px;
     -fx-fill: -google-map-marker;
 }
+
+#changeCoordinatesButton .glyph-icon {
+    -glyph-size: 25px;
+    -fx-fill: -google-map-marker;
+}
