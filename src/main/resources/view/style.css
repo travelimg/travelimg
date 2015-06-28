@@ -522,7 +522,7 @@
     -glyph-name: "CHECK_SQUARE";
 }
 .filter-group .header .expand-button .icon {
-    -fx-fill: -tmg-text;
+    -fx-fill: -tmg-text-dark;
     -glyph-name: "PLUS_SQUARE";
     -glyph-size: 14px;
 }
@@ -891,7 +891,7 @@
     -fx-background-color: -tmg-text-bright;
 }
 
-.tree-view * {
+.tree-view, .tree-view * {
     -fx-padding: 0;
     -fx-background-color: transparent;
     -fx-background-radius: 0;
@@ -901,23 +901,10 @@
     -fx-border-insets: 0;
 }
 .tree-view {
-    -fx-border-color: -tmg-text;
-    -fx-border-style: solid;
-    -fx-border-width: 0 0 2px 0;
     -fx-background-color: -tmg-bg1;
-    -fx-background-radius: 0;
-    -fx-font-size: 16px;
-    -fx-padding: 11px 0 0 0;
-}
-.tree-view:focused {
-    -fx-border-color: -tmg-primary;
-}
-.tree-view .text-input {
-    -fx-padding: 0 0 4px 0;
-    -fx-border-width: 0;
+    -fx-font-size: 14px;
 }
 .tree-view .tree-cell {
-    -fx-background-color: -tmg-bg1;
     -fx-padding: 4px 8px;
     -fx-text-fill: -tmg-text;
 }
@@ -938,19 +925,15 @@
 .tree-view .tree-cell:selected .glyph-icon {
     -fx-fill: -tmg-text-bright;
 }
-.tree-view .tree-cell .button {
-        -fx-text-alignment: right;
-        -fx-background-color: -tmg-bg2-light;
-        -fx-padding: 2.5px 8px;
-        -fx-background-radius: 3px;
-        -fx-font-size: 14px;
-        -fx-text-fill: -tmg-text;
+.tree-view .tree-cell .button .glyph-icon {
+    -fx-fill: -tmg-text-dark;
+    -glyph-size: 16px;
 }
-.tree-view .tree-cell .button:hover {
-    -fx-background-color: -tmg-bg2;
+.tree-view .tree-cell .button:hover .glyph-icon {
+    -fx-fill: -tmg-text-light;
 }
-.tree-view .tree-cell .button:pressed {
-    -fx-background-color: -tmg-primary;
+.tree-view .tree-cell .button:pressed .glyph-icon {
+    -fx-fill: -tmg-text-bright;
 }
 
 .combo-box .combo-box-popup {
