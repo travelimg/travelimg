@@ -28,36 +28,4 @@ public class ImageGridPage extends ImageGrid<PhotoGridTile> {
 
         return photos.get(0);
     }
-
-    /**
-     * Select the n'th photo (index) in the grid.
-     *
-     * @param index Specify which photo to select.
-     */
-    public void selectAt(int index) {
-        if (tiles.isEmpty())
-            return;
-
-        ImageGridTile tile = tiles.get(Math.max(Math.min(tiles.size() - 1, index), 0));
-        tile.select();
-        onSelectionChange();
-    }
-
-    /**
-     * Return the index of the first selected tile.
-     *
-     * @return the index of the first selected tile or -1 if none is selected.
-     */
-    public int getFirstSelectedIndex() {
-        ImageGridTile selected = tiles.stream()
-                .filter(ImageGridTile::isSelected)
-                .findFirst()
-                .orElse(null);
-
-        if (selected == null) {
-            return -1;
-        } else {
-            return tiles.indexOf(selected);
-        }
-    }
 }

@@ -36,10 +36,14 @@ public class PhotoServiceImpl implements PhotoService {
     private AsyncPhotoRepository photoRepository;
     @Autowired
     private WorkspaceService workspaceService;
+    @Autowired
+    private ScheduledExecutorService scheduler;
 
     private Listener listener;
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> watcherSchedule = null;
+
+    private final ExecutorService operationExecutor = Executors.newFixedThreadPool(4);
+
 
     @Autowired
     private void initializeListeners(AsyncPhotoRepository repository) {
@@ -71,6 +75,7 @@ public class PhotoServiceImpl implements PhotoService {
 
         // refresh the watcher and synchronize the repository
         watcher.refresh();
+        photoRepository.clearQueue();
         try {
             photoRepository.synchronize();
         } catch (DAOException ex) {
@@ -85,8 +90,7 @@ public class PhotoServiceImpl implements PhotoService {
         if (watcherSchedule != null) {
             watcherSchedule.cancel(true);
         }
-        scheduler.shutdown();
-        listener.close();
+        operationExecutor.shutdown();
     }
 
     @Override
@@ -182,12 +186,6 @@ public class PhotoServiceImpl implements PhotoService {
             AsyncPhotoRepository.AsyncListener,
             PhotoRepository.Listener {
 
-        private final ExecutorService executor = Executors.newFixedThreadPool(1);
-
-        public void close() {
-            executor.shutdown();
-        }
-
         @Override public void onError(PhotoRepository repository, DAOException error) {
             LOGGER.error("repository error {}", error);
         }
@@ -200,7 +198,7 @@ public class PhotoServiceImpl implements PhotoService {
         @Override public void onQueue(AsyncPhotoRepository repository, Operation operation) {
             LOGGER.info("queued {}", operation);
             LOGGER.info("queue length {}", repository.getQueue().size());
-            executor.execute(repository::completeNext);
+            operationExecutor.execute(repository::completeNext);
         }
     }
 }
