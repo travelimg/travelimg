@@ -66,7 +66,6 @@ public class GridViewImpl implements GridView {
     private Node folderDropTarget;
 
     private PaginatedImageGrid grid;
-    private boolean disableReload = false;
 
     @FXML
     private void initialize() {
@@ -76,7 +75,6 @@ public class GridViewImpl implements GridView {
         content.setCenter(grid);
         menu.addListener(new MenuListener());
         organizer.setFilterChangeAction(this::handleFilterChange);
-        content.setCenter(grid);
 
         // Selected photos are shown in the inspector.
         grid.setSelectionChangeAction(inspector::setEntities);
@@ -91,13 +89,17 @@ public class GridViewImpl implements GridView {
         // Updated photos that no longer match the filter are removed from the grid.
         inspector.setUpdateHandler(() -> {
             Collection<Photo> photos = inspector.getEntities();
-
-            photos.stream()
-                    .filter(organizer.getUsedFilter().negate())
-                    .forEach(grid::removePhoto);
-            photos.stream()
-                    .filter(organizer.getUsedFilter())
-                    .forEach(grid::updatePhoto);
+            photos.forEach(p -> {
+                if (!organizer.accept(p)) {
+                    organizer.remove(p);
+                    grid.removePhoto(p);
+                }
+            });
+            photos.forEach(p -> {
+                if (organizer.accept(p)) {
+                    grid.updatePhoto(p);
+                }
+            });
         });
 
         // Apply the initial filter.
@@ -122,16 +124,9 @@ public class GridViewImpl implements GridView {
         }
     }
 
-    private void handleImportError(Throwable error) {
-        LOGGER.error("import error", error);
-
-        // queue an update in the main gui
-        Platform.runLater(() -> ErrorDialog.show(root, "Import fehlgeschlagen", "Fehlermeldung: " + error.getMessage()));
-    }
-
     private void handlePhotoCreated(Photo photo) {
         Platform.runLater(() -> {
-            if (organizer.getUsedFilter().test(photo)) {
+            if (organizer.accept(photo)) {
                 grid.addPhoto(photo);
             }
         });
@@ -160,15 +155,16 @@ public class GridViewImpl implements GridView {
 
 
     private void handleFilterChange() {
-        if (!disableReload)
-            reloadImages();
+        reloadImages();
     }
 
     private void reloadImages() {
+        organizer.reset();
         try {
-            grid.setPhotos(photoService.getAllPhotos(organizer.getUsedFilter()).stream()
-                            .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
-                            .collect(Collectors.toList()));
+            List<Photo> photos = photoService.getAllPhotos(organizer::accept).stream()
+                    .sorted((p1, p2) -> p2.getData().getDatetime()
+                            .compareTo(p1.getData().getDatetime())).collect(Collectors.toList());
+            grid.setPhotos(photos);
         } catch (ServiceException ex) {
             LOGGER.error("failed loading fotos", ex);
             ErrorDialog.show(root, "Laden von Fotos fehlgeschlagen",

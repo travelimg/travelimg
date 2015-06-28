@@ -4,7 +4,7 @@ import at.ac.tuwien.qse.sepm.entities.*;
 
 import java.util.HashSet;
 
-public class PhotoAggregator extends HashSet<Photo> {
+public class PhotoSet extends HashSet<Photo> {
 
     private final Aggregator<Tag> tags = new Aggregator<>();
     private final Aggregator<Rating> ratings = new Aggregator<>();

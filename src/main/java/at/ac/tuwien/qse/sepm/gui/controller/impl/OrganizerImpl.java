@@ -8,6 +8,8 @@ import at.ac.tuwien.qse.sepm.gui.controller.Organizer;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.dialogs.InfoDialog;
 import at.ac.tuwien.qse.sepm.service.*;
+import at.ac.tuwien.qse.sepm.service.impl.Aggregator;
+import at.ac.tuwien.qse.sepm.service.impl.PhotoSet;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoPathFilter;
 import javafx.application.Platform;
@@ -16,7 +18,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +33,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Controller for organizer view which is used for browsing photos by month.
- */
 public class OrganizerImpl implements Organizer {
 
     private static final Logger LOGGER = LogManager.getLogger(OrganizerImpl.class);
@@ -63,6 +61,9 @@ public class OrganizerImpl implements Organizer {
     @FXML private ChoiceBox<Path> directoryChoiceBox;
     @FXML private Button deleteFolderButton;
 
+    private final PhotoSet allPhotos = new PhotoSet();
+    private final PhotoSet acceptedPhotos = new PhotoSet();
+
     private PhotoFilter usedFilter = new PhotoFilter();
     private PhotoFilter photoFilter = usedFilter;
     private PhotoFilter folderFilter = new PhotoPathFilter();
@@ -73,8 +74,24 @@ public class OrganizerImpl implements Organizer {
         filterChangeCallback = callback;
     }
 
-    @Override public PhotoFilter getUsedFilter() {
-        return usedFilter;
+    @Override public void reset() {
+        allPhotos.clear();
+        acceptedPhotos.clear();
+    }
+
+    @Override public boolean accept(Photo photo) {
+        remove(photo);
+        allPhotos.add(photo);
+        if (usedFilter.test(photo)) {
+            acceptedPhotos.add(photo);
+            return true;
+        }
+        return false;
+    }
+
+    @Override public void remove(Photo photo) {
+        allPhotos.remove(photo);
+        acceptedPhotos.remove(photo);
     }
 
     @FXML private void initialize() {
@@ -315,7 +332,7 @@ public class OrganizerImpl implements Organizer {
         refreshPhotographers();
     }
     private void refreshRatings() {
-        refreshFilter(ratingFilter, getAllRatings(), value -> {
+        refreshFilter(acceptedPhotos.getRatings(), ratingFilter, getAllRatings(), value -> {
             switch (value) {
                 case GOOD:
                     return "Gut";
@@ -329,32 +346,36 @@ public class OrganizerImpl implements Organizer {
         });
     }
     private void refreshTags() {
-        refreshFilter(tagFilter, getAllTags(), value -> {
-            if (value == null) return "Keinen Kategorien";
+        refreshFilter(acceptedPhotos.getTags(), tagFilter, getAllTags(), value -> {
+            if (value == null)
+                return "Keine Kategorien";
             return value.getName();
         });
     }
     private void refreshJourneys() {
-        refreshFilter(journeyFilter, getAllJourneys(), value -> {
-            if (value == null) return "Keine Reise";
+        refreshFilter(acceptedPhotos.getJourneys(), journeyFilter, getAllJourneys(), value -> {
+            if (value == null)
+                return "Keine Reise";
             return value.getName();
         });
     }
     private void refreshPlaces() {
-        refreshFilter(placeFilter, getAllPlaces(), value -> {
-            if (value == null) return "Kein Ort";
+        refreshFilter(acceptedPhotos.getPlaces(), placeFilter, getAllPlaces(), value -> {
+            if (value == null)
+                return "Kein Ort";
             return value.getCountry() + ", " + value.getCity();
         });
     }
     private void refreshPhotographers() {
-        refreshFilter(photographerFilter, getAllPhotographers(), value -> {
-            if (value == null)
-                return "Kein Fotograf";
-            return value.getName();
-        });
+        refreshFilter(acceptedPhotos.getPhotographers(), photographerFilter, getAllPhotographers(),
+                value -> {
+                    if (value == null)
+                        return "Kein Fotograf";
+                    return value.getName();
+                });
     }
 
-    private static <T> void refreshFilter(FilterGroup<T> filterGroup, Collection<T> values, Function<T, String> converter) {
+    private static <T> void refreshFilter(Aggregator<T> aggregator, FilterGroup<T> filterGroup, Iterable<T> values, Function<T, String> converter) {
         Platform.runLater(() -> {
             // NOTE: Remember the values that were excluded before the refresh and exclude them.
             // That way the filter stays the same and new values are included automatically.
@@ -365,12 +386,12 @@ public class OrganizerImpl implements Organizer {
                 filter.setValue(p);
                 filter.setConverter(converter);
                 filter.setIncluded(!excluded.contains(p));
+                filter.setCount(aggregator.getCount(p));
                 filterGroup.getItems().add(filter);
             });
             LOGGER.info("refreshing filter");
         });
     }
-
 
     private void handlePhotoAdded(Photo photo) {
         Platform.runLater(() -> {
@@ -385,7 +406,6 @@ public class OrganizerImpl implements Organizer {
             buildTreeView();
         });
     }
-
     private boolean isPathAlreadyKnown(Path directory, FilePathTreeItem node) {
         if (node == null) {
             return false;

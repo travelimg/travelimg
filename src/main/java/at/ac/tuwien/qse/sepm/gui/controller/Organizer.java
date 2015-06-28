@@ -1,7 +1,10 @@
 package at.ac.tuwien.qse.sepm.gui.controller;
 
+import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.entities.Place;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
+
+import java.util.Collection;
 
 /**
  * View for browsing and filtering photos by various criteria.
@@ -16,12 +19,11 @@ public interface Organizer {
      */
     void setFilterChangeAction(Runnable callback);
 
-    /**
-     * Get the current filter.
-     *
-     * @return current filter
-     */
-    PhotoFilter getUsedFilter();
+    void reset();
+
+    boolean accept(Photo photo);
+
+    void remove(Photo photo);
 
     /**
      * only check Place pl
