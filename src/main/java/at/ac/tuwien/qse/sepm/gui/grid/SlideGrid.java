@@ -21,7 +21,7 @@ public class SlideGrid extends TilePane {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final Collection<SlideGridNode> nodes = new LinkedList<>();
+    private final List<SlideGridNode> nodes = new LinkedList<>();
     private Slideshow slideshow = null;
 
     private SlideCallback<Void> slideSelectedCallback = null;
@@ -71,9 +71,8 @@ public class SlideGrid extends TilePane {
         slideshow.getMapSlides().forEach(this::addSlide);
         slideshow.getTitleSlides().forEach(this::addSlide);
 
-        nodes.stream()
-                .sorted((n1, n2) -> n1.getTile().getSlide().getOrder().compareTo(n2.getTile().getSlide().getOrder()))
-                .forEach((node) -> getChildren().add(node));
+        Collections.sort(nodes, (n1, n2) -> n1.getTile().getSlide().getOrder().compareTo(n2.getTile().getSlide().getOrder()));
+        nodes.stream().forEach((node) -> getChildren().add(node));
     }
 
     public void deselectAll() {

@@ -8,36 +8,34 @@
 <?import javafx.scene.layout.VBox?>
 <InspectorPane fx:id="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
                xmlns:fx="http://javafx.com/fxml/1"
-               fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.MapSlideInspectorImpl">
-    <VBox>
-        <Label>Beschriftung</Label>
-        <TextField fx:id="captionField"/>
+               fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.MapSlideInspectorImpl"
+        styleClass="slide-inspector, map">
+    <VBox spacing="5">
+        <Button fx:id="deleteButton" styleClass="delete">
+            <graphic>
+                <FontAwesomeIconView glyphName="TRASH" />
+            </graphic>
+            <tooltip>
+                <Tooltip text="Folie löschen" />
+            </tooltip>
+        </Button>
 
-        <GoogleMapScene fx:id="map" maxHeight="300" minHeight="100" maxWidth="300" minWidth="100"
-                        style="-fx-padding: 20 0 0 0"/>
+        <TextField fx:id="captionField" promptText="Folienunterschrift..."/>
+        <GoogleMapScene fx:id="map" maxHeight="300" minHeight="100" maxWidth="300" minWidth="100"/>
 
-        <HBox spacing="10" alignment="CENTER">
+        <HBox spacing="10" alignment="CENTER" styleClass="coord-select">
             <children>
                 <Label fx:id="choosePrompt" alignment="CENTER">Zum Ändern klicken:</Label>
                 <ToggleButton fx:id="chooseLocationButton">
                     <graphic>
-                        <FontAwesomeIconView glyphName="MAP_MARKER"
-                                             style="-fx-fill: -tmg-text-light"/>
+                        <FontAwesomeIconView glyphName="MAP_MARKER" styleClass="marker-icon"/>
                     </graphic>
                 </ToggleButton>
             </children>
         </HBox>
 
-        <Label style="-fx-padding: 20 0 0 0">Zoomstufe</Label>
+        <Label style="-fx-padding: 10 0 0 0">Zoomstufe</Label>
         <Slider fx:id="zoomSlider" min="1" max="20" value="10" showTickLabels="false"
                 showTickMarks="0" blockIncrement="1" style="-fx-padding: 5 0 0 0"/>
-
-        <Button fx:id="deleteButton"
-                style="-fx-background-color: transparent">
-            <graphic>
-                <FontAwesomeIconView glyphName="TRASH" glyphSize="25"
-                                     style="-fx-fill: -tmg-text-light"/>
-            </graphic>
-        </Button>
     </VBox>
 </InspectorPane>

@@ -62,7 +62,9 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
     private void updateCoordinates(double latitude, double longitude) {
         MapSlide slide = getSlide();
 
-        if (slide == null) {
+        if (slide == null
+                || ((Double.compare(latitude, slide.getLatitude()) == 0)
+                && (Double.compare(longitude, slide.getLongitude()) == 0))) {
             return;
         }
 
@@ -83,12 +85,13 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
 
     private void handleCaptionChange(Observable observable) {
         MapSlide slide = getSlide();
+        String caption = captionField.getText();
 
-        if (slide == null) {
+        if (slide == null || slide.getCaption().equals(caption)) {
             return;
         }
 
-        slide.setCaption(captionField.getText());
+        slide.setCaption(caption);
 
         try {
             slideService.update(slide);
@@ -100,12 +103,14 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
 
     private void handleZoomChange(Observable observable) {
         MapSlide slide = getSlide();
+        int zoomLevel = (int)zoomSlider.getValue();
 
-        if (slide == null) {
+        if (slide == null || zoomLevel == slide.getZoomLevel()) {
             return;
         }
 
-        slide.setZoomLevel((int)zoomSlider.getValue());
+        slide.setZoomLevel(zoomLevel);
+        map.setZoom(zoomLevel);
 
         try {
             slideService.update(slide);
@@ -132,9 +137,9 @@ public class MapSlideInspectorImpl extends SlideInspectorImpl<MapSlide> {
 
         try {
             slideService.delete(slide);
-            onUpdate();
+            onDelete(slide);
         } catch (ServiceException ex) {
-            ErrorDialog.show(root, "Fehler beim Ändern des Textes", "");
+            ErrorDialog.show(root, "Fehler beim Löschen der Folie", "");
         }
     }
 }

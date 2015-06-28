@@ -5,9 +5,6 @@ import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 
 import java.util.List;
 
-/**
- * Created by mb on 08.06.15.
- */
 public interface SlideshowDAO {
 
     /**
@@ -29,21 +26,11 @@ public interface SlideshowDAO {
     Slideshow update(Slideshow slideshow) throws DAOException, ValidationException;
 
     /**
-     * Reads a single slideshow by the id
-     * @param id of the desired slideshow
-     * @return the read slideshow
-     * @throws DAOException If the data store fails to retrieve the record or if the slideshow doesnt exists
-     */
-
-    Slideshow getById(int id) throws  DAOException;
-
-    /**
      * Delete a selected slideshow
      * @param slideshow of the desired slideshow
      * @return the deleted slideshow
      * @throws DAOException If the data store fails to retrieve the record or if the slideshow doesnt exists
      */
-
     void delete(Slideshow slideshow) throws DAOException, ValidationException;
 
     /**

@@ -39,12 +39,13 @@ public class PhotoSlideInspectorImpl extends SlideInspectorImpl<PhotoSlide> {
 
     private void handleCaptionChange(Observable observable) {
         PhotoSlide slide = getSlide();
+        String caption = captionField.getText();
 
-        if (slide == null) {
+        if (slide == null || slide.getCaption().equals(caption)) {
             return;
         }
 
-        slide.setCaption(captionField.getText());
+        slide.setCaption(caption);
 
         try {
             slideService.update(slide);
@@ -63,9 +64,9 @@ public class PhotoSlideInspectorImpl extends SlideInspectorImpl<PhotoSlide> {
 
         try {
             slideService.delete(slide);
-            onUpdate();
+            onDelete(slide);
         } catch (ServiceException ex) {
-            ErrorDialog.show(root, "Fehler beim Ändern des Textes", "");
+            ErrorDialog.show(root, "Fehler beim Löschen der Folie", "");
         }
     }
 }

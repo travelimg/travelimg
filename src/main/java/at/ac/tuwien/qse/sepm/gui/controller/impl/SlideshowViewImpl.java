@@ -3,25 +3,27 @@ package at.ac.tuwien.qse.sepm.gui.controller.impl;
 import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.gui.PresentationWindow;
 import at.ac.tuwien.qse.sepm.gui.control.InspectorPane;
-import at.ac.tuwien.qse.sepm.gui.controller.Inspector;
 import at.ac.tuwien.qse.sepm.gui.controller.SlideshowView;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.grid.SlideGrid;
 import at.ac.tuwien.qse.sepm.gui.slide.SlideCallback;
+import at.ac.tuwien.qse.sepm.gui.util.BufferedBatchOperation;
+import at.ac.tuwien.qse.sepm.service.PhotoService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SlideService;
 import at.ac.tuwien.qse.sepm.service.SlideshowService;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class SlideshowViewImpl implements SlideshowView {
 
@@ -34,6 +36,8 @@ public class SlideshowViewImpl implements SlideshowView {
     private SlideService slideService;
     @Autowired
     private SlideshowService slideShowService;
+    @Autowired
+    private PhotoService photoService;
 
     @Autowired
     private SlideInspectorImpl<PhotoSlide> photoSlideInspector;
@@ -58,6 +62,12 @@ public class SlideshowViewImpl implements SlideshowView {
     private SlideshowService slideshowService;
 
     private ObservableList<Slideshow> slideshows = FXCollections.observableArrayList();
+    private BufferedBatchOperation<Path> deletedOperation;
+
+    @Autowired
+    public void setScheduler(ScheduledExecutorService scheduler) {
+        deletedOperation = new BufferedBatchOperation<>(this::handleDeletedPhotos, scheduler);
+    }
 
     @FXML
     private void initialize() {
@@ -76,11 +86,10 @@ public class SlideshowViewImpl implements SlideshowView {
             slideshows.remove(slideshows.size() - 1); // remove placeholder
             slideshows.add(slideshow); // add created slideshow
             slideshows.add(createNewSlideshowPlaceholder()); // re-add placeholder
+            slideshowOrganizer.setSelected(slideshows.size() - 2);
         });
 
-        slideshowOrganizer.setDeleteAction((slideshow) -> {
-            slideshows.remove(slideshow);
-        });
+        slideshowOrganizer.setDeleteAction(this::handleDeleteSlideshow);
 
         slideshowOrganizer.setPresentAction(() -> {
             Slideshow selected = slideshowOrganizer.getSelected();
@@ -91,6 +100,25 @@ public class SlideshowViewImpl implements SlideshowView {
         photoSlideInspector.setUpdateHandler(() -> grid.setSlideshow(slideshowOrganizer.getSelected()));
         mapSlideInspector.setUpdateHandler(() -> grid.setSlideshow(slideshowOrganizer.getSelected()));
         titleSlideInspector.setUpdateHandler(() -> grid.setSlideshow(slideshowOrganizer.getSelected()));
+
+        photoSlideInspector.setDeleteHandler(slide -> {
+            slideshowOrganizer.getSelected().getPhotoSlides().remove(slide);
+            grid.setSlideshow(slideshowOrganizer.getSelected());
+        });
+
+        mapSlideInspector.setDeleteHandler(slide -> {
+            slideshowOrganizer.getSelected().getMapSlides().remove(slide);
+            grid.setSlideshow(slideshowOrganizer.getSelected());
+        });
+
+        titleSlideInspector.setDeleteHandler(slide -> {
+            slideshowOrganizer.getSelected().getTitleSlides().remove(slide);
+            grid.setSlideshow(slideshowOrganizer.getSelected());
+        });
+
+        photoService.subscribeDelete(photo -> {
+            deletedOperation.add(photo);
+        });
     }
 
     @Override
@@ -126,11 +154,35 @@ public class SlideshowViewImpl implements SlideshowView {
 
     private void loadAllSlideshows() {
         try {
+            int selectedIndex = slideshows.indexOf(slideshowOrganizer.getSelected());
             slideshows.clear();
             slideshows.addAll(slideShowService.getAllSlideshows());
             slideshows.add(createNewSlideshowPlaceholder()); // represents a new slideshow which will be created if the user makes use of it
+
+            if (selectedIndex >= 0) {
+                slideshowOrganizer.setSelected(selectedIndex);
+            } else if (slideshows.size() > 0) {
+                slideshowOrganizer.setSelected(0);
+            }
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Laden aller Slideshows", "Fehlermeldung: " + ex.getMessage());
+        }
+    }
+
+    private void handleDeletedPhotos(List<Path> paths) {
+        Platform.runLater(() -> {
+            loadAllSlideshows();
+            refreshGrid();
+        });
+    }
+
+    private void handleDeleteSlideshow(Slideshow slideshow) {
+        slideshows.remove(slideshow);
+
+        try {
+            slideShowService.delete(slideshow);
+        } catch (ServiceException ex) {
+            ErrorDialog.show(root, "Fehler beim Löschen der Diashow", "");
         }
     }
 
@@ -146,42 +198,32 @@ public class SlideshowViewImpl implements SlideshowView {
     private class SlideSelectedCallback implements SlideCallback<Void> {
         @Override
         public void handle(PhotoSlide slide) {
-            LOGGER.debug("Selected {}", slide);
             photoSlideInspector.setSlide(slide);
 
-            photoSlideInspectorPane.setVisible(true);
             photoSlideInspectorPane.setCount(1);
-
+            photoSlideInspectorPane.setVisible(true);
             mapSlideInspectorPane.setVisible(false);
-            mapSlideInspectorPane.setCount(0);
             titleSlideInspectorPane.setVisible(false);
-            titleSlideInspectorPane.setCount(0);
         }
 
         @Override
         public void handle(MapSlide slide) {
             mapSlideInspector.setSlide(slide);
 
-            mapSlideInspectorPane.setVisible(true);
             mapSlideInspectorPane.setCount(1);
-
+            mapSlideInspectorPane.setVisible(true);
             photoSlideInspectorPane.setVisible(false);
-            photoSlideInspectorPane.setCount(0);
             titleSlideInspectorPane.setVisible(false);
-            titleSlideInspectorPane.setCount(0);
         }
 
         @Override
         public void handle(TitleSlide slide) {
             titleSlideInspector.setSlide(slide);
 
-            titleSlideInspectorPane.setVisible(true);
             titleSlideInspectorPane.setCount(1);
-
+            titleSlideInspectorPane.setVisible(true);
             photoSlideInspectorPane.setVisible(false);
-            photoSlideInspectorPane.setCount(0);
             mapSlideInspectorPane.setVisible(false);
-            mapSlideInspectorPane.setCount(0);
         }
     }
 
@@ -301,6 +343,4 @@ public class SlideshowViewImpl implements SlideshowView {
             }
         }
     }
-
-
 }
