@@ -34,7 +34,7 @@ public class PageSelector extends HBox {
         Tooltip previousTooltip = new Tooltip();
         previousTooltip.setText("Vorige Seite");
         previousButton.setTooltip(previousTooltip);
-        previousButton.getStyleClass().addAll("previous");
+        previousButton.getStyleClass().addAll("nav-button");
         previousButton.setOnAction(e -> previousPage());
         previousButton.setMaxHeight(Double.MAX_VALUE);
         HBox.setHgrow(previousButton, Priority.ALWAYS);
@@ -45,7 +45,7 @@ public class PageSelector extends HBox {
         Tooltip nextTooltip = new Tooltip();
         nextTooltip.setText("Nächste Seite");
         nextButton.setTooltip(nextTooltip);
-        nextButton.getStyleClass().addAll("previous");
+        nextButton.getStyleClass().addAll("nav-button");
         nextButton.setOnAction(e -> nextPage());
         nextButton.setMaxHeight(Double.MAX_VALUE);
         HBox.setHgrow(nextButton, Priority.ALWAYS);
@@ -84,8 +84,7 @@ public class PageSelector extends HBox {
 
         buttons.forEach(b -> b.setSelected(false));
         currentPageProperty().set(currentPage);
-        buttons.get(getCurrentPage()).setSelected(true);
-        updateNavigationButtons();
+        updateCurrentPage();
     }
 
     public int getLastPage() {
@@ -132,10 +131,11 @@ public class PageSelector extends HBox {
         if (getCurrentPage() > getLastPage()) {
             setCurrentPage(getLastPage());
         }
-        updateNavigationButtons();
+        updateCurrentPage();
     }
 
-    private void updateNavigationButtons() {
+    private void updateCurrentPage() {
+        buttons.get(getCurrentPage()).setSelected(true);
         previousButton.setDisable(false);
         nextButton.setDisable(false);
         if (isFirstPage()) {

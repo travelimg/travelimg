@@ -1,7 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
 import at.ac.tuwien.qse.sepm.gui.controller.StatusIndicator;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SynchronizationService;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -14,7 +13,7 @@ import java.util.List;
 
 public class StatusIndicatorImpl implements StatusIndicator {
 
-    private final List<ServiceException> errors = new LinkedList<>();
+    private final List<Object> errors = new LinkedList<>();
 
     private State state = State.SYNCHRONIZED;
 
@@ -40,8 +39,14 @@ public class StatusIndicatorImpl implements StatusIndicator {
 
         syncService.subscribeQueue(operation -> Platform.runLater(this::update));
         syncService.subscribeComplete(operation -> Platform.runLater(this::update));
-        syncService.subscribeError((operation, error) -> Platform.runLater(this::update));
-        errorIndicator.setOnAction(event -> Platform.runLater(this::update));
+        syncService.subscribeError((operation, error) -> {
+            errors.add(operation);
+            Platform.runLater(this::update);
+        });
+        errorIndicator.setOnAction(event -> {
+            errors.clear();
+            Platform.runLater(this::update);
+        });
     }
 
     private void update() {

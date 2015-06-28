@@ -55,8 +55,8 @@ public class PhotoGridTile extends ImageGridTile {
     }
 
     @Override
-    public void setPhoto(Photo photo, Image image) {
-        super.setPhoto(photo, image);
+    public void setPhoto(Photo photo) {
+        super.setPhoto(photo);
         if (photo == null) return;
 
         showRating(photo.getData().getRating());

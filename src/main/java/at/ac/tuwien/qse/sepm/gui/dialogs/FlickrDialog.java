@@ -2,18 +2,14 @@ package at.ac.tuwien.qse.sepm.gui.dialogs;
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.gui.FXMLLoadHelper;
-import at.ac.tuwien.qse.sepm.gui.GoogleMapsScene;
+import at.ac.tuwien.qse.sepm.gui.control.GoogleMapScene;
+import at.ac.tuwien.qse.sepm.gui.util.LatLong;
+import at.ac.tuwien.qse.sepm.service.ExifService;
 import at.ac.tuwien.qse.sepm.service.FlickrService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.ErrorHandler;
-import com.lynden.gmapsfx.GoogleMapView;
-import com.lynden.gmapsfx.MapComponentInitializedListener;
-import com.lynden.gmapsfx.javascript.event.UIEventType;
-import com.lynden.gmapsfx.javascript.object.GoogleMap;
-import com.lynden.gmapsfx.javascript.object.LatLong;
-import com.lynden.gmapsfx.javascript.object.Marker;
-import com.lynden.gmapsfx.javascript.object.MarkerOptions;
+import at.ac.tuwien.qse.sepm.util.IOHandler;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -35,16 +31,17 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import netscape.javascript.JSObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,9 +60,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     @FXML
     private FlowPane photosFlowPane;
     @FXML
-    private Button downloadButton, importButton, stopButton;
-    @FXML
-    private Pane mapContainer;
+    private Button downloadButton, importButton, stopButton, cancelButton;
     @FXML
     private ScrollPane scrollPane;
     @FXML
@@ -74,21 +69,23 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     private TextField keywordTextField;
     @FXML
     private DatePicker datePicker;
+    @FXML
+    private GoogleMapScene mapScene;
+
     private FlickrService flickrService;
-    private GoogleMapView mapView;
-    private GoogleMap googleMap;
-    private Marker actualMarker;
+    private ExifService exifService;
+    private IOHandler ioHandler;
     private LatLong actualLatLong;
     private ArrayList<ImageTile> selectedImages = new ArrayList<ImageTile>();
     private Cancelable downloadTask;
 
-    public FlickrDialog(Node origin, String title, FlickrService flickrService) {
+    public FlickrDialog(Node origin, String title, FlickrService flickrService, ExifService exifService, IOHandler ioHandler) {
         super(origin, title);
         FXMLLoadHelper.load(this, this, FlickrDialog.class, "view/FlickrDialog.fxml");
-        GoogleMapsScene mapsScene = new GoogleMapsScene();
-        this.mapView = mapsScene.getMapView();
-        this.mapContainer.getChildren().add(mapsScene.getMapView());
+
         this.flickrService = flickrService;
+        this.exifService = exifService;
+        this.ioHandler = ioHandler;
         keywordTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -108,17 +105,9 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
                 }
             }
         });
-        mapView.addMapInializedListener(new MapComponentInitializedListener() {
-            @Override
-            public void mapInitialized() {
-                //wait for the map to initialize.
-                googleMap = mapView.getMap();
-                googleMap.addUIEventHandler(UIEventType.dblclick, (JSObject obj) -> {
-                    //googleMap.setZoom(googleMap.getZoom()-1); //workaround to prevent zoom on doubleclick
-                    dropMarker(new LatLong((JSObject) obj.getMember("latLng")));
-                });
-            }
-        });
+
+        mapScene.setDoubleClickCallback((position) -> dropMarker(position));
+
         scrollPane.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -139,6 +128,11 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
         stopButton.setTooltip(new Tooltip("Abbrechen"));
         datePicker.setValue(LocalDate.now());
         datePicker.setTooltip(new Tooltip("Wählen Sie ein Datum für die Fotos aus"));
+
+        cancelButton.setOnAction(e -> close());
+        importButton.setOnAction(e -> handleImport());
+        downloadButton.setOnAction(e -> handleDownload());
+        stopButton.setOnAction(e -> handleStop());
     }
 
 
@@ -179,38 +173,43 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
     }
 
     private void dropMarker(LatLong ll) {
-        if (actualMarker != null) {
-            googleMap.removeMarker(actualMarker);
+        if (actualLatLong != null) {
+            mapScene.clear();
         }
         this.actualLatLong = ll;
-        googleMap.addMarker(actualMarker = new Marker(new MarkerOptions().position(ll)));
+        mapScene.addMarker(ll);
         flickrService.reset();
         downloadButton.setText("Fotos herunterladen");
     }
 
-    @FXML
-    public void handleOnDownloadButtonClicked() {
+    public void handleDownload() {
         downloadButton.setDisable(true);
         progress.setVisible(true);
         downloadPhotos();
     }
 
-    @FXML
-    public void handleOnImportButtonClicked() {
+    public void handleImport() {
         ArrayList<Photo> photos = new ArrayList<Photo>();
         for (ImageTile i : selectedImages) {
             Photo p = i.getPhoto();
             p.getData().setDatetime(datePicker.getValue().atStartOfDay());
-            photos.add(p);
+            try {
+                exifService.setDateAndGeoData(p);
+                photos.add(p);
+                Path path = Paths.get(p.getPath());
+                ioHandler.copyFromTo(Paths.get(p.getPath()),Paths.get(System.getProperty("user.home"),"travelimg/"+path.getFileName()));
+            } catch (IOException e) {
+                logger.debug("Couldn't copy photo {} to travelimg folder ",p.getPath(),e);
+            } catch (ServiceException e) {
+                logger.debug("Couldn't set date and geodata for {} ",p.getPath(),e);
+            }
             logger.debug("Added photo for import {}", p);
         }
-        setResult(photos);
         selectedImages.clear();
         close();
     }
 
-    @FXML
-    public void handleOnStopButtonClicked() {
+    public void handleStop() {
         ConfirmationDialog confirmationDialog = new ConfirmationDialog(borderPane, "Download abbrechen", "Download abbrechen?");
         Optional<Boolean> confirmed = confirmationDialog.showForResult();
         if (!confirmed.isPresent() || !confirmed.get()) return;
@@ -236,7 +235,7 @@ public class FlickrDialog extends ResultDialog<List<Photo>> {
             double longitude = 0.0;
             boolean useGeoData = false;
 
-            if (actualMarker != null) {
+            if (actualLatLong != null) {
                 latitude = actualLatLong.getLatitude();
                 longitude = actualLatLong.getLongitude();
                 useGeoData = true;

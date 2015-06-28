@@ -20,9 +20,6 @@ public class MenuImpl implements Menu {
     private Button presentButton;
 
     @FXML
-    private Button importButton;
-
-    @FXML
     private Button flickrButton;
 
     @FXML
@@ -60,7 +57,6 @@ public class MenuImpl implements Menu {
     @FXML
     private void initialize() {
         presentButton.setOnAction((e) -> listeners.forEach(l -> l.onPresent(this)));
-        importButton.setOnAction((e) -> listeners.forEach(l -> l.onImport(this)));
         flickrButton.setOnAction((e) -> listeners.forEach(l -> l.onFlickr(this)));
         journeyButton.setOnAction((e) -> listeners.forEach(l -> l.onJourney(this)));
         deleteButton.setOnAction((e) -> listeners.forEach(l -> l.onDelete(this)));

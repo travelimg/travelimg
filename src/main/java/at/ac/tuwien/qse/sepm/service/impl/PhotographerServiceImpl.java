@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
 import at.ac.tuwien.qse.sepm.dao.PhotographerDAO;
+import at.ac.tuwien.qse.sepm.dao.EntityWatcher;
 import at.ac.tuwien.qse.sepm.entities.Photographer;
 import at.ac.tuwien.qse.sepm.entities.validators.ValidationException;
 import at.ac.tuwien.qse.sepm.service.PhotographerService;
@@ -11,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class PhotographerServiceImpl implements PhotographerService {
 
@@ -18,11 +20,18 @@ public class PhotographerServiceImpl implements PhotographerService {
 
     @Autowired
     private PhotographerDAO photographerDAO;
+    private Consumer<Photographer> refreshPhotographers;
+
+    @Autowired private void setEntityWatcher(EntityWatcher<Photographer> watcher) {
+        watcher.subscribeAdded(this::photographerAdded);
+    }
 
     @Override
     public Photographer create(Photographer photographer) throws ServiceException {
         try {
-            return photographerDAO.create(photographer);
+            photographer = photographerDAO.create(photographer);
+            photographerAdded(photographer);
+            return photographer;
         } catch (DAOException | ValidationException ex) {
             throw new ServiceException("Failed to create photographer", ex);
         }
@@ -47,5 +56,15 @@ public class PhotographerServiceImpl implements PhotographerService {
             LOGGER.debug("Failed to retrieve all photographers", ex);
             throw new ServiceException("Failed to retrieve all photographers", ex);
         }
+    }
+
+    private void photographerAdded(Photographer photographer) {
+        if (refreshPhotographers != null) {
+            refreshPhotographers.accept(photographer);
+        }
+    }
+
+    @Override public void subscribeChanged(Consumer<Photographer> callback) {
+        this.refreshPhotographers = callback;
     }
 }
