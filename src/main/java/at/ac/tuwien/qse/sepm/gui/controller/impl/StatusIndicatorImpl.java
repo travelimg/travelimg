@@ -1,8 +1,6 @@
 package at.ac.tuwien.qse.sepm.gui.controller.impl;
 
-import at.ac.tuwien.qse.sepm.dao.repo.Operation;
 import at.ac.tuwien.qse.sepm.gui.controller.StatusIndicator;
-import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.SynchronizationService;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -15,7 +13,7 @@ import java.util.List;
 
 public class StatusIndicatorImpl implements StatusIndicator {
 
-    private final List<Operation> errors = new LinkedList<>();
+    private final List<Object> errors = new LinkedList<>();
 
     private State state = State.SYNCHRONIZED;
 
