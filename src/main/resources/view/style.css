@@ -1,8 +1,8 @@
 
-.root {
+* {
 
     /* CONTRAST DARK THEME */
-    -tmg-bg0-dark: rgb(20, 20, 20);
+    /*-tmg-bg0-dark: rgb(20, 20, 20);
     -tmg-bg0: rgb(30, 30, 30);
     -tmg-bg0-light: rgb(40, 40, 40);
     -tmg-bg1-dark: rgb(40, 40, 40);
@@ -40,11 +40,11 @@
     -tmg-slide-tile-height: 200px;
 
     -google-map-marker: rgb(247, 92, 87);
-    -google-map-bg: rgb(233, 229, 220);
+    -google-map-bg: rgb(233, 229, 220);*/
 
 
     /* DARK THEME */
-    -tmg-bg0-dark: rgb(13, 13, 13);
+    /*-tmg-bg0-dark: rgb(13, 13, 13);
     -tmg-bg0: rgb(20, 20, 20);
     -tmg-bg0-light: rgb(27, 27, 27);
     -tmg-bg1-dark: rgb(27, 27, 27);
@@ -82,7 +82,7 @@
     -tmg-slide-tile-height: 200px;
 
     -google-map-marker: rgb(247, 92, 87);
-    -google-map-bg: rgb(233, 229, 220);
+    -google-map-bg: rgb(233, 229, 220);*/
 
     /* HIGH CONTRAST DARK THEME */
     -tmg-bg0-dark: rgb(20, 20, 20);
