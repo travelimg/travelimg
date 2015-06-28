@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 /**
  * Widget for one widget in the image grid. Can either be in a selected or an unselected state.
@@ -35,8 +36,7 @@ public class FlickrImageTile extends StackPane {
         Image image = null;
         try {
             FileInputStream fis = new FileInputStream(new File(
-                    tmpDir+ flickrPhoto.getId()+"."+ flickrPhoto
-                    .getOriginalFormat()));
+                    Paths.get(tmpDir, flickrPhoto.getId() + "." + flickrPhoto.getOriginalFormat()).toString()));
             image = new Image(fis, 150, 0, true, true);
             fis.close();
         } catch (FileNotFoundException ex) {

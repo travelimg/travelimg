@@ -96,7 +96,7 @@ public class FlickrServiceImpl implements FlickrService {
             throw new ServiceException(e.getMessage(), e);
         }
         try(BufferedInputStream in = new BufferedInputStream((httpConnection.getInputStream()));
-                FileOutputStream fout = new FileOutputStream(tmpDir + filename + "." + format);)
+                FileOutputStream fout = new FileOutputStream(Paths.get(tmpDir, filename + "." + format).toString()))
         {
             long completeFileSize = httpConnection.getContentLength();
             logger.debug("Size of the photo is {} MB", (double)completeFileSize/oneMB);
@@ -110,7 +110,7 @@ public class FlickrServiceImpl implements FlickrService {
                 // logger.debug("Downloaded {} MB", (double)downloadedFileSize/oneMB);
             }
             logger.debug("Downloaded photo {}", filename+"."+format);
-            new File(tmpDir + filename + "." + format).deleteOnExit();
+            new File(Paths.get(tmpDir, filename + "." + format).toString()).deleteOnExit();
 
         } catch (IOException e) {
             logger.debug(e.getMessage());

@@ -34,6 +34,8 @@ import javafx.scene.layout.FlowPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -204,7 +206,8 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                         public void run() {
                             FlickrImageTile flickrImageTile = new FlickrImageTile(photo);
                             Photo p = new Photo();
-                            p.setPath(tmpDir+photo.getId()+"."+photo.getOriginalFormat());
+
+                            p.setPath(Paths.get(tmpDir, photo.getId() + "." + photo.getOriginalFormat()).toString());
                             photos.add(p);
                             if(photos.size()==1){
                                 fullscreenButton.setDisable(false);
@@ -284,8 +287,8 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                         @Override public void accept(
                                 com.flickr4java.flickr.photos.Photo flickrPhoto) {
                             Photo p = new Photo();
-                            p.setPath(tmpDir + flickrPhoto.getId() + "_o." + flickrPhoto
-                                    .getOriginalFormat());
+                            p.setPath(Paths.get(tmpDir, flickrPhoto.getId() +"_o." + flickrPhoto
+                                    .getOriginalFormat()).toString());
                             p.getData().setLatitude(flickrPhoto.getGeoData().getLatitude());
                             p.getData().setLongitude(flickrPhoto.getGeoData().getLongitude());
                             p.getData().setDatetime(flickrDatePicker.getValue().atStartOfDay());
