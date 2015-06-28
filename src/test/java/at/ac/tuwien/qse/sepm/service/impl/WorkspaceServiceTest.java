@@ -35,6 +35,7 @@ public class WorkspaceServiceTest extends ServiceTestBase {
     public void setUp() throws ServiceException{
         watcher.getExtensions().add("jpg");
         workspaceService.addDirectory(sourceDir1);
+        watcher.refresh();
     }
 
     /**
@@ -55,6 +56,7 @@ public class WorkspaceServiceTest extends ServiceTestBase {
         int directoriesAfterAdd;
 
         workspaceService.addDirectory(sourceDir2);
+        watcher.refresh();
         watchedAfterAdd = watcher.index().size();
         directoriesAfterAdd = workspaceService.getDirectories().size();
 
@@ -70,6 +72,7 @@ public class WorkspaceServiceTest extends ServiceTestBase {
         int directoriesAfterRemove;
 
         workspaceService.removeDirectory(sourceDir1);
+        watcher.refresh();
         watchedAfterRemove = watcher.index().size();
         directoriesAfterRemove = workspaceService.getDirectories().size();
 
