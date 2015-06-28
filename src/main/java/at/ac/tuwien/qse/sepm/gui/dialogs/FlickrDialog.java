@@ -306,13 +306,14 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                                     p.getData().setPlace(place);
                                 }
                                 logger.debug("Photo {} ready for the exifservice.",p);
-                                //TODO
-                                /*exifService.setMetaData(p);
+
+                                exifService.setMetaData(p);
+
                                 ioHandler.copyFromTo(Paths.get(p.getPath()),
                                         Paths.get(System.getProperty("user.home"),
                                                 "travelimg/" + flickrPhoto.getId() + "."
-                                                        + flickrPhoto.getOriginalFormat()));*/
-                            } catch (ServiceException e) {
+                                                        + flickrPhoto.getOriginalFormat()));
+                            } catch (ServiceException | IOException e) {
                                 logger.debug(e);
                             }
                         }

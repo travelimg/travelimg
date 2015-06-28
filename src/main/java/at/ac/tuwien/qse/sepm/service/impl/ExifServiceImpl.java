@@ -1,9 +1,13 @@
 package at.ac.tuwien.qse.sepm.service.impl;
 
 import at.ac.tuwien.qse.sepm.dao.DAOException;
+import at.ac.tuwien.qse.sepm.dao.repo.PhotoNotFoundException;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoRepository;
 import at.ac.tuwien.qse.sepm.dao.repo.PhotoSerializer;
+import at.ac.tuwien.qse.sepm.dao.repo.impl.FileManager;
+import at.ac.tuwien.qse.sepm.dao.repo.impl.JpegSerializer;
 import at.ac.tuwien.qse.sepm.dao.repo.impl.PhotoFileRepository;
+import at.ac.tuwien.qse.sepm.dao.repo.impl.PhysicalFileManager;
 import at.ac.tuwien.qse.sepm.entities.Exif;
 import at.ac.tuwien.qse.sepm.entities.Photo;
 import at.ac.tuwien.qse.sepm.service.ExifService;
@@ -28,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -203,13 +208,80 @@ public class ExifServiceImpl implements ExifService {
     }
 
     @Override public void setMetaData(Photo photo) throws ServiceException {
-        if(photo != null) {
-            try {
-                repository.update(photo);
-            } catch (DAOException ex) {
-                logger.error("Failed to write MetaData to photofile", ex);
+        JpegSerializer serializer = new JpegSerializer();
+        FileManager fileManager = new PhysicalFileManager();
+
+        logger.debug("Set metadata {}", photo);
+
+        Path file = photo.getFile();
+
+        Path temp = Paths.get(file.toString() + ".temp");
+        InputStream is = null;
+        OutputStream os = null;
+        try {
+            if (!fileManager.exists(temp)) {
+                try {
+                    fileManager.createFile(temp);
+                } catch (IOException ex) {
+                    logger.warn("failed creating temp file at {}", temp);
+                    throw new ServiceException(ex);
+                }
             }
-        }  else logger.error("Photo must not be null");
+
+            try {
+                is = fileManager.newInputStream(file);
+            } catch (IOException ex) {
+                logger.warn("failed creating input stream for file {}", file);
+                throw new ServiceException(ex);
+            }
+
+            try {
+                os = fileManager.newOutputStream(temp);
+            } catch (IOException ex) {
+                logger.warn("failed creating output stream for file {}", temp);
+                throw new ServiceException(ex);
+            }
+
+            try {
+                serializer.update(is, os, photo.getData());
+            } catch (DAOException ex) {
+                throw new ServiceException(ex);
+            }
+
+        } finally {
+            try {
+                if (is != null) {
+                    is.close();
+                }
+            } catch (IOException ex) {
+                logger.warn("failed closing input stream for file {}");
+                logger.error(ex);
+            }
+            try {
+                if (os != null) {
+                    os.close();
+                }
+            } catch (IOException ex) {
+                logger.warn("failed closing output stream for file {}");
+                logger.error(ex);
+            }
+        }
+
+        try {
+            fileManager.copy(temp, file);
+        } catch (IOException ex) {
+            logger.warn("failed copying {} -> {}", temp, file);
+            throw new ServiceException(ex);
+        } finally {
+            try {
+                if (fileManager.exists(temp)) {
+                    fileManager.delete(temp);
+                }
+            } catch (IOException ex) {
+                logger.warn("failed deleting temp file {}", temp);
+                logger.error(ex);
+            }
+        }
     }
 
     private LocalDateTime getDateTime(ImageMetadata metadata) {

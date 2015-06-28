@@ -34,7 +34,7 @@ public interface ExifService {
     void setDateAndGeoData(Photo photo) throws ServiceException;
 
     /**
-     * Sets date and geodata and tags for a given photo
+     * Save date, geodata, tags, place and journey for a given photo
      * @param photo the photo, must have a valid path
      * @throws ServiceException
      */
