@@ -116,14 +116,11 @@ public class FullscreenWindow extends StackPane {
             LOGGER.debug("photo already has rating of {}", newRating);
 
         } else {
-
             Rating oldRating = photos.get(activeIndex).getData().getRating();
             LOGGER.debug("setting photo rating from {} to {}", oldRating, newRating);
             photos.get(activeIndex).getData().setRating(newRating);
 
             try {
-                System.out.println(photos.get(activeIndex).toString());
-
                 photoService.editPhoto(photos.get(activeIndex));
             } catch (ServiceException ex) {
                 LOGGER.error("Failed saving photo rating.", ex);
@@ -131,14 +128,6 @@ public class FullscreenWindow extends StackPane {
 
                 // Undo changes.
                 photos.get(activeIndex).getData().setRating(oldRating);
-                // FIXME: Reset the RatingPicker.
-                // This is not as simple as expected. Calling ratingPicker.getData().setRating(oldValue) here
-                // will complete and finish. But once the below dialog is closed ANOTHER selection-
-                // change will occur in RatingPicker that is the same as the once that caused the error.
-                // That causes an infinite loop of error dialogs.
-
-                ErrorDialog.show(root, "Bewertung fehlgeschlagen",
-                        "Die Bewertung für das Foto konnte nicht gespeichert werden.");
             }
         }
 
