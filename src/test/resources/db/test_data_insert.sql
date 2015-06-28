@@ -16,3 +16,5 @@ INSERT INTO Photo(id, photographer_id, path, rating, datetime, latitude, longitu
 INSERT INTO Photo(id, photographer_id, path, rating, datetime, latitude, longitude, place_id, journey_id) VALUES (2, 1,	'2.jpg', 0,	'2005-09-11 00:00:00.0', 39.7, -104.9, 1, 0);
 INSERT INTO Photo(id, photographer_id, path, rating, datetime, latitude, longitude, place_id, journey_id) VALUES (1, 1,	'1.jpg', 0,	'2015-03-06 00:00:00.0', 41.5, 19.5, 1, 0);
 INSERT INTO Photo(id, photographer_id, path, rating, datetime, latitude, longitude, place_id, journey_id) VALUES (4, 1,	'4.jpg', 0,	'2005-09-11 00:00:00.0', 39.7, -104.9, 1, 0);
+
+INSERT INTO Slideshow(id, name, durationBetweenPhotos) VALUES (1, 'Testshow', 5.0);

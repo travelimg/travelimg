@@ -19,6 +19,22 @@ public class TitleSlide extends Slide {
         this.color = color;
     }
 
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        TitleSlide that = (TitleSlide) o;
+
+        return color == that.color;
+
+    }
+
+    @Override public int hashCode() {
+        return color;
+    }
+
     @Override
     public String toString() {
         return "TitleSlide{" +
