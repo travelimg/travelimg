@@ -154,40 +154,6 @@ public class HighlightsViewControllerImpl implements HighlightsViewController {
         handlePlaceSelected(null);
     }
 
-    private Map<Place, List<Photo>> getPhotosByPlace(Set<Place> places, List<Photo> photos) {
-        Map<Place, List<Photo>> photosByPlace = new HashMap<>();
-
-        places.forEach(place -> {
-            photosByPlace.put(place, photos.stream()
-                            .filter(p -> p.getData().getPlace().equals(place))
-                            .collect(Collectors.toList())
-            );
-        });
-
-        return photosByPlace;
-    }
-
-    private List<Place> orderPlacesByVisitingDate(Set<Place> places, Map<Place, List<Photo>> photosByPlace) {
-        List<Place> orderedPlaces = new ArrayList<>(places);
-
-        // sort places by time
-        // the photo with the lowest datetime which belongs to a place determines the visiting time
-        orderedPlaces.sort((p1, p2) -> {
-            List<Photo> l1 = photosByPlace.get(p1);
-            List<Photo> l2 = photosByPlace.get(p2);
-
-            Optional<Photo> min1 = l1.stream().min((ph1, ph2) -> ph1.compareTo(ph2));
-            Optional<Photo> min2 = l2.stream().min((ph1, ph2) -> ph1.compareTo(ph2));
-
-            if (!min1.isPresent() || !min2.isPresent())
-                return 0;
-
-            return min1.get().getData().getDatetime().compareTo(min2.get().getData().getDatetime());
-        });
-
-        return orderedPlaces;
-    }
-
     /**
      * Sets the good rated photos for the heart imagetile based on a filter.
      *
