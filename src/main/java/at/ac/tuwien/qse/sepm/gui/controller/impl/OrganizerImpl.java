@@ -74,7 +74,7 @@ public class OrganizerImpl extends Refresher implements Organizer {
 
     @Autowired public void setScheduler(ScheduledExecutorService scheduler) {
         addOperation = new BufferedBatchOperation<>(photos -> {
-            Platform.runLater(() -> {/*TODO*/});
+            Platform.runLater(() -> {initializeFilesTree();});
         }, scheduler);
     }
 
