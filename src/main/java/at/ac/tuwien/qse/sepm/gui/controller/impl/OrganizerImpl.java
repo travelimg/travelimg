@@ -402,7 +402,9 @@ public class OrganizerImpl implements Organizer {
         refreshPhotographers();
     }
     private void refreshRatings() {
-        refreshFilter(acceptedPhotos.getRatings(), ratingFilter, getAllRatings(), value -> {
+        List<Rating> ratings = getAllRatings();
+
+        refreshFilter(acceptedPhotos.getRatings(), ratingFilter, ratings, value -> {
             switch (value) {
                 case GOOD:
                     return "Gut";
@@ -414,35 +416,48 @@ public class OrganizerImpl implements Organizer {
                     return "Keine Bewertung";
             }
         });
+
+        photoFilter.getRatingFilter().getIncluded().addAll(ratings);
     }
     private void refreshTags() {
-        refreshFilter(acceptedPhotos.getTags(), tagFilter, getAllTags(), value -> {
+        List<Tag> tags = getAllTags();
+
+        refreshFilter(acceptedPhotos.getTags(), tagFilter, tags, value -> {
             if (value == null)
                 return "Keine Kategorien";
             return value.getName();
         });
     }
     private void refreshJourneys() {
-        refreshFilter(acceptedPhotos.getJourneys(), journeyFilter, getAllJourneys(), value -> {
+        List<Journey> journeys = getAllJourneys();
+        refreshFilter(acceptedPhotos.getJourneys(), journeyFilter, journeys, value -> {
             if (value == null)
                 return "Keine Reise";
             return value.getName();
         });
+
+        photoFilter.getJourneyFilter().getIncluded().addAll(journeys);
     }
     private void refreshPlaces() {
-        refreshFilter(acceptedPhotos.getPlaces(), placeFilter, getAllPlaces(), value -> {
+        List<Place> places = getAllPlaces();
+        refreshFilter(acceptedPhotos.getPlaces(), placeFilter, places, value -> {
             if (value == null)
                 return "Kein Ort";
             return value.getCountry() + ", " + value.getCity();
         });
+
+        photoFilter.getPlaceFilter().getIncluded().addAll(places);
     }
     private void refreshPhotographers() {
-        refreshFilter(acceptedPhotos.getPhotographers(), photographerFilter, getAllPhotographers(),
-                value -> {
-                    if (value == null)
-                        return "Kein Fotograf";
-                    return value.getName();
-                });
+        List<Photographer> photographers = getAllPhotographers();
+
+        refreshFilter(acceptedPhotos.getPhotographers(), photographerFilter, photographers, value -> {
+            if (value == null)
+                return "Kein Fotograf";
+            return value.getName();
+        });
+
+        photoFilter.getPhotographerFilter().getIncluded().addAll(photographers);
     }
 
     private static <T> void refreshFilter(Aggregator<T> aggregator, FilterGroup<T> filterGroup, Iterable<T> values, Function<T, String> converter) {
