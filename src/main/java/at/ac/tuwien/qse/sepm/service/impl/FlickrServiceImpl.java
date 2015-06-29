@@ -118,6 +118,16 @@ public class FlickrServiceImpl implements FlickrService {
         }
     }
 
+    /**
+     * Get the geo data (latitude and longitude and the accuracy level) for a photo
+     * @param id the photo id
+     * @return Geo Data, if the photo has it.
+     * @throws FlickrException if photo id is invalid, if photo has no geodata or if any other error has been reported in the response.
+     */
+    public GeoData getLocation(String id) throws FlickrException {
+        return flickr.getPhotosInterface().getGeoInterface().getLocation(id);
+    }
+
     private class AsyncSearcher extends CancelableTask {
 
         private String[] tags;
@@ -231,24 +241,23 @@ public class FlickrServiceImpl implements FlickrService {
                             + "/" + p.getId() + "_" + p.getOriginalSecret() + "_o." + p
                             .getOriginalFormat();
                     downloadTempPhoto(url, p.getId() + "_o", p.getOriginalFormat());
-                    GeoData geoData = flickr.getPhotosInterface().getGeoInterface()
-                            .getLocation(p.getId());
-                    p.setGeoData(geoData);
+                    p.setGeoData(getLocation(p.getId()));
                     logger.debug("Got geodata=[{},{}]", p.getGeoData().getLatitude(),p.getGeoData().getLongitude());
 
                     if (!isRunning()) {
                         logger.debug("Download interrupted.");
                         return;
                     }
+
                     callback.accept(p);
                     progressCallback.accept((double) (i + 1) / (double) photos.size());
                 }
-            }
-            catch (FlickrException | ServiceException e) {
-                errorHandler.propagate(new ServiceException("Failed to download photo", e));
                 progressCallback.accept(1.0);
             }
-            progressCallback.accept(1.0);
+            catch (FlickrException | ServiceException e) {
+                logger.error(e.getMessage());
+                errorHandler.propagate(new ServiceException("Failed to download photo", e));
+            }
         }
     }
 }
