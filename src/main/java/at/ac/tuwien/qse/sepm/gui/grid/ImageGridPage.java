@@ -2,6 +2,7 @@ package at.ac.tuwien.qse.sepm.gui.grid;
 
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
+import javafx.scene.input.MouseEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,8 +12,8 @@ public class ImageGridPage extends ImageGrid<PhotoGridTile> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public ImageGridPage(List<Photo> photos) {
-        super(PhotoGridTile::new);
+    public ImageGridPage(List<Photo> photos, List<Photo> allPhotos) {
+        super(PhotoGridTile::new, allPhotos);
 
         setPhotos(photos);
     }

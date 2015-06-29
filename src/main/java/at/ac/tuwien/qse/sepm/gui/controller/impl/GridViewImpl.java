@@ -88,7 +88,9 @@ public class GridViewImpl implements GridView {
         // Selected photos are shown in the inspector.
         grid.setSelectionChangeAction(inspector::setEntities);
 
+
         // CTRL+A select all photos.
+        root.setOnMouseClicked((event) -> root.requestFocus());
         root.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.isControlDown() && event.getCode() == KeyCode.A) {
                 grid.selectAll();
@@ -253,7 +255,7 @@ public class GridViewImpl implements GridView {
 
             FullscreenWindow fullscreen = new FullscreenWindow(photoService);
 
-            Set<Photo> selected = grid.getSelected();
+            Collection<Photo> selected = grid.getSelected();
 
             Photo start = grid.getActivePhoto();
             if (selected.size() == 1) {

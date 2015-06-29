@@ -42,11 +42,6 @@ public class FilterSkin<T> extends SkinBase<FilterControl<T>> {
             labelText += String.format(" (%d)", getSkinnable().getCount());
         }
         label.setText(labelText);
-
-        // icon
-        if (getSkinnable().isIncluded()) {
-            icon.setGlyphName("");
-        }
     }
 
     private void handleClick() {

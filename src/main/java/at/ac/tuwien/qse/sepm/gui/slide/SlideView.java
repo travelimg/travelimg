@@ -17,9 +17,9 @@ public class SlideView extends StackPane {
         if (slide instanceof PhotoSlide) {
             return new PhotoSlideView((PhotoSlide)slide, width, height);
         } else if (slide instanceof MapSlide) {
-            return new MapSlideView((MapSlide)slide, width, height);
+            return new MapSlideView((MapSlide)slide);
         } else if (slide instanceof TitleSlide) {
-            return new TitleSlideView((TitleSlide)slide, width, height);
+            return new TitleSlideView((TitleSlide)slide);
         }
 
         return null;
