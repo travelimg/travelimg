@@ -174,12 +174,15 @@ public class ExportTest extends ServiceTestBase {
 
     private Path getDropboxInfoPathVariant(int variant) {
         switch (variant) {
-            case 0: return Paths.get(
-                    getClass().getClassLoader().getResource("export/dropbox_info.json").getPath());
-            case 1: return Paths.get(
-                    getClass().getClassLoader().getResource("export/dropbox_info_malformed.json")
-                            .getPath());
+            case 0: return getResourcePath("export/dropbox_info.json");
+            case 1: return getResourcePath("export/dropbox_info_malformed.json");
             default: return Paths.get(System.getProperty("java.io.tmpdir"), "idonotexist");
         }
+    }
+
+    private Path getResourcePath(String path) {
+        return  System.getProperty("os.name").contains("indow")
+                ? Paths.get(ExportTest.class.getClassLoader().getResource(path).getPath().substring(1))
+                : Paths.get(ExportTest.class.getClassLoader().getResource(path).getPath());
     }
 }
