@@ -9,7 +9,6 @@ import at.ac.tuwien.qse.sepm.gui.controller.HighlightsViewController;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.*;
-import at.ac.tuwien.qse.sepm.service.impl.JourneyFilter;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
@@ -21,7 +20,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -118,11 +116,8 @@ public class HighlightsViewControllerImpl implements HighlightsViewController {
         // load photos for the selected journey
 
         try {
-            JourneyFilter filter = new JourneyFilter();
-            filter.getIncludedJourneys().add(journey);
-
             photos = photoService.getAllPhotos().stream()
-                    .filter(filter)
+                    .filter(p -> journey.equals(p.getData().getJourney()))
                     .collect(Collectors.toList());
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Laden der Fotos", "");
