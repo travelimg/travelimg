@@ -1198,15 +1198,13 @@
 .fullscreen {
     -fx-background-color: -tmg-bg0;
 }
-.fullscreen .menu {
-    -fx-opacity: 0.0;
-}
-.fullscreen .menu:hover {
-    -fx-opacity: 1.0;
-}
 .fullscreen .menu.top {
     -fx-padding: 16px;
     -fx-spacing: 8px;
+    -fx-opacity: 0.0;
+}
+.fullscreen .menu.top:hover {
+    -fx-opacity: 1.0;
 }
 .fullscreen .menu.top .label {
     -fx-font-size: 24px;
