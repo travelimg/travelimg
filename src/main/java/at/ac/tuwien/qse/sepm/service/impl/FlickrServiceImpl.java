@@ -118,8 +118,6 @@ public class FlickrServiceImpl implements FlickrService {
         }
     }
 
-
-
     /**
      * Get the geo data (latitude and longitude and the accuracy level) for a photo
      * @param id the photo id
@@ -130,6 +128,12 @@ public class FlickrServiceImpl implements FlickrService {
         return flickr.getPhotosInterface().getGeoInterface().getLocation(id);
     }
 
+    /**
+     * Get all info for the specified photo. The calling user must have permission to view the photo
+     * @param photo the photo (containing id and secret)
+     * @return the photo
+     * @throws FlickrException
+     */
     public Photo getInfoForFlickrPhoto(Photo photo) throws FlickrException {
         return flickr.getPhotosInterface().getInfo(photo.getId(), photo.getSecret());
     }
