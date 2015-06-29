@@ -5,8 +5,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Paint;
 
 public class SlideView extends StackPane {
 
@@ -26,10 +29,13 @@ public class SlideView extends StackPane {
         Group overlay = new Group();
         HBox overlayBox = new HBox();
         Label caption = new Label(text);
+        caption.setStyle("rgba(0,0,0,255)");
+        caption.setTextFill(Paint.valueOf("white"));
         caption.setStyle("-fx-text-fill: white !important;");
         caption.setStyle("-fx-font-weight: bold");
         caption.setStyle("-fx-text-alignment: center");
         caption.setStyle("-fx-font-size: 70px");
+        //caption.setBackground(new Background(new BackgroundFill(Paint.valueOf("white"),null,null)));
         overlayBox.getStyleClass().add("caption-overlay");
         overlayBox.getChildren().add(caption);
         overlay.getChildren().add(overlayBox);
