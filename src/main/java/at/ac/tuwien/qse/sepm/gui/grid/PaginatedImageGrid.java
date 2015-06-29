@@ -27,7 +27,8 @@ public class PaginatedImageGrid extends StackPane {
     private List<Photo> photos = new ArrayList<>();
 
     private LRUCache<Integer, ImageGridPage> pageCache = new LRUCache<>(10);
-    private Consumer<Set<Photo>> selectionChangeAction = null;
+    private Consumer<Collection<Photo>> selectionChangeAction = null;
+    private boolean allSelected = false;
 
     private int photosPerPage = 24;
     private ObjectProperty<ImageGridPage> activePageProperty = new SimpleObjectProperty<>(null);
@@ -120,7 +121,7 @@ public class PaginatedImageGrid extends StackPane {
         photos.removeIf(p -> p.getId().equals(photo.getId()));
     }
 
-    public void setSelectionChangeAction(Consumer<Set<Photo>> selectionChangeAction) {
+    public void setSelectionChangeAction(Consumer<Collection<Photo>> selectionChangeAction) {
         this.selectionChangeAction = selectionChangeAction;
     }
 
@@ -141,6 +142,12 @@ public class PaginatedImageGrid extends StackPane {
      * Select all photos in the currently active page.
      */
     public void selectAll() {
+        allSelected = true;
+
+        if (selectionChangeAction != null) {
+            selectionChangeAction.accept(new ArrayList<>(photos));
+        }
+
         if (activePageProperty.get() != null) {
             activePageProperty.get().selectAll();
         }
@@ -152,9 +159,14 @@ public class PaginatedImageGrid extends StackPane {
      * @return collection of selected photos
      */
     public Collection<Photo> getSelected() {
+        if (allSelected) {
+            return photos;
+        }
+
         if (activePageProperty.get() == null) {
             return new HashSet<>();
         }
+
         return activePageProperty.get().getSelected();
     }
 
@@ -175,22 +187,32 @@ public class PaginatedImageGrid extends StackPane {
     private ImageGridPage getPage(int pageIndex) {
         ImageGridPage page = createPage(pageIndex);
 
-        page.setSelectionChangeAction(selectionChangeAction);
+        page.setSelectionChangeAction(this::handlePageTilesSelected);
 
         activePageProperty.set(page);
 
         return page;
     }
 
-    private int getIndexForPhoto(Photo photo) {
-        int i = 0;
-        for (Photo p : photos) {
-            if (photo.getPath().equals(p.getPath())) {
-                return i;
-            }
-            i++;
+    private void handlePageTilesSelected(Collection<Photo> photos) {
+        ImageGridPage page = activePageProperty.get();
+
+        if (page.getSelected().isEmpty()) {
+            // all items deselected which means the user selected a single tile and the selection was
+            // cleared. reset all selected state to false
+            allSelected = false;
         }
-        return -1;
+
+        if (allSelected) {
+            Set<Photo> unselected = page.getUnselected();
+
+            Set<Photo> all = new HashSet<>(this.photos);
+            all.removeAll(unselected);
+
+            selectionChangeAction.accept(all);
+        } else {
+            selectionChangeAction.accept(page.getSelected());
+        }
     }
 
     private ImageGridPage getPageForIndex(int index) {
@@ -229,12 +251,8 @@ public class PaginatedImageGrid extends StackPane {
 
     private void handlePageChange(Object observable, ImageGridPage oldValue, ImageGridPage newValue) {
         if (oldValue != null) {
-            if (oldValue.isAllSelected()) {
-                oldValue.deselectAll();
-                newValue.selectAll();
-            } else {
-                oldValue.deselectAll();
-            }
+            allSelected = false;
+            oldValue.deselectAll();
         }
     }
 

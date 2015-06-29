@@ -88,7 +88,9 @@ public class GridViewImpl implements GridView {
         // Selected photos are shown in the inspector.
         grid.setSelectionChangeAction(inspector::setEntities);
 
+
         // CTRL+A select all photos.
+        root.setOnMouseClicked((event) -> root.requestFocus());
         root.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.isControlDown() && event.getCode() == KeyCode.A) {
                 grid.selectAll();
