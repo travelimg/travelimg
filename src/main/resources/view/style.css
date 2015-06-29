@@ -891,6 +891,9 @@
 .date-picker .arrow-button:pressed .arrow {
     -fx-background-color: -tmg-text-bright;
 }
+.combo-box .list-view {
+    -fx-background-color: -tmg-bg2;
+}
 
 .tree-view, .tree-view * {
     -fx-padding: 0;
