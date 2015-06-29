@@ -110,7 +110,9 @@ public class OrganizerImpl extends Refresher implements Organizer {
     @Override public void setWorldMapPlace(Place place){
         placeFilter.excludeAll();
         placeFilter.include(place);
-        handlePlacesChange();
+        placeFilter.expand();
+
+        Platform.runLater(this::handlePlacesChange);
     }
 
     @Override protected void refresh() {
