@@ -47,7 +47,7 @@
             </Button>
             <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action" disable="true">
                 <graphic>
-                    <FontAwesomeIconView glyphName="EXPAND"/>
+                    <FontAwesomeIconView glyphName="PLAY"/>
                 </graphic>
                 <tooltip>
                     <Tooltip text="Diashow starten"/>
