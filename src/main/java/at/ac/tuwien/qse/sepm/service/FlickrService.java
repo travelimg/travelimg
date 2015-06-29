@@ -23,7 +23,6 @@ public interface FlickrService {
      * @param progressCallback used to notify the GUI about the download progress
      * @param errorHandler handler for occurring exceptions
      * @return a Cancelable object, that can be used to interrupt the download
-     * @throws ServiceException
      */
     Cancelable searchPhotos(String tags[], double latitude, double longitude, boolean useGeoData,
             Consumer<Photo> callback, Consumer<Double> progressCallback,
@@ -36,7 +35,6 @@ public interface FlickrService {
      * @param progressCallback used to notify the GUI about the download progress
      * @param errorHandler handler for occurring exceptions
      * @return a Cancelable object, that can be used to interrupt the download
-     * @throws ServiceException
      */
     Cancelable downloadPhotos(List<Photo> photos, Consumer<Photo> callback, Consumer<Double> progressCallback,
             ErrorHandler<ServiceException> errorHandler);
