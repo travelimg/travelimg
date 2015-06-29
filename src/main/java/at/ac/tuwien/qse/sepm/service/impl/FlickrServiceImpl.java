@@ -118,6 +118,8 @@ public class FlickrServiceImpl implements FlickrService {
         }
     }
 
+
+
     /**
      * Get the geo data (latitude and longitude and the accuracy level) for a photo
      * @param id the photo id
@@ -126,6 +128,21 @@ public class FlickrServiceImpl implements FlickrService {
      */
     public GeoData getLocation(String id) throws FlickrException {
         return flickr.getPhotosInterface().getGeoInterface().getLocation(id);
+    }
+
+    public Photo getInfoForFlickrPhoto(Photo photo) throws FlickrException {
+        return flickr.getPhotosInterface().getInfo(photo.getId(), photo.getSecret());
+    }
+
+    /**
+     * Search for 250 photos which match the given search parameters.
+     * @param searchParameters The search parameters
+     * @return A PhotoList
+     * @throws FlickrException
+     */
+    public PhotoList searchPhotosAtFlickr(SearchParameters searchParameters) throws FlickrException {
+        logger.debug("Searching photos using the flickr api...");
+        return flickr.getPhotosInterface().search(searchParameters, 250, 1);
     }
 
     private class AsyncSearcher extends CancelableTask {
@@ -171,8 +188,7 @@ public class FlickrServiceImpl implements FlickrService {
                         searchParameters.setRadius(5);
                     }
                     searchParameters.setHasGeo(true);
-                    logger.debug("Searching photos using the flickr api...");
-                    list = flickr.getPhotosInterface().search(searchParameters, 250, 1);
+                    list = searchPhotosAtFlickr(searchParameters);
                     logger.debug("Found {} photos.", list.size());
                 }
                 int nrOfDownloadedPhotos = 0;
@@ -191,7 +207,7 @@ public class FlickrServiceImpl implements FlickrService {
                         break;
                     }
                     logger.debug("Downloading photo nr {} ...", i + 1);
-                    Photo photoWithOriginalSecret = flickr.getPhotosInterface().getInfo(p.getId(), p.getSecret());
+                    Photo photoWithOriginalSecret = getInfoForFlickrPhoto(p);
                     p.setOriginalSecret(photoWithOriginalSecret.getOriginalSecret());
                     p.setTags(photoWithOriginalSecret.getTags());
                     if (!p.getOriginalSecret().isEmpty()) {
