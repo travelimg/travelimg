@@ -316,23 +316,6 @@ public class OrganizerImpl extends Refresher implements Organizer {
         handleFilterChange();
     }
 
-    private void resetFilter() {
-        // don't update the usedFilter until all list views have been reset
-        Runnable savedCallback = filterChangeCallback;
-        filterChangeCallback = null;
-
-        refresh();
-        inspectorController.refresh();
-        tagFilter.includeAll();
-        ratingFilter.includeAll();
-        photographerFilter.includeAll();
-        journeyFilter.includeAll();
-        placeFilter.includeAll();
-
-        // restore the callback and handle the change
-        filterChangeCallback = savedCallback;
-    }
-
     private void refreshRatings() {
         List<Rating> list = new ArrayList<>(4);
         list.add(Rating.NONE);
@@ -359,7 +342,7 @@ public class OrganizerImpl extends Refresher implements Organizer {
     }
     private void refreshTags() {
         photoFilter.getTagFilter().getRequired().clear();
-        refreshFilterList(
+        refreshFilterListExcluded(
                 allPhotos.getTags(),
                 acceptedPhotos.getTags(),
                 tagFilter,
@@ -422,6 +405,45 @@ public class OrganizerImpl extends Refresher implements Organizer {
                     return converter.apply(val);
                 });
                 item.setIncluded(!excluded.contains(p));
+                item.setCount(aggregator.getCount(p));
+                filter.getItems().add(item);
+            });
+        });
+
+        return list;
+    }
+
+    private <T> Collection<T> refreshFilterListExcluded(
+            Iterable<T> values,
+            Aggregator<T> aggregator,
+            FilterGroup<T> filter,
+            String defaultLabel,
+            Function<T, String> converter) {
+
+        // Sort values alphabetically.
+        List<T> list = new LinkedList<>();
+        values.forEach(list::add);
+        list.remove(null);
+        list.sort((a, b) -> converter.apply(a).compareTo(converter.apply(b)));
+
+        // Default value is at the beginning.
+        list.add(0, null);
+
+        Platform.runLater(() -> {
+            // NOTE: Remember the values that were excluded before the refresh and exclude them.
+            // That way the filter stays the same and new values are included automatically.
+            Set<T> included = filter.getIncludedValues();
+            filter.getItems().clear();
+            values.forEach(p -> {
+                FilterControl<T> item = new FilterControl<>();
+                item.setValue(p);
+                item.setConverter(val -> {
+                    if (val == null) {
+                        return defaultLabel;
+                    }
+                    return converter.apply(val);
+                });
+                item.setIncluded(included.contains(p));
                 item.setCount(aggregator.getCount(p));
                 filter.getItems().add(item);
             });
