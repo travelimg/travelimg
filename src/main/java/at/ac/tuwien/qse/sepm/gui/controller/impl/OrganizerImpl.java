@@ -111,7 +111,8 @@ public class OrganizerImpl extends Refresher implements Organizer {
         placeFilter.excludeAll();
         placeFilter.include(place);
         placeFilter.expand();
-
+        filterViewClicked();
+        
         Platform.runLater(this::handlePlacesChange);
     }
 
