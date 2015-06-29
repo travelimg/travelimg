@@ -64,7 +64,7 @@
     <!-- Service beans -->
     <bean id="photoService" class="at.ac.tuwien.qse.sepm.service.impl.PhotoServiceImpl" destroy-method="close"></bean>
     <bean id="synchronizationService" class="at.ac.tuwien.qse.sepm.service.impl.SynchronizationServiceImpl"></bean>
-    <bean id="dropboxService" class="at.ac.tuwien.qse.sepm.service.impl.DropboxServiceImpl"></bean>
+    <bean id="exportService" class="at.ac.tuwien.qse.sepm.service.impl.ExportServiceImpl"></bean>
     <bean id="photographerService" class="at.ac.tuwien.qse.sepm.service.impl.PhotographerServiceImpl"></bean>
     <bean id="tagService" class="at.ac.tuwien.qse.sepm.service.impl.TagServiceImpl"></bean>
     <bean id="exifService" class="at.ac.tuwien.qse.sepm.service.impl.ExifServiceImpl"></bean>

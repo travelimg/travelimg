@@ -36,7 +36,7 @@ public class GridViewImpl implements GridView {
     @Autowired
     private FlickrService flickrService;
     @Autowired
-    private DropboxService dropboxService;
+    private ExportService exportService;
     @Autowired
     private PhotographerService photographerService;
     @Autowired
@@ -293,15 +293,14 @@ public class GridViewImpl implements GridView {
         @Override public void onExport(Menu sender) {
             Collection<Photo> selection = grid.getSelected();
 
-            ExportDialog dialog = new ExportDialog(root, dropboxService, selection.size());
+            ExportDialog dialog = new ExportDialog(root, exportService, selection.size());
 
             Optional<String> destinationPath = dialog.showForResult();
             if (!destinationPath.isPresent()) return;
 
-            dropboxService.uploadPhotos(selection, destinationPath.get(), photo -> {
-                // TODO: progressbar
-            }, exception -> ErrorDialog.show(root, "Fehler beim Export",
-                    "Fehlermeldung: " + exception.getMessage()));
+            exportService.exportPhotos(selection, destinationPath.get(), photo -> {
+            }, exception -> ErrorDialog
+                    .show(root, "Fehler beim Export", "Fehlermeldung: " + exception.getMessage()));
         }
     }
 }
