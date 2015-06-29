@@ -223,8 +223,8 @@ public class FlickrServiceImpl implements FlickrService {
                         }
                         logger.debug("Downloaded photo id={}, tags={}", p.getId(),p.getTags());
                         callback.accept(p);
-                        progressCallback.accept((double) nrOfDownloadedPhotos / (double) nrOfPhotosToDownload);
                         nrOfDownloadedPhotos++;
+                        progressCallback.accept((double) nrOfDownloadedPhotos / (double) nrOfPhotosToDownload);
                     } else {
                         logger.debug("Can't get original secret for photo id {}", p.getId());
                     }

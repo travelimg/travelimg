@@ -7,12 +7,16 @@ import at.ac.tuwien.qse.sepm.util.ErrorHandler;
 import com.flickr4java.flickr.FlickrException;
 import com.flickr4java.flickr.photos.GeoData;
 import com.flickr4java.flickr.photos.Photo;
+import com.flickr4java.flickr.photos.PhotoList;
+import com.flickr4java.flickr.tags.Tag;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -22,7 +26,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 
 public class FlickrServiceTest extends ServiceTestBase {
@@ -32,7 +35,6 @@ public class FlickrServiceTest extends ServiceTestBase {
     private List<Photo> flickrPhotos = new ArrayList<>();
 
     @Autowired FlickrServiceImpl flickrService;
-
 
     @Before
     public void setUp() throws ServiceException, FlickrException {
@@ -52,7 +54,9 @@ public class FlickrServiceTest extends ServiceTestBase {
             photo.setOriginalFormat("jpg");
             photo.setSecret(String.valueOf(dummySecret+i));
             photo.setOriginalSecret(String.valueOf(dummyOriSecret+i));
-            Mockito.doNothing().when(flickrService).downloadTempPhoto(eq(buildFlickrUrl(photo)), eq(photo.getId()+"_o"),
+            Mockito.doNothing().when(flickrService).downloadTempPhoto(eq(buildOriFlickrUrl(photo)), eq(photo.getId()+"_o"),
+                    eq(photo.getOriginalFormat()));
+            Mockito.doNothing().when(flickrService).downloadTempPhoto(eq(buildFlickrUrl(photo)), eq(photo.getId()),
                     eq(photo.getOriginalFormat()));
             Mockito.doReturn(geoData).when(flickrService).getLocation(photo.getId());
             flickrPhotos.add(photo);
@@ -112,8 +116,6 @@ public class FlickrServiceTest extends ServiceTestBase {
 
     @Test
     public void testDownloadPhotosThirdPhotoNoGeoData() throws ServiceException, FlickrException {
-        Mockito.doThrow(ServiceException.class).when(flickrService).downloadTempPhoto(anyString(), eq(nonExistingId),
-                anyString());
         TestPhotoConsumer testPhotoConsumer = new TestPhotoConsumer();
         TestProgressConsumer testProgressConsumer = new TestProgressConsumer();
         TestErrorHandler testErrorHandler = new TestErrorHandler();
@@ -134,33 +136,101 @@ public class FlickrServiceTest extends ServiceTestBase {
         //make sure exception occurred
         assertTrue(testErrorHandler.exceptionOccurred());
 
-        //make sure accept method was called 4 times and the progress value at the end was 0.5
+        //make sure accept method was called 2 times and the progress value at the end was 0.5
         assertThat(testProgressConsumer.getAccepted().size(),is(2));
+        assertThat(testProgressConsumer.getAccepted().get(0), is(0.25));
         assertThat(testProgressConsumer.getAccepted().get(1), is(0.5));
+    }
+
+    @Test
+    public void testSearchPhotosNoPhotosFound() throws FlickrException {
+
+        PhotoList photoList = new PhotoList();
+        Mockito.doReturn(photoList).when(flickrService).searchPhotosAtFlickr(Matchers.any());
+
+        TestPhotoConsumer testPhotoConsumer = new TestPhotoConsumer();
+        TestProgressConsumer testProgressConsumer = new TestProgressConsumer();
+        TestErrorHandler testErrorHandler = new TestErrorHandler();
+
+        Cancelable searchTask = flickrService.searchPhotos(new String[0], 0.0, 0.0, false, testPhotoConsumer, testProgressConsumer,
+                testErrorHandler);
+
+        awaitCompletion(searchTask);
+
+        //make sure no exceptions occurred
+        assertFalse(testErrorHandler.exceptionOccurred());
+
+        //make sure that no photos were downloaded
+        assertThat(testPhotoConsumer.getAccepted(),empty());
+
+        //make sure accept method at the end was 1.0
+        assertThat(testProgressConsumer.getAccepted().size(),is(1));
+        assertThat(testProgressConsumer.getAccepted().get(0),is(1.0));
+    }
+
+    @Test
+    public void testSearchPhotos4FoundBut2DontHaveOriginalSecret() throws FlickrException {
+        PhotoList photoList = new PhotoList();
+
+        //the photos without original secret
+        Photo photoWithoutOriginalSecret = new Photo();
+        photoWithoutOriginalSecret.setOriginalSecret("");
+        photoWithoutOriginalSecret.setTags(new HashSet<Tag>());
+        Mockito.doReturn(photoWithoutOriginalSecret).when(flickrService).getInfoForFlickrPhoto(flickrPhotos.get(1));
+        Mockito.doReturn(photoWithoutOriginalSecret).when(flickrService).getInfoForFlickrPhoto(flickrPhotos.get(3));
+
+        //the photos with original secret
+        Mockito.doReturn(flickrPhotos.get(0)).when(flickrService).getInfoForFlickrPhoto(flickrPhotos.get(0));
+        Mockito.doReturn(flickrPhotos.get(2)).when(flickrService).getInfoForFlickrPhoto(flickrPhotos.get(2));
+
+        photoList.addAll(flickrPhotos);
+        Mockito.doReturn(photoList).when(flickrService).searchPhotosAtFlickr(Matchers.any());
+
+        TestPhotoConsumer testPhotoConsumer = new TestPhotoConsumer();
+        TestProgressConsumer testProgressConsumer = new TestProgressConsumer();
+        TestErrorHandler testErrorHandler = new TestErrorHandler();
+
+        Cancelable searchTask = flickrService.searchPhotos(new String[0], 0.0, 0.0, false, testPhotoConsumer, testProgressConsumer,
+                testErrorHandler);
+
+        awaitCompletion(searchTask);
+
+        //make sure no exceptions occurred
+        assertFalse(testErrorHandler.exceptionOccurred());
+
+        //make sure 2 photos were accepted
+        assertThat(testPhotoConsumer.getAccepted().size(),is(2));
+
+        //make sure progress is 1.0 at the end
+        assertThat(testProgressConsumer.getAccepted().size(),is(3));
+        assertThat(testProgressConsumer.getAccepted().get(0),is(0.25));
+        assertThat(testProgressConsumer.getAccepted().get(1),is(0.5));
+        assertThat(testProgressConsumer.getAccepted().get(2),is(1.0));
+
     }
 
     @Test(expected = ServiceException.class)
     public void testDownloadTempPhotoIdIsNull() throws ServiceException {
         Photo validPhoto = flickrPhotos.get(0);
-        flickrService.downloadTempPhoto(buildFlickrUrl(validPhoto), null, validPhoto.getOriginalFormat());
+        flickrService.downloadTempPhoto(buildOriFlickrUrl(validPhoto), null, validPhoto.getOriginalFormat());
     }
 
     @Test(expected = ServiceException.class)
     public void testDownloadTempPhotoIdIsEmpty() throws ServiceException {
         Photo validPhoto = flickrPhotos.get(1);
-        flickrService.downloadTempPhoto(buildFlickrUrl(validPhoto), "    ", validPhoto.getOriginalFormat());
+        flickrService.downloadTempPhoto(buildOriFlickrUrl(validPhoto), "    ", validPhoto.getOriginalFormat());
     }
 
     @Test(expected = ServiceException.class)
     public void testDownloadTempPhotoFormatIsNull() throws ServiceException {
         Photo validPhoto = flickrPhotos.get(2);
-        flickrService.downloadTempPhoto(buildFlickrUrl(validPhoto), validPhoto.getId(), null);
+        flickrService.downloadTempPhoto(buildOriFlickrUrl(validPhoto), validPhoto.getId(), null);
     }
 
     @Test(expected = ServiceException.class)
     public void testDownloadTempPhotoFormatIsEmpty() throws ServiceException {
         Photo validPhoto = flickrPhotos.get(3);
-        flickrService.downloadTempPhoto(buildFlickrUrl(validPhoto), validPhoto.getId(), "    ");
+        flickrService.downloadTempPhoto(buildOriFlickrUrl(validPhoto), validPhoto.getId(), "    ");
     }
 
     private void awaitCompletion(Cancelable task) {
@@ -180,10 +250,14 @@ public class FlickrServiceTest extends ServiceTestBase {
         }
     }
 
-    private String buildFlickrUrl(Photo p){
+    private String buildOriFlickrUrl(Photo p){
         return "https://farm" + p.getFarm() + ".staticflickr.com/" + p.getServer()
                 + "/" + p.getId() + "_" + p.getOriginalSecret() + "_o." + p
                 .getOriginalFormat();
+    }
+
+    private String buildFlickrUrl(Photo p){
+        return "https://farm" + p.getFarm() + ".staticflickr.com/" + p.getServer() + "/" + p.getId() + "_" + p.getSecret() + "_z." + p.getOriginalFormat();
     }
 
     private class TestPhotoConsumer implements Consumer<Photo> {
