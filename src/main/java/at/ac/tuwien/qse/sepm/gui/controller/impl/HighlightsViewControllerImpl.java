@@ -251,7 +251,6 @@ public class HighlightsViewControllerImpl implements HighlightsViewController {
 
         @Override
         public boolean test(Photo photo) {
-            // TODO: don't override
             return photo.getData().getRating() == Rating.GOOD;
         }
     }
@@ -266,7 +265,6 @@ public class HighlightsViewControllerImpl implements HighlightsViewController {
 
         @Override
         public boolean test(Photo photo) {
-            // TODO: don't override
             return super.test(photo) && photo.getData().getPlace().equals(place);
         }
     }
