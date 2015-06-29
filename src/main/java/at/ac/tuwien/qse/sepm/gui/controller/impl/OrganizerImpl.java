@@ -340,7 +340,7 @@ public class OrganizerImpl extends Refresher implements Organizer {
         list.add(Rating.NEUTRAL);
         list.add(Rating.BAD);
         photoFilter.getRatingFilter().getIncluded().addAll(refreshFilterList(
-                allPhotos.getRatings(),
+                list,
                 acceptedPhotos.getRatings(),
                 ratingFilter,
                 "Keine Kategorien",

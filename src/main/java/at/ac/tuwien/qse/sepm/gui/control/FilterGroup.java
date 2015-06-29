@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @DefaultProperty("items")
@@ -131,19 +132,11 @@ public class FilterGroup<T> extends Control {
     }
 
     public void include(T value) {
-        getItems().forEach(item -> {
-            if (item.getValue().equals(value)) {
-                item.include();
-            }
-        });
+        forItem(value, FilterControl::include);
     }
 
     public void exclude(T value) {
-        getItems().forEach(item -> {
-            if (item.getValue().equals(value)) {
-                item.exclude();
-            }
-        });
+        forItem(value, FilterControl::exclude);
     }
 
     public void includeAll() {
@@ -164,6 +157,20 @@ public class FilterGroup<T> extends Control {
 
     public void toggleExpansion() {
         setExpanded(!isExpanded());
+    }
+
+    private void forItem(T value, Consumer<FilterControl<T>> action) {
+        getItems().forEach(item -> {
+            if (item.getValue() == null) {
+                if (value == null) {
+                    action.accept(item);
+                }
+            } else {
+                if (item.getValue().equals(value)) {
+                    action.accept(item);
+                }
+            }
+        });
     }
 
     @Override protected Skin<?> createDefaultSkin() {
