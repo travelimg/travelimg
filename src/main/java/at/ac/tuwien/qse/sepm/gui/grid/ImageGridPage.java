@@ -11,8 +11,8 @@ public class ImageGridPage extends ImageGrid<PhotoGridTile> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public ImageGridPage(List<Photo> photos) {
-        super(PhotoGridTile::new);
+    public ImageGridPage(List<Photo> photos, List<Photo> allPhotos) {
+        super(PhotoGridTile::new, allPhotos);
 
         setPhotos(photos);
     }

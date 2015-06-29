@@ -8,6 +8,8 @@ import at.ac.tuwien.qse.sepm.gui.util.LRUCache;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -147,9 +149,9 @@ public class PaginatedImageGrid extends StackPane {
     /**
      * Get the currently selected photos.
      *
-     * @return set of selected photos
+     * @return collection of selected photos
      */
-    public Set<Photo> getSelected() {
+    public Collection<Photo> getSelected() {
         if (activePageProperty.get() == null) {
             return new HashSet<>();
         }
@@ -165,7 +167,7 @@ public class PaginatedImageGrid extends StackPane {
 
         List<Photo> slice = photos.subList(startIndex, endIndex);
 
-        ImageGridPage page = new ImageGridPage(slice);
+        ImageGridPage page = new ImageGridPage(slice, photos);
         pageCache.put(pageIndex, page);
         return page;
     }
@@ -227,7 +229,12 @@ public class PaginatedImageGrid extends StackPane {
 
     private void handlePageChange(Object observable, ImageGridPage oldValue, ImageGridPage newValue) {
         if (oldValue != null) {
-            oldValue.deselectAll();
+            if (oldValue.isAllSelected()) {
+                oldValue.deselectAll();
+                newValue.selectAll();
+            } else {
+                oldValue.deselectAll();
+            }
         }
     }
 

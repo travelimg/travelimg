@@ -253,7 +253,7 @@ public class GridViewImpl implements GridView {
 
             FullscreenWindow fullscreen = new FullscreenWindow(photoService);
 
-            Set<Photo> selected = grid.getSelected();
+            Collection<Photo> selected = grid.getSelected();
 
             Photo start = grid.getActivePhoto();
             if (selected.size() == 1) {
