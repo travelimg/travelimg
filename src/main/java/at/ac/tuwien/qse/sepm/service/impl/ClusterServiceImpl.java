@@ -31,8 +31,9 @@ public class ClusterServiceImpl implements ClusterService {
     @Autowired private JourneyDAO journeyDAO;
     @Autowired private PlaceDAO placeDAO;
     @Autowired private PhotoService photoService;
-    private Consumer<Place> refreshPlaces;
-    private Consumer<Journey> refreshJourneys;
+
+    private Collection<Consumer<Place>> placesListeners = new LinkedList<>();
+    private Collection<Consumer<Journey>> journeyListeners = new LinkedList<>();
 
     @Autowired private void setPlaceWatcher(EntityWatcher<Place> watcher) {
         watcher.subscribeAdded(this::placeAdded);
@@ -185,23 +186,20 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     private void placeAdded(Place place) {
-        if (refreshPlaces != null) {
-            refreshPlaces.accept(place);
-        }
+
+        placesListeners.forEach(l -> l.accept(place));
     }
 
     private void journeyAdded(Journey journey) {
-        if (refreshJourneys != null) {
-            refreshJourneys.accept(journey);
-        }
+        journeyListeners.forEach(l -> l.accept(journey));
     }
 
     @Override public void subscribePlaceChanged(Consumer<Place> callback) {
-        this.refreshPlaces = callback;
+        placesListeners.add(callback);
     }
 
     @Override public void subscribeJourneyChanged(Consumer<Journey> callback) {
-        this.refreshJourneys = callback;
+        journeyListeners.add(callback);
 
     }
 }

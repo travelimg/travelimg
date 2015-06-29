@@ -891,6 +891,9 @@
 .date-picker .arrow-button:pressed .arrow {
     -fx-background-color: -tmg-text-bright;
 }
+.combo-box .list-view {
+    -fx-background-color: -tmg-bg2;
+}
 
 .tree-view, .tree-view * {
     -fx-padding: 0;
@@ -1195,15 +1198,13 @@
 .fullscreen {
     -fx-background-color: -tmg-bg0;
 }
-.fullscreen .menu {
-    -fx-opacity: 0.0;
-}
-.fullscreen .menu:hover {
-    -fx-opacity: 1.0;
-}
 .fullscreen .menu.top {
     -fx-padding: 16px;
     -fx-spacing: 8px;
+    -fx-opacity: 0.0;
+}
+.fullscreen .menu.top:hover {
+    -fx-opacity: 1.0;
 }
 .fullscreen .menu.top .label {
     -fx-font-size: 24px;

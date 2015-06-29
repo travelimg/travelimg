@@ -4,13 +4,12 @@ import at.ac.tuwien.qse.sepm.dao.*;
 import at.ac.tuwien.qse.sepm.entities.*;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.service.ServiceTestBase;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,16 +37,29 @@ public class ClusterServiceTest extends ServiceTestBase {
     }
 
     private List<Photo> photos = Arrays.asList(
-            new Photo(2, Paths.get("2.jpg"), makeMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
-            new Photo(3, Paths.get("3.jpg"), makeMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
-            new Photo(4, Paths.get("4.jpg"), makeMeta(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9))
+            new Photo(2, Paths.get("2.jpg"), makeMetaDenver(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
+            new Photo(3, Paths.get("3.jpg"), makeMetaDenver(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9)),
+            new Photo(4, Paths.get("4.jpg"), makeMetaDenver(LocalDateTime.of(2005, 9, 11, 0, 0, 0), 39.7, -104.9))
     );
 
-    private PhotoMetadata makeMeta(LocalDateTime datetime, double lat, double lon) {
+    private List<Photo> photosExtended = new ArrayList<>(photos);
+
+    private PhotoMetadata makeMetaDenver(LocalDateTime datetime, double lat, double lon) {
         PhotoMetadata data = new PhotoMetadata();
         data.setPhotographer(new Photographer(1, "Test Photographer"));
         data.setJourney(getDenverJourney());
         data.setPlace(new Place(1, "Denver", "United States", 39.7, -104.9));
+        data.setDatetime(datetime);
+        data.setLatitude(lat);
+        data.setLongitude(lon);
+        return data;
+    }
+
+    private PhotoMetadata makeMetaSanFrancisco(LocalDateTime datetime, double lat, double lon) {
+        PhotoMetadata data = new PhotoMetadata();
+        data.setPhotographer(new Photographer(1, "Test Photographer"));
+        data.setJourney(getDenverJourney());
+        data.setPlace(new Place(1, "San Francisco", "United States", 39.7, -104.9));
         data.setDatetime(datetime);
         data.setLatitude(lat);
         data.setLongitude(lon);
@@ -151,5 +163,23 @@ public class ClusterServiceTest extends ServiceTestBase {
         assertThat(journeyPhotos.get(0).getData().getPlace(), equalTo(places.get(0)));
         assertThat(journeyPhotos.get(1).getData().getPlace(), equalTo(places.get(0)));
         assertThat(journeyPhotos.get(2).getData().getPlace(), equalTo(places.get(0)));
+    }
+
+    @Test
+    @WithData
+    public void test_multiple_cluster() throws ServiceException, DAOException {
+        Journey usaJourney = getDenverJourney();
+
+        photosExtended.add(photoDAO.create(new Photo(6, Paths.get("6.jpg"), makeMetaSanFrancisco(LocalDateTime.of(2005, 9, 12, 0, 0, 0), 37.77, -122.42))));
+        photosExtended.add(photoDAO.create(new Photo(7, Paths.get("7.jpg"), makeMetaSanFrancisco(LocalDateTime.of(2005, 9, 12, 0, 0, 0), 37.78, -122.419))));
+
+        assertThat(clusterService.getAllJourneys().size(), is(2));
+        List<Place> places = clusterService.clusterJourney(usaJourney);
+        assertThat(clusterService.getAllJourneys().size(), is(3));
+        assertThat(clusterService.getAllJourneys(), hasItem(usaJourney));
+
+        assertThat(places.size(), is(2));
+        assertThat(places.stream().filter(p -> p.getCity().equals("San Francisco")).count() == 1, is(Boolean.TRUE));
+        assertThat(places.stream().filter(p -> p.getCity().equals("Denver")).count() == 1, is(Boolean.TRUE));
     }
 }
