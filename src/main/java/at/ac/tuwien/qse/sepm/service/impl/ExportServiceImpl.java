@@ -2,7 +2,7 @@ package at.ac.tuwien.qse.sepm.service.impl;
 
 
 import at.ac.tuwien.qse.sepm.entities.Photo;
-import at.ac.tuwien.qse.sepm.service.DropboxService;
+import at.ac.tuwien.qse.sepm.service.ExportService;
 import at.ac.tuwien.qse.sepm.service.ServiceException;
 import at.ac.tuwien.qse.sepm.util.Cancelable;
 import at.ac.tuwien.qse.sepm.util.CancelableTask;
@@ -19,12 +19,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-public class DropboxServiceImpl implements DropboxService {
+public class ExportServiceImpl implements ExportService {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -44,18 +42,14 @@ public class DropboxServiceImpl implements DropboxService {
     private IOHandler ioHandler;
 
     @Override
-    public String getDropboxFolder() throws ServiceException {
-        Path dropboxInfoPath;
+    public String getDropboxFolder() {
+        Path dropboxInfoPath = getDropboxInfoPath();
 
-        if (Files.exists(DROPBOX_INFO_PATH_POSIX)) {
-            dropboxInfoPath = DROPBOX_INFO_PATH_POSIX;
-        } else if (Files.exists(DROPBOX_INFO_PATH_WIN)) {
-            dropboxInfoPath = DROPBOX_INFO_PATH_WIN;
-        } else {
-            LOGGER.error("Could not find dropbox configuration file");
-            throw new ServiceException("Could not find dropbox configuration file");
-        }
         LOGGER.debug("dropbox info path is {}", dropboxInfoPath);
+
+        if (dropboxInfoPath == null) {
+            return null;
+        }
 
         String info;
         try {
@@ -64,7 +58,7 @@ public class DropboxServiceImpl implements DropboxService {
             LOGGER.debug("read dropbox info file");
         } catch (IOException ex) {
             LOGGER.error("Failed to read dropbox configuration file", ex);
-            throw new ServiceException("Failed to read dropbox configuration file", ex);
+            return null;
         }
 
         try {
@@ -75,17 +69,34 @@ public class DropboxServiceImpl implements DropboxService {
             return dropboxPath;
         } catch (JSONException ex) {
             LOGGER.error("Failed to retrieve dropbox folder location", ex);
-            return "";
+            return null;
         }
     }
 
     @Override
-    public Cancelable uploadPhotos(Collection<Photo> photos, String destination, Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
-        LOGGER.debug("uploading photos to {}", destination);
+    public Cancelable exportPhotos(Collection<Photo> photos, String destination,
+            Consumer<Photo> callback, ErrorHandler<ServiceException> errorHandler) {
+        LOGGER.debug("exporting photos to {}", destination);
         AsyncExporter exporter = new AsyncExporter(photos, destination, callback, errorHandler);
         executor.submit(exporter);
 
         return exporter;
+    }
+
+    /**
+     * Return the path of the dropbox info file or null if it can't be found.
+     *
+     * @return Path ot dropbox info or null.
+     */
+    public Path getDropboxInfoPath() {
+        if (Files.exists(DROPBOX_INFO_PATH_POSIX)) {
+            return DROPBOX_INFO_PATH_POSIX;
+        } else if (Files.exists(DROPBOX_INFO_PATH_WIN)) {
+            return DROPBOX_INFO_PATH_WIN;
+        } else {
+            LOGGER.error("Could not find dropbox configuration file");
+            return null;
+        }
     }
 
     private class AsyncExporter extends CancelableTask {
@@ -106,19 +117,16 @@ public class DropboxServiceImpl implements DropboxService {
         protected void execute() {
             LOGGER.debug("executing async exporter");
             Path dest;
-            // get the target path by combining dropbox root folder and the destination inside the dropbox folder
-            try {
-//                String dropboxPath = getDropboxFolder();
-//                LOGGER.debug("building destination from {} and {}", dropboxPath, destination);
 
+            try {
                 dest = Paths.get(destination);
                 LOGGER.debug("destination is {}", destination);
                 if (!Files.exists(dest)) {
                     LOGGER.debug("destination does not exist at {}", dest);
-                    throw new ServiceException("Can't upload to folder which does not exist: " + dest.toString());
+                    throw new ServiceException("Can't export to folder which does not exist: " + dest.toString());
                 }
             } catch (ServiceException ex) {
-                LOGGER.error("Failed to upload photos to folder", ex);
+                LOGGER.error("Failed to export photos to folder", ex);
                 errorHandler.propagate(ex);
                 return;
             }

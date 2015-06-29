@@ -4,9 +4,6 @@ import at.ac.tuwien.qse.sepm.entities.Photo;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.function.Predicate;
 
 public class PhotoPathFilter extends PhotoFilter {
 

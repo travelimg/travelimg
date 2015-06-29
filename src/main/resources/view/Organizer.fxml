@@ -1,14 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ScrollPane?>
+<?import at.ac.tuwien.qse.sepm.gui.control.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="240.0"
+<?import javafx.scene.layout.StackPane?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefWidth="240.0" styleClass="organizer"
             stylesheets="@style.css" xmlns="http://javafx.com/javafx/8"
-            fx:controller="at.ac.tuwien.qse.sepm.gui.controller.Organizer">
+            fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.OrganizerImpl">
     <center>
-        <ScrollPane hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
-            <VBox fx:id="filterContainer" style="-fx-background-color: -tmg-bg1"/>
-        </ScrollPane>
+        <VBox>
+            <HBox styleClass="tabs">
+                <ToggleButton fx:id="listTab">
+                    <tooltip>
+                        <Tooltip text="Filteransicht"/>
+                    </tooltip>
+                    <graphic>
+                        <FontAwesomeIconView glyphName="LIST"/>
+                    </graphic>
+                </ToggleButton>
+                <ToggleButton fx:id="folderTab">
+                    <tooltip>
+                        <Tooltip text="Ordneransicht"/>
+                    </tooltip>
+                    <graphic>
+                        <FontAwesomeIconView glyphName="FOLDER_OPEN"/>
+                    </graphic>
+                </ToggleButton>
+            </HBox>
+            <ScrollPane hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" fitToHeight="true">
+                <StackPane>
+                    <VBox fx:id="folderTabContent">
+                        <TreeView fx:id="folderTree"/>
+                    </VBox>
+                    <VBox fx:id="listTabContent" spacing="2">
+                        <FilterGroup fx:id="tagFilter" title="Kategorien" expanded="true"/>
+                        <FilterGroup fx:id="ratingFilter" title="Bewertungen"/>
+                        <FilterGroup fx:id="photographerFilter" title="Fotografen"/>
+                        <FilterGroup fx:id="journeyFilter" title="Reisen"/>
+                        <FilterGroup fx:id="placeFilter" title="Orte"/>
+                    </VBox>
+                </StackPane>
+            </ScrollPane>
+        </VBox>
     </center>
 </BorderPane>

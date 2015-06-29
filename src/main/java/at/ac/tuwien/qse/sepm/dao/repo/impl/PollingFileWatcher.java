@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
@@ -156,6 +157,8 @@ public class PollingFileWatcher implements FileWatcher {
                     result.add(path);
                 }
             }
+        } catch (NoSuchFileException ex) {
+            LOGGER.info("can not find directory {}", directory);
         } catch (IOException ex) {
             // NOTE: The path may not exist, or it may be a file, or something else. There is a lot
             // that can happen from outside the application, so we just have to ignore such errors.

@@ -74,7 +74,7 @@ public class JourneyPlaceList extends VBox {
         backButton.setOnAction((event) -> selectedJourney.set(null));
 
         allPlacesButton.setToggleGroup(toggleGroup);
-        allPlacesButton.setOnAction((event) -> allPlacesSelectedCallback.accept(selectedJourney.get()));
+        allPlacesButton.setOnAction((event) -> selectedPlace.set(null));
 
         selectedJourney.addListener(((observable, oldValue, newValue) -> {
             if (newValue == null) {
@@ -96,6 +96,8 @@ public class JourneyPlaceList extends VBox {
             LOGGER.debug("Selected place changed to {}", newValue);
             if (newValue != null) {
                 placeSelectedCallback.accept(newValue);
+            } else {
+                allPlacesSelectedCallback.accept(getSelectedJourney());
             }
         });
     }

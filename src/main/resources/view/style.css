@@ -2,6 +2,7 @@
 * {
     /* CONTRAST DARK THEME
     -tmg-bg0-dark: rgb(20, 20, 20);
+
     -tmg-bg0: rgb(30, 30, 30);
     -tmg-bg0-light: rgb(40, 40, 40);
     -tmg-bg1-dark: rgb(40, 40, 40);
@@ -419,6 +420,126 @@
     -fx-background-color: -tmg-bg2-dark;
 }
 
+.filter {
+    -fx-padding: 4px 14px;
+    -fx-font-size: 14;
+}
+.filter:hover {
+    -fx-background-color: -tmg-bg1-light;
+}
+.filter:pressed {
+    -fx-background-color: -tmg-bg1-dark;
+}
+.filter .label {
+    -fx-padding: 0 0 0 12px;
+    -fx-text-fill: -tmg-text-dark;
+}
+.filter:hover .label {
+    -fx-text-fill: -tmg-text-light;
+}
+.filter:pressed .label {
+    -fx-text-fill: -tmg-text-bright;
+}
+.filter.included .label {
+    -fx-text-fill: -tmg-text-bright;
+}
+.filter.inactive .label {
+    -fx-text-fill: -tmg-text-dark;
+}
+.filter.inactive:hover .label {
+    -fx-text-fill: -tmg-text-light;
+}
+.filter.inactive:pressed .label {
+    -fx-text-fill: -tmg-text-bright;
+}
+.filter .icon {
+    -glyph-size: 14px;
+    -fx-fill: -tmg-bg0;
+    -glyph-name: "SQUARE";
+}
+.filter.included .icon {
+    -fx-fill: -tmg-primary;
+    -glyph-name: "CHECK_SQUARE";
+}
+.filter.inactive .icon {
+    -fx-fill: -tmg-text-dark;
+}
+
+.filter-group {
+    -fx-background-color: -tmg-bg1;
+}
+.filter-group .placeholder {
+    -fx-font-size: 12;
+    -fx-text-fill: -tmg-text-dark;
+    -fx-alignment: center;
+    -fx-padding: 16px;
+}
+.filter-group .header {
+    -fx-background-color: -tmg-bg2;
+    -fx-font-size: 16;
+    -fx-padding: 8px 12px;
+}
+.filter-group .header:hover {
+    -fx-background-color: -tmg-bg2-light;
+}
+.filter-group .header:pressed {
+    -fx-background-color: -tmg-bg2-dark;
+}
+.filter-group .header .left {
+    -fx-spacing: 12px;
+    -fx-alignment: center-left;
+}
+.filter-group .header .label {
+    -fx-text-fill: -tmg-text;
+}
+.filter-group .header:hover .label {
+    -fx-text-fill: -tmg-text-light;
+}
+.filter-group .header:pressed .label {
+    -fx-text-fill: -tmg-text-bright;
+}
+.filter-group.all-included .header .label {
+    -fx-text-fill: -tmg-text-bright;
+}
+.filter-group.all-excluded .label {
+    -fx-text-fill: -tmg-text-dark;
+}
+.filter-group .header .check-icon {
+    -glyph-size: 20px;
+    -fx-fill: -tmg-bg1;
+    -glyph-name: "SQUARE";
+}
+.filter-group.all-included .header .check-icon {
+    -fx-fill: -tmg-primary;
+    -glyph-name: "CHECK_SQUARE";
+}
+.filter-group.indetermined .header .check-icon {
+    -fx-fill: -tmg-secondary;
+    -glyph-name: "MINUS_SQUARE";
+}
+.filter-group.indetermined .header .check-icon:hover {
+    -fx-fill: -tmg-secondary;
+    -glyph-name: "CHECK_SQUARE";
+}
+.filter-group .header .expand-button .icon {
+    -fx-fill: -tmg-text-dark;
+    -glyph-name: "PLUS_SQUARE";
+    -glyph-size: 14px;
+}
+.filter-group .header:hover .expand-button .icon {
+    -fx-fill: -tmg-text-light;
+}
+.filter-group .header:pressed .expand-button .icon {
+    -fx-fill: -tmg-text-bright;
+}
+.filter-group.expanded .header .expand-button .icon {
+    -fx-fill: -tmg-text;
+    -glyph-name: "MINUS_SQUARE";
+}
+.filter-group .list {
+    -fx-padding: 8px 0 8px 0;
+}
+
 .tab-pane {
     -fx-padding: 0;
 }
@@ -563,7 +684,7 @@
 }
 .page-selector .page-button .glyph-icon {
     -glyph-size: 13px;
-    -fx-fill: -tmg-text;
+    -fx-fill: -tmg-text-dark;
 }
 .page-selector .page-button:hover .glyph-icon {
     -glyph-size: 13px;
@@ -771,25 +892,7 @@
     -fx-background-color: -tmg-text-bright;
 }
 
-.toggle-button {
-    -fx-background-color: transparent;
-    -fx-padding: 11px 8px;
-    -fx-background-radius: 3px;
-    -fx-font-size: 14px;
-    -fx-text-fill: -tmg-text;
-}
-.toggle-button:hover {
-    -fx-background-color: -tmg-bg2-light;
-}
-.toggle-button:focused {
-    -fx-background-color: -tmg-bg2-light;
-}
-.toggle-button:pressed {
-    -fx-background-color: -tmg-bg2-dark;
-}
-
-
-.tree-view * {
+.tree-view, .tree-view * {
     -fx-padding: 0;
     -fx-background-color: transparent;
     -fx-background-radius: 0;
@@ -799,23 +902,10 @@
     -fx-border-insets: 0;
 }
 .tree-view {
-    -fx-border-color: -tmg-text;
-    -fx-border-style: solid;
-    -fx-border-width: 0 0 2px 0;
     -fx-background-color: -tmg-bg1;
-    -fx-background-radius: 0;
-    -fx-font-size: 16px;
-    -fx-padding: 11px 0 0 0;
-}
-.tree-view:focused {
-    -fx-border-color: -tmg-primary;
-}
-.tree-view .text-input {
-    -fx-padding: 0 0 4px 0;
-    -fx-border-width: 0;
+    -fx-font-size: 14px;
 }
 .tree-view .tree-cell {
-    -fx-background-color: -tmg-bg1;
     -fx-padding: 4px 8px;
     -fx-text-fill: -tmg-text;
 }
@@ -836,19 +926,15 @@
 .tree-view .tree-cell:selected .glyph-icon {
     -fx-fill: -tmg-text-bright;
 }
-.tree-view .tree-cell .button {
-        -fx-text-alignment: right;
-        -fx-background-color: -tmg-bg2-light;
-        -fx-padding: 2.5px 8px;
-        -fx-background-radius: 3px;
-        -fx-font-size: 14px;
-        -fx-text-fill: -tmg-text;
+.tree-view .tree-cell .button .glyph-icon {
+    -fx-fill: -tmg-text-dark;
+    -glyph-size: 16px;
 }
-.tree-view .tree-cell .button:hover {
-    -fx-background-color: -tmg-bg2;
+.tree-view .tree-cell .button:hover .glyph-icon {
+    -fx-fill: -tmg-text-light;
 }
-.tree-view .tree-cell .button:pressed {
-    -fx-background-color: -tmg-primary;
+.tree-view .tree-cell .button:pressed .glyph-icon {
+    -fx-fill: -tmg-text-bright;
 }
 
 .combo-box .combo-box-popup {
@@ -875,6 +961,23 @@
 
 .organizer, .organizer .list-view {
     -fx-background-color: -tmg-bg1;
+}
+.organizer .tabs .toggle-button {
+    -fx-background-color: transparent;
+    -fx-padding: 12px 12px;
+}
+.organizer .tabs .toggle-button .glyph-icon {
+    -glyph-size: 20px;
+    -fx-fill: -tmg-text-dark;
+}
+.organizer .tabs .toggle-button:hover .glyph-icon {
+    -fx-fill: -tmg-text-light;
+}
+.organizer .tabs .toggle-button:pressed .glyph-icon {
+    -fx-fill: -tmg-text-bright;
+}
+.organizer .tabs .toggle-button:selected .glyph-icon {
+    -fx-fill: -tmg-primary;
 }
 
 .scroll-bar, .scroll-bar * {
@@ -1085,7 +1188,6 @@
 .date-picker-popup > * > .spinner > .label {
     -fx-text-fill: black;
 }
-
 .date-picker-popup > * > .date-cell {
     -fx-text-fill: black;
 }
@@ -1117,62 +1219,39 @@
     -fx-background-color: -tmg-bg2-dark;
 }
 
-.slide-bottom-bar, .slide-bottom-bar * {
-    -fx-padding: 0;
+.inspector-pane .action {
     -fx-background-color: -tmg-bg2;
-    -fx-background-radius: 0;
-    -fx-border-radius: 0;
-    -fx-border-width: 0;
-    -fx-background-insets: 0;
-    -fx-border-insets: 0;
+    -fx-padding: 8px 16px;
+    -fx-max-width: 99999;
+    -fx-text-fill: -tmg-text;
+    -fx-font-size: 14px;
 }
-.slide-bottom-bar .action {
-    -fx-padding: 10px 20px;
-}
-.slide-bottom-bar .action:hover {
+.inspector-pane .action:hover {
+    -fx-text-fill: -tmg-text-light;
     -fx-background-color: -tmg-bg2-light;
 }
-.slide-bottom-bar .action:pressed {
+.inspector-pane .action:pressed {
     -fx-background-color: -tmg-bg2-dark;
+    -fx-text-fill: -tmg-text-bright;
 }
-.slide-bottom-bar .action .glyph-icon {
+.inspector-pane .action:selected {
+    -fx-background-color: -tmg-primary;
+    -fx-text-fill: -tmg-text-bright;
+}
+.inspector-pane .action .glyph-icon {
     -fx-fill: -tmg-text;
-    -glyph-size: 20px;
+    -glyph-size: 18px;
 }
-.slide-bottom-bar .action:hover .glyph-icon {
+.inspector-pane .action:hover .glyph-icon {
     -fx-fill: -tmg-text-light;
 }
-.slide-bottom-bar .action:pressed .glyph-icon {
+.inspector-pane .action:pressed .glyph-icon {
     -fx-fill: -tmg-text-bright;
 }
-.slide-bottom-bar .action:disabled .glyph-icon {
-    -fx-fill: -tmg-text-dark;
+.inspector-pane .action:selected .glyph-icon {
+    -fx-fill: -tmg-text-bright;
 }
 
 #slideshowPropertiesBox {
-    -fx-padding: 10px;
-    -fx-border-width: 3px 0 0 0;
-    -fx-border-inset: 3px;
-    -fx-border-color: -tmg-secondary;
-}
-
-.slide-inspector .delete {
-    -fx-background-color: transparent;
-}
-.slide-inspector .delete .glyph-icon {
-    -glyph-size: 25px;
-    -fx-fill: -tmg-text-light;
-}
-.slide-inspector .map #map {
-    -fx-padding: 20px 0 0 0;
-}
-
-.slide-inspector .marker-icon {
-    -glyph-size: 25px;
-    -fx-fill: -google-map-marker;
-}
-
-#changeCoordinatesButton .glyph-icon {
-    -glyph-size: 25px;
-    -fx-fill: -google-map-marker;
+    -fx-background-color: -tmg-bg1-light;
 }

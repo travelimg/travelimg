@@ -16,22 +16,17 @@
         <VBox>
             <RatingPicker fx:id="ratingPicker"/>
             <GoogleMapScene fx:id="mapScene" styleClass="map" maxHeight="200.0"/>
-
-            <HBox>
-                <children>
-                    <Label>
-                        Koordinaten ändern:
-                    </Label>
-                    <ToggleButton fx:id="changeCoordinatesButton">
-                        <graphic>
-                            <FontAwesomeIconView glyphName="MAP_MARKER" />
-                        </graphic>
-                    </ToggleButton>
-                </children>
-            </HBox>
         </VBox>
     </header>
     <VBox spacing="16">
+        <ToggleButton fx:id="changeCoordinatesButton" styleClass="action">
+            <graphic>
+                <HBox alignment="CENTER" spacing="12">
+                    <FontAwesomeIconView glyphName="MAP_MARKER" />
+                    <Label>Koordinaten bearbeiten</Label>
+                </HBox>
+            </graphic>
+        </ToggleButton>
         <SuggestionField fx:id="tagField" label="Neue Kategorie:"/>
         <TagPicker fx:id="tagPicker"/>
         <SuggestionField fx:id="photographerField" label="Fotograf setzen:"/>

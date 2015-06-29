@@ -36,7 +36,7 @@ public class GridViewImpl implements GridView {
     @Autowired
     private FlickrService flickrService;
     @Autowired
-    private DropboxService dropboxService;
+    private ExportService exportService;
     @Autowired
     private PhotographerService photographerService;
     @Autowired
@@ -65,8 +65,6 @@ public class GridViewImpl implements GridView {
     private Node folderDropTarget;
 
     private PaginatedImageGrid grid;
-    private boolean disableReload = false;
-    private boolean treeViewActive = false;
 
     private BufferedBatchOperation<Photo> addOperation = null;
     private BufferedBatchOperation<Photo> updateOperation = null;
@@ -86,7 +84,6 @@ public class GridViewImpl implements GridView {
         content.setCenter(grid);
         menu.addListener(new MenuListener());
         organizer.setFilterChangeAction(this::handleFilterChange);
-        content.setCenter(grid);
 
         // Selected photos are shown in the inspector.
         grid.setSelectionChangeAction(inspector::setEntities);
@@ -102,12 +99,20 @@ public class GridViewImpl implements GridView {
         inspector.setUpdateHandler(() -> {
             Collection<Photo> photos = inspector.getEntities();
 
-            grid.removePhotos(photos.stream()
-                            .filter(organizer.getUsedFilter().negate())
-                            .collect(Collectors.toList()));
-            grid.updatePhotos(photos.stream()
-                            .filter(organizer.getUsedFilter())
-                            .collect(Collectors.toList()));
+            List<Photo> toRemove = new ArrayList<>(photos.size());
+            List<Photo> toUpdate = new ArrayList<>(photos.size());
+
+            photos.forEach(p -> {
+                if (!organizer.accept(p)) {
+                    organizer.remove(p);
+                    toRemove.add(p);
+                } else {
+                    toUpdate.add(p);
+                }
+            });
+
+            grid.removePhotos(toRemove);
+            grid.updatePhotos(toUpdate);
         });
 
         // Apply the initial filter.
@@ -122,8 +127,6 @@ public class GridViewImpl implements GridView {
         root.setOnDragOver(this::handleDragOver);
         root.setOnDragDropped(this::handleDragDropped);
         root.setOnDragExited(this::handleDragExited);
-
-        folderDropTarget.setVisible(false);
 
         try {
             if (workspaceService.getDirectories().isEmpty()) {
@@ -176,13 +179,13 @@ public class GridViewImpl implements GridView {
     }
 
     private void handlePhotoCreated(Photo photo) {
-        if (organizer.getUsedFilter().test(photo)) {
+        if (organizer.accept(photo)) {
             addOperation.add(photo);
         }
     }
 
     private void handlePhotoUpdated(Photo photo) {
-        if (organizer.getUsedFilter().test(photo)) {
+        if (organizer.accept(photo)) {
             updateOperation.add(photo);
         }
     }
@@ -192,13 +195,13 @@ public class GridViewImpl implements GridView {
     }
 
     private void handleFilterChange() {
-        if (!disableReload)
-            reloadImages();
+        reloadImages();
     }
 
     private void reloadImages() {
+        organizer.reset();
         try {
-            grid.setPhotos(photoService.getAllPhotos(organizer.getUsedFilter()).stream()
+            grid.setPhotos(photoService.getAllPhotos(organizer::accept).stream()
                             .sorted((p1, p2) -> p2.getData().getDatetime().compareTo(p1.getData().getDatetime()))
                             .collect(Collectors.toList()));
         } catch (ServiceException ex) {
@@ -293,15 +296,14 @@ public class GridViewImpl implements GridView {
         @Override public void onExport(Menu sender) {
             Collection<Photo> selection = grid.getSelected();
 
-            ExportDialog dialog = new ExportDialog(root, dropboxService, selection.size());
+            ExportDialog dialog = new ExportDialog(root, exportService, selection.size());
 
             Optional<String> destinationPath = dialog.showForResult();
             if (!destinationPath.isPresent()) return;
 
-            dropboxService.uploadPhotos(selection, destinationPath.get(), photo -> {
-                // TODO: progressbar
-            }, exception -> ErrorDialog.show(root, "Fehler beim Export",
-                    "Fehlermeldung: " + exception.getMessage()));
+            exportService.exportPhotos(selection, destinationPath.get(), photo -> {
+            }, exception -> ErrorDialog
+                    .show(root, "Fehler beim Export", "Fehlermeldung: " + exception.getMessage()));
         }
     }
 }

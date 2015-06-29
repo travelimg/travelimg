@@ -14,47 +14,45 @@
                     <ListView fx:id="slideshowList">
                     </ListView>
                 </ScrollPane>
-                <VBox fx:id="slideshowPropertiesBox" prefHeight="150" spacing="5">
-                    <children>
-                        <TextField fx:id="slideshowNameTextField" promptText="Diashowtitel"/>
-
-                        <Label style="-fx-padding: 10px 0 5px 0;">Dauer zwischen Folien:</Label>
-                        <RadioButton fx:id="shortDurationButton" mnemonicParsing="false" text="5 Sekunden" />
-                        <RadioButton fx:id="mediumDurationButton" mnemonicParsing="false" text="15 Sekunden" />
-                        <RadioButton fx:id="longDurationButton" mnemonicParsing="false" text="30 Sekunden" />
-                    </children>
+                <VBox fx:id="slideshowPropertiesBox" prefHeight="100" spacing="16" style="-fx-padding: 16px 16px 32px 16px">
+                    <VBox>
+                        <Label>Slideshow Titel</Label>
+                        <TextField fx:id="slideshowNameTextField"/>
+                    </VBox>
+                    <Label>Dauer zwischen Folien</Label>
+                    <RadioButton fx:id="shortDurationButton" mnemonicParsing="false" text="5 Sekunden" />
+                    <RadioButton fx:id="mediumDurationButton" mnemonicParsing="false" text="15 Sekunden" />
+                    <RadioButton fx:id="longDurationButton" mnemonicParsing="false" text="30 Sekunden" />
                 </VBox>
             </children>
         </VBox>
     </center>
     <bottom>
-        <HBox styleClass="slide-bottom-bar">
-            <children>
-                <Button fx:id="addButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="PLUS"/>
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="Diashow hinzufügen"/>
-                    </tooltip>
-                </Button>
-                <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action" disable="true">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="TRASH"/>
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="Diashow entfernen"/>
-                    </tooltip>
-                </Button>
-                <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action" disable="true">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="EXPAND"/>
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="Diashow starten"/>
-                    </tooltip>
-                </Button>
-            </children>
+        <HBox styleClass="menu">
+            <Button fx:id="addButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action">
+                <graphic>
+                    <FontAwesomeIconView glyphName="PLUS"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Diashow hinzufügen"/>
+                </tooltip>
+            </Button>
+            <Button fx:id="deleteButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action" disable="true">
+                <graphic>
+                    <FontAwesomeIconView glyphName="TRASH"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Diashow entfernen"/>
+                </tooltip>
+            </Button>
+            <Button fx:id="presentButton" maxHeight="Infinity" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="action" disable="true">
+                <graphic>
+                    <FontAwesomeIconView glyphName="EXPAND"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Diashow starten"/>
+                </tooltip>
+            </Button>
         </HBox>
     </bottom>
 </BorderPane>

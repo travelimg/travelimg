@@ -86,6 +86,10 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
      * Select all photos in the grid.
      */
     public void selectAll() {
+        if (getSelected().size() == photos.size()) {
+            return;
+        }
+
         LOGGER.debug("selecting all items");
         suppressSelectEvent = true;
         tiles.forEach(T::select);
@@ -97,8 +101,14 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
      * Remove selection for all photos in the grid.
      */
     public void deselectAll() {
+        if (getSelected().isEmpty()) {
+            return;
+        }
+
         LOGGER.debug("deselecting all items");
+        suppressSelectEvent = true;
         tiles.forEach(T::deselect);
+        suppressSelectEvent = false;
         onSelectionChange();
     }
 

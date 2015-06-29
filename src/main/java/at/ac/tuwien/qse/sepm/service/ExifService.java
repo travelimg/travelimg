@@ -18,22 +18,6 @@ public interface ExifService {
     Exif getExif(Photo photo) throws ServiceException;
 
     /**
-     * Reads date, latitude and longitude (if possible)
-     *
-     * @param photo the photo, must have a valid path
-     * @throws ServiceException
-     */
-    @Deprecated
-    void attachDateAndGeoData(Photo photo) throws ServiceException;
-
-    /**
-     * Sets date and geodata for a given photo
-     * @param photo the photo, must have a valid path
-     * @throws ServiceException
-     */
-    void setDateAndGeoData(Photo photo) throws ServiceException;
-
-    /**
      * Save date, geodata, tags, place and journey for a given photo
      * @param photo the photo, must have a valid path
      * @throws ServiceException

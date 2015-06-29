@@ -18,9 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by mb on 08.06.15.
- */
+
 public class SlideshowServiceImpl implements SlideshowService {
 
     private static final Logger LOGGER = LogManager.getLogger();

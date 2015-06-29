@@ -2,25 +2,27 @@
 
 <?import at.ac.tuwien.qse.sepm.gui.control.InspectorPane?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ColorPicker?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <InspectorPane fx:id="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-               fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.TitleSlideInspectorImpl"
-        styleClass="slide-inspector">
-    <VBox spacing="15">
-        <Button fx:id="deleteButton" styleClass="delete">
+               fx:controller="at.ac.tuwien.qse.sepm.gui.controller.impl.TitleSlideInspectorImpl">
+    <VBox spacing="16">
+        <Button fx:id="deleteButton" styleClass="action">
             <graphic>
-                <FontAwesomeIconView glyphName="TRASH" />
+                <HBox alignment="CENTER" spacing="12">
+                    <FontAwesomeIconView glyphName="TRASH" />
+                    <Label>Folie löschen</Label>
+                </HBox>
             </graphic>
             <tooltip>
                 <Tooltip text="Folie löschen" />
             </tooltip>
         </Button>
-
-        <TextField fx:id="captionField" promptText="Titeltext..."/>
-        <ColorPicker fx:id="colorPicker" maxWidth="Infinity"/>
+        <VBox>
+            <Label>Beschriftung</Label>
+            <TextField fx:id="captionField"/>
+        </VBox>
+        <ColorPicker fx:id="colorPicker"/>
     </VBox>
 </InspectorPane>

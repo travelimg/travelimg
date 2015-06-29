@@ -39,7 +39,7 @@
                         <HBox alignment="CENTER" spacing="16.0" styleClass="note">
                             <children>
                                 <FontAwesomeIconView/>
-                                <Label text="Alle Fotos innerhalb des angegebenen Zeitraus werden dieser Reise zugeordnet."
+                                <Label text="Alle Fotos innerhalb des angegebenen Zeitraums werden dieser Reise zugeordnet."
                                        textFill="WHITE" wrapText="true" HBox.hgrow="ALWAYS"/>
                             </children>
                             <VBox.margin>

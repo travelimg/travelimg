@@ -21,7 +21,7 @@
             <fx:include source="/view/Menu.fxml"/>
         </bottom>
     </BorderPane>
-    <VBox fx:id="folderDropTarget" styleClass="folder-drop-target">
+    <VBox fx:id="folderDropTarget" styleClass="folder-drop-target" visible="false">
         <FontAwesomeIconView glyphName="FOLDER_ALT" glyphSize="100"/>
         <Label text="Ordner ablegen um ihn hinzuzufügen"/>
     </VBox>
