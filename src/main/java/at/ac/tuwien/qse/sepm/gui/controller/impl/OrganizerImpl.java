@@ -140,7 +140,6 @@ public class OrganizerImpl extends Refresher implements Organizer {
         placeFilter.setOnUpdate(this::handlePlacesChange);
 
         refresh();
-        resetFilter();
         listTab.fire();
 
         tagService.subscribeTagChanged((p) -> refreshTags());
@@ -317,80 +316,6 @@ public class OrganizerImpl extends Refresher implements Organizer {
         handleFilterChange();
     }
 
-    private List<Rating> getAllRatings() {
-        LOGGER.debug("fetching ratings");
-        List<Rating> list = new LinkedList<Rating>();
-        list.add(Rating.NONE);
-        list.add(Rating.GOOD);
-        list.add(Rating.NEUTRAL);
-        list.add(Rating.BAD);
-        LOGGER.debug("fetching ratings succeeded with {} items", list.size());
-        return list;
-    }
-    private List<Tag> getAllTags() {
-        LOGGER.debug("fetching categories");
-        try {
-            List<Tag> list = tagService.getAllTags();
-            LOGGER.debug("fetching categories succeeded with {} items", list.size());
-            list.sort((a, b) -> a.getName().compareTo(b.getName()));
-            list.add(0, null);
-            return list;
-        } catch (ServiceException ex) {
-            LOGGER.error("fetching categories failed", ex);
-            ErrorDialog.show(root, "Fehler beim Laden",
-                    "Foto-Kategorien konnten nicht geladen werden.");
-            return new ArrayList<>();
-        }
-    }
-    private List<Photographer> getAllPhotographers() {
-        LOGGER.debug("fetching photographers");
-        try {
-            List<Photographer> list = photographerService.readAll();
-            LOGGER.debug("fetching photographers succeeded with {} items", list.size());
-            list.add(0, null);
-            return list;
-        } catch (ServiceException ex) {
-            LOGGER.error("fetching photographers failed", ex);
-            ErrorDialog.show(root, "Fehler beim Laden", "Fotografen konnten nicht geladen werden.");
-            return new ArrayList<>();
-        }
-    }
-    private List<Journey> getAllJourneys() {
-        LOGGER.debug("fetching journeys");
-        try {
-            List<Journey> list = clusterService.getAllJourneys();
-            list.sort((a, b) -> a.getName().compareTo(b.getName()));
-            list.add(0, null);
-            return list;
-        } catch (ServiceException ex) {
-            LOGGER.error("fetching journeys failed", ex);
-            InfoDialog dialog = new InfoDialog(root, "Fehler");
-            dialog.setError(true);
-            dialog.setHeaderText("Fehler beim Laden");
-            dialog.setContentText("Reisen konnten nicht geladen werden.");
-            dialog.showAndWait();
-            return new ArrayList<>();
-        }
-    }
-    private List<Place> getAllPlaces() {
-        LOGGER.debug("fetching journeys");
-        try {
-            List<Place> list = clusterService.getAllPlaces();
-            list.sort((a, b) -> {
-                int c = a.getCountry().compareTo(b.getCountry());
-                if (c != 0)
-                    return c;
-                return a.getCity().compareTo(b.getCity());
-            });
-            list.add(0, null);
-            return list;
-        } catch (ServiceException ex) {
-            LOGGER.error("fetching journeys failed", ex);
-            ErrorDialog.show(root, "Fehler beim Laden", "Reisen konnten nicht geladen werden.");
-            return new ArrayList<>();
-        }
-    }
-
     private void resetFilter() {
         // don't update the usedFilter until all list views have been reset
         Runnable savedCallback = filterChangeCallback;
@@ -409,80 +334,100 @@ public class OrganizerImpl extends Refresher implements Organizer {
     }
 
     private void refreshRatings() {
-        List<Rating> ratings = getAllRatings();
-
-        refreshFilter(acceptedPhotos.getRatings(), ratingFilter, ratings, value -> {
-            switch (value) {
-                case GOOD:
-                    return "Gut";
-                case NEUTRAL:
-                    return "Neutral";
-                case BAD:
-                    return "Schlecht";
-                default:
-                    return "Keine Bewertung";
-            }
-        });
-
-        photoFilter.getRatingFilter().getIncluded().addAll(ratings);
+        List<Rating> list = new ArrayList<>(4);
+        list.add(Rating.NONE);
+        list.add(Rating.GOOD);
+        list.add(Rating.NEUTRAL);
+        list.add(Rating.BAD);
+        photoFilter.getRatingFilter().getIncluded().addAll(refreshFilterList(
+                allPhotos.getRatings(),
+                acceptedPhotos.getRatings(),
+                ratingFilter,
+                "Keine Kategorien",
+                value -> {
+                    switch (value) {
+                        case GOOD:
+                            return "Gut";
+                        case NEUTRAL:
+                            return "Neutral";
+                        case BAD:
+                            return "Schlecht";
+                        default:
+                            return "Keine Bewertung";
+                    }
+                }));
     }
     private void refreshTags() {
-        List<Tag> tags = getAllTags();
-
-        refreshFilter(acceptedPhotos.getTags(), tagFilter, tags, value -> {
-            if (value == null)
-                return "Keine Kategorien";
-            return value.getName();
-        });
+        photoFilter.getTagFilter().getRequired().clear();
+        refreshFilterList(
+                allPhotos.getTags(),
+                acceptedPhotos.getTags(),
+                tagFilter,
+                "Keine Kategorien",
+                Tag::getName);
     }
     private void refreshJourneys() {
-        List<Journey> journeys = getAllJourneys();
-        refreshFilter(acceptedPhotos.getJourneys(), journeyFilter, journeys, value -> {
-            if (value == null)
-                return "Keine Reise";
-            return value.getName();
-        });
-
-        photoFilter.getJourneyFilter().getIncluded().addAll(journeys);
+        photoFilter.getJourneyFilter().getIncluded().addAll(refreshFilterList(
+                allPhotos.getJourneys(),
+                acceptedPhotos.getJourneys(),
+                journeyFilter,
+                "Keine Reise",
+                Journey::getName));
     }
     private void refreshPlaces() {
-        List<Place> places = getAllPlaces();
-        refreshFilter(acceptedPhotos.getPlaces(), placeFilter, places, value -> {
-            if (value == null)
-                return "Kein Ort";
-            return value.getCountry() + ", " + value.getCity();
-        });
-
-        photoFilter.getPlaceFilter().getIncluded().addAll(places);
+        photoFilter.getPlaceFilter().getIncluded().addAll(refreshFilterList(
+                allPhotos.getPlaces(),
+                acceptedPhotos.getPlaces(),
+                placeFilter,
+                "Kein Ort",
+                (p) -> p.getCountry() + ", " + p.getCity()));
     }
     private void refreshPhotographers() {
-        List<Photographer> photographers = getAllPhotographers();
-
-        refreshFilter(acceptedPhotos.getPhotographers(), photographerFilter, photographers, value -> {
-            if (value == null)
-                return "Kein Fotograf";
-            return value.getName();
-        });
-
-        photoFilter.getPhotographerFilter().getIncluded().addAll(photographers);
+        photoFilter.getPhotographerFilter().getIncluded().addAll(refreshFilterList(
+                allPhotos.getPhotographers(),
+                acceptedPhotos.getPhotographers(),
+                photographerFilter,
+                "Kein Fotograf",
+                Photographer::getName));
     }
 
-    private static <T> void refreshFilter(Aggregator<T> aggregator, FilterGroup<T> filterGroup, Iterable<T> values, Function<T, String> converter) {
+    private <T> Collection<T> refreshFilterList(
+            Iterable<T> values,
+            Aggregator<T> aggregator,
+            FilterGroup<T> filter,
+            String defaultLabel,
+            Function<T, String> converter) {
+
+        // Sort values alphabetically.
+        List<T> list = new LinkedList<>();
+        values.forEach(list::add);
+        list.remove(null);
+        list.sort((a, b) -> converter.apply(a).compareTo(converter.apply(b)));
+
+        // Default value is at the beginning.
+        list.add(0, null);
+
         Platform.runLater(() -> {
             // NOTE: Remember the values that were excluded before the refresh and exclude them.
             // That way the filter stays the same and new values are included automatically.
-            Set<T> excluded = filterGroup.getExcludedValues();
-            filterGroup.getItems().clear();
+            Set<T> excluded = filter.getExcludedValues();
+            filter.getItems().clear();
             values.forEach(p -> {
-                FilterControl<T> filter = new FilterControl<>();
-                filter.setValue(p);
-                filter.setConverter(converter);
-                filter.setIncluded(!excluded.contains(p));
-                filter.setCount(aggregator.getCount(p));
-                filterGroup.getItems().add(filter);
+                FilterControl<T> item = new FilterControl<>();
+                item.setValue(p);
+                item.setConverter(val -> {
+                    if (val == null) {
+                        return defaultLabel;
+                    }
+                    return converter.apply(val);
+                });
+                item.setIncluded(!excluded.contains(p));
+                item.setCount(aggregator.getCount(p));
+                filter.getItems().add(item);
             });
-            LOGGER.info("refreshing filter");
         });
+
+        return list;
     }
 
     private void handlePhotoAdded(Photo photo) {
