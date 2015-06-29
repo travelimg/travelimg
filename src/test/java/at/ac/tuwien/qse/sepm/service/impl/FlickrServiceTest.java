@@ -30,7 +30,6 @@ import static org.mockito.Matchers.eq;
 
 public class FlickrServiceTest extends ServiceTestBase {
 
-    private static final String nonExistingId ="dieseidgibtsned";
     private static final GeoData geoData = new GeoData("16.35720443725586","48.210906982421875","1");
     private List<Photo> flickrPhotos = new ArrayList<>();
 
