@@ -197,45 +197,43 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
             useGeoData = true;
         }
 
-        try {
-            searchTask = flickrService.searchPhotos(tags, latitude, longitude, useGeoData
 
-                    , new Consumer<com.flickr4java.flickr.photos.Photo>() {
-                public void accept(com.flickr4java.flickr.photos.Photo photo) {
-                    Platform.runLater(new Runnable() {
-                        public void run() {
-                            FlickrImageTile flickrImageTile = new FlickrImageTile(photo);
-                            Photo p = new Photo();
+        searchTask = flickrService.searchPhotos(tags, latitude, longitude, useGeoData
 
-                            p.setPath(Paths.get(tmpDir, photo.getId() + "." + photo.getOriginalFormat()).toString());
-                            photos.add(p);
-                            if(photos.size()==1){
-                                fullscreenButton.setDisable(false);
-                            }
-                            photosFlowPane.getChildren().add(flickrImageTile);
+                , new Consumer<com.flickr4java.flickr.photos.Photo>() {
+            public void accept(com.flickr4java.flickr.photos.Photo photo) {
+                Platform.runLater(new Runnable() {
+                    public void run() {
+                        FlickrImageTile flickrImageTile = new FlickrImageTile(photo);
+                        Photo p = new Photo();
+
+                        p.setPath(Paths.get(tmpDir, photo.getId() + "." + photo.getOriginalFormat()).toString());
+                        photos.add(p);
+                        if(photos.size()==1){
+                            fullscreenButton.setDisable(false);
                         }
-                    });
-                }
+                        photosFlowPane.getChildren().add(flickrImageTile);
+                    }
+                });
             }
-                    , new Consumer<Double>() {
-                public void accept(Double downloadProgress) {
-                    Platform.runLater(new Runnable() {
-                        public void run() {
-                            if (downloadProgress == 1.0) {
-                                reActivateElements();
-                            }
-                        }
-                    });
-                }
-            }
-                    , new ErrorHandler<ServiceException>() {
-                public void handle(ServiceException exception) {
-                    reActivateElements();
-                }
-            });
-        } catch (ServiceException e) {
-            reActivateElements();
         }
+                , new Consumer<Double>() {
+            public void accept(Double downloadProgress) {
+                Platform.runLater(new Runnable() {
+                    public void run() {
+                        if (downloadProgress == 1.0) {
+                            reActivateElements();
+                        }
+                    }
+                });
+            }
+        }
+                , new ErrorHandler<ServiceException>() {
+            public void handle(ServiceException exception) {
+                reActivateElements();
+            }
+        });
+
     }
 
     private void handleFullscreen() {
@@ -281,65 +279,62 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
         flickrButton.setTooltip(null);
         flickrButton.setOnAction(null);
 
-        try {
-            flickrService.downloadPhotos(flickrPhotos,
-                    new Consumer<com.flickr4java.flickr.photos.Photo>() {
-                        @Override public void accept(
-                                com.flickr4java.flickr.photos.Photo flickrPhoto) {
-                            Photo p = new Photo();
-                            p.setPath(Paths.get(tmpDir, flickrPhoto.getId() +"_o." + flickrPhoto
-                                    .getOriginalFormat()).toString());
-                            p.getData().setLatitude(flickrPhoto.getGeoData().getLatitude());
-                            p.getData().setLongitude(flickrPhoto.getGeoData().getLongitude());
-                            p.getData().setDatetime(flickrDatePicker.getValue().atStartOfDay());
-                            HashSet<at.ac.tuwien.qse.sepm.entities.Tag> tags = new HashSet<>();
-                            for (Tag t : flickrPhoto.getTags()) {
-                                tags.add(new at.ac.tuwien.qse.sepm.entities.Tag(0, t.getValue()));
+        flickrService.downloadPhotos(flickrPhotos,
+                new Consumer<com.flickr4java.flickr.photos.Photo>() {
+                    @Override public void accept(
+                            com.flickr4java.flickr.photos.Photo flickrPhoto) {
+                        Photo p = new Photo();
+                        p.setPath(Paths.get(tmpDir, flickrPhoto.getId() +"_o." + flickrPhoto
+                                .getOriginalFormat()).toString());
+                        p.getData().setLatitude(flickrPhoto.getGeoData().getLatitude());
+                        p.getData().setLongitude(flickrPhoto.getGeoData().getLongitude());
+                        p.getData().setDatetime(flickrDatePicker.getValue().atStartOfDay());
+                        HashSet<at.ac.tuwien.qse.sepm.entities.Tag> tags = new HashSet<>();
+                        for (Tag t : flickrPhoto.getTags()) {
+                            tags.add(new at.ac.tuwien.qse.sepm.entities.Tag(0, t.getValue()));
+                        }
+                        p.getData().setTags(tags);
+                        try {
+                            p.getData().setPhotographer(new Photographer(2,"Flickr"));
+                            Journey selectedJourney = journeysComboBox.getSelectedJourney();
+                            if (selectedJourney.getId() != -1) {
+                                p.getData().setJourney(selectedJourney);
+                                Place place = clusterService.getPlaceNearTo(p);
+                                p.getData().setPlace(place);
                             }
-                            p.getData().setTags(tags);
-                            try {
-                                p.getData().setPhotographer(new Photographer(2,"Flickr"));
-                                Journey selectedJourney = journeysComboBox.getSelectedJourney();
-                                if (selectedJourney.getId() != -1) {
-                                    p.getData().setJourney(selectedJourney);
-                                    Place place = clusterService.getPlaceNearTo(p);
-                                    p.getData().setPlace(place);
+                            logger.debug("Photo {} ready for the exifservice.",p);
+
+                            exifService.setMetaData(p);
+
+                            ioHandler.copyFromTo(Paths.get(p.getPath()),
+                                    Paths.get(System.getProperty("user.home"),
+                                            "travelimg/" + flickrPhoto.getId() + "."
+                                                    + flickrPhoto.getOriginalFormat()));
+                        } catch (ServiceException | IOException e) {
+                            logger.debug(e);
+                        }
+                    }
+                }, new Consumer<Double>() {
+                    public void accept(Double downloadProgress) {
+                        Platform.runLater(new Runnable() {
+                            public void run() {
+                                downloadProgressControl.setProgress(downloadProgress);
+                                if (downloadProgress == 1.0) {
+                                    downloadProgressControl.finish(false);
                                 }
-                                logger.debug("Photo {} ready for the exifservice.",p);
-
-                                exifService.setMetaData(p);
-
-                                ioHandler.copyFromTo(Paths.get(p.getPath()),
-                                        Paths.get(System.getProperty("user.home"),
-                                                "travelimg/" + flickrPhoto.getId() + "."
-                                                        + flickrPhoto.getOriginalFormat()));
-                            } catch (ServiceException | IOException e) {
-                                logger.debug(e);
+                                logger.debug("Downloading photos from flickr. Progress {}",
+                                        downloadProgress);
                             }
-                        }
-                    }, new Consumer<Double>() {
-                        public void accept(Double downloadProgress) {
-                            Platform.runLater(new Runnable() {
-                                public void run() {
-                                    downloadProgressControl.setProgress(downloadProgress);
-                                    if (downloadProgress == 1.0) {
-                                        downloadProgressControl.finish(false);
-                                    }
-                                    logger.debug("Downloading photos from flickr. Progress {}",
-                                            downloadProgress);
-                                }
-                            });
+                        });
 
-                        }
-                    }, new ErrorHandler<ServiceException>() {
+                    }
+                }, new ErrorHandler<ServiceException>() {
 
-                        public void handle(ServiceException exception) {
-                            downloadProgressControl.finish(true);
-                        }
-                    });
-        } catch (ServiceException e) {
-            downloadProgressControl.finish(true);
-        }
+                    public void handle(ServiceException exception) {
+                        downloadProgressControl.finish(true);
+                    }
+                });
+
         close();
     }
 

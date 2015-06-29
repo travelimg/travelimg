@@ -49,7 +49,7 @@ public class FlickrServiceImpl implements FlickrService {
     @Override
     public Cancelable searchPhotos(String tags[], double latitude, double longitude,
             boolean useGeoData, Consumer<Photo> callback,
-            Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler) throws ServiceException {
+            Consumer<Double> progressCallback, ErrorHandler<ServiceException> errorHandler){
         if (i == 0) {
             searcher = new AsyncSearcher(tags, latitude, longitude, useGeoData, callback, progressCallback, errorHandler);
         }

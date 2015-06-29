@@ -27,7 +27,7 @@ public interface FlickrService {
      */
     Cancelable searchPhotos(String tags[], double latitude, double longitude, boolean useGeoData,
             Consumer<Photo> callback, Consumer<Double> progressCallback,
-            ErrorHandler<ServiceException> errorHandler) throws ServiceException;
+            ErrorHandler<ServiceException> errorHandler);
 
     /**
      * Downloads photos from flickr in original size
@@ -39,7 +39,7 @@ public interface FlickrService {
      * @throws ServiceException
      */
     Cancelable downloadPhotos(List<Photo> photos, Consumer<Photo> callback, Consumer<Double> progressCallback,
-            ErrorHandler<ServiceException> errorHandler) throws ServiceException;
+            ErrorHandler<ServiceException> errorHandler);
 
     /**
      * After calling this method, the service will be ready to load photos again from the beginning.
