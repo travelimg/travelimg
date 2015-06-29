@@ -3,8 +3,11 @@ package at.ac.tuwien.qse.sepm.service.impl;
 import at.ac.tuwien.qse.sepm.entities.*;
 
 import java.util.HashSet;
+import java.util.Set;
 
-public class PhotoSet extends HashSet<Photo> {
+public class PhotoSet {
+
+    private final Set<Integer> ids = new HashSet<>();
 
     private final Aggregator<Tag> tags = new Aggregator<>();
     private final Aggregator<Rating> ratings = new Aggregator<>();
@@ -32,8 +35,13 @@ public class PhotoSet extends HashSet<Photo> {
         return places;
     }
 
-    @Override public boolean add(Photo photo) {
-        if (!super.add(photo)) return false;
+    public boolean contains(Photo photo) {
+        return ids.contains(photo.getId());
+    }
+
+    public boolean add(Photo photo) {
+        if (contains(photo)) return false;
+        ids.add(photo.getId());
         photo.getData().getTags().forEach(getTags()::add);
         getRatings().add(photo.getData().getRating());
         getPhotographers().add(photo.getData().getPhotographer());
@@ -42,9 +50,9 @@ public class PhotoSet extends HashSet<Photo> {
         return true;
     }
 
-    @Override public boolean remove(Object o) {
-        if (!super.remove(o)) return false;
-        Photo photo = (Photo)o;
+    public boolean remove(Photo photo) {
+        if (!contains(photo)) return false;
+        ids.remove(photo.getId());
         photo.getData().getTags().forEach(getTags()::remove);
         getRatings().remove(photo.getData().getRating());
         getPhotographers().remove(photo.getData().getPhotographer());
@@ -53,8 +61,8 @@ public class PhotoSet extends HashSet<Photo> {
         return true;
     }
 
-    @Override public void clear() {
-        super.clear();
+    public void clear() {
+        ids.clear();
         getTags().clear();
         getRatings().clear();
         getPhotographers().clear();
