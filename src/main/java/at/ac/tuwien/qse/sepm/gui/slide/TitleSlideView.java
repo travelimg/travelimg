@@ -34,6 +34,7 @@ public class TitleSlideView extends SlideView {
         box.getChildren().add(label);
         getChildren().add(box);
 
+        label.setTextFill(Paint.valueOf("white"));
         label.setStyle("-fx-text-fill: white !important;");
         label.setStyle("-fx-font-weight: bold");
         label.setStyle("-fx-text-alignment: center");

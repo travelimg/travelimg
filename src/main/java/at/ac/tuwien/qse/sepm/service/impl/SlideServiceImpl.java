@@ -15,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-/**
- * Created by mb on 08.06.15.
- */
+
 public class SlideServiceImpl implements SlideService{
 
     private static final Logger LOGGER = LogManager.getLogger();
