@@ -122,6 +122,8 @@ public class JourneyPlaceList extends VBox {
         return placesByJourney.get(journey);
     }
 
+    public Place getSelectedPlace() { return selectedPlace.get(); }
+
     public void addJourney(Journey journey, List<Place> places) {
         placesByJourney.put(journey, places);
 

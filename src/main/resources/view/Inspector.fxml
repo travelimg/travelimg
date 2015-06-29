@@ -35,7 +35,7 @@
 
         <!-- FIXME: somehow the width of all other elements is dictated by this HBox -->
         <HBox maxWidth="232">
-            <ComboBox fx:id="slideshowsCombobox" />
+            <ComboBox fx:id="slideshowsCombobox" visibleRowCount="5"/>
             <Button fx:id="addToSlideshowButton" styleClass="btn">
                 <graphic>
                     <FontAwesomeIconView glyphName="PLUS"/>

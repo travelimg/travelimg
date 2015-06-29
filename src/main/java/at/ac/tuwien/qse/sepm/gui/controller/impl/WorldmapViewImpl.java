@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,36 +31,35 @@ public class WorldmapViewImpl implements WorldmapView {
     private ClusterService clusterService;
     @Autowired
     private MainControllerImpl mainController;
-    private List<Place> places;
+    private List<Place> places = new LinkedList<>();
 
     @FXML
     private void initialize() {
         mapScene.setOnLoaded(this::showPlaces);
         mapScene.setMarkerClickCallback(this::handleMarkerClicked);
         clusterService.subscribePlaceChanged(place -> {
-            Platform.runLater(() -> this.addPlace(place));
+            Platform.runLater(() -> {
+                this.addPlace(place);
+                mapScene.fitToMarkers();
+            });
         });
     }
 
     private void addPlace(Place place) {
         String caption = String.format("%s, %s", place.getCity(), place.getCountry());
         mapScene.addMarker(new LatLong(place.getLatitude(), place.getLongitude()), caption);
-        mapScene.fitToMarkers();
+
+        places.add(place);
     }
 
     private void showPlaces() {
-        LOGGER.debug("new Places");
         try {
-            places = clusterService.getAllPlaces();
+            clusterService.getAllPlaces().forEach(this::addPlace);
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Laden aller Orte", "");
             return;
         }
 
-        places.forEach(place -> {
-            String caption = String.format("%s, %s", place.getCity(), place.getCountry());
-            mapScene.addMarker(new LatLong(place.getLatitude(), place.getLongitude()), caption);
-        });
         mapScene.fitToMarkers();
     }
 

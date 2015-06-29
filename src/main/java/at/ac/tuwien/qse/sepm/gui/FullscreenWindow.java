@@ -10,6 +10,7 @@ import at.ac.tuwien.qse.sepm.service.ServiceException;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
@@ -39,6 +40,10 @@ public class FullscreenWindow extends StackPane {
     private RatingPicker ratingPicker;
     @FXML
     private VBox vBoxTop;
+    @FXML
+    private Button hideButton;
+    @FXML
+    private Node menu;
 
     private PhotoService photoService;
     private List<Photo> photos;
@@ -62,6 +67,8 @@ public class FullscreenWindow extends StackPane {
         image.setPreserveRatio(true);
         getChildren().add(0, image);
 
+        hideButton.setOnAction((e) -> menu.setOpacity(0.0));
+        menu.setOnMouseEntered(e -> menu.setOpacity(1.0));
 
         root.setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(final KeyEvent keyEvent) {

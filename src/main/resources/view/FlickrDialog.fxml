@@ -79,7 +79,7 @@
                     <left>
                         <HBox spacing="25.0">
                             <HBox>
-                                <FlickrJourneysComboBox fx:id="journeysComboBox" prefWidth="200" maxWidth="200">
+                                <FlickrJourneysComboBox fx:id="journeysComboBox" prefWidth="200" maxWidth="200" visibleRowCount="5">
                                     <tooltip>
                                         <Tooltip text="Wählen Sie eine Reise für die Fotos aus" />
                                     </tooltip>
