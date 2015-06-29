@@ -13,7 +13,7 @@ public class MapSlideView extends SlideView {
 
     private GoogleMapScene mapScene = new GoogleMapScene();
 
-    public MapSlideView(MapSlide slide, int height, int width) {
+    public MapSlideView(MapSlide slide) {
         this.slide = slide;
 
         Node overlay = createCaptionBox(slide.getCaption());
