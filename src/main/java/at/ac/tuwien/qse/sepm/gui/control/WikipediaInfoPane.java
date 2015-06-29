@@ -62,9 +62,9 @@ public class WikipediaInfoPane extends VBox {
      * Clear the info table and reset the labels to default values.
      */
     public void showDefaultWikiInfo(Place place) {
-        placeLabel.setText("Stadt");
-        countryLabel.setText("Land");
-        descriptionText.setText("Your ad here.");
+        placeLabel.setText("");
+        countryLabel.setText("");
+        descriptionText.setText("");
 
         infoTable.getItems().clear();
 
