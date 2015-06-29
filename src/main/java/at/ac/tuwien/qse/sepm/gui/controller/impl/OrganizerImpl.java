@@ -31,9 +31,10 @@ import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-public class OrganizerImpl implements Organizer {
+public class OrganizerImpl extends Refresher implements Organizer {
 
     private static final Logger LOGGER = LogManager.getLogger(OrganizerImpl.class);
     private final DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy MMM");
@@ -85,6 +86,7 @@ public class OrganizerImpl implements Organizer {
     @Override public void reset() {
         allPhotos.clear();
         acceptedPhotos.clear();
+        markDirty();
     }
 
     @Override public boolean accept(Photo photo) {
@@ -92,14 +94,32 @@ public class OrganizerImpl implements Organizer {
         allPhotos.add(photo);
         if (usedFilter.test(photo)) {
             acceptedPhotos.add(photo);
+            markDirty();
             return true;
         }
+        markDirty();
         return false;
     }
 
     @Override public void remove(Photo photo) {
         allPhotos.remove(photo);
         acceptedPhotos.remove(photo);
+        markDirty();
+    }
+
+    @Override public void setWorldMapPlace(Place place){
+        placeFilter.excludeAll();
+        placeFilter.include(place);
+        handlePlacesChange();
+    }
+
+    @Override protected void refresh() {
+        LOGGER.debug("refreshing filter");
+        refreshRatings();
+        refreshTags();
+        refreshJourneys();
+        refreshPlaces();
+        refreshPhotographers();
     }
 
     @FXML private void initialize() {
@@ -128,12 +148,8 @@ public class OrganizerImpl implements Organizer {
         clusterService.subscribePlaceChanged((p) -> refreshPlaces());
         photographerService.subscribeChanged((p) -> refreshPhotographers());
         photoService.subscribeCreate(this::handlePhotoAdded);
-    }
 
-    @Override public void setWorldMapPlace(Place place){
-        placeFilter.excludeAll();
-        placeFilter.include(place);
-        handlePlacesChange();
+        start(1, TimeUnit.SECONDS);
     }
 
     private void initializeFilesTree() {
@@ -392,15 +408,6 @@ public class OrganizerImpl implements Organizer {
         filterChangeCallback = savedCallback;
     }
 
-    private void refresh() {
-        LOGGER.debug("refreshing filter");
-
-        refreshRatings();
-        refreshTags();
-        refreshJourneys();
-        refreshPlaces();
-        refreshPhotographers();
-    }
     private void refreshRatings() {
         List<Rating> ratings = getAllRatings();
 
