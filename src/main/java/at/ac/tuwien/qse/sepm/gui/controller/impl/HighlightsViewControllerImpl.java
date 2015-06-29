@@ -96,9 +96,8 @@ public class HighlightsViewControllerImpl implements HighlightsViewController {
 
         reloadJourneys();
 
-        clusterService.subscribeJourneyChanged((journey) -> {
-            Platform.runLater(this::reloadJourneys);
-        });
+        clusterService.subscribeJourneyChanged((journey) -> Platform.runLater(this::reloadJourneys));
+        clusterService.subscribePlaceChanged((place) -> Platform.runLater(this::reloadJourneys));
     }
 
     private void reloadJourneys() {
