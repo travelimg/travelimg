@@ -7,6 +7,7 @@ import at.ac.tuwien.qse.sepm.gui.control.JourneyPlaceList;
 import at.ac.tuwien.qse.sepm.gui.control.WikipediaInfoPane;
 import at.ac.tuwien.qse.sepm.gui.controller.HighlightsViewController;
 import at.ac.tuwien.qse.sepm.gui.dialogs.ErrorDialog;
+import at.ac.tuwien.qse.sepm.gui.util.BufferedBatchOperation;
 import at.ac.tuwien.qse.sepm.gui.util.LatLong;
 import at.ac.tuwien.qse.sepm.service.*;
 import at.ac.tuwien.qse.sepm.service.impl.PhotoFilter;
@@ -21,6 +22,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class HighlightsViewControllerImpl implements HighlightsViewController {
@@ -55,6 +58,15 @@ public class HighlightsViewControllerImpl implements HighlightsViewController {
 
     // photos for currently selected journey
     private List<Photo> photos = new ArrayList<>();
+
+    @Autowired
+    private ScheduledExecutorService scheduler;
+    private BufferedBatchOperation<Photo> addBuffer;
+
+    @Autowired
+    public void setScheduler(ScheduledExecutorService scheduler) {
+        addBuffer = new BufferedBatchOperation<>(this::handlePhotosAdded, scheduler);
+    }
 
     @FXML
     private void initialize() {
@@ -94,10 +106,17 @@ public class HighlightsViewControllerImpl implements HighlightsViewController {
         row3.setPercentHeight(33);
         gridPane.getRowConstraints().addAll(row1, row2, row3);
 
-        reloadJourneys();
+        clusterService.subscribeJourneyChanged((journey) ->
+                scheduler.schedule(() -> Platform.runLater(this::reloadJourneys), 2, TimeUnit.SECONDS)
+        );
 
-        clusterService.subscribeJourneyChanged((journey) -> Platform.runLater(this::reloadJourneys));
-        clusterService.subscribePlaceChanged((place) -> Platform.runLater(this::reloadJourneys));
+        clusterService.subscribePlaceChanged((place) ->
+                scheduler.schedule(() -> Platform.runLater(this::reloadJourneys), 2, TimeUnit.SECONDS)
+        );
+
+        photoService.subscribeCreate(addBuffer::add);
+
+        reloadJourneys();
     }
 
     private void reloadJourneys() {
@@ -109,6 +128,24 @@ public class HighlightsViewControllerImpl implements HighlightsViewController {
         } catch (ServiceException ex) {
             ErrorDialog.show(root, "Fehler beim Laden der Reisen", "");
         }
+    }
+
+    private void handlePhotosAdded(List<Photo> photos) {
+        Platform.runLater(() -> {
+            Journey journey = journeyPlaceList.getSelectedJourney();
+
+            if (journey == null) {
+                return;
+            }
+
+            // add photos which belong to the current journey to the list
+            this.photos.addAll(photos.stream().filter(p -> journey.equals(p.getData().getJourney()))
+                    .collect(Collectors.toList()));
+
+            // reload the photos in the grid view
+            setGoodPhotos(journeyPlaceList.getSelectedPlace());
+            setMostUsedTagsWithPhotos(journeyPlaceList.getSelectedPlace());
+        });
     }
 
     private void handleJourneySelected(Journey journey) {
