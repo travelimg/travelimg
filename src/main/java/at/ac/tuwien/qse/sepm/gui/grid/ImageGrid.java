@@ -22,7 +22,7 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
     private final Supplier<T> tileFactory;
 
     protected List<Photo> photos = new ArrayList<>();
-    protected final List<T> tiles = new LinkedList<>();
+    protected final ArrayList<T> tiles = new ArrayList<>();
     private Consumer<Set<Photo>> selectionChangeAction = null;
 
     private boolean suppressSelectEvent = false;
@@ -55,9 +55,7 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
      * @return set of selected photos
      */
     public Set<Photo> getSelected() {
-        return tiles.stream()
-                .filter(ImageGridTile::isSelected)
-                .map(ImageGridTile::getPhoto)
+        return tiles.stream().filter(ImageGridTile::isSelected).map(ImageGridTile::getPhoto)
                 .collect(Collectors.toSet());
     }
 
@@ -68,7 +66,8 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
      */
     public void updatePhoto(Photo photo) {
         ImageGridTile tile = findTile(photo);
-        if (tile == null) return;
+        if (tile == null)
+            return;
 
         // update photo in list
         int index = 0;
@@ -87,8 +86,14 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
      * Select all photos in the grid.
      */
     public void selectAll() {
+        if (getSelected().size() == photos.size()) {
+            return;
+        }
+
         LOGGER.debug("selecting all items");
+        suppressSelectEvent = true;
         tiles.forEach(T::select);
+        suppressSelectEvent = false;
         onSelectionChange();
     }
 
@@ -96,8 +101,14 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
      * Remove selection for all photos in the grid.
      */
     public void deselectAll() {
+        if (getSelected().isEmpty()) {
+            return;
+        }
+
         LOGGER.debug("deselecting all items");
+        suppressSelectEvent = true;
         tiles.forEach(T::deselect);
+        suppressSelectEvent = false;
         onSelectionChange();
     }
 
@@ -123,6 +134,11 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
             } else {
                 select(tile);
             }
+        } else if (event.isShiftDown()) {
+            int index = tiles.indexOf(tile);
+            do {
+                select(tiles.get(index--));
+            } while (index >= 0 && !tiles.get(index).isSelected());
         } else {
             deselectAll();
             select(tile);
@@ -133,19 +149,22 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
     }
 
     protected void select(T tile) {
-        if (tile == null) return;
+        if (tile == null)
+            return;
         tile.select();
         onSelectionChange();
     }
 
     protected void deselect(T tile) {
-        if (tile == null) return;
+        if (tile == null)
+            return;
         tile.deselect();
         onSelectionChange();
     }
 
     protected void onSelectionChange() {
-        if (selectionChangeAction == null || suppressSelectEvent) return;
+        if (selectionChangeAction == null || suppressSelectEvent)
+            return;
 
         selectionChangeAction.accept(getSelectedItems());
     }
@@ -155,15 +174,13 @@ public class ImageGrid<T extends ImageGridTile> extends TilePane {
     }
 
     private Set<Photo> getSelectedItems() {
-        return tiles.stream()
-                .filter(T::isSelected)
-                .map(T::getPhoto)
-                .collect(Collectors.toSet());
+        return tiles.stream().filter(T::isSelected).map(T::getPhoto).collect(Collectors.toSet());
     }
 
     private T findTile(Photo photo) {
         for (T tile : tiles) {
-            if (photo.getId().equals(tile.getPhoto().getId())) return tile;
+            if (photo.getId().equals(tile.getPhoto().getId()))
+                return tile;
         }
         return null;
     }

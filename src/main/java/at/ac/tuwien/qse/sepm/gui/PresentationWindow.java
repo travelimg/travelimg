@@ -69,7 +69,7 @@ public class PresentationWindow extends StackPane {
         Background background = new Background(new BackgroundFill(Paint.valueOf("black"), null, null));
         setBackground(background);
 
-        setOnKeyPressed(new EventHandler<KeyEvent>() {
+        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             public void handle(final KeyEvent keyEvent) {
                 if (keyEvent.getCode() == KeyCode.RIGHT) {
                     showNextSlide(null);
@@ -77,8 +77,6 @@ public class PresentationWindow extends StackPane {
                 if (keyEvent.getCode() == KeyCode.LEFT) {
                     logger.debug("Button pressed");
                     showPrevSlide(null);
-
-
                 }
                 if (keyEvent.getCode() == KeyCode.ESCAPE) {
                     close();
