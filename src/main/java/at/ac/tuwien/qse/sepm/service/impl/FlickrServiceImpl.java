@@ -26,7 +26,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class FlickrServiceImpl implements FlickrService {
 
@@ -214,8 +213,7 @@ public class FlickrServiceImpl implements FlickrService {
                     logger.debug("Downloading photo nr {} ...", i + 1);
                     Photo photoWithOriginalSecret = getInfoForFlickrPhoto(p);
                     p.setOriginalSecret(photoWithOriginalSecret.getOriginalSecret());
-                    p.setTags(photoWithOriginalSecret.getTags().stream().limit(5).collect(
-                            Collectors.toSet()));
+                    p.setTags(photoWithOriginalSecret.getTags());
                     if (!p.getOriginalSecret().isEmpty()) {
                         String mediumSizeUrl = "https://farm" + p.getFarm() + ".staticflickr.com/" + p.getServer() + "/" + p.getId() + "_" + p.getSecret() + "_z." + p.getOriginalFormat();
                         downloadTempPhoto(mediumSizeUrl, p.getId(), p.getOriginalFormat());

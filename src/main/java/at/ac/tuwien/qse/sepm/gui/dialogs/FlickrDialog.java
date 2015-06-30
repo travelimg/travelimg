@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photos.Photo>> {
 
@@ -293,7 +294,8 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                         for (Tag t : flickrPhoto.getTags()) {
                             tags.add(new at.ac.tuwien.qse.sepm.entities.Tag(0, t.getValue()));
                         }
-                        p.getData().setTags(tags);
+                        p.getData().setTags(tags.stream().limit(5).collect(
+                                Collectors.toSet()));
                         try {
                             p.getData().setPhotographer(new Photographer(2,"Flickr"));
                             Journey selectedJourney = journeysComboBox.getSelectedJourney();
