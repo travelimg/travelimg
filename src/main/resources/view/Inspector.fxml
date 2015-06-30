@@ -15,7 +15,7 @@
     <header>
         <VBox>
             <RatingPicker fx:id="ratingPicker"/>
-            <GoogleMapScene fx:id="mapScene" styleClass="map" maxHeight="200.0"/>
+            <GoogleMapScene fx:id="mapScene" styleClass="map" minHeight="150.0" maxHeight="200.0"/>
         </VBox>
     </header>
     <VBox spacing="16">
