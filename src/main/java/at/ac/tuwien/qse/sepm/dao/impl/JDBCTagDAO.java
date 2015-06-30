@@ -25,6 +25,7 @@ import java.util.function.Consumer;
 public class JDBCTagDAO extends JDBCDAOBase implements TagDAO, EntityWatcher<Tag> {
 
     private static final Logger logger = LogManager.getLogger();
+    private static final int MAX_TAG_LENGTH = 30;
 
     private static final String readStatement = "SELECT ID,name FROM TAG WHERE ID=?;";
     private static final String readNameStatement = "SELECT ID,name FROM TAG WHERE NAME=?;";
@@ -63,7 +64,9 @@ public class JDBCTagDAO extends JDBCDAOBase implements TagDAO, EntityWatcher<Tag
 
         try {
             Map<String, Object> parameters = new HashMap<String, Object>(1);
-            parameters.put("name", t.getName());
+            String name = t.getName();
+            name = name.substring(0, Math.min(name.length(), MAX_TAG_LENGTH));
+            parameters.put("name", name);
             Number newId = insertTag.executeAndReturnKey(parameters);
             t.setId((int) newId.longValue());
 

@@ -43,6 +43,8 @@ import java.util.function.Consumer;
 
 public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photos.Photo>> {
 
+    private static final int MAX_TAG_LENGTH = 30;
+
     @FXML
     private ScrollPane photosScrollpane;
     @FXML
@@ -291,7 +293,9 @@ public class FlickrDialog extends ResultDialog<List<com.flickr4java.flickr.photo
                         p.getData().setDatetime(flickrDatePicker.getValue().atStartOfDay());
                         HashSet<at.ac.tuwien.qse.sepm.entities.Tag> tags = new HashSet<>();
                         for (Tag t : flickrPhoto.getTags()) {
-                            tags.add(new at.ac.tuwien.qse.sepm.entities.Tag(0, t.getValue()));
+                            String name = t.getValue();
+                            name = name.substring(0, Math.min(name.length(), MAX_TAG_LENGTH));
+                            tags.add(new at.ac.tuwien.qse.sepm.entities.Tag(0, name));
                         }
                         p.getData().setTags(tags);
                         try {
