@@ -138,6 +138,9 @@ public class SlideshowViewImpl implements SlideshowView {
                 slideshows.remove(slideshows.size() - 1);
                 slideshows.add(slideshow);
                 slideshows.add(createNewSlideshowPlaceholder());
+
+                slideshowOrganizer.setSlideshows(null);
+                slideshowOrganizer.setSlideshows(slideshows);
             }
 
             slideshowService.addPhotosToSlideshow(photos, slideshow);

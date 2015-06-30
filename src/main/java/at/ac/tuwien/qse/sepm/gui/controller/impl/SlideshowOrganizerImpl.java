@@ -78,6 +78,11 @@ public class SlideshowOrganizerImpl implements SlideshowOrganizer {
 
     public void setSlideshows(ObservableList<Slideshow> slideshows) {
         // only display real slideshows (no placeholder)
+        if (slideshows == null) {
+            slideshowList.setItems(null);
+            return;
+        }
+
         FilteredList<Slideshow> filtered = slideshows.filtered(s -> s.getId() >= 0);
         slideshowList.setItems(filtered);
     }
