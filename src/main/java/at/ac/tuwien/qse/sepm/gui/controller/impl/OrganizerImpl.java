@@ -71,10 +71,15 @@ public class OrganizerImpl extends Refresher implements Organizer {
     private boolean suppressChangeEvent = false;
 
     private BufferedBatchOperation<Photo> addOperation;
+    private BufferedBatchOperation<Path> deleteOperation;
 
     @Autowired public void setScheduler(ScheduledExecutorService scheduler) {
         addOperation = new BufferedBatchOperation<>(photos -> {
-            Platform.runLater(() -> {initializeFilesTree();});
+            Platform.runLater(this::buildTreeView);
+        }, scheduler);
+
+        deleteOperation = new BufferedBatchOperation<>(paths -> {
+            Platform.runLater(this::buildTreeView);
         }, scheduler);
     }
 
@@ -149,7 +154,8 @@ public class OrganizerImpl extends Refresher implements Organizer {
         clusterService.subscribeJourneyChanged((p) -> refreshJourneys());
         clusterService.subscribePlaceChanged((p) -> refreshPlaces());
         photographerService.subscribeChanged((p) -> refreshPhotographers());
-        photoService.subscribeCreate(this::handlePhotoAdded);
+        photoService.subscribeCreate(addOperation::add);
+        photoService.subscribeDelete(deleteOperation::add);
 
         start(1, TimeUnit.SECONDS);
     }
@@ -497,36 +503,6 @@ public class OrganizerImpl extends Refresher implements Organizer {
     }
 
     private void handlePhotoAdded(Photo photo) {
-        Platform.runLater(() -> {
-            FilePathTreeItem root = (FilePathTreeItem) folderTree.getRoot();
-
-            Path directory = photo.getFile().getParent();
-
-            if (isPathAlreadyKnown(directory, root)) {
-                return;
-            }
-
-            buildTreeView();
-        });
         addOperation.add(photo);
-    }
-    private boolean isPathAlreadyKnown(Path directory, FilePathTreeItem node) {
-        if (node == null) {
-            return false;
-        }
-
-        if (node.getFullPath().equals(directory.toString())) {
-            return true;
-        }
-
-        for (TreeItem<String> child : node.getChildren()) {
-            FilePathTreeItem item = (FilePathTreeItem) child;
-
-            if (isPathAlreadyKnown(directory, item)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
